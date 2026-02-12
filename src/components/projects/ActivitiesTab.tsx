@@ -5,8 +5,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, ChevronRight, ChevronDown, FolderTree, Trash2, Pencil } from 'lucide-react';
-import { useProjectActivities, useCreateActivity, useUpdateActivity, useDeleteActivity } from '@/hooks/useProject';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Plus, ChevronRight, ChevronDown, FolderTree, Trash2, Pencil, CheckSquare } from 'lucide-react';
+import { useProjectActivities, useCreateActivity, useUpdateActivity, useDeleteActivity, useProjectTasks } from '@/hooks/useProject';
+import { TASK_STATUS_LABELS, TASK_PRIORITY_LABELS } from '@/types/database';
 import EmptyState from '@/components/common/EmptyState';
 
 const LEVEL_LABELS: Record<number, string> = {
@@ -17,30 +19,80 @@ const LEVEL_LABELS: Record<number, string> = {
 
 const STATUS_COLORS: Record<string, string> = {
   pending: 'bg-muted text-muted-foreground',
-  in_progress: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  completed: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  in_progress: 'bg-info/15 text-info',
+  completed: 'bg-success/15 text-success',
 };
+
+const TASK_STATUS_COLORS: Record<string, string> = {
+  todo: 'bg-muted text-muted-foreground',
+  in_progress: 'bg-info/15 text-info',
+  in_review: 'bg-warning/15 text-warning',
+  correction: 'bg-destructive/15 text-destructive',
+  validated: 'bg-success/15 text-success',
+  completed: 'bg-primary/15 text-primary',
+};
+
+const TASK_PRIORITY_COLORS: Record<string, string> = {
+  low: 'bg-muted text-muted-foreground',
+  medium: 'bg-info/15 text-info',
+  high: 'bg-warning/15 text-warning',
+  urgent: 'bg-destructive/15 text-destructive',
+};
+
+function initials(name: string) {
+  return name?.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2) ?? '?';
+}
+
+interface TaskItemProps {
+  task: any;
+}
+
+function TaskItem({ task }: TaskItemProps) {
+  return (
+    <div className="flex items-center gap-2 py-1.5 px-3 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors text-sm">
+      <CheckSquare className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+      <span className="font-medium truncate flex-1">{task.title}</span>
+      <div className="flex -space-x-1 shrink-0">
+        {task.assignments?.slice(0, 2).map((a: any) => (
+          <Avatar key={a.id} className="h-5 w-5 border border-background">
+            <AvatarImage src={a.user?.avatar_url ?? ''} />
+            <AvatarFallback className="text-[8px]">{initials(a.user?.full_name ?? '')}</AvatarFallback>
+          </Avatar>
+        ))}
+      </div>
+      <Badge variant="outline" className={`text-[9px] px-1.5 py-0 ${TASK_STATUS_COLORS[task.status] ?? ''}`}>
+        {TASK_STATUS_LABELS[task.status as keyof typeof TASK_STATUS_LABELS] ?? task.status}
+      </Badge>
+      <Badge variant="outline" className={`text-[9px] px-1.5 py-0 ${TASK_PRIORITY_COLORS[task.priority] ?? ''}`}>
+        {TASK_PRIORITY_LABELS[task.priority as keyof typeof TASK_PRIORITY_LABELS] ?? task.priority}
+      </Badge>
+    </div>
+  );
+}
 
 interface ActivityNodeProps {
   activity: any;
   allActivities: any[];
+  tasks: any[];
   projectId: string;
   onAddChild: (parentId: string, depth: number) => void;
   onEdit: (activity: any) => void;
   onDelete: (id: string) => void;
 }
 
-function ActivityNode({ activity, allActivities, projectId, onAddChild, onEdit, onDelete }: ActivityNodeProps) {
+function ActivityNode({ activity, allActivities, tasks, projectId, onAddChild, onEdit, onDelete }: ActivityNodeProps) {
   const [expanded, setExpanded] = useState(true);
   const children = allActivities.filter((a) => a.parent_id === activity.id);
+  const activityTasks = tasks.filter((t) => t.activity_id === activity.id);
   const depth = activity.depth ?? 0;
-  const canAddChild = depth < 2; // Max 3 levels (0, 1, 2)
+  const canAddChild = depth < 2;
+  const hasContent = children.length > 0 || activityTasks.length > 0;
 
   return (
     <div>
       <div className="flex items-center gap-2 py-2 px-3 rounded-md hover:bg-muted/50 transition-colors group">
         <button onClick={() => setExpanded(!expanded)} className="shrink-0">
-          {children.length > 0 ? (
+          {hasContent ? (
             expanded ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />
           ) : (
             <span className="w-4" />
@@ -53,6 +105,11 @@ function ActivityNode({ activity, allActivities, projectId, onAddChild, onEdit, 
               <span className="text-xs font-mono text-muted-foreground">{activity.code}</span>
             )}
             <span className="text-sm font-medium truncate">{activity.name}</span>
+            {activityTasks.length > 0 && (
+              <span className="text-[10px] text-muted-foreground">
+                ({activityTasks.length} tâche{activityTasks.length > 1 ? 's' : ''})
+              </span>
+            )}
           </div>
           {activity.description && (
             <p className="text-xs text-muted-foreground truncate mt-0.5">{activity.description}</p>
@@ -69,7 +126,7 @@ function ActivityNode({ activity, allActivities, projectId, onAddChild, onEdit, 
           {activity.status ?? 'pending'}
         </Badge>
 
-        <Badge variant="secondary" className="text-[10px] shrink-0">
+        <Badge variant="secondary" className={`text-[10px] shrink-0`}>
           {LEVEL_LABELS[depth] ?? `Niv.${depth}`}
         </Badge>
 
@@ -87,19 +144,28 @@ function ActivityNode({ activity, allActivities, projectId, onAddChild, onEdit, 
           </Button>
         </div>
       </div>
-      {expanded && children.length > 0 && (
-        <div className="ml-6 border-l border-border">
+
+      {expanded && hasContent && (
+        <div className="ml-6 border-l border-border pl-1">
           {children.map((child) => (
             <ActivityNode
               key={child.id}
               activity={child}
               allActivities={allActivities}
+              tasks={tasks}
               projectId={projectId}
               onAddChild={onAddChild}
               onEdit={onEdit}
               onDelete={onDelete}
             />
           ))}
+          {activityTasks.length > 0 && (
+            <div className="ml-4 space-y-1 py-1">
+              {activityTasks.map((task) => (
+                <TaskItem key={task.id} task={task} />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -108,6 +174,7 @@ function ActivityNode({ activity, allActivities, projectId, onAddChild, onEdit, 
 
 export default function ActivitiesTab({ projectId }: { projectId: string }) {
   const { data: activities = [], isLoading } = useProjectActivities(projectId);
+  const { data: tasks = [] } = useProjectTasks(projectId);
   const createActivity = useCreateActivity();
   const updateActivity = useUpdateActivity();
   const deleteActivity = useDeleteActivity();
@@ -119,6 +186,7 @@ export default function ActivitiesTab({ projectId }: { projectId: string }) {
   const [form, setForm] = useState({ name: '', description: '', code: '', planned_start_date: '', planned_end_date: '' });
 
   const rootActivities = activities.filter((a: any) => !a.parent_id);
+  const unlinkedTasks = tasks.filter((t: any) => !t.activity_id);
 
   const resetForm = () => setForm({ name: '', description: '', code: '', planned_start_date: '', planned_end_date: '' });
 
@@ -181,7 +249,7 @@ export default function ActivitiesTab({ projectId }: { projectId: string }) {
         <EmptyState
           icon={FolderTree}
           title="Aucune activité"
-          description="Structurez votre projet en créant des activités et sous-activités (jusqu'à 3 niveaux)."
+          description="Structurez votre projet en créant des activités et sous-activités (jusqu'à 3 niveaux). Les tâches seront rattachées aux activités."
           actionLabel="Ajouter une activité"
           onAction={() => handleAdd(null, 0)}
         />
@@ -202,17 +270,22 @@ export default function ActivitiesTab({ projectId }: { projectId: string }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold font-display">Activités ({activities.length})</h3>
+        <div>
+          <h3 className="text-lg font-semibold font-display">Structure du projet</h3>
+          <p className="text-xs text-muted-foreground">Activités, sous-activités et tâches rattachées</p>
+        </div>
         <Button size="sm" onClick={() => handleAdd(null, 0)}>
           <Plus className="h-4 w-4 mr-1" /> Ajouter une activité
         </Button>
       </div>
+
       <div className="border rounded-lg p-2">
         {rootActivities.map((a: any) => (
           <ActivityNode
             key={a.id}
             activity={a}
             allActivities={activities}
+            tasks={tasks}
             projectId={projectId}
             onAddChild={handleAdd}
             onEdit={handleEdit}
@@ -220,6 +293,21 @@ export default function ActivitiesTab({ projectId }: { projectId: string }) {
           />
         ))}
       </div>
+
+      {unlinkedTasks.length > 0 && (
+        <div className="border rounded-lg p-3 border-dashed border-warning/50 bg-warning/5">
+          <p className="text-xs font-medium text-warning mb-2 flex items-center gap-1.5">
+            <CheckSquare className="h-3.5 w-3.5" />
+            Tâches non rattachées à une activité ({unlinkedTasks.length})
+          </p>
+          <div className="space-y-1">
+            {unlinkedTasks.map((task: any) => (
+              <TaskItem key={task.id} task={task} />
+            ))}
+          </div>
+        </div>
+      )}
+
       <ActivityFormDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
