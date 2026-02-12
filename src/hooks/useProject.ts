@@ -257,6 +257,29 @@ export function useDeleteActivity() {
   });
 }
 
+export function useReorderActivities() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ updates, projectId }: { updates: { id: string; order_index: number }[]; projectId: string }) => {
+      for (const u of updates) {
+        const { error } = await supabase
+          .from('activities')
+          .update({ order_index: u.order_index })
+          .eq('id', u.id);
+        if (error) throw error;
+      }
+      return projectId;
+    },
+    onSuccess: (projectId) => {
+      queryClient.invalidateQueries({ queryKey: ['project-activities', projectId] });
+    },
+    onError: (error: Error) => {
+      toast.error(`Erreur de réorganisation: ${error.message}`);
+    },
+  });
+}
+
 export function useAddProjectMember() {
   const queryClient = useQueryClient();
 
