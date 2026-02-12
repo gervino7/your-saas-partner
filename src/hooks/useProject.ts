@@ -164,6 +164,7 @@ export function useUpdateTask() {
 
 export function useCreateActivity() {
   const queryClient = useQueryClient();
+  const profile = useAuthStore((s) => s.profile);
 
   return useMutation({
     mutationFn: async (values: {
@@ -172,10 +173,13 @@ export function useCreateActivity() {
       project_id: string;
       parent_id?: string;
       depth?: number;
+      code?: string;
+      planned_start_date?: string;
+      planned_end_date?: string;
     }) => {
       const { data, error } = await supabase
         .from('activities')
-        .insert(values)
+        .insert({ ...values, created_by: profile?.id })
         .select()
         .single();
       if (error) throw error;
@@ -184,6 +188,49 @@ export function useCreateActivity() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['project-activities', data.project_id] });
       toast.success('Activité créée');
+    },
+    onError: (error: Error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+}
+
+export function useUpdateActivity() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, ...values }: { id: string; [key: string]: any }) => {
+      const { data, error } = await supabase
+        .from('activities')
+        .update(values)
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['project-activities', data.project_id] });
+      toast.success('Activité mise à jour');
+    },
+    onError: (error: Error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+}
+
+export function useDeleteActivity() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, projectId }: { id: string; projectId: string }) => {
+      const { error } = await supabase.from('activities').delete().eq('id', id);
+      if (error) throw error;
+      return projectId;
+    },
+    onSuccess: (projectId) => {
+      queryClient.invalidateQueries({ queryKey: ['project-activities', projectId] });
+      toast.success('Activité supprimée');
     },
     onError: (error: Error) => {
       toast.error(`Erreur: ${error.message}`);

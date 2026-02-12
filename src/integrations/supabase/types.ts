@@ -16,39 +16,73 @@ export type Database = {
     Tables: {
       activities: {
         Row: {
+          actual_end_date: string | null
+          actual_start_date: string | null
+          code: string | null
           created_at: string | null
+          created_by: string | null
           depth: number | null
           description: string | null
           id: string
           name: string
           order_index: number | null
           parent_id: string | null
+          path: string | null
+          planned_end_date: string | null
+          planned_start_date: string | null
+          progress: number | null
           project_id: string | null
           status: string | null
+          updated_at: string | null
         }
         Insert: {
+          actual_end_date?: string | null
+          actual_start_date?: string | null
+          code?: string | null
           created_at?: string | null
+          created_by?: string | null
           depth?: number | null
           description?: string | null
           id?: string
           name: string
           order_index?: number | null
           parent_id?: string | null
+          path?: string | null
+          planned_end_date?: string | null
+          planned_start_date?: string | null
+          progress?: number | null
           project_id?: string | null
           status?: string | null
+          updated_at?: string | null
         }
         Update: {
+          actual_end_date?: string | null
+          actual_start_date?: string | null
+          code?: string | null
           created_at?: string | null
+          created_by?: string | null
           depth?: number | null
           description?: string | null
           id?: string
           name?: string
           order_index?: number | null
           parent_id?: string | null
+          path?: string | null
+          planned_end_date?: string | null
+          planned_start_date?: string | null
+          progress?: number | null
           project_id?: string | null
           status?: string | null
+          updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "activities_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "activities_parent_id_fkey"
             columns: ["parent_id"]
