@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Plus, FolderKanban } from 'lucide-react';
 import { useMissionProjects } from '@/hooks/useMissions';
 import EmptyState from '@/components/common/EmptyState';
+import ProjectFormDialog from './ProjectFormDialog';
 
 function initials(name: string) {
   return name?.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2) ?? '?';
@@ -23,18 +25,22 @@ const statusLabels: Record<string, string> = {
 
 export default function MissionProjectsTab({ missionId, canCreate }: { missionId: string; canCreate: boolean }) {
   const { data: projects = [], isLoading } = useMissionProjects(missionId);
+  const [formOpen, setFormOpen] = useState(false);
 
   if (isLoading) return <p className="text-sm text-muted-foreground">Chargement...</p>;
 
   if (projects.length === 0) {
     return (
-      <EmptyState
-        icon={FolderKanban}
-        title="Aucun projet"
-        description="Créez un projet pour structurer les activités de cette mission."
-        actionLabel={canCreate ? 'Créer un projet' : undefined}
-        onAction={canCreate ? () => {} : undefined}
-      />
+      <>
+        <EmptyState
+          icon={FolderKanban}
+          title="Aucun projet"
+          description="Créez un projet pour structurer les activités de cette mission."
+          actionLabel={canCreate ? 'Créer un projet' : undefined}
+          onAction={canCreate ? () => setFormOpen(true) : undefined}
+        />
+        <ProjectFormDialog open={formOpen} onOpenChange={setFormOpen} missionId={missionId} />
+      </>
     );
   }
 
@@ -43,7 +49,9 @@ export default function MissionProjectsTab({ missionId, canCreate }: { missionId
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold font-display">Projets ({projects.length})</h3>
         {canCreate && (
-          <Button size="sm"><Plus className="h-4 w-4 mr-2" /> Créer un projet</Button>
+          <Button size="sm" onClick={() => setFormOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" /> Créer un projet
+          </Button>
         )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -81,6 +89,7 @@ export default function MissionProjectsTab({ missionId, canCreate }: { missionId
           </Link>
         ))}
       </div>
+      <ProjectFormDialog open={formOpen} onOpenChange={setFormOpen} missionId={missionId} />
     </div>
   );
 }
