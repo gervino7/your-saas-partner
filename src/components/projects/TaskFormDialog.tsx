@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -7,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { useCreateTask } from '@/hooks/useProject';
+import { useCreateTask, useUpdateTask } from '@/hooks/useProject';
 
 const schema = z.object({
   title: z.string().min(1, 'Titre requis').default(''),
@@ -32,32 +33,69 @@ interface TaskFormDialogProps {
   members: any[];
   activities: any[];
   tasks: any[];
+  editingTask?: any;
 }
 
-export default function TaskFormDialog({ open, onOpenChange, projectId, members, activities, tasks }: TaskFormDialogProps) {
+export default function TaskFormDialog({ open, onOpenChange, projectId, members, activities, tasks, editingTask }: TaskFormDialogProps) {
   const createTask = useCreateTask();
+  const updateTask = useUpdateTask();
+  const isEditing = !!editingTask;
+
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { status: 'todo', priority: 'medium', assigned_to: [] },
   });
 
+  useEffect(() => {
+    if (editingTask && open) {
+      form.reset({
+        title: editingTask.title ?? '',
+        description: editingTask.description ?? '',
+        status: editingTask.status ?? 'todo',
+        priority: editingTask.priority ?? 'medium',
+        due_date: editingTask.due_date ?? '',
+        start_date: editingTask.start_date ?? '',
+        estimated_hours: editingTask.estimated_hours ?? undefined,
+        compartment: editingTask.compartment ?? '',
+        activity_id: editingTask.activity_id ?? '',
+        parent_task_id: editingTask.parent_task_id ?? '',
+        assigned_to: editingTask.assignments?.map((a: any) => a.user?.id).filter(Boolean) ?? [],
+      });
+    } else if (!editingTask && open) {
+      form.reset({ status: 'todo', priority: 'medium', assigned_to: [] });
+    }
+  }, [editingTask, open]);
+
   const onSubmit = (values: FormValues) => {
-    createTask.mutate(
-      { ...values, title: values.title, project_id: projectId },
-      {
-        onSuccess: () => {
-          form.reset();
-          onOpenChange(false);
-        },
-      }
-    );
+    if (isEditing) {
+      const { assigned_to, ...taskValues } = values;
+      updateTask.mutate(
+        { id: editingTask.id, ...taskValues },
+        {
+          onSuccess: () => {
+            form.reset();
+            onOpenChange(false);
+          },
+        }
+      );
+    } else {
+      createTask.mutate(
+        { ...values, title: values.title, project_id: projectId },
+        {
+          onSuccess: () => {
+            form.reset();
+            onOpenChange(false);
+          },
+        }
+      );
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display">Nouvelle tâche</DialogTitle>
+          <DialogTitle className="font-display">{isEditing ? 'Modifier la tâche' : 'Nouvelle tâche'}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -81,7 +119,7 @@ export default function TaskFormDialog({ open, onOpenChange, projectId, members,
               <FormField control={form.control} name="status" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Statut</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                     <SelectContent>
                       <SelectItem value="todo">À faire</SelectItem>
@@ -99,7 +137,7 @@ export default function TaskFormDialog({ open, onOpenChange, projectId, members,
               <FormField control={form.control} name="priority" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Priorité</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                     <SelectContent>
                       <SelectItem value="low">Basse</SelectItem>
@@ -166,7 +204,7 @@ export default function TaskFormDialog({ open, onOpenChange, projectId, members,
               )} />
             )}
 
-            {tasks.length > 0 && (
+            {tasks.length > 0 && !isEditing && (
               <FormField control={form.control} name="parent_task_id" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Tâche parente (sous-tâche)</FormLabel>
@@ -218,8 +256,8 @@ export default function TaskFormDialog({ open, onOpenChange, projectId, members,
 
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="outline" type="button" onClick={() => onOpenChange(false)}>Annuler</Button>
-              <Button type="submit" disabled={createTask.isPending}>
-                {createTask.isPending ? 'Création...' : 'Créer'}
+              <Button type="submit" disabled={createTask.isPending || updateTask.isPending}>
+                {(createTask.isPending || updateTask.isPending) ? (isEditing ? 'Mise à jour...' : 'Création...') : (isEditing ? 'Enregistrer' : 'Créer')}
               </Button>
             </div>
           </form>
