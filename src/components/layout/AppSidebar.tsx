@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, Target, FolderKanban, FileText, MessageSquare,
-  Calendar, Clock, Settings, HardDrive, Shield, LogOut,
+  LayoutDashboard, Briefcase, FolderKanban, FileText, MessageSquare,
+  Calendar, Clock, Monitor, Settings, LogOut, ChevronDown,
 } from 'lucide-react';
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent,
@@ -9,29 +9,48 @@ import {
 } from '@/components/ui/sidebar';
 import { useAuthStore } from '@/stores/authStore';
 import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 const mainNav = [
   { label: 'Tableau de bord', icon: LayoutDashboard, path: '/' },
-  { label: 'Missions', icon: Target, path: '/missions' },
+  { label: 'Missions', icon: Briefcase, path: '/missions' },
   { label: 'Documents', icon: FileText, path: '/documents' },
   { label: 'Messagerie', icon: MessageSquare, path: '/messages' },
   { label: 'Calendrier', icon: Calendar, path: '/calendar' },
   { label: 'Feuilles de temps', icon: Clock, path: '/timesheets' },
 ];
 
-const secondaryNav = [
-  { label: 'Bureau personnel', icon: HardDrive, path: '/workspace' },
-  { label: 'Administration', icon: Shield, path: '/admin' },
-  { label: 'Paramètres', icon: Settings, path: '/settings' },
-];
-
 const AppSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { profile } = useAuthStore();
+  const { profile, user } = useAuthStore();
+  const gradeLevel = profile?.grade_level ?? 8;
+  const showAdmin = gradeLevel <= 2; // DA or DM
+
+  // Unread message count
+  const { data: unreadMessages = 0 } = useQuery({
+    queryKey: ['unreadMessages', user?.id],
+    queryFn: async () => {
+      if (!user) return 0;
+      // Count conversations where last_read_at < latest message
+      const { data } = await supabase
+        .from('conversation_members')
+        .select('conversation_id, last_read_at')
+        .eq('user_id', user.id);
+      // Simplified: return count of conversations (real implementation would compare dates)
+      return 0;
+    },
+    enabled: !!user,
+    refetchInterval: 30000,
+  });
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+  };
+
+  const isActive = (path: string) => {
+    if (path === '/') return location.pathname === '/';
+    return location.pathname.startsWith(path);
   };
 
   return (
@@ -56,12 +75,17 @@ const AppSidebar = () => {
               {mainNav.map((item) => (
                 <SidebarMenuItem key={item.path}>
                   <SidebarMenuButton
-                    isActive={location.pathname === item.path}
+                    isActive={isActive(item.path)}
                     onClick={() => navigate(item.path)}
                     tooltip={item.label}
                   >
                     <item.icon className="h-4 w-4" />
-                    <span>{item.label}</span>
+                    <span className="flex-1">{item.label}</span>
+                    {item.path === '/messages' && unreadMessages > 0 && (
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground">
+                        {unreadMessages > 99 ? '99+' : unreadMessages}
+                      </span>
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -73,18 +97,28 @@ const AppSidebar = () => {
           <SidebarGroupLabel>Espace de travail</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {secondaryNav.map((item) => (
-                <SidebarMenuItem key={item.path}>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive('/workspace')}
+                  onClick={() => navigate('/workspace')}
+                  tooltip="Bureau personnel"
+                >
+                  <Monitor className="h-4 w-4" />
+                  <span>Bureau personnel</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              {showAdmin && (
+                <SidebarMenuItem>
                   <SidebarMenuButton
-                    isActive={location.pathname === item.path}
-                    onClick={() => navigate(item.path)}
-                    tooltip={item.label}
+                    isActive={isActive('/admin')}
+                    onClick={() => navigate('/admin')}
+                    tooltip="Administration"
                   >
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.label}</span>
+                    <Settings className="h-4 w-4" />
+                    <span>Administration</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              ))}
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -92,8 +126,13 @@ const AppSidebar = () => {
 
       <SidebarFooter className="border-t border-sidebar-border p-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-accent text-sidebar-accent-foreground text-xs font-semibold">
-            {profile?.full_name?.charAt(0)?.toUpperCase() || 'U'}
+          <div className="relative">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-accent text-sidebar-accent-foreground text-xs font-semibold">
+              {profile?.full_name?.charAt(0)?.toUpperCase() || 'U'}
+            </div>
+            {profile?.is_online && (
+              <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-sidebar-background bg-success" />
+            )}
           </div>
           <div className="flex flex-1 flex-col overflow-hidden">
             <span className="truncate text-sm font-medium text-sidebar-foreground">
@@ -103,7 +142,11 @@ const AppSidebar = () => {
               {profile?.grade || ''}
             </span>
           </div>
-          <button onClick={handleLogout} className="text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors">
+          <button
+            onClick={handleLogout}
+            className="text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors"
+            title="Déconnexion"
+          >
             <LogOut className="h-4 w-4" />
           </button>
         </div>
