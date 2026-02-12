@@ -162,6 +162,25 @@ export function useUpdateTask() {
   });
 }
 
+export function useDeleteTask() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, projectId }: { id: string; projectId: string }) => {
+      const { error } = await supabase.from('tasks').delete().eq('id', id);
+      if (error) throw error;
+      return projectId;
+    },
+    onSuccess: (projectId) => {
+      queryClient.invalidateQueries({ queryKey: ['project-tasks', projectId] });
+      toast.success('Tâche supprimée');
+    },
+    onError: (error: Error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+}
+
 export function useCreateActivity() {
   const queryClient = useQueryClient();
   const profile = useAuthStore((s) => s.profile);
