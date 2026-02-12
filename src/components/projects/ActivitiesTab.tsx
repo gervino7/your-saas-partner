@@ -7,9 +7,10 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Plus, ChevronRight, ChevronDown, FolderTree, Trash2, Pencil, CheckSquare } from 'lucide-react';
-import { useProjectActivities, useCreateActivity, useUpdateActivity, useDeleteActivity, useProjectTasks } from '@/hooks/useProject';
+import { useProjectActivities, useCreateActivity, useUpdateActivity, useDeleteActivity, useProjectTasks, useUpdateTask, useDeleteTask, useProjectMembers } from '@/hooks/useProject';
 import { TASK_STATUS_LABELS, TASK_PRIORITY_LABELS } from '@/types/database';
 import EmptyState from '@/components/common/EmptyState';
+import TaskFormDialog from './TaskFormDialog';
 
 const LEVEL_LABELS: Record<number, string> = {
   0: 'Activité',
@@ -45,11 +46,13 @@ function initials(name: string) {
 
 interface TaskItemProps {
   task: any;
+  onEdit: (task: any) => void;
+  onDelete: (task: any) => void;
 }
 
-function TaskItem({ task }: TaskItemProps) {
+function TaskItem({ task, onEdit, onDelete }: TaskItemProps) {
   return (
-    <div className="flex items-center gap-2 py-1.5 px-3 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors text-sm">
+    <div className="flex items-center gap-2 py-1.5 px-3 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors text-sm group/task">
       <CheckSquare className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
       <span className="font-medium truncate flex-1">{task.title}</span>
       <div className="flex -space-x-1 shrink-0">
@@ -66,6 +69,14 @@ function TaskItem({ task }: TaskItemProps) {
       <Badge variant="outline" className={`text-[9px] px-1.5 py-0 ${TASK_PRIORITY_COLORS[task.priority] ?? ''}`}>
         {TASK_PRIORITY_LABELS[task.priority as keyof typeof TASK_PRIORITY_LABELS] ?? task.priority}
       </Badge>
+      <div className="flex gap-0.5 opacity-0 group-hover/task:opacity-100 transition-opacity shrink-0">
+        <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => onEdit(task)}>
+          <Pencil className="h-3 w-3" />
+        </Button>
+        <Button variant="ghost" size="icon" className="h-5 w-5 text-destructive" onClick={() => onDelete(task)}>
+          <Trash2 className="h-3 w-3" />
+        </Button>
+      </div>
     </div>
   );
 }
@@ -78,9 +89,11 @@ interface ActivityNodeProps {
   onAddChild: (parentId: string, depth: number) => void;
   onEdit: (activity: any) => void;
   onDelete: (id: string) => void;
+  onEditTask: (task: any) => void;
+  onDeleteTask: (task: any) => void;
 }
 
-function ActivityNode({ activity, allActivities, tasks, projectId, onAddChild, onEdit, onDelete }: ActivityNodeProps) {
+function ActivityNode({ activity, allActivities, tasks, projectId, onAddChild, onEdit, onDelete, onEditTask, onDeleteTask }: ActivityNodeProps) {
   const [expanded, setExpanded] = useState(true);
   const children = allActivities.filter((a) => a.parent_id === activity.id);
   const activityTasks = tasks.filter((t) => t.activity_id === activity.id);
@@ -157,12 +170,14 @@ function ActivityNode({ activity, allActivities, tasks, projectId, onAddChild, o
               onAddChild={onAddChild}
               onEdit={onEdit}
               onDelete={onDelete}
+              onEditTask={onEditTask}
+              onDeleteTask={onDeleteTask}
             />
           ))}
           {activityTasks.length > 0 && (
             <div className="ml-4 space-y-1 py-1">
               {activityTasks.map((task) => (
-                <TaskItem key={task.id} task={task} />
+                <TaskItem key={task.id} task={task} onEdit={onEditTask} onDelete={onDeleteTask} />
               ))}
             </div>
           )}
@@ -175,15 +190,19 @@ function ActivityNode({ activity, allActivities, tasks, projectId, onAddChild, o
 export default function ActivitiesTab({ projectId }: { projectId: string }) {
   const { data: activities = [], isLoading } = useProjectActivities(projectId);
   const { data: tasks = [] } = useProjectTasks(projectId);
+  const { data: members = [] } = useProjectMembers(projectId);
   const createActivity = useCreateActivity();
   const updateActivity = useUpdateActivity();
   const deleteActivity = useDeleteActivity();
+  const deleteTask = useDeleteTask();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingActivity, setEditingActivity] = useState<any>(null);
   const [parentId, setParentId] = useState<string | null>(null);
   const [depth, setDepth] = useState(0);
   const [form, setForm] = useState({ name: '', description: '', code: '', planned_start_date: '', planned_end_date: '' });
+  const [taskFormOpen, setTaskFormOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<any>(null);
 
   const rootActivities = activities.filter((a: any) => !a.parent_id);
   const unlinkedTasks = tasks.filter((t: any) => !t.activity_id);
@@ -215,6 +234,17 @@ export default function ActivitiesTab({ projectId }: { projectId: string }) {
   const handleDelete = (id: string) => {
     if (confirm('Supprimer cette activité et tous ses enfants ?')) {
       deleteActivity.mutate({ id, projectId });
+    }
+  };
+
+  const handleEditTask = (task: any) => {
+    setEditingTask(task);
+    setTaskFormOpen(true);
+  };
+
+  const handleDeleteTask = (task: any) => {
+    if (confirm(`Supprimer la tâche "${task.title}" ?`)) {
+      deleteTask.mutate({ id: task.id, projectId });
     }
   };
 
@@ -290,6 +320,8 @@ export default function ActivitiesTab({ projectId }: { projectId: string }) {
             onAddChild={handleAdd}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onEditTask={handleEditTask}
+            onDeleteTask={handleDeleteTask}
           />
         ))}
       </div>
@@ -302,7 +334,7 @@ export default function ActivitiesTab({ projectId }: { projectId: string }) {
           </p>
           <div className="space-y-1">
             {unlinkedTasks.map((task: any) => (
-              <TaskItem key={task.id} task={task} />
+              <TaskItem key={task.id} task={task} onEdit={handleEditTask} onDelete={handleDeleteTask} />
             ))}
           </div>
         </div>
@@ -317,6 +349,16 @@ export default function ActivitiesTab({ projectId }: { projectId: string }) {
         isPending={createActivity.isPending || updateActivity.isPending}
         isEditing={!!editingActivity}
         depth={depth}
+      />
+
+      <TaskFormDialog
+        open={taskFormOpen}
+        onOpenChange={(open) => { setTaskFormOpen(open); if (!open) setEditingTask(null); }}
+        projectId={projectId}
+        members={members}
+        activities={activities}
+        tasks={tasks}
+        editingTask={editingTask}
       />
     </div>
   );
