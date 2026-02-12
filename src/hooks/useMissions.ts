@@ -260,6 +260,62 @@ export function useOrganizationUsers() {
   });
 }
 
+export function useCreateProject() {
+  const queryClient = useQueryClient();
+  const profile = useAuthStore((s) => s.profile);
+
+  return useMutation({
+    mutationFn: async (values: {
+      name: string;
+      description?: string;
+      mission_id: string;
+      lead_id?: string;
+      budget_allocated?: number;
+      start_date?: string;
+      end_date?: string;
+    }) => {
+      // Generate project code
+      const year = new Date().getFullYear();
+      const { count } = await supabase
+        .from('projects')
+        .select('*', { count: 'exact', head: true })
+        .eq('mission_id', values.mission_id);
+      const code = `PRJ-${year}-${String((count ?? 0) + 1).padStart(3, '0')}`;
+
+      const { data, error } = await supabase
+        .from('projects')
+        .insert({
+          ...values,
+          code,
+          organization_id: profile!.organization_id!,
+          status: 'planning',
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Add lead as project member
+      if (values.lead_id) {
+        await supabase.from('project_members').insert({
+          project_id: data.id,
+          user_id: values.lead_id,
+          role: 'lead',
+        });
+      }
+
+      return data;
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['mission-projects', vars.mission_id] });
+      toast.success('Projet créé avec succès');
+    },
+    onError: (error: Error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+}
+
 export function useClients() {
   const profile = useAuthStore((s) => s.profile);
 
