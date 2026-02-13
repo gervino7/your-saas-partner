@@ -16,7 +16,8 @@ import MissionTeamTab from '@/components/missions/MissionTeamTab';
 import MissionBudgetTab from '@/components/missions/MissionBudgetTab';
 import MissionSettingsTab from '@/components/missions/MissionSettingsTab';
 import EmptyState from '@/components/common/EmptyState';
-import { FileText, Calendar, Shield } from 'lucide-react';
+import CopilTab from '@/components/copil/CopilTab';
+import { FileText, Calendar } from 'lucide-react';
 
 const MissionDetailPage = () => {
   const { id } = useParams();
@@ -118,11 +119,7 @@ const MissionDetailPage = () => {
         </TabsContent>
 
         <TabsContent value="copil" className="mt-6">
-          <EmptyState
-            icon={Shield}
-            title="COPIL"
-            description="Le module de gouvernance COPIL sera implémenté prochainement."
-          />
+          <CopilTab missionId={mission.id} missionName={mission.name} canManage={canManage} />
         </TabsContent>
 
         <TabsContent value="calendar" className="mt-6">
