@@ -170,9 +170,10 @@ export const useMailingGroup = (committeeId?: string) =>
         .from('mailing_groups')
         .select('*, mailing_group_recipients(*)')
         .eq('committee_id', committeeId!)
-        .maybeSingle();
+        .order('created_at', { ascending: true })
+        .limit(1);
       if (error) throw error;
-      return data;
+      return data?.[0] ?? null;
     },
   });
 
@@ -255,8 +256,8 @@ export const useEnsureMailingGroup = () => {
         .from('mailing_groups')
         .select('id')
         .eq('committee_id', committeeId)
-        .maybeSingle();
-      if (existing) return existing;
+        .limit(1);
+      if (existing && existing.length > 0) return existing[0];
       
       const { data, error } = await supabase
         .from('mailing_groups')
