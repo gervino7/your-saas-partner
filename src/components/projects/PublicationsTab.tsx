@@ -15,15 +15,15 @@ import EmptyState from '@/components/common/EmptyState';
 
 const typeLabels: Record<string, string> = {
   note: 'Note',
-  annonce: 'Annonce',
-  mise_a_jour: 'Mise à jour',
+  announcement: 'Annonce',
+  update: 'Mise à jour',
   decision: 'Décision',
 };
 
 const typeColors: Record<string, string> = {
   note: 'bg-muted text-muted-foreground',
-  annonce: 'bg-info/15 text-info',
-  mise_a_jour: 'bg-warning/15 text-warning',
+  announcement: 'bg-info/15 text-info',
+  update: 'bg-warning/15 text-warning',
   decision: 'bg-success/15 text-success',
 };
 
@@ -69,8 +69,8 @@ export default function PublicationsTab({ projectId }: { projectId: string }) {
             <SelectContent>
               <SelectItem value="all">Tous types</SelectItem>
               <SelectItem value="note">Note</SelectItem>
-              <SelectItem value="annonce">Annonce</SelectItem>
-              <SelectItem value="mise_a_jour">Mise à jour</SelectItem>
+              <SelectItem value="announcement">Annonce</SelectItem>
+              <SelectItem value="update">Mise à jour</SelectItem>
               <SelectItem value="decision">Décision</SelectItem>
             </SelectContent>
           </Select>
@@ -127,8 +127,8 @@ export default function PublicationsTab({ projectId }: { projectId: string }) {
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="note">Note</SelectItem>
-                <SelectItem value="annonce">Annonce</SelectItem>
-                <SelectItem value="mise_a_jour">Mise à jour</SelectItem>
+                <SelectItem value="announcement">Annonce</SelectItem>
+                <SelectItem value="update">Mise à jour</SelectItem>
                 <SelectItem value="decision">Décision</SelectItem>
               </SelectContent>
             </Select>
