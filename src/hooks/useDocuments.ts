@@ -177,7 +177,10 @@ export function useUploadDocument() {
       checksum?: string;
     }) => {
       const orgId = profile!.organization_id!;
-      const filePath = `${orgId}/${input.missionId || '_'}/${input.projectId || '_'}/${Date.now()}_${input.file.name}`;
+      const sanitizedName = input.file.name
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9._-]/g, '_');
+      const filePath = `${orgId}/${input.missionId || '_'}/${input.projectId || '_'}/${Date.now()}_${sanitizedName}`;
 
       const { error: uploadErr } = await supabase.storage
         .from('documents')
