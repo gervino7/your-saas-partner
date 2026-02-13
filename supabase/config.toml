@@ -1,1 +1,4 @@
 project_id = "zewszfgmysyocroavlja"
+
+[functions.send-group-email]
+verify_jwt = false
