@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -8,17 +8,76 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { LogIn, UserPlus } from 'lucide-react';
 
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 60_000; // 1 minute
+
+const getAuthErrorMessage = (error: any): string => {
+  const msg = error?.message ?? '';
+  const map: Record<string, string> = {
+    'Invalid login credentials': 'Email ou mot de passe incorrect.',
+    'Email not confirmed': 'Veuillez confirmer votre email avant de vous connecter.',
+    'User already registered': 'Cette adresse email est déjà utilisée.',
+    'Signup requires a valid password': 'Le mot de passe est invalide.',
+    'Password should be at least 6 characters': 'Le mot de passe doit contenir au moins 8 caractères.',
+  };
+  return map[msg] || 'Une erreur est survenue. Veuillez réessayer.';
+};
+
+const validatePassword = (pwd: string): string[] => {
+  const errors: string[] = [];
+  if (pwd.length < 8) errors.push('Au moins 8 caractères');
+  if (!/[A-Z]/.test(pwd)) errors.push('Une lettre majuscule');
+  if (!/[a-z]/.test(pwd)) errors.push('Une lettre minuscule');
+  if (!/[0-9]/.test(pwd)) errors.push('Un chiffre');
+  return errors;
+};
+
 const LoginPage = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const handlePasswordChange = useCallback((value: string) => {
+    setPassword(value);
+    if (isSignUp) {
+      setPasswordErrors(validatePassword(value));
+    }
+  }, [isSignUp]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Rate limiting check
+    if (lockoutUntil && Date.now() < lockoutUntil) {
+      const remaining = Math.ceil((lockoutUntil - Date.now()) / 1000);
+      toast({
+        title: 'Trop de tentatives',
+        description: `Veuillez patienter ${remaining} secondes avant de réessayer.`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Password validation for signup
+    if (isSignUp) {
+      const errors = validatePassword(password);
+      if (errors.length > 0) {
+        toast({
+          title: 'Mot de passe trop faible',
+          description: `Requis : ${errors.join(', ')}`,
+          variant: 'destructive',
+        });
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -32,25 +91,38 @@ const LoginPage = () => {
           },
         });
         if (error) throw error;
+        setLoginAttempts(0);
         toast({
           title: 'Inscription réussie',
           description: 'Vérifiez votre email pour confirmer votre compte.',
         });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (error) {
+          const newAttempts = loginAttempts + 1;
+          setLoginAttempts(newAttempts);
+          if (newAttempts >= MAX_ATTEMPTS) {
+            setLockoutUntil(Date.now() + LOCKOUT_DURATION_MS);
+            setLoginAttempts(0);
+          }
+          throw error;
+        }
+        setLoginAttempts(0);
         navigate('/', { replace: true });
       }
     } catch (error: any) {
+      console.error('[Auth Error]', error?.message);
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: getAuthErrorMessage(error),
         variant: 'destructive',
       });
     } finally {
       setLoading(false);
     }
   };
+
+  const isLocked = lockoutUntil !== null && Date.now() < lockoutUntil;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -85,6 +157,7 @@ const LoginPage = () => {
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Jean Dupont"
                     required
+                    maxLength={255}
                   />
                 </div>
               )}
@@ -105,15 +178,24 @@ const LoginPage = () => {
                   id="password"
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
                   placeholder="••••••••"
                   required
-                  minLength={6}
+                  minLength={8}
                 />
+                {isSignUp && passwordErrors.length > 0 && password.length > 0 && (
+                  <ul className="text-xs text-destructive space-y-0.5 mt-1">
+                    {passwordErrors.map((err) => (
+                      <li key={err}>• {err}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full" disabled={loading || isLocked}>
                 {loading ? (
                   'Chargement...'
+                ) : isLocked ? (
+                  'Veuillez patienter...'
                 ) : isSignUp ? (
                   <>
                     <UserPlus className="mr-2 h-4 w-4" />
@@ -130,7 +212,10 @@ const LoginPage = () => {
             <div className="mt-4 text-center text-sm">
               <button
                 type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setPasswordErrors([]);
+                }}
                 className="text-primary hover:underline"
               >
                 {isSignUp ? 'Déjà un compte ? Se connecter' : "Pas encore de compte ? S'inscrire"}
