@@ -117,9 +117,9 @@ export default function AdminSettings() {
     try {
       const ext = file.name.split('.').pop();
       const filePath = `${org.id}/logo.${ext}`;
-      const { error: uploadError } = await supabase.storage.from('documents').upload(filePath, file, { upsert: true });
+      const { error: uploadError } = await supabase.storage.from('org-assets').upload(filePath, file, { upsert: true });
       if (uploadError) throw uploadError;
-      const { data: urlData } = supabase.storage.from('documents').getPublicUrl(filePath);
+      const { data: urlData } = supabase.storage.from('org-assets').getPublicUrl(filePath);
       const publicUrl = urlData.publicUrl;
       await supabase.from('organizations').update({ logo_url: publicUrl }).eq('id', org.id);
       setLogoUrl(publicUrl);
