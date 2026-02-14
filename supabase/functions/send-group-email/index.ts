@@ -104,6 +104,25 @@ Deno.serve(async (req) => {
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
+    // Build attachments array for Resend
+    const emailAttachments: { filename: string; path: string }[] = [];
+    const attachmentsData = email.attachments ?? [];
+    
+    for (const att of attachmentsData) {
+      if (att.file_path) {
+        const { data: signedData } = await admin.storage
+          .from('documents')
+          .createSignedUrl(att.file_path, 3600); // 1h expiry
+        
+        if (signedData?.signedUrl) {
+          emailAttachments.push({
+            filename: att.name || 'attachment',
+            path: signedData.signedUrl,
+          });
+        }
+      }
+    }
+
     // Send via Resend API - with rate limiting (max 2 req/s)
     for (let i = 0; i < allRecipients.length; i++) {
       const recipient = allRecipients[i];
@@ -114,14 +133,11 @@ Deno.serve(async (req) => {
       }
 
       try {
-        const res = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${resendApiKey}` },
-          body: JSON.stringify({
-            from: 'MissionFlow <onboarding@resend.dev>',
-            to: [recipient.email],
-            subject: email.subject,
-            html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        const emailPayload: Record<string, any> = {
+          from: 'MissionFlow <onboarding@resend.dev>',
+          to: [recipient.email],
+          subject: email.subject,
+          html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <div style="background: #1a1a2e; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
                 <h2 style="margin: 0;">MissionFlow</h2>
               </div>
@@ -132,7 +148,16 @@ Deno.serve(async (req) => {
                 Envoyé via MissionFlow
               </p>
             </div>`,
-          }),
+        };
+
+        if (emailAttachments.length > 0) {
+          emailPayload.attachments = emailAttachments;
+        }
+
+        const res = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${resendApiKey}` },
+          body: JSON.stringify(emailPayload),
         });
 
         if (res.ok) {
