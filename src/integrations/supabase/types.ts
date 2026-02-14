@@ -592,6 +592,44 @@ export type Database = {
           },
         ]
       }
+      daily_rates: {
+        Row: {
+          created_at: string | null
+          currency: string | null
+          daily_rate: number
+          grade: string
+          id: string
+          organization_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          currency?: string | null
+          daily_rate?: number
+          grade: string
+          id?: string
+          organization_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          currency?: string | null
+          daily_rate?: number
+          grade?: string
+          id?: string
+          organization_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_rates_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_access_log: {
         Row: {
           action: string | null
@@ -2496,6 +2534,95 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      time_entries: {
+        Row: {
+          created_at: string | null
+          date: string
+          description: string | null
+          hours: number
+          id: string
+          is_billable: boolean | null
+          mission_id: string | null
+          organization_id: string | null
+          project_id: string | null
+          review_comment: string | null
+          reviewed_at: string | null
+          reviewer_id: string | null
+          status: string | null
+          task_id: string | null
+          updated_at: string | null
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          description?: string | null
+          hours?: number
+          id?: string
+          is_billable?: boolean | null
+          mission_id?: string | null
+          organization_id?: string | null
+          project_id?: string | null
+          review_comment?: string | null
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          status?: string | null
+          task_id?: string | null
+          updated_at?: string | null
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          description?: string | null
+          hours?: number
+          id?: string
+          is_billable?: boolean | null
+          mission_id?: string | null
+          organization_id?: string | null
+          project_id?: string | null
+          review_comment?: string | null
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          status?: string | null
+          task_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_entries_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_entries_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_entries_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_entries_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
             referencedColumns: ["id"]
           },
         ]
