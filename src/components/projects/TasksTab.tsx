@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Plus, Search, Kanban, Table2, LayoutGrid, Users, BarChart3 } from 'lucide-react';
-import { useProjectTasks, useProjectActivities } from '@/hooks/useProject';
+import { useProjectTasks, useProjectActivities, useProject } from '@/hooks/useProject';
 import { useProjectMembers } from '@/hooks/useProject';
 import TaskKanbanView from './TaskKanbanView';
 import TaskTableView from './TaskTableView';
@@ -18,6 +18,8 @@ export default function TasksTab({ projectId }: { projectId: string }) {
   const { data: tasks = [], isLoading } = useProjectTasks(projectId);
   const { data: activities = [] } = useProjectActivities(projectId);
   const { data: members = [] } = useProjectMembers(projectId);
+  const { data: project } = useProject(projectId);
+  const projectLeadId = project?.lead_id ?? null;
   const [view, setView] = useState<ViewMode>('kanban');
   const [formOpen, setFormOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -102,8 +104,8 @@ export default function TasksTab({ projectId }: { projectId: string }) {
         />
       ) : (
         <>
-          {view === 'kanban' && <TaskKanbanView tasks={filteredTasks} />}
-          {view === 'table' && <TaskTableView tasks={filteredTasks} />}
+          {view === 'kanban' && <TaskKanbanView tasks={filteredTasks} projectLeadId={projectLeadId} />}
+          {view === 'table' && <TaskTableView tasks={filteredTasks} projectLeadId={projectLeadId} />}
           {view === 'compartment' && <TaskGroupedView tasks={filteredTasks} groupBy="compartment" />}
           {view === 'assignee' && <TaskGroupedView tasks={filteredTasks} groupBy="assignee" />}
           {view === 'gantt' && <GanttPlaceholder />}

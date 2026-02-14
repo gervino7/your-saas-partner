@@ -19,6 +19,7 @@ import MessagesPage from '@/pages/MessagesPage';
 import CalendarPage from '@/pages/CalendarPage';
 import TimesheetsPage from '@/pages/TimesheetsPage';
 import AdminPage from '@/pages/AdminPage';
+import PerformanceReviewsPage from '@/pages/PerformanceReviewsPage';
 import WorkspacePage from '@/pages/WorkspacePage';
 import SettingsPage from '@/pages/SettingsPage';
 import NotFound from '@/pages/NotFound';
@@ -87,6 +88,7 @@ const App = () => (
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/timesheets" element={<TimesheetsPage />} />
               <Route path="/admin" element={<AdminPage />} />
+              <Route path="/admin/reviews" element={<PerformanceReviewsPage />} />
               <Route path="/workspace" element={<WorkspacePage />} />
               <Route path="/settings" element={<SettingsPage />} />
             </Route>

@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TASK_STATUS_LABELS, TASK_PRIORITY_LABELS } from '@/types/database';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import TaskDetailDialog from './TaskDetailDialog';
 
 const priorityColors: Record<string, string> = {
   low: 'bg-muted text-muted-foreground',
@@ -25,8 +27,12 @@ function initials(name: string) {
   return name?.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2) ?? '?';
 }
 
-export default function TaskTableView({ tasks }: { tasks: any[] }) {
+export default function TaskTableView({ tasks, projectLeadId }: { tasks: any[]; projectLeadId?: string | null }) {
+  const [selectedTask, setSelectedTask] = useState<any>(null);
+
   return (
+    <>
+    
     <div className="border rounded-lg overflow-hidden">
       <Table>
         <TableHeader>
@@ -49,7 +55,7 @@ export default function TaskTableView({ tasks }: { tasks: any[] }) {
             </TableRow>
           ) : (
             tasks.map((task) => (
-              <TableRow key={task.id}>
+              <TableRow key={task.id} className="cursor-pointer" onClick={() => setSelectedTask(task)}>
                 <TableCell className="font-medium">{task.title}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className={`text-xs ${statusColors[task.status] ?? ''}`}>
@@ -82,5 +88,13 @@ export default function TaskTableView({ tasks }: { tasks: any[] }) {
         </TableBody>
       </Table>
     </div>
+
+    <TaskDetailDialog
+      task={selectedTask}
+      open={!!selectedTask}
+      onOpenChange={(open) => !open && setSelectedTask(null)}
+      projectLeadId={projectLeadId}
+    />
+    </>
   );
 }

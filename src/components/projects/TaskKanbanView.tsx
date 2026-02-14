@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -6,6 +7,7 @@ import { TASK_STATUS_LABELS, TASK_PRIORITY_LABELS } from '@/types/database';
 import { useUpdateTask } from '@/hooks/useProject';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import TaskDetailDialog from './TaskDetailDialog';
 
 const COLUMNS = ['todo', 'in_progress', 'in_review', 'correction', 'validated', 'completed'] as const;
 
@@ -20,14 +22,16 @@ function initials(name: string) {
   return name?.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2) ?? '?';
 }
 
-export default function TaskKanbanView({ tasks }: { tasks: any[] }) {
+export default function TaskKanbanView({ tasks, projectLeadId }: { tasks: any[]; projectLeadId?: string | null }) {
   const updateTask = useUpdateTask();
+  const [selectedTask, setSelectedTask] = useState<any>(null);
 
   const handleDrop = (taskId: string, newStatus: string) => {
     updateTask.mutate({ id: taskId, status: newStatus });
   };
 
   return (
+    <>
     <div className="flex gap-4 overflow-x-auto pb-4">
       {COLUMNS.map((status) => {
         const columnTasks = tasks.filter((t) => t.status === status);
@@ -54,7 +58,8 @@ export default function TaskKanbanView({ tasks }: { tasks: any[] }) {
                   key={task.id}
                   draggable
                   onDragStart={(e) => e.dataTransfer.setData('taskId', task.id)}
-                  className="p-3 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow"
+                  onClick={() => setSelectedTask(task)}
+                  className="p-3 cursor-pointer hover:shadow-md transition-shadow"
                 >
                   <div className="space-y-2">
                     <p className="text-sm font-medium leading-tight">{task.title}</p>
@@ -90,5 +95,13 @@ export default function TaskKanbanView({ tasks }: { tasks: any[] }) {
         );
       })}
     </div>
+
+    <TaskDetailDialog
+      task={selectedTask}
+      open={!!selectedTask}
+      onOpenChange={(open) => !open && setSelectedTask(null)}
+      projectLeadId={projectLeadId}
+    />
+    </>
   );
 }
