@@ -167,39 +167,237 @@ export type Database = {
           },
         ]
       }
+      client_contacts: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          email: string | null
+          id: string
+          is_primary: boolean | null
+          name: string
+          phone: string | null
+          position: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_primary?: boolean | null
+          name: string
+          phone?: string | null
+          position?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_primary?: boolean | null
+          name?: string
+          phone?: string | null
+          position?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_contacts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_interactions: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          interaction_date: string | null
+          metadata: Json | null
+          mission_id: string | null
+          title: string
+          type: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          interaction_date?: string | null
+          metadata?: Json | null
+          mission_id?: string | null
+          title: string
+          type?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          interaction_date?: string | null
+          metadata?: Json | null
+          mission_id?: string | null
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_interactions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_interactions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_interactions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_interactions_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_portal_tokens: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          created_by: string | null
+          expires_at: string
+          id: string
+          is_active: boolean | null
+          mission_id: string
+          token: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          is_active?: boolean | null
+          mission_id: string
+          token: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          is_active?: boolean | null
+          mission_id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_portal_tokens_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_portal_tokens_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_portal_tokens_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_portal_tokens_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_surveys: {
         Row: {
           client_id: string | null
           comments: string | null
+          communication_rating: number | null
+          competence_rating: number | null
           id: string
           mission_id: string | null
+          nps_score: number | null
+          organization_id: string | null
           overall_rating: number | null
+          quality_rating: number | null
           respondent_email: string | null
           respondent_name: string | null
           responses: Json | null
           submitted_at: string | null
+          timeliness_rating: number | null
+          token: string | null
+          value_rating: number | null
         }
         Insert: {
           client_id?: string | null
           comments?: string | null
+          communication_rating?: number | null
+          competence_rating?: number | null
           id?: string
           mission_id?: string | null
+          nps_score?: number | null
+          organization_id?: string | null
           overall_rating?: number | null
+          quality_rating?: number | null
           respondent_email?: string | null
           respondent_name?: string | null
           responses?: Json | null
           submitted_at?: string | null
+          timeliness_rating?: number | null
+          token?: string | null
+          value_rating?: number | null
         }
         Update: {
           client_id?: string | null
           comments?: string | null
+          communication_rating?: number | null
+          competence_rating?: number | null
           id?: string
           mission_id?: string | null
+          nps_score?: number | null
+          organization_id?: string | null
           overall_rating?: number | null
+          quality_rating?: number | null
           respondent_email?: string | null
           respondent_name?: string | null
           responses?: Json | null
           submitted_at?: string | null
+          timeliness_rating?: number | null
+          token?: string | null
+          value_rating?: number | null
         }
         Relationships: [
           {
@@ -214,6 +412,13 @@ export type Database = {
             columns: ["mission_id"]
             isOneToOne: false
             referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_surveys_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -233,6 +438,7 @@ export type Database = {
           notes: string | null
           organization_id: string | null
           updated_at: string | null
+          website: string | null
         }
         Insert: {
           address?: string | null
@@ -248,6 +454,7 @@ export type Database = {
           notes?: string | null
           organization_id?: string | null
           updated_at?: string | null
+          website?: string | null
         }
         Update: {
           address?: string | null
@@ -263,6 +470,7 @@ export type Database = {
           notes?: string | null
           organization_id?: string | null
           updated_at?: string | null
+          website?: string | null
         }
         Relationships: [
           {

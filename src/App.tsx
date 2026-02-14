@@ -23,6 +23,10 @@ import PerformanceReviewsPage from '@/pages/PerformanceReviewsPage';
 import WorkspacePage from '@/pages/WorkspacePage';
 import SettingsPage from '@/pages/SettingsPage';
 import FinancePage from '@/pages/FinancePage';
+import CRMPage from '@/pages/CRMPage';
+import ClientDetailPage from '@/pages/ClientDetailPage';
+import ClientPortalPage from '@/pages/ClientPortalPage';
+import SatisfactionSurveyPage from '@/pages/SatisfactionSurveyPage';
 import NotFound from '@/pages/NotFound';
 
 const queryClient = new QueryClient();
@@ -79,6 +83,8 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/portal/:token" element={<ClientPortalPage />} />
+            <Route path="/survey/:token" element={<SatisfactionSurveyPage />} />
             <Route element={<AuthGuard><AppLayout /></AuthGuard>}>
               <Route path="/" element={<DashboardPage />} />
               <Route path="/missions" element={<MissionsPage />} />
@@ -91,6 +97,8 @@ const App = () => (
               <Route path="/admin" element={<AdminPage />} />
               <Route path="/admin/finance" element={<FinancePage />} />
               <Route path="/admin/reviews" element={<PerformanceReviewsPage />} />
+              <Route path="/admin/clients" element={<CRMPage />} />
+              <Route path="/admin/clients/:id" element={<ClientDetailPage />} />
               <Route path="/workspace" element={<WorkspacePage />} />
               <Route path="/workspace/:userId" element={<WorkspacePage />} />
               <Route path="/settings" element={<SettingsPage />} />
