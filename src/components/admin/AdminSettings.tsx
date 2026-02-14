@@ -10,8 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useOrganization, useUpdateOrganization, useUpdateOrgSettings } from '@/hooks/useAdmin';
-import { Building2, Shield, Briefcase, FileText, Mail, Bell, Clock, Receipt, CreditCard, Save, Check } from 'lucide-react';
+import { Building2, Shield, Briefcase, FileText, Mail, Bell, Clock, Receipt, CreditCard, Save, Check, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 function SettingsSection({ title, description, icon: Icon, children, onSave, saving }: {
   title: string; description: string; icon: any; children: React.ReactNode; onSave: () => void; saving?: boolean;
@@ -62,6 +64,10 @@ export default function AdminSettings() {
   const [defaultTva, setDefaultTva] = useState(18);
   const [invoicePrefix, setInvoicePrefix] = useState('FAC');
 
+  // Logo upload
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
   // Notifications
   const [notifInApp, setNotifInApp] = useState(true);
   const [notifEmail, setNotifEmail] = useState(true);
@@ -75,6 +81,7 @@ export default function AdminSettings() {
 
   useEffect(() => {
     if (org) {
+      setLogoUrl(org.logo_url ?? null);
       setOrgName(org.name ?? '');
       setOrgSlug(org.slug ?? '');
       setMinPwdLen(settings.min_password_length ?? 8);
@@ -95,6 +102,42 @@ export default function AdminSettings() {
 
   if (isLoading) return <div className="animate-pulse h-32 bg-muted rounded-lg" />;
 
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !org) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Veuillez sélectionner une image.');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('L\'image ne doit pas dépasser 2 Mo.');
+      return;
+    }
+    setUploading(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const filePath = `${org.id}/logo.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('documents').upload(filePath, file, { upsert: true });
+      if (uploadError) throw uploadError;
+      const { data: urlData } = supabase.storage.from('documents').getPublicUrl(filePath);
+      const publicUrl = urlData.publicUrl;
+      await supabase.from('organizations').update({ logo_url: publicUrl }).eq('id', org.id);
+      setLogoUrl(publicUrl);
+      toast.success('Logo mis à jour.');
+    } catch (err: any) {
+      toast.error(err.message || 'Erreur lors de l\'upload.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemoveLogo = async () => {
+    if (!org) return;
+    await supabase.from('organizations').update({ logo_url: null }).eq('id', org.id);
+    setLogoUrl(null);
+    toast.success('Logo supprimé.');
+  };
+
   return (
     <Tabs defaultValue="org">
       <TabsList className="flex-wrap h-auto gap-1">
@@ -114,6 +157,33 @@ export default function AdminSettings() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div><Label>Nom du cabinet</Label><Input value={orgName} onChange={(e) => setOrgName(e.target.value)} /></div>
             <div><Label>Identifiant (slug)</Label><Input value={orgSlug} disabled className="bg-muted" /></div>
+          </div>
+
+          <div>
+            <Label>Logo du cabinet</Label>
+            <div className="flex items-center gap-4 mt-2">
+              <Avatar className="h-16 w-16 rounded-lg border">
+                {logoUrl ? <AvatarImage src={logoUrl} alt="Logo" /> : null}
+                <AvatarFallback className="rounded-lg text-lg">{orgName?.charAt(0) || 'O'}</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" asChild disabled={uploading}>
+                    <label className="cursor-pointer">
+                      <Upload className="h-3.5 w-3.5 mr-1.5" />
+                      {uploading ? 'Envoi…' : 'Changer le logo'}
+                      <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                    </label>
+                  </Button>
+                  {logoUrl && (
+                    <Button variant="ghost" size="sm" onClick={handleRemoveLogo}>
+                      <X className="h-3.5 w-3.5 mr-1" /> Supprimer
+                    </Button>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">PNG, JPG ou SVG. Max 2 Mo.</p>
+              </div>
+            </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
