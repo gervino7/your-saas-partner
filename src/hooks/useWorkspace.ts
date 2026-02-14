@@ -223,6 +223,102 @@ export function useRenameWorkspaceFile() {
   });
 }
 
+export function useMoveWorkspaceFile() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, targetFolderPath }: { id: string; targetFolderPath: string }) => {
+      const { error } = await supabase
+        .from('workspace_files')
+        .update({ folder_path: targetFolderPath })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['workspace_files'] });
+      toast({ title: 'Déplacé' });
+    },
+  });
+}
+
+export function useCopyWorkspaceFile() {
+  const qc = useQueryClient();
+  const profile = useAuthStore((s) => s.profile);
+
+  return useMutation({
+    mutationFn: async ({ file, targetFolderPath }: { file: WorkspaceFile; targetFolderPath: string }) => {
+      if (file.is_folder) {
+        // Copy folder (create new folder entry)
+        const { error } = await supabase
+          .from('workspace_files')
+          .insert({
+            workspace_id: file.workspace_id,
+            file_name: file.file_name + ' (copie)',
+            file_path: '',
+            folder_path: targetFolderPath,
+            is_folder: true,
+            sync_status: 'synced',
+          });
+        if (error) throw error;
+      } else {
+        // Copy file in storage then create new record
+        const { data: fileData, error: dlErr } = await supabase.storage.from('workspace').download(file.file_path);
+        if (dlErr) throw dlErr;
+
+        const newPath = `${profile!.id}/${Date.now()}_copy_${file.file_name
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+
+        const { error: upErr } = await supabase.storage.from('workspace').upload(newPath, fileData, { upsert: false });
+        if (upErr) throw upErr;
+
+        const { error } = await supabase
+          .from('workspace_files')
+          .insert({
+            workspace_id: file.workspace_id,
+            file_name: file.file_name,
+            file_path: newPath,
+            file_size: file.file_size,
+            mime_type: file.mime_type,
+            checksum: file.checksum,
+            sync_status: 'synced',
+            folder_path: targetFolderPath,
+            is_folder: false,
+            last_modified_remote: new Date().toISOString(),
+          });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['workspace_files'] });
+      qc.invalidateQueries({ queryKey: ['workspace'] });
+      toast({ title: 'Copié' });
+    },
+    onError: (e: any) => toast({ title: 'Erreur copie', description: e.message, variant: 'destructive' }),
+  });
+}
+
+export function useBulkDeleteWorkspaceFiles() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (files: WorkspaceFile[]) => {
+      const filePaths = files.filter(f => !f.is_folder && f.file_path).map(f => f.file_path);
+      if (filePaths.length) {
+        await supabase.storage.from('workspace').remove(filePaths);
+      }
+      const ids = files.map(f => f.id);
+      const { error } = await supabase.from('workspace_files').delete().in('id', ids);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['workspace_files'] });
+      qc.invalidateQueries({ queryKey: ['workspace'] });
+      toast({ title: 'Éléments supprimés' });
+    },
+  });
+}
+
 export function useUpdateWorkspaceSettings() {
   const qc = useQueryClient();
 
