@@ -182,7 +182,7 @@ function WeeklyView() {
                       </TableCell>
                       <TableCell className="text-center">
                         {row.is_billable ? (
-                          <Badge variant="default" className="text-[10px] px-1">€</Badge>
+                          <Badge variant="default" className="text-[10px] px-1">F</Badge>
                         ) : (
                           <Badge variant="secondary" className="text-[10px] px-1">—</Badge>
                         )}
