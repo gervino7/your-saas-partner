@@ -2752,7 +2752,9 @@ export type Database = {
           file_name: string
           file_path: string
           file_size: number | null
+          folder_path: string | null
           id: string
+          is_folder: boolean | null
           last_modified_local: string | null
           last_modified_remote: string | null
           local_path: string | null
@@ -2767,7 +2769,9 @@ export type Database = {
           file_name: string
           file_path: string
           file_size?: number | null
+          folder_path?: string | null
           id?: string
+          is_folder?: boolean | null
           last_modified_local?: string | null
           last_modified_remote?: string | null
           local_path?: string | null
@@ -2782,7 +2786,9 @@ export type Database = {
           file_name?: string
           file_path?: string
           file_size?: number | null
+          folder_path?: string | null
           id?: string
+          is_folder?: boolean | null
           last_modified_local?: string | null
           last_modified_remote?: string | null
           local_path?: string | null
