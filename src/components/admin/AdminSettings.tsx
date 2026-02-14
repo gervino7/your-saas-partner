@@ -162,10 +162,13 @@ export default function AdminSettings() {
           <div>
             <Label>Logo du cabinet</Label>
             <div className="flex items-center gap-4 mt-2">
-              <Avatar className="h-16 w-16 rounded-lg border">
-                {logoUrl ? <AvatarImage src={logoUrl} alt="Logo" /> : null}
-                <AvatarFallback className="rounded-lg text-lg">{orgName?.charAt(0) || 'O'}</AvatarFallback>
-              </Avatar>
+              {logoUrl ? (
+                <img src={logoUrl} alt="Logo" className="h-20 w-20 rounded-lg border border-border object-contain bg-white p-1" />
+              ) : (
+                <Avatar className="h-20 w-20 rounded-lg border">
+                  <AvatarFallback className="rounded-lg text-xl font-bold">{orgName?.charAt(0) || 'O'}</AvatarFallback>
+                </Avatar>
+              )}
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center gap-2">
                   <Button variant="outline" size="sm" asChild disabled={uploading}>
