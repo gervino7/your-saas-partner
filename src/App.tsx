@@ -22,6 +22,7 @@ import AdminPage from '@/pages/AdminPage';
 import PerformanceReviewsPage from '@/pages/PerformanceReviewsPage';
 import WorkspacePage from '@/pages/WorkspacePage';
 import SettingsPage from '@/pages/SettingsPage';
+import FinancePage from '@/pages/FinancePage';
 import NotFound from '@/pages/NotFound';
 
 const queryClient = new QueryClient();
@@ -88,6 +89,7 @@ const App = () => (
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/timesheets" element={<TimesheetsPage />} />
               <Route path="/admin" element={<AdminPage />} />
+              <Route path="/admin/finance" element={<FinancePage />} />
               <Route path="/admin/reviews" element={<PerformanceReviewsPage />} />
               <Route path="/workspace" element={<WorkspacePage />} />
               <Route path="/workspace/:userId" element={<WorkspacePage />} />
