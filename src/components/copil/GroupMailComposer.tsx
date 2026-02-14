@@ -1,16 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Mail, Send, Clock, Eye, CheckCircle, AlertCircle, History } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Mail, Send, Clock, Eye, CheckCircle, AlertCircle, History, Bold, Italic, Underline, List, ListOrdered, Paperclip, X, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/stores/authStore';
+import { toast } from 'sonner';
 import {
   useCommitteeMembers, useMailingGroup, useEnsureMailingGroup,
   useCreateGroupEmail, useSendGroupEmail, useGroupEmails,
@@ -23,6 +25,13 @@ const STATUS_LABELS: Record<string, string> = {
   draft: 'Brouillon', sending: 'Envoi...', sent: 'Envoyé', delivered: 'Délivré', opened: 'Ouvert', error: 'Erreur',
 };
 
+interface Attachment {
+  name: string;
+  file_path: string;
+  mime_type: string;
+  file_size: number;
+}
+
 interface Props {
   committeeId: string;
   committeeName: string;
@@ -30,7 +39,65 @@ interface Props {
   canManage: boolean;
 }
 
+/* ── Simple rich-text toolbar using contenteditable ── */
+function RichTextEditor({ value, onChange, placeholder }: {
+  value: string; onChange: (html: string) => void; placeholder?: string;
+}) {
+  const editorRef = useRef<HTMLDivElement>(null);
+  const isInternalChange = useRef(false);
+
+  useEffect(() => {
+    if (editorRef.current && !isInternalChange.current && editorRef.current.innerHTML !== value) {
+      editorRef.current.innerHTML = value;
+    }
+    isInternalChange.current = false;
+  }, [value]);
+
+  const handleInput = () => {
+    isInternalChange.current = true;
+    onChange(editorRef.current?.innerHTML ?? '');
+  };
+
+  const exec = (cmd: string, val?: string) => {
+    document.execCommand(cmd, false, val);
+    editorRef.current?.focus();
+    handleInput();
+  };
+
+  return (
+    <div className="border rounded-md overflow-hidden">
+      <div className="flex items-center gap-1 p-1 border-b bg-muted/30">
+        <Button type="button" size="icon" variant="ghost" className="h-7 w-7" onClick={() => exec('bold')} title="Gras">
+          <Bold className="h-3.5 w-3.5" />
+        </Button>
+        <Button type="button" size="icon" variant="ghost" className="h-7 w-7" onClick={() => exec('italic')} title="Italique">
+          <Italic className="h-3.5 w-3.5" />
+        </Button>
+        <Button type="button" size="icon" variant="ghost" className="h-7 w-7" onClick={() => exec('underline')} title="Souligné">
+          <Underline className="h-3.5 w-3.5" />
+        </Button>
+        <Separator orientation="vertical" className="h-5 mx-1" />
+        <Button type="button" size="icon" variant="ghost" className="h-7 w-7" onClick={() => exec('insertUnorderedList')} title="Liste">
+          <List className="h-3.5 w-3.5" />
+        </Button>
+        <Button type="button" size="icon" variant="ghost" className="h-7 w-7" onClick={() => exec('insertOrderedList')} title="Liste numérotée">
+          <ListOrdered className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+      <div
+        ref={editorRef}
+        contentEditable
+        onInput={handleInput}
+        className="min-h-[200px] p-3 text-sm focus:outline-none prose prose-sm max-w-none"
+        data-placeholder={placeholder}
+        style={{ minHeight: 200 }}
+      />
+    </div>
+  );
+}
+
 const GroupMailComposer = ({ committeeId, committeeName, missionName, canManage }: Props) => {
+  const profile = useAuthStore((s) => s.profile);
   const { data: members } = useCommitteeMembers(committeeId);
   const { data: mailingGroup } = useMailingGroup(committeeId);
   const ensureGroup = useEnsureMailingGroup();
@@ -40,7 +107,9 @@ const GroupMailComposer = ({ committeeId, committeeName, missionName, canManage 
 
   const [composeOpen, setComposeOpen] = useState(false);
   const [form, setForm] = useState({ subject: '', body: '', cc: '' });
-  const [tab, setTab] = useState('compose');
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (committeeId && !mailingGroup) {
@@ -55,16 +124,57 @@ const GroupMailComposer = ({ committeeId, committeeName, missionName, canManage 
 
   const defaultSubject = `Rapport COPIL - ${missionName ?? committeeName} - ${format(new Date(), 'dd/MM/yyyy')}`;
 
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const path = `email-attachments/${profile?.organization_id}/${Date.now()}_${safeName}`;
+        
+        const { error } = await supabase.storage.from('documents').upload(path, file);
+        if (error) {
+          toast.error(`Erreur upload: ${file.name}`);
+          continue;
+        }
+
+        setAttachments(prev => [...prev, {
+          name: file.name,
+          file_path: path,
+          mime_type: file.type,
+          file_size: file.size,
+        }]);
+      }
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const removeAttachment = (idx: number) => {
+    setAttachments(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} o`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
+  };
+
   const handleSend = async () => {
     if (!mailingGroup) return;
     const email = await createEmail.mutateAsync({
       group_id: mailingGroup.id,
       subject: form.subject || defaultSubject,
       body: form.body,
+      attachments: attachments.length > 0 ? attachments : undefined,
     });
     await sendEmail.mutateAsync(email.id);
     setComposeOpen(false);
     setForm({ subject: '', body: '', cc: '' });
+    setAttachments([]);
   };
 
   if (!canManage) return null;
@@ -77,7 +187,7 @@ const GroupMailComposer = ({ committeeId, committeeName, missionName, canManage 
           <DialogTrigger asChild>
             <Button size="sm"><Send className="h-4 w-4 mr-2" /> Envoyer un rapport</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle>Envoyer au {committeeName}</DialogTitle></DialogHeader>
             <div className="space-y-4">
               <div>
@@ -90,7 +200,36 @@ const GroupMailComposer = ({ committeeId, committeeName, missionName, canManage 
               </div>
               <div><Label>Cc (optionnel)</Label><Input value={form.cc} onChange={(e) => setForm((p) => ({ ...p, cc: e.target.value }))} placeholder="email1@example.com, email2@example.com" /></div>
               <div><Label>Objet</Label><Input value={form.subject} onChange={(e) => setForm((p) => ({ ...p, subject: e.target.value }))} placeholder={defaultSubject} /></div>
-              <div><Label>Message</Label><Textarea value={form.body} onChange={(e) => setForm((p) => ({ ...p, body: e.target.value }))} rows={10} placeholder="Rédigez votre message..." /></div>
+              <div>
+                <Label>Message</Label>
+                <RichTextEditor
+                  value={form.body}
+                  onChange={(html) => setForm((p) => ({ ...p, body: html }))}
+                  placeholder="Rédigez votre message..."
+                />
+              </div>
+
+              {/* Attachments */}
+              <div>
+                <Label>Pièces jointes</Label>
+                <div className="mt-1 space-y-2">
+                  {attachments.map((att, i) => (
+                    <div key={i} className="flex items-center gap-2 p-2 border rounded-md bg-muted/30 text-sm">
+                      <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <span className="truncate flex-1">{att.name}</span>
+                      <span className="text-muted-foreground text-xs">{formatFileSize(att.file_size)}</span>
+                      <Button type="button" size="icon" variant="ghost" className="h-6 w-6" onClick={() => removeAttachment(i)}>
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                  <input ref={fileInputRef} type="file" multiple className="hidden" onChange={handleFileSelect} />
+                  <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+                    <Paperclip className="h-4 w-4 mr-2" />{uploading ? 'Upload...' : 'Joindre un fichier'}
+                  </Button>
+                </div>
+              </div>
+
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setComposeOpen(false)}>Annuler</Button>
                 <Button onClick={handleSend} disabled={!form.body || sendEmail.isPending || createEmail.isPending}>

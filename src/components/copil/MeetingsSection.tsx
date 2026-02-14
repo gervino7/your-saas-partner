@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { CalendarDays, ChevronDown, Clock, MapPin, Plus, Video } from 'lucide-react';
+import { CalendarDays, ChevronDown, MapPin, Plus, Save, Video } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useCommitteeMeetings, useCreateMeeting, useUpdateMeeting } from '@/hooks/useCommittees';
@@ -27,6 +27,87 @@ interface Decision { text: string; responsible: string; deadline: string; status
 interface Props {
   committeeId: string;
   canManage: boolean;
+}
+
+/* ── Decisions editor with LOCAL state ── */
+function DecisionsEditor({ meetingId, committeeId, initialDecisions, canManage }: {
+  meetingId: string; committeeId: string; initialDecisions: Decision[]; canManage: boolean;
+}) {
+  const updateMeeting = useUpdateMeeting();
+  const [decisions, setDecisions] = useState<Decision[]>(initialDecisions);
+  const [dirty, setDirty] = useState(false);
+
+  // Sync from server when initialDecisions change and there are no unsaved edits
+  const initialRef = useRef(initialDecisions);
+  useEffect(() => {
+    if (JSON.stringify(initialDecisions) !== JSON.stringify(initialRef.current)) {
+      initialRef.current = initialDecisions;
+      if (!dirty) setDecisions(initialDecisions);
+    }
+  }, [initialDecisions, dirty]);
+
+  const handleChange = (idx: number, field: string, value: string) => {
+    setDecisions(prev => {
+      const updated = [...prev];
+      updated[idx] = { ...updated[idx], [field]: value };
+      return updated;
+    });
+    setDirty(true);
+  };
+
+  const handleAdd = () => {
+    setDecisions(prev => [...prev, { text: '', responsible: '', deadline: '', status: 'todo' }]);
+    setDirty(true);
+  };
+
+  const handleSave = () => {
+    updateMeeting.mutate(
+      { id: meetingId, committee_id: committeeId, decisions: decisions as unknown as Json },
+      { onSuccess: () => setDirty(false) }
+    );
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-sm font-medium">Décisions ({decisions.length})</p>
+        <div className="flex gap-2">
+          {canManage && dirty && (
+            <Button size="sm" variant="default" onClick={handleSave} disabled={updateMeeting.isPending}>
+              <Save className="h-3 w-3 mr-1" />Enregistrer
+            </Button>
+          )}
+          {canManage && (
+            <Button size="sm" variant="outline" onClick={handleAdd}>
+              <Plus className="h-3 w-3 mr-1" />Décision
+            </Button>
+          )}
+        </div>
+      </div>
+      {decisions.map((d, i) => (
+        <div key={i} className="border rounded p-3 mb-2 space-y-2">
+          <Input
+            placeholder="Décision..."
+            value={d.text}
+            onChange={(e) => handleChange(i, 'text', e.target.value)}
+            disabled={!canManage}
+          />
+          <div className="grid grid-cols-3 gap-2">
+            <Input placeholder="Responsable" value={d.responsible} onChange={(e) => handleChange(i, 'responsible', e.target.value)} disabled={!canManage} />
+            <Input type="date" value={d.deadline} onChange={(e) => handleChange(i, 'deadline', e.target.value)} disabled={!canManage} />
+            <Select value={d.status} onValueChange={(v) => handleChange(i, 'status', v)} disabled={!canManage}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todo">À faire</SelectItem>
+                <SelectItem value="in_progress">En cours</SelectItem>
+                <SelectItem value="done">Réalisé</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 const MeetingsSection = ({ committeeId, canManage }: Props) => {
@@ -51,20 +132,6 @@ const MeetingsSection = ({ committeeId, canManage }: Props) => {
 
   const handleStatusChange = (meetingId: string, status: string) => {
     updateMeeting.mutate({ id: meetingId, committee_id: committeeId, status });
-  };
-
-  const handleAddDecision = (meetingId: string, existingDecisions: Decision[]) => {
-    const newDecision: Decision = { text: '', responsible: '', deadline: '', status: 'todo' };
-    updateMeeting.mutate({
-      id: meetingId, committee_id: committeeId,
-      decisions: [...existingDecisions, newDecision] as unknown as Json,
-    });
-  };
-
-  const handleUpdateDecision = (meetingId: string, decisions: Decision[], idx: number, field: string, value: string) => {
-    const updated = [...decisions];
-    updated[idx] = { ...updated[idx], [field]: value };
-    updateMeeting.mutate({ id: meetingId, committee_id: committeeId, decisions: updated as unknown as Json });
   };
 
   return (
@@ -137,40 +204,14 @@ const MeetingsSection = ({ committeeId, canManage }: Props) => {
                     </div>
                   )}
 
-                  {/* Decisions section */}
+                  {/* Decisions - uses local state, saves only on button click */}
                   {m.status === 'completed' && (
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-sm font-medium">Décisions ({decisions.length})</p>
-                        {canManage && (
-                          <Button size="sm" variant="outline" onClick={() => handleAddDecision(m.id, decisions)}>
-                            <Plus className="h-3 w-3 mr-1" />Décision
-                          </Button>
-                        )}
-                      </div>
-                      {decisions.map((d, i) => (
-                        <div key={i} className="border rounded p-3 mb-2 space-y-2">
-                          <Input
-                            placeholder="Décision..."
-                            value={d.text}
-                            onChange={(e) => handleUpdateDecision(m.id, decisions, i, 'text', e.target.value)}
-                            disabled={!canManage}
-                          />
-                          <div className="grid grid-cols-3 gap-2">
-                            <Input placeholder="Responsable" value={d.responsible} onChange={(e) => handleUpdateDecision(m.id, decisions, i, 'responsible', e.target.value)} disabled={!canManage} />
-                            <Input type="date" value={d.deadline} onChange={(e) => handleUpdateDecision(m.id, decisions, i, 'deadline', e.target.value)} disabled={!canManage} />
-                            <Select value={d.status} onValueChange={(v) => handleUpdateDecision(m.id, decisions, i, 'status', v)} disabled={!canManage}>
-                              <SelectTrigger><SelectValue /></SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="todo">À faire</SelectItem>
-                                <SelectItem value="in_progress">En cours</SelectItem>
-                                <SelectItem value="done">Réalisé</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    <DecisionsEditor
+                      meetingId={m.id}
+                      committeeId={committeeId}
+                      initialDecisions={decisions}
+                      canManage={canManage}
+                    />
                   )}
 
                   {/* Status change */}
