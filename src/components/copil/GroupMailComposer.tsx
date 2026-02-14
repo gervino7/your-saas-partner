@@ -4,15 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Separator } from '@/components/ui/separator';
-import { Mail, Send, Clock, Eye, CheckCircle, AlertCircle, History, Bold, Italic, Underline, List, ListOrdered, Paperclip, X, FileText } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Mail, Send, Clock, Eye, CheckCircle, AlertCircle, History, Bold, Italic, Underline, List, ListOrdered, Paperclip, X, FileText, Trash2, EyeIcon, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   useCommitteeMembers, useMailingGroup, useEnsureMailingGroup,
   useCreateGroupEmail, useSendGroupEmail, useGroupEmails,
@@ -96,8 +98,64 @@ function RichTextEditor({ value, onChange, placeholder }: {
   );
 }
 
+/* ── Email detail viewer ── */
+function EmailViewDialog({ email, open, onOpenChange }: { email: any; open: boolean; onOpenChange: (o: boolean) => void }) {
+  const attachments: Attachment[] = (email?.attachments as Attachment[]) ?? [];
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{email?.subject}</DialogTitle>
+          <DialogDescription>
+            Envoyé le {email?.sent_at ? format(new Date(email.sent_at), 'dd/MM/yyyy à HH:mm', { locale: fr }) : email?.created_at ? format(new Date(email.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr }) : '—'}
+            {' • '}{email?.profiles?.full_name ?? 'Inconnu'}
+          </DialogDescription>
+        </DialogHeader>
+        <Separator />
+        <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: email?.body ?? '' }} />
+        {attachments.length > 0 && (
+          <>
+            <Separator />
+            <div>
+              <p className="text-sm font-medium mb-2">Pièces jointes ({attachments.length})</p>
+              <div className="space-y-1">
+                {attachments.map((att, i) => (
+                  <div key={i} className="flex items-center gap-2 p-2 border rounded-md bg-muted/30 text-sm">
+                    <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <span className="truncate flex-1">{att.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+        {email?.delivery_report && Object.keys(email.delivery_report).length > 0 && (
+          <>
+            <Separator />
+            <div>
+              <p className="text-sm font-medium mb-2">Rapport de livraison</p>
+              <div className="text-xs text-muted-foreground space-y-1">
+                {Object.entries(email.delivery_report as Record<string, any>).map(([emailAddr, info]: [string, any]) => (
+                  <div key={emailAddr} className="flex items-center justify-between p-1.5 border rounded">
+                    <span className="truncate">{emailAddr}</span>
+                    <Badge variant={info.status === 'sent' || info.status === 'delivered' ? 'default' : 'destructive'} className="text-xs">
+                      {STATUS_LABELS[info.status] ?? info.status}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 const GroupMailComposer = ({ committeeId, committeeName, missionName, canManage }: Props) => {
   const profile = useAuthStore((s) => s.profile);
+  const qc = useQueryClient();
   const { data: members } = useCommitteeMembers(committeeId);
   const { data: mailingGroup } = useMailingGroup(committeeId);
   const ensureGroup = useEnsureMailingGroup();
@@ -110,6 +168,12 @@ const GroupMailComposer = ({ committeeId, committeeName, missionName, canManage 
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // View / Delete state
+  const [viewEmail, setViewEmail] = useState<any>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  // Edit (resend) state
+  const [editEmail, setEditEmail] = useState<any>(null);
 
   useEffect(() => {
     if (committeeId && !mailingGroup) {
@@ -177,106 +241,186 @@ const GroupMailComposer = ({ committeeId, committeeName, missionName, canManage 
     setAttachments([]);
   };
 
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    const { error } = await supabase.from('group_emails').delete().eq('id', deleteId);
+    if (error) {
+      toast.error('Impossible de supprimer: ' + error.message);
+    } else {
+      toast.success('Email supprimé');
+      qc.invalidateQueries({ queryKey: ['group-emails'] });
+    }
+    setDeleteId(null);
+  };
+
+  const handleEditResend = async () => {
+    if (!mailingGroup || !editEmail) return;
+    const email = await createEmail.mutateAsync({
+      group_id: mailingGroup.id,
+      subject: form.subject || editEmail.subject,
+      body: form.body,
+      attachments: attachments.length > 0 ? attachments : undefined,
+    });
+    await sendEmail.mutateAsync(email.id);
+    setEditEmail(null);
+    setComposeOpen(false);
+    setForm({ subject: '', body: '', cc: '' });
+    setAttachments([]);
+    toast.success('Email renvoyé');
+  };
+
+  const openEdit = (e: any) => {
+    setEditEmail(e);
+    setForm({ subject: e.subject, body: e.body, cc: '' });
+    setAttachments((e.attachments as Attachment[]) ?? []);
+    setComposeOpen(true);
+  };
+
+  const openCompose = () => {
+    setEditEmail(null);
+    setForm({ subject: '', body: '', cc: '' });
+    setAttachments([]);
+    setComposeOpen(true);
+  };
+
   if (!canManage) return null;
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-lg flex items-center gap-2"><Mail className="h-5 w-5" /> Mailing groupé</CardTitle>
-        <Dialog open={composeOpen} onOpenChange={setComposeOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm"><Send className="h-4 w-4 mr-2" /> Envoyer un rapport</Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader><DialogTitle>Envoyer au {committeeName}</DialogTitle></DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label>Destinataires ({recipients.length})</Label>
-                <div className="flex flex-wrap gap-1 mt-1 p-2 border rounded-md bg-muted/50 max-h-24 overflow-y-auto">
-                  {recipients.map((r, i) => (
-                    <Badge key={i} variant="secondary" className="text-xs">{r.name} &lt;{r.email}&gt;</Badge>
-                  ))}
-                </div>
-              </div>
-              <div><Label>Cc (optionnel)</Label><Input value={form.cc} onChange={(e) => setForm((p) => ({ ...p, cc: e.target.value }))} placeholder="email1@example.com, email2@example.com" /></div>
-              <div><Label>Objet</Label><Input value={form.subject} onChange={(e) => setForm((p) => ({ ...p, subject: e.target.value }))} placeholder={defaultSubject} /></div>
-              <div>
-                <Label>Message</Label>
-                <RichTextEditor
-                  value={form.body}
-                  onChange={(html) => setForm((p) => ({ ...p, body: html }))}
-                  placeholder="Rédigez votre message..."
-                />
-              </div>
+    <>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-lg flex items-center gap-2"><Mail className="h-5 w-5" /> Mailing groupé</CardTitle>
+          <Button size="sm" onClick={openCompose}><Send className="h-4 w-4 mr-2" /> Envoyer un rapport</Button>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-muted-foreground flex items-center gap-2"><History className="h-4 w-4" /> Historique des envois</p>
+            {emailHistory && emailHistory.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Objet</TableHead>
+                    <TableHead>Expéditeur</TableHead>
+                    <TableHead>Statut</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {emailHistory.map((e: any) => {
+                    const Icon = STATUS_ICONS[e.status ?? 'draft'] ?? Clock;
+                    return (
+                      <TableRow key={e.id}>
+                        <TableCell className="text-sm">{format(new Date(e.created_at), 'dd/MM/yyyy HH:mm', { locale: fr })}</TableCell>
+                        <TableCell className="font-medium">{e.subject}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{e.profiles?.full_name ?? '—'}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="flex items-center gap-1 w-fit">
+                            <Icon className="h-3 w-3" />{STATUS_LABELS[e.status ?? 'draft']}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button size="icon" variant="ghost" className="h-7 w-7" title="Visualiser" onClick={() => setViewEmail(e)}>
+                              <EyeIcon className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button size="icon" variant="ghost" className="h-7 w-7" title="Modifier et renvoyer" onClick={() => openEdit(e)}>
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive" title="Supprimer" onClick={() => setDeleteId(e.id)}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            ) : (
+              <p className="text-center text-muted-foreground py-6 text-sm">Aucun envoi</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
-              {/* Attachments */}
-              <div>
-                <Label>Pièces jointes</Label>
-                <div className="mt-1 space-y-2">
-                  {attachments.map((att, i) => (
-                    <div key={i} className="flex items-center gap-2 p-2 border rounded-md bg-muted/30 text-sm">
-                      <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <span className="truncate flex-1">{att.name}</span>
-                      <span className="text-muted-foreground text-xs">{formatFileSize(att.file_size)}</span>
-                      <Button type="button" size="icon" variant="ghost" className="h-6 w-6" onClick={() => removeAttachment(i)}>
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  ))}
-                  <input ref={fileInputRef} type="file" multiple className="hidden" onChange={handleFileSelect} />
-                  <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
-                    <Paperclip className="h-4 w-4 mr-2" />{uploading ? 'Upload...' : 'Joindre un fichier'}
-                  </Button>
-                </div>
+      {/* Compose / Edit Dialog */}
+      <Dialog open={composeOpen} onOpenChange={setComposeOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editEmail ? 'Modifier et renvoyer' : `Envoyer au ${committeeName}`}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Destinataires ({recipients.length})</Label>
+              <div className="flex flex-wrap gap-1 mt-1 p-2 border rounded-md bg-muted/50 max-h-24 overflow-y-auto">
+                {recipients.map((r, i) => (
+                  <Badge key={i} variant="secondary" className="text-xs">{r.name} &lt;{r.email}&gt;</Badge>
+                ))}
               </div>
+            </div>
+            <div><Label>Cc (optionnel)</Label><Input value={form.cc} onChange={(e) => setForm((p) => ({ ...p, cc: e.target.value }))} placeholder="email1@example.com, email2@example.com" /></div>
+            <div><Label>Objet</Label><Input value={form.subject} onChange={(e) => setForm((p) => ({ ...p, subject: e.target.value }))} placeholder={defaultSubject} /></div>
+            <div>
+              <Label>Message</Label>
+              <RichTextEditor
+                value={form.body}
+                onChange={(html) => setForm((p) => ({ ...p, body: html }))}
+                placeholder="Rédigez votre message..."
+              />
+            </div>
 
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setComposeOpen(false)}>Annuler</Button>
-                <Button onClick={handleSend} disabled={!form.body || sendEmail.isPending || createEmail.isPending}>
-                  <Send className="h-4 w-4 mr-2" />{sendEmail.isPending ? 'Envoi...' : 'Envoyer'}
+            {/* Attachments */}
+            <div>
+              <Label>Pièces jointes</Label>
+              <div className="mt-1 space-y-2">
+                {attachments.map((att, i) => (
+                  <div key={i} className="flex items-center gap-2 p-2 border rounded-md bg-muted/30 text-sm">
+                    <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <span className="truncate flex-1">{att.name}</span>
+                    <span className="text-muted-foreground text-xs">{formatFileSize(att.file_size)}</span>
+                    <Button type="button" size="icon" variant="ghost" className="h-6 w-6" onClick={() => removeAttachment(i)}>
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+                <input ref={fileInputRef} type="file" multiple className="hidden" onChange={handleFileSelect} />
+                <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+                  <Paperclip className="h-4 w-4 mr-2" />{uploading ? 'Upload...' : 'Joindre un fichier'}
                 </Button>
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-muted-foreground flex items-center gap-2"><History className="h-4 w-4" /> Historique des envois</p>
-          {emailHistory && emailHistory.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Objet</TableHead>
-                  <TableHead>Expéditeur</TableHead>
-                  <TableHead>Statut</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {emailHistory.map((e: any) => {
-                  const Icon = STATUS_ICONS[e.status ?? 'draft'] ?? Clock;
-                  return (
-                    <TableRow key={e.id}>
-                      <TableCell className="text-sm">{format(new Date(e.created_at), 'dd/MM/yyyy HH:mm', { locale: fr })}</TableCell>
-                      <TableCell className="font-medium">{e.subject}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{e.profiles?.full_name ?? '—'}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="flex items-center gap-1 w-fit">
-                          <Icon className="h-3 w-3" />{STATUS_LABELS[e.status ?? 'draft']}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          ) : (
-            <p className="text-center text-muted-foreground py-6 text-sm">Aucun envoi</p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => { setComposeOpen(false); setEditEmail(null); }}>Annuler</Button>
+              <Button
+                onClick={editEmail ? handleEditResend : handleSend}
+                disabled={!form.body || sendEmail.isPending || createEmail.isPending}
+              >
+                <Send className="h-4 w-4 mr-2" />{sendEmail.isPending ? 'Envoi...' : editEmail ? 'Renvoyer' : 'Envoyer'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Dialog */}
+      <EmailViewDialog email={viewEmail} open={!!viewEmail} onOpenChange={(o) => !o && setViewEmail(null)} />
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer cet email ?</AlertDialogTitle>
+            <AlertDialogDescription>Cette action est irréversible. L'historique de cet envoi sera supprimé définitivement.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Supprimer</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 
