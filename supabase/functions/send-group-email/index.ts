@@ -24,8 +24,8 @@ Deno.serve(async (req) => {
     const userClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!, {
       global: { headers: { Authorization: authHeader } },
     });
-    const { data: claims, error: claimsErr } = await userClient.auth.getClaims(authHeader.replace('Bearer ', ''));
-    if (claimsErr || !claims?.claims?.sub) {
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData?.user?.id) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
@@ -148,16 +148,20 @@ Deno.serve(async (req) => {
     }
 
     const allSent = Object.values(deliveryReport).every((r: any) => r.status === 'sent');
-    await admin.from('group_emails').update({
+    const updateResult = await admin.from('group_emails').update({
       status: allSent ? 'sent' : 'error',
       delivery_report: deliveryReport,
     }).eq('id', emailId);
+
+    console.log('Final update result:', JSON.stringify(updateResult));
+    console.log('Delivery report:', JSON.stringify(deliveryReport));
 
     return new Response(JSON.stringify({
       success: true,
       recipients: allRecipients.length,
       sent: Object.values(deliveryReport).filter((r: any) => r.status === 'sent').length,
       errors: Object.values(deliveryReport).filter((r: any) => r.status === 'error').length,
+      deliveryReport,
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
   } catch (error) {
