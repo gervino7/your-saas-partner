@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Shield, BarChart3, Users, Briefcase, DollarSign, Star, Activity, Settings, ChevronLeft } from 'lucide-react';
+import { Shield, BarChart3, Users, Briefcase, DollarSign, Star, Activity, Settings, ChevronLeft, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/authStore';
@@ -23,6 +23,7 @@ import AdminSettings from '@/components/admin/AdminSettings';
 const sections = [
   { id: 'dashboard', label: 'Tableau de bord', icon: BarChart3 },
   { id: 'users', label: 'Utilisateurs', icon: Users },
+  { id: 'clients', label: 'CRM / Clients', icon: Building2 },
   { id: 'missions', label: 'Missions', icon: Briefcase },
   { id: 'codir', label: 'Comité de Direction', icon: Shield },
   { id: 'finance', label: 'Finance', icon: DollarSign },
@@ -94,8 +95,10 @@ const AdminPage = () => {
     switch (activeSection) {
       case 'dashboard': return <AdminDashboard />;
       case 'users': return <AdminUsers />;
+      case 'clients':
+        navigate('/admin/clients');
+        return <div className="text-muted-foreground">Redirection vers le CRM…</div>;
       case 'missions':
-        // Redirect to missions page with admin view
         return (
           <div className="space-y-4">
             <p className="text-muted-foreground">Vue administrative des missions. Utilisez la page Missions pour la gestion complète.</p>
