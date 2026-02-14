@@ -104,46 +104,48 @@ Deno.serve(async (req) => {
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    // Send via Resend API
-    for (const recipient of allRecipients) {
-      let attempts = 0;
-      let sent = false;
+    // Send via Resend API - with rate limiting (max 2 req/s)
+    for (let i = 0; i < allRecipients.length; i++) {
+      const recipient = allRecipients[i];
+      
+      // Wait between recipients to respect rate limits
+      if (i > 0) {
+        await new Promise(r => setTimeout(r, 600));
+      }
 
-      while (attempts < 3 && !sent) {
-        attempts++;
-        try {
-          const res = await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${resendApiKey}` },
-            body: JSON.stringify({
-              from: 'MissionFlow <onboarding@resend.dev>',
-              to: [recipient.email],
-              subject: email.subject,
-              html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <div style="background: #1a1a2e; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
-                  <h2 style="margin: 0;">MissionFlow</h2>
-                </div>
-                <div style="padding: 20px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
-                  ${email.body.replace(/\n/g, '<br>')}
-                </div>
-                <p style="color: #6b7280; font-size: 12px; text-align: center; margin-top: 16px;">
-                  Envoyé via MissionFlow
-                </p>
-              </div>`,
-            }),
-          });
+      try {
+        const res = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${resendApiKey}` },
+          body: JSON.stringify({
+            from: 'MissionFlow <onboarding@resend.dev>',
+            to: [recipient.email],
+            subject: email.subject,
+            html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <div style="background: #1a1a2e; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
+                <h2 style="margin: 0;">MissionFlow</h2>
+              </div>
+              <div style="padding: 20px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
+                ${email.body.replace(/\n/g, '<br>')}
+              </div>
+              <p style="color: #6b7280; font-size: 12px; text-align: center; margin-top: 16px;">
+                Envoyé via MissionFlow
+              </p>
+            </div>`,
+          }),
+        });
 
-          if (res.ok) {
-            const data = await res.json();
-            deliveryReport[recipient.email] = { status: 'sent', resend_id: data.id, name: recipient.name, timestamp: new Date().toISOString() };
-            sent = true;
-          } else {
-            const errText = await res.text();
-            deliveryReport[recipient.email] = { status: 'error', error: errText, attempts, name: recipient.name };
-          }
-        } catch (e) {
-          deliveryReport[recipient.email] = { status: 'error', error: String(e), attempts, name: recipient.name };
+        if (res.ok) {
+          const data = await res.json();
+          deliveryReport[recipient.email] = { status: 'sent', resend_id: data.id, name: recipient.name, timestamp: new Date().toISOString() };
+        } else {
+          const errText = await res.text();
+          console.error(`Failed to send to ${recipient.email}:`, errText);
+          deliveryReport[recipient.email] = { status: 'error', error: errText, name: recipient.name };
         }
+      } catch (e) {
+        console.error(`Exception sending to ${recipient.email}:`, e);
+        deliveryReport[recipient.email] = { status: 'error', error: String(e), name: recipient.name };
       }
     }
 
