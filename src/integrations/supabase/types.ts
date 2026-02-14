@@ -1439,6 +1439,7 @@ export type Database = {
       }
       meetings: {
         Row: {
+          agenda: string | null
           created_at: string | null
           description: string | null
           duration_minutes: number | null
@@ -1449,6 +1450,8 @@ export type Database = {
           organizer_id: string | null
           project_id: string | null
           recording_url: string | null
+          recurrence: string | null
+          reminders: Json | null
           scheduled_at: string
           status: string | null
           summary: string | null
@@ -1456,6 +1459,7 @@ export type Database = {
           type: string | null
         }
         Insert: {
+          agenda?: string | null
           created_at?: string | null
           description?: string | null
           duration_minutes?: number | null
@@ -1466,6 +1470,8 @@ export type Database = {
           organizer_id?: string | null
           project_id?: string | null
           recording_url?: string | null
+          recurrence?: string | null
+          reminders?: Json | null
           scheduled_at: string
           status?: string | null
           summary?: string | null
@@ -1473,6 +1479,7 @@ export type Database = {
           type?: string | null
         }
         Update: {
+          agenda?: string | null
           created_at?: string | null
           description?: string | null
           duration_minutes?: number | null
@@ -1483,6 +1490,8 @@ export type Database = {
           organizer_id?: string | null
           project_id?: string | null
           recording_url?: string | null
+          recurrence?: string | null
+          reminders?: Json | null
           scheduled_at?: string
           status?: string | null
           summary?: string | null
