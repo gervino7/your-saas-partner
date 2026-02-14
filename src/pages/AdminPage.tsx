@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Users, CalendarDays, Mail, BarChart3 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Shield, Users, CalendarDays, Mail, BarChart3, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useCommittees } from '@/hooks/useCommittees';
 import CommitteeSetup from '@/components/copil/CommitteeSetup';
@@ -14,7 +16,8 @@ import EmptyState from '@/components/common/EmptyState';
 const AdminPage = () => {
   const profile = useAuthStore((s) => s.profile);
   const gradeLevel = profile?.grade_level ?? 8;
-  const canAccess = gradeLevel <= 2; // DA, DM only
+  const canAccess = gradeLevel <= 2;
+  const navigate = useNavigate();
 
   // For CODIR, use committees without missionId (org-level)
   const { data: committees, isLoading } = useCommittees();
@@ -41,6 +44,7 @@ const AdminPage = () => {
         <TabsList>
           <TabsTrigger value="codir" className="flex items-center gap-1"><Shield className="h-4 w-4" /> Comité de Direction</TabsTrigger>
           <TabsTrigger value="overview" className="flex items-center gap-1"><BarChart3 className="h-4 w-4" /> Vue d'ensemble</TabsTrigger>
+          <TabsTrigger value="reviews" className="flex items-center gap-1"><Star className="h-4 w-4" /> Évaluations</TabsTrigger>
         </TabsList>
 
         <TabsContent value="codir" className="mt-6 space-y-6">
@@ -94,6 +98,20 @@ const AdminPage = () => {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground text-sm">Le dashboard consolidé sera disponible prochainement.</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="reviews" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Évaluations de performance</CardTitle>
+              <CardDescription>Suivi des notes et de la qualité des livrables par collaborateur.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={() => navigate('/admin/reviews')}>
+                <Star className="h-4 w-4 mr-1" /> Voir les évaluations détaillées
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
