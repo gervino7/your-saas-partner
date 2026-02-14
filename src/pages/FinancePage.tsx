@@ -60,11 +60,11 @@ function BudgetTab() {
                     <div className="font-medium text-sm">{m.name}</div>
                     <div className="text-xs text-muted-foreground">{m.code}</div>
                   </TableCell>
-                  <TableCell className="text-right text-sm">{m.budget ? `${m.budget.toLocaleString()} FCFA` : '—'}</TableCell>
+                  <TableCell className="text-right text-sm">{m.budget ? `${m.budget.toLocaleString('fr-FR')} FCFA` : '—'}</TableCell>
                   <TableCell className="text-right text-sm">{m.total_hours.toFixed(1)}h</TableCell>
-                  <TableCell className="text-right text-sm">{m.total_cost.toLocaleString()} FCFA</TableCell>
+                  <TableCell className="text-right text-sm">{m.total_cost.toLocaleString('fr-FR')} FCFA</TableCell>
                   <TableCell className="text-right text-sm">
-                    {m.budget ? `${(m.budget - m.total_cost).toLocaleString()} FCFA` : '—'}
+                    {m.budget ? `${(m.budget - m.total_cost).toLocaleString('fr-FR')} FCFA` : '—'}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
@@ -126,7 +126,7 @@ function DailyRatesTab() {
             <TableHeader>
               <TableRow>
                 <TableHead>Grade</TableHead>
-                <TableHead className="text-right">Taux journalier (FCFA)</TableHead>
+                <TableHead className="text-right">Taux journalier (XOF / FCFA BCEAO)</TableHead>
                 <TableHead className="w-20" />
               </TableRow>
             </TableHeader>
@@ -281,7 +281,7 @@ function ExpensesTab() {
                   <TableCell className="text-sm">{exp.user?.full_name || '—'}</TableCell>
                   <TableCell className="text-sm">{exp.category || '—'}</TableCell>
                   <TableCell className="text-sm">{exp.mission?.name || '—'}</TableCell>
-                  <TableCell className="text-right text-sm font-medium">{Number(exp.amount).toLocaleString()} {exp.currency}</TableCell>
+                  <TableCell className="text-right text-sm font-medium">{Number(exp.amount).toLocaleString('fr-FR')} FCFA</TableCell>
                   <TableCell><Badge variant={statusVariant[exp.status] || 'secondary'}>{statusLabel[exp.status] || exp.status}</Badge></TableCell>
                   {isSuperior && (
                     <TableCell>
@@ -405,7 +405,7 @@ function InvoicesTab() {
               </div>
               {form.amount && (
                 <div className="text-sm text-right text-muted-foreground">
-                  Total TTC : <span className="font-bold text-foreground">{(Number(form.amount) * (1 + Number(form.tax_pct) / 100)).toLocaleString()} FCFA</span>
+                  Total TTC : <span className="font-bold text-foreground">{(Number(form.amount) * (1 + Number(form.tax_pct) / 100)).toLocaleString('fr-FR')} FCFA</span>
                 </div>
               )}
               <div>
@@ -443,7 +443,7 @@ function InvoicesTab() {
                   <TableCell className="text-sm">{inv.client?.name || '—'}</TableCell>
                   <TableCell className="text-sm">{inv.mission?.name || '—'}</TableCell>
                   <TableCell className="text-sm capitalize">{inv.type}</TableCell>
-                  <TableCell className="text-right text-sm font-medium">{Number(inv.total_amount).toLocaleString()} {inv.currency}</TableCell>
+                  <TableCell className="text-right text-sm font-medium">{Number(inv.total_amount).toLocaleString('fr-FR')} FCFA</TableCell>
                   <TableCell className="text-sm">{inv.due_date ? format(new Date(inv.due_date), 'dd/MM/yyyy') : '—'}</TableCell>
                   <TableCell><Badge variant={statusVariant[inv.status] || 'secondary'}>{statusLabel[inv.status] || inv.status}</Badge></TableCell>
                   <TableCell>

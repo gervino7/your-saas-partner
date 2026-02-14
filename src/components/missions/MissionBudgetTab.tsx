@@ -3,9 +3,9 @@ import { Progress } from '@/components/ui/progress';
 import { CURRENCY_LABELS } from '@/types/database';
 import { DollarSign, TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
 
-function formatAmount(amount: number | null, currency: string | null) {
+function formatAmount(amount: number | null) {
   if (amount == null) return '—';
-  return new Intl.NumberFormat('fr-FR').format(amount) + ' ' + (currency ?? 'XOF');
+  return new Intl.NumberFormat('fr-FR').format(amount) + ' FCFA';
 }
 
 export default function MissionBudgetTab({ mission }: { mission: any }) {
@@ -25,7 +25,7 @@ export default function MissionBudgetTab({ mission }: { mission: any }) {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Budget initial</p>
-                <p className="text-lg font-semibold">{formatAmount(budget, mission.budget_currency)}</p>
+                <p className="text-lg font-semibold">{formatAmount(budget)}</p>
               </div>
             </div>
           </CardContent>
@@ -39,7 +39,7 @@ export default function MissionBudgetTab({ mission }: { mission: any }) {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Consommé</p>
-                <p className="text-lg font-semibold">{formatAmount(consumed, mission.budget_currency)}</p>
+                <p className="text-lg font-semibold">{formatAmount(consumed)}</p>
               </div>
             </div>
           </CardContent>
@@ -56,7 +56,7 @@ export default function MissionBudgetTab({ mission }: { mission: any }) {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Restant</p>
-                <p className="text-lg font-semibold">{formatAmount(remaining, mission.budget_currency)}</p>
+                <p className="text-lg font-semibold">{formatAmount(remaining)}</p>
               </div>
             </div>
           </CardContent>
