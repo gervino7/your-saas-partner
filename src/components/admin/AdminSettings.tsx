@@ -8,8 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useOrganization, useUpdateOrganization, useUpdateOrgSettings } from '@/hooks/useAdmin';
-import { Building2, Shield, Briefcase, FileText, Mail, Bell, Clock, Receipt, CreditCard, Save } from 'lucide-react';
+import { Building2, Shield, Briefcase, FileText, Mail, Bell, Clock, Receipt, CreditCard, Save, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
 function SettingsSection({ title, description, icon: Icon, children, onSave, saving }: {
@@ -65,6 +66,13 @@ export default function AdminSettings() {
   const [notifInApp, setNotifInApp] = useState(true);
   const [notifEmail, setNotifEmail] = useState(true);
 
+  // Mission & Project numbering
+  const [missionFormat, setMissionFormat] = useState('MIS-{YYYY}-{NNN}');
+  const [projectFormat, setProjectFormat] = useState('PRJ-{YYYY}-{NNN}');
+
+  // Plan dialog
+  const [showPlanDialog, setShowPlanDialog] = useState(false);
+
   useEffect(() => {
     if (org) {
       setOrgName(org.name ?? '');
@@ -80,6 +88,8 @@ export default function AdminSettings() {
       setInvoicePrefix(settings.invoice_prefix ?? 'FAC');
       setNotifInApp(settings.notif_in_app ?? true);
       setNotifEmail(settings.notif_email ?? true);
+      setMissionFormat(settings.mission_code_format ?? 'MIS-{YYYY}-{NNN}');
+      setProjectFormat(settings.project_code_format ?? 'PRJ-{YYYY}-{NNN}');
     }
   }, [org]);
 
@@ -159,12 +169,24 @@ export default function AdminSettings() {
       </TabsContent>
 
       <TabsContent value="missions" className="mt-6">
-        <SettingsSection title="Missions" description="Configuration des missions et projets." icon={Briefcase}
-          onSave={() => updateSettings.mutate({ mission_code_prefix: 'MIS' })} saving={updateSettings.isPending}>
-          <div>
-            <Label>Format de numérotation</Label>
-            <Input defaultValue="MIS-{YYYY}-{NNN}" disabled className="bg-muted" />
-            <p className="text-xs text-muted-foreground mt-1">Le format de numérotation automatique des missions.</p>
+        <SettingsSection title="Missions & Projets" description="Configuration de la numérotation des missions et projets." icon={Briefcase}
+          onSave={() => updateSettings.mutate({ mission_code_format: missionFormat, project_code_format: projectFormat })} saving={updateSettings.isPending}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label>Format numérotation des missions</Label>
+              <Input value={missionFormat} onChange={(e) => setMissionFormat(e.target.value)} placeholder="MIS-{YYYY}-{NNN}" />
+              <p className="text-xs text-muted-foreground mt-1">Ex: MIS-2026-001. Variables : {'{YYYY}'}, {'{YY}'}, {'{NNN}'}, {'{NNNN}'}</p>
+            </div>
+            <div>
+              <Label>Format numérotation des projets</Label>
+              <Input value={projectFormat} onChange={(e) => setProjectFormat(e.target.value)} placeholder="PRJ-{YYYY}-{NNN}" />
+              <p className="text-xs text-muted-foreground mt-1">Ex: PRJ-2026-001. Variables : {'{YYYY}'}, {'{YY}'}, {'{NNN}'}, {'{NNNN}'}</p>
+            </div>
+          </div>
+          <div className="bg-muted/50 rounded-lg p-3 text-xs text-muted-foreground space-y-1">
+            <p className="font-medium text-foreground">Aperçu :</p>
+            <p>Mission : <span className="font-mono text-foreground">{missionFormat.replace('{YYYY}', '2026').replace('{YY}', '26').replace('{NNNN}', '0001').replace('{NNN}', '001')}</span></p>
+            <p>Projet : <span className="font-mono text-foreground">{projectFormat.replace('{YYYY}', '2026').replace('{YY}', '26').replace('{NNNN}', '0001').replace('{NNN}', '001')}</span></p>
           </div>
         </SettingsSection>
       </TabsContent>
@@ -249,9 +271,58 @@ export default function AdminSettings() {
                 <p className="font-semibold">— / ∞</p>
               </div>
             </div>
-            <Button variant="outline" size="sm">Changer de plan</Button>
+            <Button variant="outline" size="sm" onClick={() => setShowPlanDialog(true)}>Changer de plan</Button>
           </CardContent>
         </Card>
+
+        <Dialog open={showPlanDialog} onOpenChange={setShowPlanDialog}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Changer de plan</DialogTitle>
+              <DialogDescription>Choisissez le plan adapté à votre cabinet.</DialogDescription>
+            </DialogHeader>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+              {[
+                { name: 'Starter', price: '49 000', users: 5, missions: 3, emails: 100 },
+                { name: 'Pro', price: '149 000', users: 15, missions: 10, emails: 500 },
+                { name: 'Business', price: '299 000', users: 50, missions: '∞', emails: 2000 },
+              ].map((plan) => {
+                const current = (org?.subscription_plan || 'starter').toLowerCase() === plan.name.toLowerCase();
+                return (
+                  <Card key={plan.name} className={current ? 'border-primary ring-2 ring-primary/20' : ''}>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        {plan.name}
+                        {current && <Badge variant="secondary" className="text-[10px]">Actuel</Badge>}
+                      </CardTitle>
+                      <p className="text-lg font-bold">{plan.price} <span className="text-xs font-normal text-muted-foreground">FCFA/mois</span></p>
+                    </CardHeader>
+                    <CardContent className="space-y-2 text-sm">
+                      <div className="flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-primary" />{plan.users} utilisateurs</div>
+                      <div className="flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-primary" />{plan.missions} missions</div>
+                      <div className="flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-primary" />{plan.emails} emails/mois</div>
+                      <Button
+                        size="sm"
+                        className="w-full mt-2"
+                        variant={current ? 'outline' : 'default'}
+                        disabled={current}
+                        onClick={() => {
+                          toast.info('Contactez-nous à support@missionflow.ci pour changer de plan.');
+                          setShowPlanDialog(false);
+                        }}
+                      >
+                        {current ? 'Plan actuel' : 'Sélectionner'}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+            <p className="text-xs text-muted-foreground text-center mt-2">
+              Pour le plan Enterprise (illimité), contactez-nous à <span className="font-medium">support@missionflow.ci</span>
+            </p>
+          </DialogContent>
+        </Dialog>
       </TabsContent>
     </Tabs>
   );
