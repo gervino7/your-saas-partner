@@ -1,4 +1,5 @@
 import AdminSettings from '@/components/admin/AdminSettings';
+import DataSaverSettings from '@/components/settings/DataSaverSettings';
 import { useAuthStore } from '@/stores/authStore';
 import EmptyState from '@/components/common/EmptyState';
 import { Shield } from 'lucide-react';
@@ -11,7 +12,8 @@ const SettingsPage = () => {
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-bold font-display">Paramètres</h1>
-        <EmptyState icon={Shield} title="Accès restreint" description="Les paramètres sont réservés aux administrateurs." />
+        <DataSaverSettings />
+        <EmptyState icon={Shield} title="Accès restreint" description="Les paramètres d'administration sont réservés aux administrateurs." />
       </div>
     );
   }
@@ -22,6 +24,7 @@ const SettingsPage = () => {
         <h1 className="text-2xl font-bold font-display">Paramètres</h1>
         <p className="text-muted-foreground">Configuration de votre organisation.</p>
       </div>
+      <DataSaverSettings />
       <AdminSettings />
     </div>
   );
