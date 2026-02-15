@@ -5,3 +5,15 @@ verify_jwt = false
 
 [functions.meeting-reminders]
 verify_jwt = false
+
+[functions.send-satisfaction-survey]
+verify_jwt = false
+
+[functions.task-automation]
+verify_jwt = false
+
+[functions.timesheet-reminder]
+verify_jwt = false
+
+[functions.budget-monitor]
+verify_jwt = false
