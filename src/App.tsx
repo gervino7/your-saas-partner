@@ -27,6 +27,7 @@ import CRMPage from '@/pages/CRMPage';
 import ClientDetailPage from '@/pages/ClientDetailPage';
 import ClientPortalPage from '@/pages/ClientPortalPage';
 import SatisfactionSurveyPage from '@/pages/SatisfactionSurveyPage';
+import NotificationsPage from '@/pages/NotificationsPage';
 import NotFound from '@/pages/NotFound';
 
 const queryClient = new QueryClient();
@@ -101,6 +102,7 @@ const App = () => (
               <Route path="/admin/clients/:id" element={<ClientDetailPage />} />
               <Route path="/workspace" element={<WorkspacePage />} />
               <Route path="/workspace/:userId" element={<WorkspacePage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
               <Route path="/settings" element={<SettingsPage />} />
             </Route>
             <Route path="*" element={<NotFound />} />

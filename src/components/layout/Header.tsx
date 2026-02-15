@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Search, Bell, ChevronRight, LogOut, User, Settings, Check } from 'lucide-react';
+import {
+  Search, Bell, ChevronRight, LogOut, User, Settings,
+  ClipboardList, Clock, AlertTriangle, Send, RotateCcw, CheckCircle,
+  Video, FileText, AtSign, MessageSquare, Mail, DollarSign, Star, UserPlus,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -32,11 +36,20 @@ const routeLabels: Record<string, string> = {
   settings: 'Paramètres',
 };
 
+const typeIconMap: Record<string, React.ElementType> = {
+  task_assigned: ClipboardList, task_deadline_soon: Clock, task_overdue: AlertTriangle,
+  submission_received: Send, correction_needed: RotateCcw, task_validated: CheckCircle,
+  meeting_invite: Video, meeting_reminder: Bell, document_shared: FileText,
+  message_mention: AtSign, new_message: MessageSquare, copil_report: Mail,
+  budget_alert: DollarSign, new_evaluation: Star, timesheet_reminder: Clock,
+  invitation_received: UserPlus,
+};
+
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile } = useAuthStore();
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, getNavigationPath } = useNotifications();
   const [searchQuery, setSearchQuery] = useState('');
 
   const segments = location.pathname.split('/').filter(Boolean);
@@ -119,18 +132,21 @@ const Header = () => {
                 Aucune notification
               </div>
             ) : (
-              notifications.map((n) => (
-                <DropdownMenuItem
-                  key={n.id}
-                  className="flex flex-col items-start gap-1 cursor-pointer"
-                  onClick={() => {
-                    if (!n.is_read) markAsRead.mutate(n.id);
-                  }}
-                >
-                  <div className="flex w-full items-start gap-2">
-                    {!n.is_read && (
-                      <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
-                    )}
+              notifications.map((n) => {
+                const Icon = typeIconMap[n.type] || Bell;
+                return (
+                  <DropdownMenuItem
+                    key={n.id}
+                    className="flex items-start gap-2 cursor-pointer"
+                    onClick={() => {
+                      if (!n.is_read) markAsRead.mutate(n.id);
+                      const path = getNavigationPath(n);
+                      if (path) navigate(path);
+                    }}
+                  >
+                    <div className={`mt-0.5 rounded-md p-1 ${!n.is_read ? 'bg-primary/10 text-primary' : 'text-muted-foreground'}`}>
+                      <Icon className="h-3.5 w-3.5" />
+                    </div>
                     <div className="flex-1 min-w-0">
                       <p className={`text-sm truncate ${!n.is_read ? 'font-semibold' : ''}`}>
                         {n.title}
@@ -142,9 +158,18 @@ const Header = () => {
                         {formatDistanceToNow(new Date(n.created_at!), { addSuffix: true, locale: fr })}
                       </p>
                     </div>
-                  </div>
+                    {!n.is_read && <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />}
+                  </DropdownMenuItem>
+                );
+              })
+            )}
+            {notifications.length > 0 && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="justify-center text-xs text-primary" onClick={() => navigate('/notifications')}>
+                  Voir toutes les notifications
                 </DropdownMenuItem>
-              ))
+              </>
             )}
           </DropdownMenuContent>
         </DropdownMenu>
