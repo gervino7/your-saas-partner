@@ -6,7 +6,6 @@ import {
   Video, FileText, AtSign, MessageSquare, Mail, DollarSign, Star, UserPlus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,13 +14,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useAuthStore } from '@/stores/authStore';
 import { useNotifications } from '@/hooks/useNotifications';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { GlobalSearch } from '@/components/search/GlobalSearch';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 const routeLabels: Record<string, string> = {
   '': 'Tableau de bord',
@@ -50,7 +50,6 @@ const Header = () => {
   const navigate = useNavigate();
   const { profile } = useAuthStore();
   const { notifications, unreadCount, markAsRead, markAllAsRead, getNavigationPath } = useNotifications();
-  const [searchQuery, setSearchQuery] = useState('');
 
   const segments = location.pathname.split('/').filter(Boolean);
   const breadcrumbs = segments.length === 0
@@ -87,25 +86,30 @@ const Header = () => {
         </nav>
       </div>
 
-      {/* Center: search */}
+      {/* Center: search trigger */}
       <div className="hidden lg:flex flex-1 max-w-md mx-4">
-        <div className="relative w-full">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher missions, projets, documents…"
-            className="pl-9 h-9 bg-muted/50"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+        <Button
+          variant="outline"
+          className="w-full justify-start text-muted-foreground h-9 bg-muted/50"
+          onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
+        >
+          <Search className="mr-2 h-4 w-4" />
+          <span className="flex-1 text-left text-sm">Rechercher…</span>
+          <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground sm:flex">
+            ⌘K
+          </kbd>
+        </Button>
       </div>
+      <GlobalSearch />
 
-      {/* Right: notifications + profile */}
+      {/* Right: theme + notifications + profile */}
       <div className="flex items-center gap-1">
+        <ThemeToggle />
+
         {/* Notifications */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative">
+            <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
               <Bell className="h-4 w-4" />
               {unreadCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
@@ -177,7 +181,7 @@ const Header = () => {
         {/* Profile */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative">
+            <Button variant="ghost" size="icon" className="relative" aria-label="Profil utilisateur">
               <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-semibold">
                 {profile?.full_name?.charAt(0)?.toUpperCase() || 'U'}
               </div>
