@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Plus } from 'lucide-react';
+import ExportMenu from '@/components/common/ExportMenu';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthStore } from '@/stores/authStore';
@@ -31,12 +32,38 @@ const MissionsPage = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold font-display">Missions</h1>
-        {canCreate && (
-          <Button onClick={() => setFormOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Nouvelle mission
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          <ExportMenu
+            data={missions.map((m: any) => ({
+              code: m.code,
+              nom: m.name,
+              client: m.client?.name ?? '',
+              statut: m.status,
+              priorite: m.priority,
+              progression: `${m.progress ?? 0}%`,
+              debut: m.start_date ?? '',
+              fin: m.end_date ?? '',
+            }))}
+            filename="missions"
+            columns={[
+              { key: 'code', label: 'Code' },
+              { key: 'nom', label: 'Nom' },
+              { key: 'client', label: 'Client' },
+              { key: 'statut', label: 'Statut' },
+              { key: 'priorite', label: 'Priorité' },
+              { key: 'progression', label: 'Progression' },
+              { key: 'debut', label: 'Début' },
+              { key: 'fin', label: 'Fin' },
+            ]}
+            title="Liste des missions"
+          />
+          {canCreate && (
+            <Button onClick={() => setFormOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Nouvelle mission
+            </Button>
+          )}
+        </div>
       </div>
 
       <MissionFiltersBar

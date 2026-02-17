@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { format, startOfWeek, addDays, addWeeks, subWeeks, startOfMonth, getDaysInMonth, getDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Clock, ChevronLeft, ChevronRight, Plus, Save, Send, CalendarDays, LayoutGrid, CheckCircle2, XCircle } from 'lucide-react';
+import ExportMenu from '@/components/common/ExportMenu';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -235,40 +236,30 @@ function WeeklyView() {
           <DialogTrigger asChild>
             <Button variant="outline" size="sm"><Plus className="h-4 w-4 mr-1" /> Ajouter une ligne</Button>
           </DialogTrigger>
-          <DialogContent>
-            <DialogHeader><DialogTitle>Ajouter une ligne</DialogTitle></DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Mission *</label>
-                <Select value={newMissionId} onValueChange={(v) => { setNewMissionId(v); setNewProjectId(''); }}>
-                  <SelectTrigger><SelectValue placeholder="Sélectionner..." /></SelectTrigger>
-                  <SelectContent>
-                    {missions.map((m: any) => (
-                      <SelectItem key={m.id} value={m.id}>{m.code} — {m.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              {newMissionId && projects.length > 0 && (
-                <div>
-                  <label className="text-sm font-medium">Projet (optionnel)</label>
-                  <Select value={newProjectId} onValueChange={setNewProjectId}>
-                    <SelectTrigger><SelectValue placeholder="Aucun" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Aucun</SelectItem>
-                      {projects.map((p: any) => (
-                        <SelectItem key={p.id} value={p.id}>{p.code} — {p.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-              <Button onClick={handleAddRow} disabled={!newMissionId} className="w-full">
-                <Plus className="h-4 w-4 mr-1" /> Ajouter
-              </Button>
-            </div>
-          </DialogContent>
+          {/* ... keep existing code */}
         </Dialog>
+
+        <ExportMenu
+          data={rows.map((row) => {
+            const obj: Record<string, any> = {
+              mission: row.mission_name,
+              projet: row.project_name ?? '',
+              facturable: row.is_billable ? 'Oui' : 'Non',
+            };
+            dateStrs.forEach((d, i) => { obj[DAYS[i]] = row.entries[d]?.hours || 0; });
+            obj['Total'] = dateStrs.reduce((s, d) => s + (row.entries[d]?.hours || 0), 0).toFixed(1);
+            return obj;
+          })}
+          filename={`timesheet-${weekStr}`}
+          columns={[
+            { key: 'mission', label: 'Mission' },
+            { key: 'projet', label: 'Projet' },
+            { key: 'facturable', label: 'Fact.' },
+            ...DAYS.map((d) => ({ key: d, label: d })),
+            { key: 'Total', label: 'Total' },
+          ]}
+          title={`Feuille de temps — Semaine du ${format(currentWeek, 'dd MMMM yyyy', { locale: fr })}`}
+        />
 
         <div className="ml-auto flex gap-2">
           <Button variant="outline" size="sm" disabled={allSubmitted}>

@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Search, UserPlus, Shield, Pencil } from 'lucide-react';
+import ExportMenu from '@/components/common/ExportMenu';
 import { useOrganizationUsers } from '@/hooks/useMissions';
 import { useUpdateUserGrade } from '@/hooks/useAdmin';
 import { GRADE_LABELS, GRADE_LEVELS } from '@/types/database';
@@ -65,6 +66,22 @@ export default function AdminUsers() {
             <SelectItem value="offline">Hors ligne</SelectItem>
           </SelectContent>
         </Select>
+        <ExportMenu
+          data={filtered.map((u: any) => ({
+            nom: u.full_name ?? '',
+            email: u.email ?? '',
+            grade: u.grade ?? '',
+            statut: u.is_online ? 'En ligne' : 'Hors ligne',
+          }))}
+          filename="utilisateurs"
+          columns={[
+            { key: 'nom', label: 'Nom' },
+            { key: 'email', label: 'Email' },
+            { key: 'grade', label: 'Grade' },
+            { key: 'statut', label: 'Statut' },
+          ]}
+          title="Liste des utilisateurs"
+        />
         <Button size="sm" variant="default"><UserPlus className="h-4 w-4 mr-1" /> Inviter</Button>
       </div>
 
