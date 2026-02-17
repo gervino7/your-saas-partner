@@ -4,27 +4,30 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Search, UserPlus, Shield, Pencil } from 'lucide-react';
+import { Search, UserPlus, Pencil } from 'lucide-react';
 import ExportMenu from '@/components/common/ExportMenu';
 import { useOrganizationUsers } from '@/hooks/useMissions';
-import { useUpdateUserGrade } from '@/hooks/useAdmin';
+import { useUpdateUserGrade, useInviteUser } from '@/hooks/useAdmin';
 import { GRADE_LABELS, GRADE_LEVELS } from '@/types/database';
 import type { Grade } from '@/types/database';
-import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
 
 const GRADES = Object.keys(GRADE_LABELS) as Grade[];
 
 export default function AdminUsers() {
   const { data: users = [], isLoading } = useOrganizationUsers();
   const updateGrade = useUpdateUserGrade();
+  const inviteUser = useInviteUser();
   const [search, setSearch] = useState('');
   const [filterGrade, setFilterGrade] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [editingUser, setEditingUser] = useState<{ id: string; grade: Grade } | null>(null);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteGrade, setInviteGrade] = useState<Grade>('AUD');
 
   const filtered = users.filter((u: any) => {
     if (search && !u.full_name?.toLowerCase().includes(search.toLowerCase()) && !u.email?.toLowerCase().includes(search.toLowerCase())) return false;
@@ -42,6 +45,20 @@ export default function AdminUsers() {
       grade_level: GRADE_LEVELS[editingUser.grade],
     });
     setEditingUser(null);
+  };
+
+  const handleInvite = () => {
+    if (!inviteEmail.trim()) return;
+    inviteUser.mutate(
+      { email: inviteEmail.trim(), grade: inviteGrade },
+      {
+        onSuccess: () => {
+          setInviteOpen(false);
+          setInviteEmail('');
+          setInviteGrade('AUD');
+        },
+      }
+    );
   };
 
   return (
@@ -82,7 +99,9 @@ export default function AdminUsers() {
           ]}
           title="Liste des utilisateurs"
         />
-        <Button size="sm" variant="default"><UserPlus className="h-4 w-4 mr-1" /> Inviter</Button>
+        <Button size="sm" variant="default" onClick={() => setInviteOpen(true)}>
+          <UserPlus className="h-4 w-4 mr-1" /> Inviter
+        </Button>
       </div>
 
       <Card>
@@ -156,6 +175,44 @@ export default function AdminUsers() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Invite Dialog */}
+      <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-display">Inviter un collaborateur</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="invite-email">Email</Label>
+              <Input
+                id="invite-email"
+                type="email"
+                placeholder="nom@cabinet.com"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Grade</Label>
+              <Select value={inviteGrade} onValueChange={(v) => setInviteGrade(v as Grade)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {GRADES.map((g) => (
+                    <SelectItem key={g} value={g}>{g} — {GRADE_LABELS[g]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setInviteOpen(false)}>Annuler</Button>
+              <Button onClick={handleInvite} disabled={inviteUser.isPending || !inviteEmail.trim()}>
+                {inviteUser.isPending ? 'Envoi...' : 'Envoyer l\'invitation'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
