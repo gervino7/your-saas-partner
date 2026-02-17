@@ -18,19 +18,18 @@ function usePortalData(token: string | undefined) {
     queryFn: async () => {
       if (!token) return null;
 
-      // Fetch token data - use service role via edge function in production
-      // For now, we query directly (the portal is a public page)
-      const { data: tokenData, error: tokenErr } = await supabase
-        .from('client_portal_tokens')
-        .select('*, client:clients(*), mission:missions(*, director:profiles!missions_director_id_fkey(full_name))')
-        .eq('token', token)
-        .eq('is_active', true)
-        .single();
-
-      if (tokenErr || !tokenData) return null;
-
-      // Check expiration
-      if (new Date(tokenData.expires_at) < new Date()) return null;
+      // Token validation via edge function (server-side expiration check)
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/validate-portal-token`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+          body: JSON.stringify({ token }),
+        }
+      );
+      if (!res.ok) return null;
+      const { data: tokenData } = await res.json();
+      if (!tokenData) return null;
 
       // Get projects
       const { data: projects } = await supabase

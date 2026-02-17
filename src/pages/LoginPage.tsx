@@ -11,16 +11,13 @@ import { LogIn, UserPlus } from 'lucide-react';
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 60_000; // 1 minute
 
-const getAuthErrorMessage = (error: any): string => {
-  const msg = error?.message ?? '';
-  const map: Record<string, string> = {
-    'Invalid login credentials': 'Email ou mot de passe incorrect.',
-    'Email not confirmed': 'Veuillez confirmer votre email avant de vous connecter.',
-    'User already registered': 'Cette adresse email est déjà utilisée.',
-    'Signup requires a valid password': 'Le mot de passe est invalide.',
-    'Password should be at least 6 characters': 'Le mot de passe doit contenir au moins 8 caractères.',
-  };
-  return map[msg] || 'Une erreur est survenue. Veuillez réessayer.';
+const getAuthErrorMessage = (error: any, isSignUp: boolean): string => {
+  if (isSignUp) {
+    // Generic message for signup — never reveal if email exists
+    return 'Impossible de créer le compte. Si cette adresse est déjà utilisée, connectez-vous directement.';
+  }
+  // Generic message for login — prevent user enumeration
+  return 'Identifiants invalides. Veuillez vérifier votre email et mot de passe.';
 };
 
 const validatePassword = (pwd: string): string[] => {
@@ -113,8 +110,8 @@ const LoginPage = () => {
     } catch (error: any) {
       console.error('[Auth Error]', error?.message);
       toast({
-        title: 'Erreur',
-        description: getAuthErrorMessage(error),
+        title: isSignUp ? "Erreur d'inscription" : "Erreur d'authentification",
+        description: getAuthErrorMessage(error, isSignUp),
         variant: 'destructive',
       });
     } finally {
