@@ -14,38 +14,44 @@ export interface ExportColumn {
 export function exportToCSV(data: Record<string, any>[], filename: string, columns?: ExportColumn[]) {
   if (data.length === 0) return;
   const cols = columns ?? Object.keys(data[0]).map((k) => ({ key: k, label: k }));
-  const header = cols.map((c) => `"${c.label}"`).join(',');
+  // Use semicolon separator for French locale Excel compatibility
+  const header = cols.map((c) => `"${c.label}"`).join(';');
   const rows = data.map((row) =>
     cols.map((c) => {
       const val = row[c.key];
       if (val == null) return '""';
       const str = String(val).replace(/"/g, '""');
       return `"${str}"`;
-    }).join(',')
+    }).join(';')
   );
-  const csvContent = [header, ...rows].join('\n');
+  const csvContent = [header, ...rows].join('\r\n');
   const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
   downloadBlob(blob, `${filename}.csv`);
 }
 
-// ── XLSX (Tab-separated CSV opened natively by Excel) ──
+// ── XLSX (Tab-separated values with .xls extension for native Excel opening) ──
 export function exportToXLSX(data: Record<string, any>[], filename: string, columns?: ExportColumn[]) {
   if (data.length === 0) return;
   const cols = columns ?? Object.keys(data[0]).map((k) => ({ key: k, label: k }));
 
-  const header = cols.map((c) => `"${c.label}"`).join('\t');
-  const rows = data.map((row) =>
-    cols.map((c) => {
+  // Build simple HTML table that Excel can open natively
+  let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:spreadsheet">';
+  html += '<head><meta charset="UTF-8"></head><body><table border="1">';
+  html += '<tr>' + cols.map((c) => `<th style="font-weight:bold;background:#e2e8f0">${escapeHtml(c.label)}</th>`).join('') + '</tr>';
+  data.forEach((row) => {
+    html += '<tr>' + cols.map((c) => {
       const val = row[c.key];
-      if (val == null) return '';
-      const str = String(val).replace(/"/g, '""');
-      return `"${str}"`;
-    }).join('\t')
-  );
-  const content = [header, ...rows].join('\n');
-  // Use UTF-8 BOM + tab-separated values with .xls extension for native Excel compatibility
-  const blob = new Blob(['\uFEFF' + content], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+      return `<td>${escapeHtml(val == null ? '' : String(val))}</td>`;
+    }).join('') + '</tr>';
+  });
+  html += '</table></body></html>';
+
+  const blob = new Blob(['\uFEFF' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
   downloadBlob(blob, `${filename}.xls`);
+}
+
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 // ── PDF (jsPDF + autoTable) ──

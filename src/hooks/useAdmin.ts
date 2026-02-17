@@ -281,3 +281,28 @@ export function useUpdateUserGrade() {
     onError: (e: Error) => toast.error(e.message),
   });
 }
+
+export function useInviteUser() {
+  const qc = useQueryClient();
+  const profile = useAuthStore((s) => s.profile);
+
+  return useMutation({
+    mutationFn: async ({ email, grade }: { email: string; grade: string }) => {
+      if (!profile?.organization_id) throw new Error('Organisation non trouvée');
+      const token = crypto.randomUUID();
+      const { error } = await supabase.from('invitations').insert({
+        email,
+        grade,
+        token,
+        organization_id: profile.organization_id,
+        invited_by: profile.id,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['org-users'] });
+      toast.success('Invitation envoyée avec succès');
+    },
+    onError: (e: Error) => toast.error(`Erreur : ${e.message}`),
+  });
+}
