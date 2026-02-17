@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -113,7 +114,7 @@ function EmailViewDialog({ email, open, onOpenChange }: { email: any; open: bool
           </DialogDescription>
         </DialogHeader>
         <Separator />
-        <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: email?.body ?? '' }} />
+        <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(email?.body ?? '', { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'b', 'i', 'h1', 'h2', 'h3', 'h4', 'blockquote', 'a', 'span', 'div'], ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'style'] }) }} />
         {attachments.length > 0 && (
           <>
             <Separator />

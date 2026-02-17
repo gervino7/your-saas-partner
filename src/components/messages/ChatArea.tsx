@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Send, Paperclip, Reply, Pencil, Trash2, X, ArrowDown, Check, CheckCheck,
@@ -458,8 +459,9 @@ export default function ChatArea({
 function MessageContent({ content, attachments }: { content: string; attachments: any }) {
   const atts = Array.isArray(attachments) ? attachments : [];
 
-  // Highlight mentions
-  const highlighted = content.replace(
+  // Sanitize then highlight mentions
+  const sanitized = DOMPurify.sanitize(content, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+  const highlighted = sanitized.replace(
     /@(\w+)/g,
     '<span class="font-semibold text-accent">@$1</span>'
   );
