@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Star, Download, Search, Shield, BarChart3 } from 'lucide-react';
+import ExportMenu from '@/components/common/ExportMenu';
 import { useAuthStore } from '@/stores/authStore';
 import { usePerformanceData } from '@/hooks/useTaskSubmissions';
 import EmptyState from '@/components/common/EmptyState';
@@ -206,6 +207,24 @@ export default function PerformanceReviewsPage() {
             {allMissions.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>
+        <ExportMenu
+          data={filteredStats.map((emp) => ({
+            nom: emp.name,
+            grade: emp.grade,
+            missions: emp.missionsStr,
+            taches: emp.taskCount,
+            score: emp.avgRating.toFixed(1),
+          }))}
+          filename="evaluations-performance"
+          columns={[
+            { key: 'nom', label: 'Collaborateur' },
+            { key: 'grade', label: 'Grade' },
+            { key: 'missions', label: 'Missions' },
+            { key: 'taches', label: 'Tâches évaluées' },
+            { key: 'score', label: 'Score moyen' },
+          ]}
+          title="Évaluations de performance"
+        />
       </div>
 
       {/* Employee table */}

@@ -9,6 +9,7 @@ import { useActivityLogs } from '@/hooks/useAdmin';
 import { useOrganizationUsers } from '@/hooks/useMissions';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import ExportMenu from '@/components/common/ExportMenu';
 
 const ACTION_LABELS: Record<string, string> = {
   login: 'Connexion',
@@ -67,6 +68,24 @@ export default function AdminActivityLogs() {
         </Select>
         <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="w-[150px] h-9" placeholder="Du" />
         <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="w-[150px] h-9" placeholder="Au" />
+        <ExportMenu
+          data={logs.map((log: any) => ({
+            date: log.created_at ? format(new Date(log.created_at), 'dd/MM/yy HH:mm', { locale: fr }) : '',
+            utilisateur: log.user?.full_name ?? '',
+            action: ACTION_LABELS[log.action] || log.action,
+            entite: log.entity_type ?? '',
+            details: log.metadata ? JSON.stringify(log.metadata).slice(0, 100) : '',
+          }))}
+          filename="journal-activites"
+          columns={[
+            { key: 'date', label: 'Date' },
+            { key: 'utilisateur', label: 'Utilisateur' },
+            { key: 'action', label: 'Action' },
+            { key: 'entite', label: 'Entité' },
+            { key: 'details', label: 'Détails' },
+          ]}
+          title="Journal d'activités"
+        />
       </div>
 
       <Card>

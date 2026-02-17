@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { DollarSign, TrendingUp, Receipt, FileText, Plus, Check, X } from 'lucide-react';
+import ExportMenu from '@/components/common/ExportMenu';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -37,6 +38,30 @@ function BudgetTab() {
 
   return (
     <div className="space-y-4">
+      <div className="flex justify-end">
+        <ExportMenu
+          data={summaries.map((m: any) => ({
+            mission: m.name,
+            code: m.code,
+            budget: m.budget ?? '',
+            heures: m.total_hours.toFixed(1),
+            cout_reel: m.total_cost,
+            marge: m.budget ? m.budget - m.total_cost : '',
+            consomme_pct: `${m.consumed_pct}%`,
+          }))}
+          filename="budget-missions"
+          columns={[
+            { key: 'code', label: 'Code' },
+            { key: 'mission', label: 'Mission' },
+            { key: 'budget', label: 'Budget (FCFA)' },
+            { key: 'heures', label: 'Heures' },
+            { key: 'cout_reel', label: 'Coût réel (FCFA)' },
+            { key: 'marge', label: 'Marge (FCFA)' },
+            { key: 'consomme_pct', label: '% Consommé' },
+          ]}
+          title="Budget des missions"
+        />
+      </div>
       <Card>
         <CardContent className="p-0">
           <Table>
@@ -213,6 +238,26 @@ function ExpensesTab() {
           </SelectContent>
         </Select>
         <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <ExportMenu
+          data={expenses.map((exp: any) => ({
+            date: format(new Date(exp.date), 'dd/MM/yyyy'),
+            employe: exp.user?.full_name ?? '',
+            categorie: exp.category ?? '',
+            mission: exp.mission?.name ?? '',
+            montant: Number(exp.amount),
+            statut: statusLabel[exp.status] ?? exp.status,
+          }))}
+          filename="notes-de-frais"
+          columns={[
+            { key: 'date', label: 'Date' },
+            { key: 'employe', label: 'Employé' },
+            { key: 'categorie', label: 'Catégorie' },
+            { key: 'mission', label: 'Mission' },
+            { key: 'montant', label: 'Montant (FCFA)' },
+            { key: 'statut', label: 'Statut' },
+          ]}
+          title="Notes de frais"
+        />
           <DialogTrigger asChild>
             <Button size="sm"><Plus className="h-4 w-4 mr-1" /> Nouvelle note</Button>
           </DialogTrigger>
@@ -355,6 +400,28 @@ function InvoicesTab() {
             <SelectItem value="overdue">En retard</SelectItem>
           </SelectContent>
         </Select>
+        <ExportMenu
+          data={invoices.map((inv: any) => ({
+            numero: inv.invoice_number,
+            client: inv.client?.name ?? '',
+            mission: inv.mission?.name ?? '',
+            type: inv.type,
+            montant_ttc: Number(inv.total_amount),
+            echeance: inv.due_date ? format(new Date(inv.due_date), 'dd/MM/yyyy') : '',
+            statut: statusLabel[inv.status] ?? inv.status,
+          }))}
+          filename="factures"
+          columns={[
+            { key: 'numero', label: 'N° Facture' },
+            { key: 'client', label: 'Client' },
+            { key: 'mission', label: 'Mission' },
+            { key: 'type', label: 'Type' },
+            { key: 'montant_ttc', label: 'Montant TTC (FCFA)' },
+            { key: 'echeance', label: 'Échéance' },
+            { key: 'statut', label: 'Statut' },
+          ]}
+          title="Factures"
+        />
         <Dialog open={addOpen} onOpenChange={setAddOpen}>
           <DialogTrigger asChild>
             <Button size="sm"><Plus className="h-4 w-4 mr-1" /> Nouvelle facture</Button>
