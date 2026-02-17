@@ -1,7 +1,7 @@
 /**
  * Export utilities for CSV, Excel (XLSX) and PDF exports.
+ * Uses native CSV-based Excel export to avoid vulnerable xlsx dependency.
  */
-import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -28,31 +28,24 @@ export function exportToCSV(data: Record<string, any>[], filename: string, colum
   downloadBlob(blob, `${filename}.csv`);
 }
 
-// ── XLSX (SheetJS) ──
+// ── XLSX (Tab-separated CSV opened natively by Excel) ──
 export function exportToXLSX(data: Record<string, any>[], filename: string, columns?: ExportColumn[]) {
   if (data.length === 0) return;
   const cols = columns ?? Object.keys(data[0]).map((k) => ({ key: k, label: k }));
 
-  const sheetData = data.map((row) => {
-    const obj: Record<string, any> = {};
-    cols.forEach((c) => { obj[c.label] = row[c.key] ?? ''; });
-    return obj;
-  });
-
-  const ws = XLSX.utils.json_to_sheet(sheetData);
-  // Auto-size columns
-  const colWidths = cols.map((c) => {
-    const maxLen = Math.max(
-      c.label.length,
-      ...data.map((r) => String(r[c.key] ?? '').length)
-    );
-    return { wch: Math.min(maxLen + 2, 40) };
-  });
-  ws['!cols'] = colWidths;
-
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Données');
-  XLSX.writeFile(wb, `${filename}.xlsx`);
+  const header = cols.map((c) => `"${c.label}"`).join('\t');
+  const rows = data.map((row) =>
+    cols.map((c) => {
+      const val = row[c.key];
+      if (val == null) return '';
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    }).join('\t')
+  );
+  const content = [header, ...rows].join('\n');
+  // Use UTF-8 BOM + tab-separated values with .xls extension for native Excel compatibility
+  const blob = new Blob(['\uFEFF' + content], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+  downloadBlob(blob, `${filename}.xls`);
 }
 
 // ── PDF (jsPDF + autoTable) ──
