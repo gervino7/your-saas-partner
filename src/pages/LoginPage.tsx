@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { LogIn, UserPlus } from 'lucide-react';
+import logoImg from '@/assets/logo.png';
 
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 60_000; // 1 minute
@@ -125,9 +126,7 @@ const LoginPage = () => {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-primary text-primary-foreground font-display font-bold text-xl">
-            MF
-          </div>
+          <img src={logoImg} alt="MissionFlow" className="mx-auto mb-0 h-14 w-14 rounded-xl object-contain" />
           <h1 className="text-2xl font-bold font-display">MissionFlow</h1>
           <p className="text-sm text-muted-foreground">Plateforme de gestion de missions</p>
         </div>
