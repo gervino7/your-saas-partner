@@ -5,6 +5,7 @@ import {
   Briefcase, FolderOpen, FileText, Users, BarChart3, Shield,
   Check, ChevronRight, Star, ArrowRight,
 } from 'lucide-react';
+import logoImg from '@/assets/logo.png';
 
 const features = [
   { icon: Briefcase, title: 'Gestion des missions', desc: 'Planifiez, suivez et pilotez vos missions de bout en bout.' },
@@ -44,7 +45,7 @@ const LandingPage = () => {
       <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">MF</div>
+            <img src={logoImg} alt="MissionFlow" className="h-9 w-9 rounded-lg object-contain" />
             <span className="font-display font-bold text-lg">MissionFlow</span>
           </div>
           <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
@@ -209,7 +210,7 @@ const LandingPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-xs">MF</div>
+                <img src={logoImg} alt="MissionFlow" className="h-8 w-8 rounded-lg object-contain" />
                 <span className="font-display font-bold">MissionFlow</span>
               </div>
               <p className="text-sm text-muted-foreground">La plateforme de gestion de missions pour les cabinets d'Afrique francophone.</p>
