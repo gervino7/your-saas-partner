@@ -298,6 +298,17 @@ export function useInviteUser() {
         invited_by: profile.id,
       });
       if (error) throw error;
+
+      // Send invitation email via edge function
+      const { data: org } = await supabase
+        .from('organizations')
+        .select('name')
+        .eq('id', profile.organization_id)
+        .single();
+
+      await supabase.functions.invoke('send-invitation', {
+        body: { email, token, grade, organizationName: org?.name },
+      });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['org-users'] });
