@@ -10,6 +10,7 @@ import {
 import { useAuthStore } from '@/stores/authStore';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import logoImg from '@/assets/logo.png';
 
 const mainNav = [
   { label: 'Tableau de bord', icon: LayoutDashboard, path: '/' },
@@ -57,9 +58,7 @@ const AppSidebar = () => {
     <Sidebar>
       <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground font-display font-bold text-sm">
-            MF
-          </div>
+          <img src={logoImg} alt="MissionFlow" className="h-9 w-9 rounded-lg object-contain" />
           <div className="flex flex-col">
             <span className="text-sm font-semibold font-display text-sidebar-foreground">MissionFlow</span>
             <span className="text-xs text-sidebar-foreground/60">Gestion de missions</span>
