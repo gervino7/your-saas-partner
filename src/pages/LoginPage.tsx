@@ -14,7 +14,7 @@ import type { Grade } from '@/types/database';
 const TOAST_ERROR = 'destructive' as const;
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 60_000;
-const INVITATION_TOKEN_KEYS = ['token', 'invitation_token', 'invite_token'] as const;
+const INVITATION_TOKEN_KEYS = ['token', 'invitation_token', 'invite_token', 'invitation'] as const;
 
 const getAuthErrorMessage = (_error: unknown, isSignUp: boolean): string => {
   if (isSignUp) {
@@ -38,6 +38,22 @@ const readTokenFromParams = (params: URLSearchParams): string | null => {
     if (value) return value;
   }
   return null;
+};
+
+const safeDecode = (value: string): string => {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
+
+const readTokenFromText = (value: string): string | null => {
+  const tokenMatch = value.match(/[?&#](token|invitation_token|invite_token|invitation)=([^&#]+)/i);
+  if (!tokenMatch?.[2]) return null;
+
+  const decoded = safeDecode(tokenMatch[2]).trim();
+  return decoded || null;
 };
 
 const extractInvitationToken = (
@@ -67,12 +83,18 @@ const extractInvitationToken = (
 
   // Handles links where query/hash is transformed by gateways or clients
   if (href) {
-    const fromHrefMatch = href.match(/[?&#](token|invitation_token|invite_token)=([^&#]+)/i);
-    if (fromHrefMatch?.[2]) {
-      try {
-        return decodeURIComponent(fromHrefMatch[2]);
-      } catch {
-        return fromHrefMatch[2];
+    const fromHref = readTokenFromText(href);
+    if (fromHref) return fromHref;
+
+    const decodedHref = safeDecode(href);
+    if (decodedHref !== href) {
+      const fromDecodedHref = readTokenFromText(decodedHref);
+      if (fromDecodedHref) return fromDecodedHref;
+
+      const decodedTwiceHref = safeDecode(decodedHref);
+      if (decodedTwiceHref !== decodedHref) {
+        const fromDecodedTwiceHref = readTokenFromText(decodedTwiceHref);
+        if (fromDecodedTwiceHref) return fromDecodedTwiceHref;
       }
     }
   }
@@ -105,8 +127,9 @@ const LoginPage = () => {
   );
   const normalizedPathname = location.pathname.replace(/\/+$/, '') || '/';
   const isRegisterRoute = normalizedPathname === '/register';
+  const isForcedSignUp = isRegisterRoute || Boolean(invitationToken);
 
-  const [isSignUp, setIsSignUp] = useState(isRegisterRoute || !!invitationToken);
+  const [isSignUp, setIsSignUp] = useState(isForcedSignUp);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -168,10 +191,10 @@ const LoginPage = () => {
   }, [invitationToken, toast]);
 
   useEffect(() => {
-    if (isRegisterRoute || invitationToken) {
+    if (isForcedSignUp) {
       setIsSignUp(true);
     }
-  }, [isRegisterRoute, invitationToken]);
+  }, [isForcedSignUp]);
 
   const handlePasswordChange = useCallback(
     (value: string) => {
@@ -272,7 +295,7 @@ const LoginPage = () => {
 
   const isLocked = lockoutUntil !== null && Date.now() < lockoutUntil;
   const gradeLabel = invitation?.grade ? GRADE_LABELS[invitation.grade as Grade] || invitation.grade : null;
-  const showInvitationFields = isSignUp;
+  const showInvitationFields = isSignUp || isForcedSignUp;
   const signUpBlocked = isSignUp && (!invitationToken || !invitation);
 
   return (
@@ -403,18 +426,20 @@ const LoginPage = () => {
                 </Button>
               </form>
             )}
-            <div className="mt-4 text-center text-sm">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsSignUp(!isSignUp);
-                  setPasswordErrors([]);
-                }}
-                className="text-primary hover:underline"
-              >
-                {isSignUp ? 'Déjà un compte ? Se connecter' : "Pas encore de compte ? S'inscrire"}
-              </button>
-            </div>
+            {!isForcedSignUp && (
+              <div className="mt-4 text-center text-sm">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsSignUp(!isSignUp);
+                    setPasswordErrors([]);
+                  }}
+                  className="text-primary hover:underline"
+                >
+                  {isSignUp ? 'Déjà un compte ? Se connecter' : "Pas encore de compte ? S'inscrire"}
+                </button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
