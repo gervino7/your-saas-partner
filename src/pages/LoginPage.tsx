@@ -40,7 +40,12 @@ const readTokenFromParams = (params: URLSearchParams): string | null => {
   return null;
 };
 
-const extractInvitationToken = (searchParams: URLSearchParams, pathname: string, hash: string): string | null => {
+const extractInvitationToken = (
+  searchParams: URLSearchParams,
+  pathname: string,
+  hash: string,
+  href?: string,
+): string | null => {
   const fromSearch = readTokenFromParams(searchParams);
   if (fromSearch) return fromSearch;
 
@@ -58,6 +63,18 @@ const extractInvitationToken = (searchParams: URLSearchParams, pathname: string,
     // Handles links like /#token=...
     const fromHashDirect = readTokenFromParams(new URLSearchParams(normalizedHash));
     if (fromHashDirect) return fromHashDirect;
+  }
+
+  // Handles links where query/hash is transformed by gateways or clients
+  if (href) {
+    const fromHrefMatch = href.match(/[?&#](token|invitation_token|invite_token)=([^&#]+)/i);
+    if (fromHrefMatch?.[2]) {
+      try {
+        return decodeURIComponent(fromHrefMatch[2]);
+      } catch {
+        return fromHrefMatch[2];
+      }
+    }
   }
 
   // Handles links like /register/<token>
@@ -78,10 +95,16 @@ const LoginPage = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const invitationToken = useMemo(
-    () => extractInvitationToken(searchParams, location.pathname, location.hash),
-    [searchParams, location.pathname, location.hash],
+    () => extractInvitationToken(
+      searchParams,
+      location.pathname,
+      location.hash,
+      typeof window !== 'undefined' ? window.location.href : undefined,
+    ),
+    [searchParams, location.pathname, location.hash, location.key],
   );
-  const isRegisterRoute = location.pathname === '/register';
+  const normalizedPathname = location.pathname.replace(/\/+$/, '') || '/';
+  const isRegisterRoute = normalizedPathname === '/register';
 
   const [isSignUp, setIsSignUp] = useState(isRegisterRoute || !!invitationToken);
   const [email, setEmail] = useState('');
@@ -249,7 +272,7 @@ const LoginPage = () => {
 
   const isLocked = lockoutUntil !== null && Date.now() < lockoutUntil;
   const gradeLabel = invitation?.grade ? GRADE_LABELS[invitation.grade as Grade] || invitation.grade : null;
-  const showInvitationFields = isSignUp && (isRegisterRoute || !!invitationToken);
+  const showInvitationFields = isSignUp;
   const signUpBlocked = isSignUp && (!invitationToken || !invitation);
 
   return (
