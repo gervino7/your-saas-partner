@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'email and token required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    const appUrl = req.headers.get('origin') || 'https://mamission.abodje.com';
+    const appUrl = Deno.env.get('APP_URL') || 'https://mamission.abodje.com';
     const inviteLink = `${appUrl}/register?token=${token}`;
 
     const gradeLabels: Record<string, string> = {
