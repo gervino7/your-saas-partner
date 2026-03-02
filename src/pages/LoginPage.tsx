@@ -5,19 +5,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { LogIn, UserPlus } from 'lucide-react';
+import { LogIn, UserPlus, Building2, Shield } from 'lucide-react';
 import logoImg from '@/assets/logo.png';
+import { GRADE_LABELS } from '@/types/database';
+import type { Grade } from '@/types/database';
 
 const MAX_ATTEMPTS = 5;
-const LOCKOUT_DURATION_MS = 60_000; // 1 minute
+const LOCKOUT_DURATION_MS = 60_000;
 
-const getAuthErrorMessage = (error: any, isSignUp: boolean): string => {
+const getAuthErrorMessage = (_error: any, isSignUp: boolean): string => {
   if (isSignUp) {
-    // Generic message for signup — never reveal if email exists
     return 'Impossible de créer le compte. Si cette adresse est déjà utilisée, connectez-vous directement.';
   }
-  // Generic message for login — prevent user enumeration
   return 'Identifiants invalides. Veuillez vérifier votre email et mot de passe.';
 };
 
@@ -30,12 +31,19 @@ const validatePassword = (pwd: string): string[] => {
   return errors;
 };
 
+interface InvitationInfo {
+  email: string;
+  grade: string;
+  organization_name: string;
+  organization_id: string;
+}
+
 const LoginPage = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const invitationToken = searchParams.get('token');
   const isRegisterRoute = location.pathname === '/register';
-  
+
   const [isSignUp, setIsSignUp] = useState(isRegisterRoute || !!invitationToken);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,8 +52,37 @@ const LoginPage = () => {
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  const [invitation, setInvitation] = useState<InvitationInfo | null>(null);
+  const [loadingInvitation, setLoadingInvitation] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Fetch invitation details when token is present
+  useEffect(() => {
+    if (!invitationToken) return;
+    setLoadingInvitation(true);
+    supabase
+      .rpc('get_invitation_by_token', { _token: invitationToken })
+      .then(({ data, error }) => {
+        if (!error && data && data.length > 0) {
+          const inv = data[0];
+          setInvitation({
+            email: inv.email,
+            grade: inv.grade,
+            organization_name: inv.organization_name,
+            organization_id: inv.organization_id,
+          });
+          setEmail(inv.email);
+        } else {
+          toast({
+            title: 'Invitation invalide',
+            description: 'Ce lien d\'invitation est expiré ou invalide.',
+            variant: 'destructive',
+          });
+        }
+      })
+      .finally(() => setLoadingInvitation(false));
+  }, [invitationToken]);
 
   useEffect(() => {
     if (isRegisterRoute || invitationToken) {
@@ -63,7 +100,6 @@ const LoginPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Rate limiting check
     if (lockoutUntil && Date.now() < lockoutUntil) {
       const remaining = Math.ceil((lockoutUntil - Date.now()) / 1000);
       toast({
@@ -74,7 +110,6 @@ const LoginPage = () => {
       return;
     }
 
-    // Password validation for signup
     if (isSignUp) {
       const errors = validatePassword(password);
       if (errors.length > 0) {
@@ -132,6 +167,9 @@ const LoginPage = () => {
   };
 
   const isLocked = lockoutUntil !== null && Date.now() < lockoutUntil;
+  const gradeLabel = invitation?.grade
+    ? GRADE_LABELS[invitation.grade as Grade] || invitation.grade
+    : null;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -156,68 +194,105 @@ const LoginPage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {isSignUp && (
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">Nom complet</Label>
+            {/* Invitation info banner */}
+            {isSignUp && invitation && (
+              <div className="mb-4 rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium">Organisation</span>
+                </div>
+                <Input
+                  value={invitation.organization_name || '—'}
+                  disabled
+                  className="bg-muted text-muted-foreground"
+                />
+                <div className="flex items-center gap-2 mt-2">
+                  <Shield className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium">Grade attribué</span>
+                </div>
+                <div className="flex items-center gap-2">
                   <Input
-                    id="fullName"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Jean Dupont"
-                    required
-                    maxLength={255}
+                    value={gradeLabel ? `${invitation.grade} — ${gradeLabel}` : invitation.grade || '—'}
+                    disabled
+                    className="bg-muted text-muted-foreground"
                   />
                 </div>
-              )}
-              <div className="space-y-2">
-                <Label htmlFor="email">Adresse email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="jean@cabinet.com"
-                  required
-                />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Mot de passe</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => handlePasswordChange(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  minLength={8}
-                />
-                {isSignUp && passwordErrors.length > 0 && password.length > 0 && (
-                  <ul className="text-xs text-destructive space-y-0.5 mt-1">
-                    {passwordErrors.map((err) => (
-                      <li key={err}>• {err}</li>
-                    ))}
-                  </ul>
-                )}
+            )}
+
+            {loadingInvitation ? (
+              <div className="py-8 text-center text-sm text-muted-foreground">
+                Chargement de l'invitation…
               </div>
-              <Button type="submit" className="w-full" disabled={loading || isLocked}>
-                {loading ? (
-                  'Chargement...'
-                ) : isLocked ? (
-                  'Veuillez patienter...'
-                ) : isSignUp ? (
-                  <>
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Créer un compte
-                  </>
-                ) : (
-                  <>
-                    <LogIn className="mr-2 h-4 w-4" />
-                    Se connecter
-                  </>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {isSignUp && (
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Nom complet</Label>
+                    <Input
+                      id="fullName"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Jean Dupont"
+                      required
+                      maxLength={255}
+                    />
+                  </div>
                 )}
-              </Button>
-            </form>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Adresse email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="jean@cabinet.com"
+                    required
+                    disabled={!!invitation}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Mot de passe</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => handlePasswordChange(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    minLength={8}
+                  />
+                  {isSignUp && passwordErrors.length > 0 && password.length > 0 && (
+                    <ul className="text-xs text-destructive space-y-0.5 mt-1">
+                      {passwordErrors.map((err) => (
+                        <li key={err}>• {err}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={loading || isLocked || (!!invitationToken && !invitation)}
+                >
+                  {loading ? (
+                    'Chargement...'
+                  ) : isLocked ? (
+                    'Veuillez patienter...'
+                  ) : isSignUp ? (
+                    <>
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Créer un compte
+                    </>
+                  ) : (
+                    <>
+                      <LogIn className="mr-2 h-4 w-4" />
+                      Se connecter
+                    </>
+                  )}
+                </Button>
+              </form>
+            )}
             <div className="mt-4 text-center text-sm">
               <button
                 type="button"
