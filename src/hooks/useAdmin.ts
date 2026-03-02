@@ -306,9 +306,13 @@ export function useInviteUser() {
         .eq('id', profile.organization_id)
         .single();
 
-      await supabase.functions.invoke('send-invitation', {
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('send-invitation', {
         body: { email, token, grade, organizationName: org?.name },
       });
+      console.log('send-invitation response data:', fnData);
+      console.log('send-invitation response error:', fnError);
+      if (fnError) throw new Error(`Edge function error: ${fnError.message}`);
+      if (fnData?.error) throw new Error(`Email error: ${fnData.error}`);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['org-users'] });
