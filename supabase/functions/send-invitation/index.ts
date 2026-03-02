@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'email and token required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    const appUrl = req.headers.get('origin') || 'https://missionpro.lovable.app';
+    const appUrl = req.headers.get('origin') || 'https://mamission.abodje.com';
     const inviteLink = `${appUrl}/register?token=${token}`;
 
     const gradeLabels: Record<string, string> = {
@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${resendApiKey}` },
       body: JSON.stringify({
-        from: 'MissionFlow <onboarding@resend.dev>',
+        from: 'MissionFlow <noreply@mamission.abodje.com>',
         to: [email],
         subject: `Invitation à rejoindre ${orgName} sur MissionFlow`,
         html,
