@@ -1,21 +1,22 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { LogIn, UserPlus, Building2, Shield } from 'lucide-react';
 import logoImg from '@/assets/logo.png';
 import { GRADE_LABELS } from '@/types/database';
 import type { Grade } from '@/types/database';
 
+const TOAST_ERROR = 'destructive' as const;
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 60_000;
+const INVITATION_TOKEN_KEYS = ['token', 'invitation_token', 'invite_token'] as const;
 
-const getAuthErrorMessage = (_error: any, isSignUp: boolean): string => {
+const getAuthErrorMessage = (_error: unknown, isSignUp: boolean): string => {
   if (isSignUp) {
     return 'Impossible de créer le compte. Si cette adresse est déjà utilisée, connectez-vous directement.';
   }
@@ -31,6 +32,41 @@ const validatePassword = (pwd: string): string[] => {
   return errors;
 };
 
+const readTokenFromParams = (params: URLSearchParams): string | null => {
+  for (const key of INVITATION_TOKEN_KEYS) {
+    const value = params.get(key);
+    if (value) return value;
+  }
+  return null;
+};
+
+const extractInvitationToken = (searchParams: URLSearchParams, pathname: string, hash: string): string | null => {
+  const fromSearch = readTokenFromParams(searchParams);
+  if (fromSearch) return fromSearch;
+
+  if (hash) {
+    const normalizedHash = hash.startsWith('#') ? hash.slice(1) : hash;
+
+    // Handles links like /#/register?token=...
+    const hashQueryIndex = normalizedHash.indexOf('?');
+    if (hashQueryIndex >= 0) {
+      const hashQuery = normalizedHash.slice(hashQueryIndex + 1);
+      const fromHashQuery = readTokenFromParams(new URLSearchParams(hashQuery));
+      if (fromHashQuery) return fromHashQuery;
+    }
+
+    // Handles links like /#token=...
+    const fromHashDirect = readTokenFromParams(new URLSearchParams(normalizedHash));
+    if (fromHashDirect) return fromHashDirect;
+  }
+
+  // Handles links like /register/<token>
+  const pathMatch = pathname.match(/\/register\/([0-9a-fA-F-]{36})/);
+  if (pathMatch?.[1]) return pathMatch[1];
+
+  return null;
+};
+
 interface InvitationInfo {
   email: string;
   grade: string;
@@ -41,7 +77,10 @@ interface InvitationInfo {
 const LoginPage = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const invitationToken = searchParams.get('token');
+  const invitationToken = useMemo(
+    () => extractInvitationToken(searchParams, location.pathname, location.hash),
+    [searchParams, location.pathname, location.hash],
+  );
   const isRegisterRoute = location.pathname === '/register';
 
   const [isSignUp, setIsSignUp] = useState(isRegisterRoute || !!invitationToken);
@@ -59,11 +98,21 @@ const LoginPage = () => {
 
   // Fetch invitation details when token is present
   useEffect(() => {
-    if (!invitationToken) return;
-    setLoadingInvitation(true);
-    supabase
-      .rpc('get_invitation_by_token', { _token: invitationToken })
-      .then(({ data, error }) => {
+    if (!invitationToken) {
+      setInvitation(null);
+      setLoadingInvitation(false);
+      return;
+    }
+
+    let isMounted = true;
+
+    const fetchInvitation = async () => {
+      setLoadingInvitation(true);
+      try {
+        const { data, error } = await supabase.rpc('get_invitation_by_token', { _token: invitationToken });
+
+        if (!isMounted) return;
+
         if (!error && data && data.length > 0) {
           const inv = data[0];
           setInvitation({
@@ -74,15 +123,26 @@ const LoginPage = () => {
           });
           setEmail(inv.email);
         } else {
+          setInvitation(null);
           toast({
             title: 'Invitation invalide',
             description: 'Ce lien d\'invitation est expiré ou invalide.',
-            variant: 'destructive',
+            variant: TOAST_ERROR,
           });
         }
-      })
-      .finally(() => setLoadingInvitation(false));
-  }, [invitationToken]);
+      } finally {
+        if (isMounted) {
+          setLoadingInvitation(false);
+        }
+      }
+    };
+
+    void fetchInvitation();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [invitationToken, toast]);
 
   useEffect(() => {
     if (isRegisterRoute || invitationToken) {
@@ -90,12 +150,15 @@ const LoginPage = () => {
     }
   }, [isRegisterRoute, invitationToken]);
 
-  const handlePasswordChange = useCallback((value: string) => {
-    setPassword(value);
-    if (isSignUp) {
-      setPasswordErrors(validatePassword(value));
-    }
-  }, [isSignUp]);
+  const handlePasswordChange = useCallback(
+    (value: string) => {
+      setPassword(value);
+      if (isSignUp) {
+        setPasswordErrors(validatePassword(value));
+      }
+    },
+    [isSignUp],
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,7 +168,25 @@ const LoginPage = () => {
       toast({
         title: 'Trop de tentatives',
         description: `Veuillez patienter ${remaining} secondes avant de réessayer.`,
-        variant: 'destructive',
+        variant: TOAST_ERROR,
+      });
+      return;
+    }
+
+    if (isSignUp && !invitationToken) {
+      toast({
+        title: 'Invitation requise',
+        description: 'Utilisez le lien d’invitation reçu par email pour créer votre compte.',
+        variant: TOAST_ERROR,
+      });
+      return;
+    }
+
+    if (isSignUp && invitationToken && !invitation) {
+      toast({
+        title: 'Invitation invalide',
+        description: 'Ce lien est invalide ou expiré.',
+        variant: TOAST_ERROR,
       });
       return;
     }
@@ -116,7 +197,7 @@ const LoginPage = () => {
         toast({
           title: 'Mot de passe trop faible',
           description: `Requis : ${errors.join(', ')}`,
-          variant: 'destructive',
+          variant: TOAST_ERROR,
         });
         return;
       }
@@ -130,7 +211,7 @@ const LoginPage = () => {
           email,
           password,
           options: {
-            data: { full_name: fullName, invitation_token: invitationToken || undefined },
+            data: { full_name: fullName, invitation_token: invitationToken },
             emailRedirectTo: window.location.origin,
           },
         });
@@ -154,12 +235,12 @@ const LoginPage = () => {
         setLoginAttempts(0);
         navigate('/', { replace: true });
       }
-    } catch (error: any) {
-      console.error('[Auth Error]', error?.message);
+    } catch (error: unknown) {
+      console.error('[Auth Error]', error);
       toast({
         title: isSignUp ? "Erreur d'inscription" : "Erreur d'authentification",
         description: getAuthErrorMessage(error, isSignUp),
-        variant: 'destructive',
+        variant: TOAST_ERROR,
       });
     } finally {
       setLoading(false);
@@ -167,9 +248,9 @@ const LoginPage = () => {
   };
 
   const isLocked = lockoutUntil !== null && Date.now() < lockoutUntil;
-  const gradeLabel = invitation?.grade
-    ? GRADE_LABELS[invitation.grade as Grade] || invitation.grade
-    : null;
+  const gradeLabel = invitation?.grade ? GRADE_LABELS[invitation.grade as Grade] || invitation.grade : null;
+  const showInvitationFields = isSignUp && (isRegisterRoute || !!invitationToken);
+  const signUpBlocked = isSignUp && (!invitationToken || !invitation);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -182,27 +263,31 @@ const LoginPage = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="font-display">
-              {isSignUp ? 'Créer un compte' : 'Connexion'}
-            </CardTitle>
+            <CardTitle className="font-display">{isSignUp ? 'Créer un compte' : 'Connexion'}</CardTitle>
             <CardDescription>
               {invitationToken
                 ? 'Créez votre compte pour accepter l\'invitation'
                 : isSignUp
-                ? 'Remplissez les informations pour créer votre compte'
-                : 'Connectez-vous à votre espace de travail'}
+                  ? 'Inscription uniquement via un lien d\'invitation'
+                  : 'Connectez-vous à votre espace de travail'}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* Invitation info banner */}
-            {isSignUp && invitation && (
+            {showInvitationFields && (
               <div className="mb-4 rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-2">
                 <div className="flex items-center gap-2">
                   <Building2 className="h-4 w-4 text-primary" />
                   <span className="text-sm font-medium">Organisation</span>
                 </div>
                 <Input
-                  value={invitation.organization_name || '—'}
+                  value={
+                    invitation?.organization_name ||
+                    (loadingInvitation
+                      ? 'Chargement…'
+                      : invitationToken
+                        ? 'Invitation invalide ou expirée'
+                        : 'Lien d’invitation requis')
+                  }
                   disabled
                   className="bg-muted text-muted-foreground"
                 />
@@ -212,7 +297,15 @@ const LoginPage = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Input
-                    value={gradeLabel ? `${invitation.grade} — ${gradeLabel}` : invitation.grade || '—'}
+                    value={
+                      invitation
+                        ? `${invitation.grade} — ${gradeLabel || invitation.grade}`
+                        : loadingInvitation
+                          ? 'Chargement…'
+                          : invitationToken
+                            ? 'Invitation invalide ou expirée'
+                            : 'Lien d’invitation requis'
+                    }
                     disabled
                     className="bg-muted text-muted-foreground"
                   />
@@ -221,9 +314,7 @@ const LoginPage = () => {
             )}
 
             {loadingInvitation ? (
-              <div className="py-8 text-center text-sm text-muted-foreground">
-                Chargement de l'invitation…
-              </div>
+              <div className="py-8 text-center text-sm text-muted-foreground">Chargement de l'invitation…</div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 {isSignUp && (
@@ -248,7 +339,7 @@ const LoginPage = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="jean@cabinet.com"
                     required
-                    disabled={!!invitation}
+                    disabled={isSignUp && !!invitationToken}
                   />
                 </div>
                 <div className="space-y-2">
@@ -270,11 +361,7 @@ const LoginPage = () => {
                     </ul>
                   )}
                 </div>
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={loading || isLocked || (!!invitationToken && !invitation)}
-                >
+                <Button type="submit" className="w-full" disabled={loading || isLocked || signUpBlocked}>
                   {loading ? (
                     'Chargement...'
                   ) : isLocked ? (
