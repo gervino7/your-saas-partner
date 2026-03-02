@@ -3214,6 +3214,16 @@ export type Database = {
       }
     }
     Functions: {
+      get_invitation_by_token: {
+        Args: { _token: string }
+        Returns: {
+          email: string
+          grade: string
+          organization_id: string
+          organization_name: string
+          status: string
+        }[]
+      }
       get_user_conversation_ids: {
         Args: { _user_id: string }
         Returns: string[]
