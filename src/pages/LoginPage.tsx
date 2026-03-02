@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useCallback, useEffect } from 'react';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,7 +31,12 @@ const validatePassword = (pwd: string): string[] => {
 };
 
 const LoginPage = () => {
-  const [isSignUp, setIsSignUp] = useState(false);
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const invitationToken = searchParams.get('token');
+  const isRegisterRoute = location.pathname === '/register';
+  
+  const [isSignUp, setIsSignUp] = useState(isRegisterRoute || !!invitationToken);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -41,6 +46,12 @@ const LoginPage = () => {
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (isRegisterRoute || invitationToken) {
+      setIsSignUp(true);
+    }
+  }, [isRegisterRoute, invitationToken]);
 
   const handlePasswordChange = useCallback((value: string) => {
     setPassword(value);
@@ -84,7 +95,7 @@ const LoginPage = () => {
           email,
           password,
           options: {
-            data: { full_name: fullName },
+            data: { full_name: fullName, invitation_token: invitationToken || undefined },
             emailRedirectTo: window.location.origin,
           },
         });
@@ -137,7 +148,9 @@ const LoginPage = () => {
               {isSignUp ? 'Créer un compte' : 'Connexion'}
             </CardTitle>
             <CardDescription>
-              {isSignUp
+              {invitationToken
+                ? 'Créez votre compte pour accepter l\'invitation'
+                : isSignUp
                 ? 'Remplissez les informations pour créer votre compte'
                 : 'Connectez-vous à votre espace de travail'}
             </CardDescription>
