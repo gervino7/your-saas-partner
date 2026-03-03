@@ -43,7 +43,7 @@ export default function ConversationList({
     if (!selectedMembers.length) return;
     onCreateConversation({
       name: newType === 'group' ? groupName || 'Groupe' : undefined,
-      type: newType,
+      type: newType === 'direct' ? 'individual' : 'group',
       memberIds: selectedMembers,
     });
     setShowNew(false);
@@ -212,7 +212,7 @@ function ConversationAvatar({ conv, userId }: { conv: ConversationWithDetails; u
   const otherMembers = conv.members.filter((m) => m.user_id !== userId);
   const first = otherMembers[0];
 
-  if (conv.type === 'direct' && first) {
+  if ((conv.type === 'direct' || conv.type === 'individual') && first) {
     return (
       <div className="relative">
         <Avatar className="h-10 w-10">
@@ -239,7 +239,7 @@ function ConversationAvatar({ conv, userId }: { conv: ConversationWithDetails; u
 
 function getConversationName(conv: ConversationWithDetails, userId: string): string {
   if (conv.name) return conv.name;
-  if (conv.type === 'direct') {
+  if (conv.type === 'direct' || conv.type === 'individual') {
     const other = conv.members.find((m) => m.user_id !== userId);
     return other?.full_name || 'Conversation';
   }
