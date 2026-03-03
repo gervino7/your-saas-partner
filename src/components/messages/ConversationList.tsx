@@ -43,7 +43,7 @@ export default function ConversationList({
     if (!selectedMembers.length) return;
     onCreateConversation({
       name: newType === 'group' ? groupName || 'Groupe' : undefined,
-      type: newType,
+      type: newType === 'direct' ? 'individual' : 'group',
       memberIds: selectedMembers,
     });
     setShowNew(false);
