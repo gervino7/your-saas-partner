@@ -178,33 +178,34 @@ export function useConversations() {
       if (!user) throw new Error('Not authenticated');
 
       const profile = useAuthStore.getState().profile;
+      const conversationId = crypto.randomUUID();
 
-      const { data: conv, error } = await supabase
+      const { error: conversationError } = await supabase
         .from('conversations')
         .insert({
+          id: conversationId,
           name: name || null,
           type,
           created_by: user.id,
           organization_id: profile?.organization_id || null,
-        })
-        .select()
-        .single();
+        });
 
-      if (error) throw error;
+      if (conversationError) throw conversationError;
 
-      // Add creator as member
+      // Add creator + selected members
       const allMembers = [...new Set([user.id, ...memberIds])];
       const { error: memberError } = await supabase
         .from('conversation_members')
         .insert(
           allMembers.map((uid) => ({
-            conversation_id: conv.id,
+            conversation_id: conversationId,
             user_id: uid,
           }))
         );
 
       if (memberError) throw memberError;
-      return conv;
+
+      return { id: conversationId };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
