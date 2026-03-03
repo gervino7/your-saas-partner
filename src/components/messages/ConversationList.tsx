@@ -212,7 +212,7 @@ function ConversationAvatar({ conv, userId }: { conv: ConversationWithDetails; u
   const otherMembers = conv.members.filter((m) => m.user_id !== userId);
   const first = otherMembers[0];
 
-  if (conv.type === 'direct' && first) {
+  if ((conv.type === 'direct' || conv.type === 'individual') && first) {
     return (
       <div className="relative">
         <Avatar className="h-10 w-10">
