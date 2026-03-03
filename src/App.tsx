@@ -5,8 +5,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from 'next-themes';
+import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
+import { GRADE_LEVELS } from '@/types/database';
+import type { Grade } from '@/types/database';
 
 import AuthGuard from '@/components/auth/AuthGuard';
 import AppLayout from '@/components/layout/AppLayout';
@@ -34,43 +37,118 @@ import NotFound from '@/pages/NotFound';
 
 const queryClient = new QueryClient();
 
+const INVITATION_META_KEYS = ['invitation_token', 'token', 'invite_token', 'invitation'] as const;
+const FALLBACK_GRADE: Grade = 'AUD';
+
+const getInvitationToken = (metadata: Record<string, unknown> | null | undefined): string | null => {
+  if (!metadata) return null;
+
+  for (const key of INVITATION_META_KEYS) {
+    const value = metadata[key];
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return null;
+};
+
+const resolveFullName = (user: User): string => {
+  const metadata = user.user_metadata as Record<string, unknown> | null;
+  const fromMetadata = typeof metadata?.full_name === 'string' ? metadata.full_name.trim() : '';
+  if (fromMetadata) return fromMetadata;
+
+  const fromEmail = user.email?.split('@')[0]?.replace(/[._-]+/g, ' ').trim();
+  return fromEmail || 'Utilisateur';
+};
+
+const ensureUserProfile = async (user: User) => {
+  const { data: existingProfile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  const needsHydration =
+    !existingProfile ||
+    !existingProfile.organization_id ||
+    !existingProfile.grade ||
+    !existingProfile.grade_level ||
+    !existingProfile.full_name;
+
+  if (!needsHydration) {
+    return existingProfile;
+  }
+
+  const metadata = user.user_metadata as Record<string, unknown> | null;
+  const invitationToken = getInvitationToken(metadata);
+
+  let invitationOrgId: string | null = null;
+  let invitationGrade: Grade | null = null;
+
+  if (invitationToken) {
+    const { data: invitationData } = await supabase.rpc('get_invitation_by_token', { _token: invitationToken });
+    const invitation = invitationData?.[0];
+
+    if (invitation?.organization_id) invitationOrgId = invitation.organization_id;
+    if (invitation?.grade && invitation.grade in GRADE_LEVELS) {
+      invitationGrade = invitation.grade as Grade;
+    }
+  }
+
+  const nextGrade = ((existingProfile?.grade as Grade | null) ?? invitationGrade ?? FALLBACK_GRADE) as Grade;
+  const nextEmail = existingProfile?.email || user.email;
+
+  if (!nextEmail) return existingProfile ?? null;
+
+  const { data: syncedProfile } = await supabase
+    .from('profiles')
+    .upsert({
+      id: user.id,
+      email: nextEmail,
+      full_name: existingProfile?.full_name || resolveFullName(user),
+      organization_id: existingProfile?.organization_id ?? invitationOrgId,
+      grade: nextGrade,
+      grade_level: existingProfile?.grade_level ?? GRADE_LEVELS[nextGrade],
+    })
+    .select('*')
+    .single();
+
+  return syncedProfile ?? existingProfile ?? null;
+};
+
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { setSession, setProfile, setLoading } = useAuthStore();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        if (session?.user) {
-          setTimeout(async () => {
-            const { data } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .single();
-            setProfile(data);
-          }, 0);
-        } else {
-          setProfile(null);
-        }
-        setLoading(false);
-      }
-    );
+    let isMounted = true;
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const syncSessionState = async (session: Awaited<ReturnType<typeof supabase.auth.getSession>>['data']['session']) => {
       setSession(session);
-      if (session?.user) {
-        supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-          .then(({ data }) => setProfile(data));
+
+      if (!session?.user) {
+        if (isMounted) setProfile(null);
+        if (isMounted) setLoading(false);
+        return;
       }
-      setLoading(false);
+
+      const profile = await ensureUserProfile(session.user);
+      if (isMounted) setProfile(profile);
+      if (isMounted) setLoading(false);
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      void syncSessionState(session);
     });
 
-    return () => subscription.unsubscribe();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      void syncSessionState(session);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, [setSession, setProfile, setLoading]);
 
   return <>{children}</>;
