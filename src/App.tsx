@@ -117,16 +117,41 @@ const ensureUserProfile = async (user: User) => {
   return syncedProfile ?? existingProfile ?? null;
 };
 
+const setUserOnline = async (userId: string) => {
+  await supabase
+    .from('profiles')
+    .update({ is_online: true, last_login_at: new Date().toISOString(), last_seen_at: new Date().toISOString() })
+    .eq('id', userId);
+
+  // Record session
+  await supabase.from('user_sessions').insert({ user_id: userId });
+};
+
+const setUserOffline = async (userId: string) => {
+  await supabase
+    .from('profiles')
+    .update({ is_online: false, last_seen_at: new Date().toISOString() })
+    .eq('id', userId);
+};
+
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { setSession, setProfile, setLoading } = useAuthStore();
 
   useEffect(() => {
     let isMounted = true;
+    let heartbeatInterval: ReturnType<typeof setInterval> | null = null;
+    let currentUserId: string | null = null;
 
-    const syncSessionState = async (session: Awaited<ReturnType<typeof supabase.auth.getSession>>['data']['session']) => {
+    const syncSessionState = async (session: Awaited<ReturnType<typeof supabase.auth.getSession>>['data']['session'], event?: string) => {
       setSession(session);
 
       if (!session?.user) {
+        // User signed out — mark offline
+        if (currentUserId) {
+          await setUserOffline(currentUserId);
+          currentUserId = null;
+        }
+        if (heartbeatInterval) { clearInterval(heartbeatInterval); heartbeatInterval = null; }
         if (isMounted) setProfile(null);
         if (isMounted) setLoading(false);
         return;
@@ -135,19 +160,50 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const profile = await ensureUserProfile(session.user);
       if (isMounted) setProfile(profile);
       if (isMounted) setLoading(false);
+
+      // Mark user online on sign-in
+      if (!currentUserId || event === 'SIGNED_IN') {
+        currentUserId = session.user.id;
+        await setUserOnline(session.user.id);
+
+        // Heartbeat: update last_seen_at every 60s
+        if (heartbeatInterval) clearInterval(heartbeatInterval);
+        heartbeatInterval = setInterval(async () => {
+          if (currentUserId) {
+            await supabase
+              .from('profiles')
+              .update({ last_seen_at: new Date().toISOString() })
+              .eq('id', currentUserId);
+          }
+        }, 60_000);
+      }
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      void syncSessionState(session);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      void syncSessionState(session, event);
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      void syncSessionState(session);
+      void syncSessionState(session, 'INITIAL_SESSION');
     });
+
+    // Mark offline on tab close
+    const handleBeforeUnload = () => {
+      if (currentUserId) {
+        navigator.sendBeacon?.(
+          `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/profiles?id=eq.${currentUserId}`,
+          '' // sendBeacon can't PATCH, so we rely on heartbeat timeout instead
+        );
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
       isMounted = false;
       subscription.unsubscribe();
+      if (heartbeatInterval) clearInterval(heartbeatInterval);
+      if (currentUserId) void setUserOffline(currentUserId);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [setSession, setProfile, setLoading]);
 
