@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
                 <p style="color: #6b7280; font-size: 14px;">Ce lien est personnel et à usage unique.</p>
               </div>
               <p style="color: #6b7280; font-size: 12px; text-align: center; margin-top: 16px;">
-                Envoyé via MissionFlow
+                Envoyé via Mission-DGC
               </p>
             </div>
           `,

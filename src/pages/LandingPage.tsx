@@ -241,7 +241,7 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} MissionFlow — D&G CONSEIL. Tous droits réservés.
+            © {new Date().getFullYear()} Mission-DGC — D&G CONSEIL. Tous droits réservés.
           </div>
         </div>
       </footer>
