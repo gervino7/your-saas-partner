@@ -87,7 +87,7 @@ export function exportToPDF(data: Record<string, any>[], filename: string, colum
     doc.setFontSize(7);
     doc.setTextColor(150);
     doc.text(
-      `MissionFlow — Exporté le ${new Date().toLocaleDateString('fr-FR')} — Page ${i}/${pageCount}`,
+      `Mission-DGC — Exporté le ${new Date().toLocaleDateString('fr-FR')} — Page ${i}/${pageCount}`,
       doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 6, { align: 'center' }
     );
   }

@@ -100,7 +100,7 @@ const ClientPortalPage = () => {
           <div className="flex items-center gap-3">
             <Building2 className="h-6 w-6 text-primary" />
             <div>
-              <h1 className="font-bold font-display text-lg">MissionFlow — Portail Client</h1>
+              <h1 className="font-bold font-display text-lg">Mission-DGC — Portail Client</h1>
               <p className="text-sm text-muted-foreground">{(client as any)?.name}</p>
             </div>
           </div>

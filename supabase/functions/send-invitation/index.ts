@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
       JUN: 'Auditeur Junior', STG: 'Stagiaire',
     };
     const gradeLabel = gradeLabels[grade] || grade || 'Membre';
-    const orgName = organizationName || 'MissionFlow';
+    const orgName = organizationName || 'Mission-DGC';
 
     if (!resendApiKey) {
       console.log(`[SIMULATED] Invitation email to ${email} with link ${inviteLink}`);
@@ -57,12 +57,12 @@ Deno.serve(async (req) => {
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: #1a1a2e; color: white; padding: 24px; border-radius: 8px 8px 0 0; text-align: center;">
-          <h2 style="margin: 0;">MissionFlow</h2>
+          <h2 style="margin: 0;">Mission-DGC</h2>
         </div>
         <div style="padding: 24px; border: 1px solid #e5e7eb; border-top: none;">
           <h3 style="margin-top: 0;">Vous êtes invité(e) à rejoindre ${orgName}</h3>
           <p>Bonjour,</p>
-          <p>Vous avez été invité(e) à rejoindre l'équipe <strong>${orgName}</strong> sur MissionFlow en tant que <strong>${gradeLabel}</strong>.</p>
+          <p>Vous avez été invité(e) à rejoindre l'équipe <strong>${orgName}</strong> sur Mission-DGC en tant que <strong>${gradeLabel}</strong>.</p>
           <p>Cliquez sur le bouton ci-dessous pour créer votre compte :</p>
           <div style="text-align: center; margin: 32px 0;">
             <a href="${inviteLink}" style="background: #6366f1; color: white; padding: 12px 32px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
           <p style="color: #6b7280; font-size: 14px;">Ce lien expire dans 7 jours. Si vous n'avez pas demandé cette invitation, ignorez cet email.</p>
         </div>
         <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 16px;">
-          Envoyé via MissionFlow
+          Envoyé via Mission-DGC
         </p>
       </div>
     `;
@@ -81,9 +81,9 @@ Deno.serve(async (req) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${resendApiKey}` },
       body: JSON.stringify({
-        from: 'MissionFlow <noreply@mamission.abodje.com>',
+        from: 'Mission-DGC <noreply@mamission.abodje.com>',
         to: [email],
-        subject: `Invitation à rejoindre ${orgName} sur MissionFlow`,
+        subject: `Invitation à rejoindre ${orgName} sur Mission-DGC`,
         html,
       }),
     });

@@ -24,13 +24,13 @@ const plans = [
 ];
 
 const testimonials = [
-  { name: 'Koné Amadou', role: 'Associé, Cabinet KA Audit', text: 'MissionFlow a transformé notre façon de gérer les missions d\'audit. Le suivi des équipes est devenu un jeu d\'enfant.' },
+  { name: 'Koné Amadou', role: 'Associé, Cabinet KA Audit', text: 'Mission-DGC a transformé notre façon de gérer les missions d\'audit. Le suivi des équipes est devenu un jeu d\'enfant.' },
   { name: 'Marie-Claire Diallo', role: 'Directrice, MC Conseil', text: 'La gestion des COPIL et le mailing groupé nous font gagner un temps précieux avec nos clients.' },
   { name: 'Jean-Baptiste Ouédraogo', role: 'Chef de mission, Ernst & Co', text: 'Enfin un outil pensé pour les réalités africaines. Le mode hors-ligne est indispensable sur le terrain.' },
 ];
 
 const faqs = [
-  { q: 'MissionFlow est-il adapté aux cabinets d\'audit ?', a: 'Oui, MissionFlow est conçu spécifiquement pour les cabinets d\'audit, de conseil et d\'expertise comptable en Afrique francophone.' },
+  { q: 'Mission-DGC est-il adapté aux cabinets d\'audit ?', a: 'Oui, Mission-DGC est conçu spécifiquement pour les cabinets d\'audit, de conseil et d\'expertise comptable en Afrique francophone.' },
   { q: 'Peut-on l\'utiliser hors connexion ?', a: 'Oui, le mode offline permet de consulter ses tâches, saisir des timesheets et lire des documents même sans internet.' },
   { q: 'Quelles devises sont supportées ?', a: 'XOF (FCFA UEMOA), XAF (FCFA CEMAC), EUR et USD sont nativement supportés.' },
   { q: 'Comment fonctionne le COPIL ?', a: 'Chaque mission dispose d\'un COPIL avec membres internes et externes. Les comptes rendus, convocations et rapports sont envoyés via le mailing groupé intégré.' },
@@ -45,8 +45,8 @@ const LandingPage = () => {
       <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <img src={logoImg} alt="MissionFlow" className="h-9 w-9 rounded-lg object-contain" />
-            <span className="font-display font-bold text-lg">MissionFlow</span>
+            <img src={logoImg} alt="Mission-DGC" className="h-9 w-9 rounded-lg object-contain" />
+            <span className="font-display font-bold text-lg">Mission-DGC</span>
           </div>
           <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
             <a href="#features" className="hover:text-foreground transition-colors">Fonctionnalités</a>
@@ -241,7 +241,7 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} MissionFlow — D&G CONSEIL. Tous droits réservés.
+            © {new Date().getFullYear()} Mission-DGC — D&G CONSEIL. Tous droits réservés.
           </div>
         </div>
       </footer>

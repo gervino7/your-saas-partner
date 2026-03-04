@@ -1,6 +1,6 @@
 {
-  "name": "MissionFlow",
-  "short_name": "MissionFlow",
+  "name": "Mission-DGC",
+  "short_name": "Mission-DGC",
   "description": "Gestion de missions et projets collaboratifs",
   "start_url": "/",
   "display": "standalone",

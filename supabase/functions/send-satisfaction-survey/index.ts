@@ -52,13 +52,13 @@ Deno.serve(async (req) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${resendApiKey}` },
         body: JSON.stringify({
-          from: 'MissionFlow <onboarding@resend.dev>',
+          from: 'Mission-DGC <onboarding@resend.dev>',
           to: [contactEmail],
           subject: `Enquête de satisfaction — ${mission?.name || 'Mission'}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <div style="background: #1a1a2e; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
-                <h2 style="margin: 0;">MissionFlow</h2>
+                <h2 style="margin: 0;">Mission-DGC</h2>
               </div>
               <div style="padding: 20px; border: 1px solid #e5e7eb; border-top: none;">
                 <p>Bonjour${contactName ? ` ${contactName}` : ''},</p>
@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
                 <p style="color: #6b7280; font-size: 14px;">Ce lien est personnel et à usage unique.</p>
               </div>
               <p style="color: #6b7280; font-size: 12px; text-align: center; margin-top: 16px;">
-                Envoyé via MissionFlow
+                Envoyé via Mission-DGC
               </p>
             </div>
           `,
