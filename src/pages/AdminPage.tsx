@@ -166,7 +166,7 @@ const AdminPage = () => {
   const activeItem = sections.find((s) => s.id === activeSection);
 
   return (
-    <div className="flex gap-6 min-h-[calc(100vh-8rem)]">
+    <div className="flex min-h-[calc(100vh-8rem)] gap-3 md:gap-6">
       {/* Desktop sidebar */}
       <div className="hidden w-56 shrink-0 space-y-1 lg:block">
         <AdminSidebarContent activeSection={activeSection} onSelect={handleSelectSection} />
