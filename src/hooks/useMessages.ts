@@ -200,6 +200,7 @@ export function useConversations() {
       const profile = useAuthStore.getState().profile;
       const conversationId = crypto.randomUUID();
 
+      // Step 1: Create conversation
       const { error: conversationError } = await supabase
         .from('conversations')
         .insert({
@@ -210,20 +211,41 @@ export function useConversations() {
           organization_id: profile?.organization_id || null,
         });
 
-      if (conversationError) throw conversationError;
+      if (conversationError) {
+        console.error('Error creating conversation:', conversationError);
+        throw conversationError;
+      }
 
-      // Add creator + selected members
-      const allMembers = [...new Set([user.id, ...memberIds])];
-      const { error: memberError } = await supabase
+      // Step 2: Add creator first (always passes RLS user_id = auth.uid())
+      const { error: creatorError } = await supabase
         .from('conversation_members')
-        .insert(
-          allMembers.map((uid) => ({
-            conversation_id: conversationId,
-            user_id: uid,
-          }))
-        );
+        .insert({
+          conversation_id: conversationId,
+          user_id: user.id,
+        });
 
-      if (memberError) throw memberError;
+      if (creatorError) {
+        console.error('Error adding creator as member:', creatorError);
+        throw creatorError;
+      }
+
+      // Step 3: Add other members separately (uses is_conversation_creator check)
+      const otherMembers = memberIds.filter((uid) => uid !== user.id);
+      if (otherMembers.length > 0) {
+        const { error: memberError } = await supabase
+          .from('conversation_members')
+          .insert(
+            otherMembers.map((uid) => ({
+              conversation_id: conversationId,
+              user_id: uid,
+            }))
+          );
+
+        if (memberError) {
+          console.error('Error adding other members:', memberError);
+          throw memberError;
+        }
+      }
 
       return { id: conversationId };
     },
