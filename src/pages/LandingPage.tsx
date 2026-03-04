@@ -30,7 +30,7 @@ const testimonials = [
 ];
 
 const faqs = [
-  { q: 'MissionFlow est-il adapté aux cabinets d\'audit ?', a: 'Oui, MissionFlow est conçu spécifiquement pour les cabinets d\'audit, de conseil et d\'expertise comptable en Afrique francophone.' },
+  { q: 'Mission-DGC est-il adapté aux cabinets d\'audit ?', a: 'Oui, Mission-DGC est conçu spécifiquement pour les cabinets d\'audit, de conseil et d\'expertise comptable en Afrique francophone.' },
   { q: 'Peut-on l\'utiliser hors connexion ?', a: 'Oui, le mode offline permet de consulter ses tâches, saisir des timesheets et lire des documents même sans internet.' },
   { q: 'Quelles devises sont supportées ?', a: 'XOF (FCFA UEMOA), XAF (FCFA CEMAC), EUR et USD sont nativement supportés.' },
   { q: 'Comment fonctionne le COPIL ?', a: 'Chaque mission dispose d\'un COPIL avec membres internes et externes. Les comptes rendus, convocations et rapports sont envoyés via le mailing groupé intégré.' },
