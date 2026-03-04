@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
         <div style="padding: 24px; border: 1px solid #e5e7eb; border-top: none;">
           <h3 style="margin-top: 0;">Vous êtes invité(e) à rejoindre ${orgName}</h3>
           <p>Bonjour,</p>
-          <p>Vous avez été invité(e) à rejoindre l'équipe <strong>${orgName}</strong> sur MissionFlow en tant que <strong>${gradeLabel}</strong>.</p>
+          <p>Vous avez été invité(e) à rejoindre l'équipe <strong>${orgName}</strong> sur Mission-DGC en tant que <strong>${gradeLabel}</strong>.</p>
           <p>Cliquez sur le bouton ci-dessous pour créer votre compte :</p>
           <div style="text-align: center; margin: 32px 0;">
             <a href="${inviteLink}" style="background: #6366f1; color: white; padding: 12px 32px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;">
