@@ -168,11 +168,9 @@ const AdminPage = () => {
   return (
     <div className="flex gap-6 min-h-[calc(100vh-8rem)]">
       {/* Desktop sidebar */}
-      {!isMobile && (
-        <div className="w-56 shrink-0 space-y-1">
-          <AdminSidebarContent activeSection={activeSection} onSelect={handleSelectSection} />
-        </div>
-      )}
+      <div className="hidden w-56 shrink-0 space-y-1 lg:block">
+        <AdminSidebarContent activeSection={activeSection} onSelect={handleSelectSection} />
+      </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
