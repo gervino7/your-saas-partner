@@ -11,12 +11,20 @@ interface Props {
 }
 
 export default function DocumentGridView({ documents, onAction }: Props) {
+  const handleDragStart = (e: React.DragEvent, doc: DocumentRow) => {
+    e.dataTransfer.setData('application/x-document-id', doc.id);
+    e.dataTransfer.setData('application/x-document-name', doc.name);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
       {documents.map((doc) => (
         <div
           key={doc.id}
           className="group bg-card rounded-lg border p-3 hover:shadow-md transition-shadow cursor-pointer"
+          draggable
+          onDragStart={(e) => handleDragStart(e, doc)}
           onClick={() => onAction('preview', doc)}
         >
           <div className="flex items-center justify-between mb-2">
