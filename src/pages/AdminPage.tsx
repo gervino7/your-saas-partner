@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, BarChart3, Users, Briefcase, DollarSign, Star, Activity, Settings, Building2, Menu, X } from 'lucide-react';
+import { Shield, BarChart3, Users, Briefcase, DollarSign, Star, Activity, Settings, Building2, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/authStore';
