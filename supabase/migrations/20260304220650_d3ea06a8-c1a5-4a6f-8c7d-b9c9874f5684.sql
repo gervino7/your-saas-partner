@@ -1,0 +1,1 @@
+ALTER TABLE public.conversation_members ADD CONSTRAINT conversation_members_unique_user_conv UNIQUE (conversation_id, user_id);
