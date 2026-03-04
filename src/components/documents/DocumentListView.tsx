@@ -12,6 +12,12 @@ interface Props {
 }
 
 export default function DocumentListView({ documents, onAction }: Props) {
+  const handleDragStart = (e: React.DragEvent, doc: DocumentRow) => {
+    e.dataTransfer.setData('application/x-document-id', doc.id);
+    e.dataTransfer.setData('application/x-document-name', doc.name);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -28,7 +34,13 @@ export default function DocumentListView({ documents, onAction }: Props) {
       </TableHeader>
       <TableBody>
         {documents.map((doc) => (
-          <TableRow key={doc.id} className="cursor-pointer" onClick={() => onAction('preview', doc)}>
+          <TableRow
+            key={doc.id}
+            className="cursor-pointer"
+            draggable
+            onDragStart={(e) => handleDragStart(e, doc)}
+            onClick={() => onAction('preview', doc)}
+          >
             <TableCell>
               <div className="flex items-center gap-2">
                 <span>{getFileIcon(doc.mime_type)}</span>

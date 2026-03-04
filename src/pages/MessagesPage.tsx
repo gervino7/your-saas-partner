@@ -3,9 +3,13 @@ import { useConversations, useMessages } from '@/hooks/useMessages';
 import ConversationList from '@/components/messages/ConversationList';
 import ChatArea from '@/components/messages/ChatArea';
 import { toast } from 'sonner';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, MessageSquare } from 'lucide-react';
 
 const MessagesPage = () => {
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
+  const isMobile = useIsMobile();
   const { conversations, createConversation, isLoading: convsLoading } = useConversations();
   const {
     messages,
@@ -59,19 +63,66 @@ const MessagesPage = () => {
     [deleteMessage]
   );
 
+  const handleSelectConversation = useCallback((id: string) => {
+    setActiveConvId(id);
+  }, []);
+
+  const handleBack = useCallback(() => {
+    setActiveConvId(null);
+  }, []);
+
+  // Mobile: show either list or chat, not both
+  if (isMobile) {
+    return (
+      <div className="flex h-[calc(100vh-4rem)] overflow-hidden rounded-lg border border-border bg-card">
+        {activeConvId && activeConv ? (
+          <div className="flex-1 flex flex-col">
+            <div className="flex items-center gap-2 border-b border-border px-2 py-1.5">
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleBack}>
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm font-medium truncate">
+                {activeConv.name || 'Conversation'}
+              </span>
+            </div>
+            <div className="flex-1 min-h-0">
+              <ChatArea
+                conversation={activeConv}
+                messages={messages}
+                typingUsers={typingUsers}
+                onSendMessage={handleSendMessage}
+                onEditMessage={handleEditMessage}
+                onDeleteMessage={handleDeleteMessage}
+                onMarkAsRead={markAsRead}
+                onTyping={sendTyping}
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1">
+            <ConversationList
+              conversations={conversations}
+              activeId={activeConvId}
+              onSelect={handleSelectConversation}
+              onCreateConversation={handleCreateConversation}
+            />
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Desktop: side-by-side
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden rounded-lg border border-border bg-card">
-      {/* Left panel: conversation list */}
       <div className="w-[320px] flex-shrink-0">
         <ConversationList
           conversations={conversations}
           activeId={activeConvId}
-          onSelect={setActiveConvId}
+          onSelect={handleSelectConversation}
           onCreateConversation={handleCreateConversation}
         />
       </div>
-
-      {/* Right panel: chat */}
       <div className="flex-1">
         <ChatArea
           conversation={activeConv}
