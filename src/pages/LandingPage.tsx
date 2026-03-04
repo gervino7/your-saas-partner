@@ -45,8 +45,8 @@ const LandingPage = () => {
       <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <img src={logoImg} alt="MissionFlow" className="h-9 w-9 rounded-lg object-contain" />
-            <span className="font-display font-bold text-lg">MissionFlow</span>
+            <img src={logoImg} alt="Mission-DGC" className="h-9 w-9 rounded-lg object-contain" />
+            <span className="font-display font-bold text-lg">Mission-DGC</span>
           </div>
           <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
             <a href="#features" className="hover:text-foreground transition-colors">Fonctionnalités</a>

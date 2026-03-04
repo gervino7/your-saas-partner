@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <div style="background: #1a1a2e; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
-                <h2 style="margin: 0;">MissionFlow</h2>
+                <h2 style="margin: 0;">Mission-DGC</h2>
               </div>
               <div style="padding: 20px; border: 1px solid #e5e7eb; border-top: none;">
                 <p>Bonjour${contactName ? ` ${contactName}` : ''},</p>

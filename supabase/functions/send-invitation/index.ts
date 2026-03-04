@@ -81,9 +81,9 @@ Deno.serve(async (req) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${resendApiKey}` },
       body: JSON.stringify({
-        from: 'MissionFlow <noreply@mamission.abodje.com>',
+        from: 'Mission-DGC <noreply@mamission.abodje.com>',
         to: [email],
-        subject: `Invitation à rejoindre ${orgName} sur MissionFlow`,
+        subject: `Invitation à rejoindre ${orgName} sur Mission-DGC`,
         html,
       }),
     });

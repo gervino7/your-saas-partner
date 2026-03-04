@@ -1,4 +1,4 @@
-// MissionFlow Database Types
+// Mission-DGC Database Types
 // These types mirror the Supabase schema. For auto-generated types, use @/integrations/supabase/types
 
 export type Grade = 'DA' | 'DM' | 'CM' | 'SUP' | 'AS' | 'AUD' | 'AJ' | 'STG';

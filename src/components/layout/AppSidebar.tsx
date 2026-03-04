@@ -58,9 +58,9 @@ const AppSidebar = () => {
     <Sidebar>
       <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
         <div className="flex items-center gap-3">
-          <img src={logoImg} alt="MissionFlow" className="h-9 w-9 rounded-lg object-contain" />
+          <img src={logoImg} alt="Mission-DGC" className="h-9 w-9 rounded-lg object-contain" />
           <div className="flex flex-col">
-            <span className="text-sm font-semibold font-display text-sidebar-foreground">MissionFlow</span>
+            <span className="text-sm font-semibold font-display text-sidebar-foreground">Mission-DGC</span>
             <span className="text-xs text-sidebar-foreground/60">Gestion de missions</span>
           </div>
         </div>

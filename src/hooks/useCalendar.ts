@@ -134,7 +134,7 @@ export function useCalendar() {
           ...meetingData,
           organizer_id: user!.id,
           organization_id: profile!.organization_id,
-          meeting_link: meetingData.meeting_link || `https://meet.jit.si/MissionFlow-${crypto.randomUUID().slice(0, 8)}`,
+          meeting_link: meetingData.meeting_link || `https://meet.jit.si/MissionDGC-${crypto.randomUUID().slice(0, 8)}`,
           status: 'scheduled',
         })
         .select()
