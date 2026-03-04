@@ -112,7 +112,6 @@ const AdminPage = () => {
   const canAccess = gradeLevel <= 2;
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('dashboard');
-  const isMobile = useIsMobile();
   const [sheetOpen, setSheetOpen] = useState(false);
 
   if (!canAccess) {
