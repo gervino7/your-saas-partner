@@ -3,14 +3,12 @@ import { useConversations, useMessages } from '@/hooks/useMessages';
 import ConversationList from '@/components/messages/ConversationList';
 import ChatArea from '@/components/messages/ChatArea';
 import { toast } from 'sonner';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, MessageSquare } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 const MessagesPage = () => {
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
-  const isMobile = useIsMobile();
-  const { conversations, createConversation, isLoading: convsLoading } = useConversations();
+  const { conversations, createConversation } = useConversations();
   const {
     messages,
     sendMessage,
@@ -19,7 +17,6 @@ const MessagesPage = () => {
     markAsRead,
     typingUsers,
     sendTyping,
-    isLoading: msgsLoading,
   } = useMessages(activeConvId);
 
   const activeConv = conversations.find((c) => c.id === activeConvId) || null;
@@ -71,21 +68,19 @@ const MessagesPage = () => {
     setActiveConvId(null);
   }, []);
 
-  // Mobile: show either list or chat, not both
-  if (isMobile) {
-    return (
-      <div className="flex h-[calc(100vh-4rem)] overflow-hidden rounded-lg border border-border bg-card">
+  return (
+    <div className="h-[calc(100svh-3.5rem)] md:h-[calc(100vh-4rem)] overflow-hidden rounded-lg border border-border bg-card">
+      {/* Mobile + tablet: one pane at a time for max content width */}
+      <div className="h-full lg:hidden">
         {activeConvId && activeConv ? (
-          <div className="flex-1 flex flex-col">
+          <div className="flex h-full flex-col">
             <div className="flex items-center gap-2 border-b border-border px-2 py-1.5">
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleBack}>
                 <ArrowLeft className="h-4 w-4" />
               </Button>
-              <span className="text-sm font-medium truncate">
-                {activeConv.name || 'Conversation'}
-              </span>
+              <span className="truncate text-sm font-medium">{activeConv.name || 'Conversation'}</span>
             </div>
-            <div className="flex-1 min-h-0">
+            <div className="min-h-0 flex-1">
               <ChatArea
                 conversation={activeConv}
                 messages={messages}
@@ -99,44 +94,41 @@ const MessagesPage = () => {
             </div>
           </div>
         ) : (
-          <div className="flex-1">
-            <ConversationList
-              conversations={conversations}
-              activeId={activeConvId}
-              onSelect={handleSelectConversation}
-              onCreateConversation={handleCreateConversation}
-            />
-          </div>
+          <ConversationList
+            conversations={conversations}
+            activeId={activeConvId}
+            onSelect={handleSelectConversation}
+            onCreateConversation={handleCreateConversation}
+          />
         )}
       </div>
-    );
-  }
 
-  // Desktop: side-by-side
-  return (
-    <div className="flex h-[calc(100vh-4rem)] overflow-hidden rounded-lg border border-border bg-card">
-      <div className="w-[320px] flex-shrink-0">
-        <ConversationList
-          conversations={conversations}
-          activeId={activeConvId}
-          onSelect={handleSelectConversation}
-          onCreateConversation={handleCreateConversation}
-        />
-      </div>
-      <div className="flex-1">
-        <ChatArea
-          conversation={activeConv}
-          messages={messages}
-          typingUsers={typingUsers}
-          onSendMessage={handleSendMessage}
-          onEditMessage={handleEditMessage}
-          onDeleteMessage={handleDeleteMessage}
-          onMarkAsRead={markAsRead}
-          onTyping={sendTyping}
-        />
+      {/* Desktop: split view */}
+      <div className="hidden h-full lg:flex">
+        <div className="w-[280px] flex-shrink-0 border-r border-border xl:w-[320px]">
+          <ConversationList
+            conversations={conversations}
+            activeId={activeConvId}
+            onSelect={handleSelectConversation}
+            onCreateConversation={handleCreateConversation}
+          />
+        </div>
+        <div className="flex-1 min-w-0">
+          <ChatArea
+            conversation={activeConv}
+            messages={messages}
+            typingUsers={typingUsers}
+            onSendMessage={handleSendMessage}
+            onEditMessage={handleEditMessage}
+            onDeleteMessage={handleDeleteMessage}
+            onMarkAsRead={markAsRead}
+            onTyping={sendTyping}
+          />
+        </div>
       </div>
     </div>
   );
 };
 
 export default MessagesPage;
+
