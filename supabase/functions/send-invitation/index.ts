@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
       JUN: 'Auditeur Junior', STG: 'Stagiaire',
     };
     const gradeLabel = gradeLabels[grade] || grade || 'Membre';
-    const orgName = organizationName || 'MissionFlow';
+    const orgName = organizationName || 'Mission-DGC';
 
     if (!resendApiKey) {
       console.log(`[SIMULATED] Invitation email to ${email} with link ${inviteLink}`);
