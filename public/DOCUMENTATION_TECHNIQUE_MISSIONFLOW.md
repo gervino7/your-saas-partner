@@ -1,8 +1,8 @@
-# 📖 DOCUMENTATION TECHNIQUE — MissionFlow
-## Guide complet pour la prise en main du code
+# 📖 DOCUMENTATION TECHNIQUE COMPLÈTE — MissionFlow
+## Guide complet avec code source et explications
 
-**Version** : 1.0  
-**Date** : 3 Mars 2026  
+**Version** : 2.0  
+**Date** : 4 Mars 2026  
 **Stack** : React 18 + TypeScript + Tailwind CSS + Shadcn/UI + Supabase (Lovable Cloud)
 
 ---
@@ -10,25 +10,29 @@
 ## TABLE DES MATIÈRES
 
 1. [Architecture générale](#1-architecture-générale)
-2. [Structure des fichiers](#2-structure-des-fichiers)
-3. [Point d'entrée et configuration](#3-point-dentrée-et-configuration)
-4. [Système d'authentification](#4-système-dauthentification)
-5. [Layout et navigation](#5-layout-et-navigation)
-6. [Gestion d'état (State Management)](#6-gestion-détat)
-7. [Hooks métier (Business Logic)](#7-hooks-métier)
-8. [Pages de l'application](#8-pages-de-lapplication)
-9. [Composants principaux](#9-composants-principaux)
-10. [Base de données et types](#10-base-de-données-et-types)
-11. [Edge Functions (Backend)](#11-edge-functions-backend)
-12. [Thème et design system](#12-thème-et-design-system)
-13. [Fonctionnalités temps réel](#13-fonctionnalités-temps-réel)
-14. [Guide de développement](#14-guide-de-développement)
+2. [Point d'entrée — App.tsx](#2-point-dentrée--apptsx)
+3. [Store global — authStore.ts](#3-store-global--authstorets)
+4. [Authentification — LoginPage.tsx](#4-authentification--loginpagetsx)
+5. [Garde d'authentification — AuthGuard.tsx](#5-garde-dauthentification--authguardtsx)
+6. [Layout — AppLayout, AppSidebar, Header](#6-layout--applayout-appsidebar-header)
+7. [Dashboard — DashboardPage.tsx + useDashboardData.ts](#7-dashboard--dashboardpagetsx--usedashboarddatats)
+8. [Missions — MissionsPage.tsx + useMissions.ts](#8-missions--missionspagetsx--usemissionsts)
+9. [Projets et Tâches — useProject.ts](#9-projets-et-tâches--useprojectts)
+10. [Workflow de validation — useTaskSubmissions.ts](#10-workflow-de-validation--usetasksubmissionsts)
+11. [Documents (GED) — useDocuments.ts](#11-documents-ged--usedocumentsts)
+12. [Messagerie temps réel — useMessages.ts](#12-messagerie-temps-réel--usemessagests)
+13. [Timesheets et Finance — useTimesheets.ts](#13-timesheets-et-finance--usetimesheetsts)
+14. [COPIL / CODIR / Mailing — useCommittees.ts](#14-copil--codir--mailing--usecommitteests)
+15. [CRM et Portail client — useCRM.ts](#15-crm-et-portail-client--usecrmts)
+16. [Administration et KPIs — useAdmin.ts](#16-administration-et-kpis--useadmints)
+17. [Notifications — useNotifications.ts](#17-notifications--usenotificationsts)
+18. [Edge Functions (Backend)](#18-edge-functions-backend)
+19. [Design System (CSS)](#19-design-system-css)
+20. [Types et constantes — database.ts](#20-types-et-constantes--databasets)
 
 ---
 
 ## 1. ARCHITECTURE GÉNÉRALE
-
-### 1.1 Schéma d'architecture
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -40,890 +44,640 @@
 │                     │                                    │
 │  ┌──────────────────▼──────────────────────┐             │
 │  │        Supabase Client SDK              │             │
-│  │   (src/integrations/supabase/client.ts) │             │
 │  └──────────────────┬──────────────────────┘             │
 └─────────────────────┼───────────────────────────────────┘
                       │ HTTPS / WebSocket
 ┌─────────────────────▼───────────────────────────────────┐
-│                BACKEND (Lovable Cloud / Supabase)        │
+│                BACKEND (Lovable Cloud)                    │
 │  ┌──────┐  ┌──────┐  ┌────────┐  ┌──────────┐          │
 │  │ Auth │  │  DB  │  │Storage │  │ Realtime │          │
 │  └──────┘  └──────┘  └────────┘  └──────────┘          │
-│                │                                         │
-│       ┌────────▼────────┐                               │
-│       │ Edge Functions  │ (Deno)                        │
-│       └─────────────────┘                               │
+│  ┌──────────────────────────────────────────┐           │
+│  │           Edge Functions (Deno)          │           │
+│  │  send-group-email, send-invitation, ...  │           │
+│  └──────────────────────────────────────────┘           │
 └─────────────────────────────────────────────────────────┘
 ```
 
-### 1.2 Flux de données
-
-```
-Utilisateur → Composant React → Hook personnalisé → Supabase SDK → API REST/Realtime → PostgreSQL
-                                                                                         ↓
-Utilisateur ← Re-render ← React Query (cache) ← Supabase SDK ← Réponse ← PostgreSQL
-```
-
-### 1.3 Technologies clés
-
-| Technologie | Rôle | Fichier de config |
-|-------------|------|-------------------|
-| **Vite** | Bundler/Dev server | `vite.config.ts` |
-| **React 18** | Framework UI | - |
-| **TypeScript** | Typage statique | `tsconfig.json` |
-| **Tailwind CSS** | Styles utilitaires | `tailwind.config.ts` |
-| **Shadcn/UI** | Composants UI | `components.json` |
-| **React Router v6** | Navigation/Routes | `src/App.tsx` |
-| **React Query** | Cache/Fetch données | Hooks `use*.ts` |
-| **Zustand** | État global | `src/stores/*.ts` |
-| **Supabase** | Backend complet | `src/integrations/supabase/` |
-| **date-fns** | Dates (locale fr) | - |
-
----
-
-## 2. STRUCTURE DES FICHIERS
+### Structure des dossiers
 
 ```
 src/
-├── App.tsx                    # Point d'entrée React, routage, AuthProvider
-├── main.tsx                   # Montage DOM (createRoot)
-├── index.css                  # Variables CSS (thème), imports Tailwind
-│
-├── assets/                    # Images statiques
-│   └── logo.png
-│
-├── components/                # Composants React réutilisables
-│   ├── auth/                  # Authentification (AuthGuard)
-│   ├── layout/                # Layout global (Sidebar, Header, AppLayout)
-│   ├── common/                # Composants partagés (Loading, EmptyState, ExportMenu)
-│   ├── ui/                    # Composants Shadcn/UI (button, card, dialog...)
-│   ├── missions/              # Composants liés aux missions
-│   ├── projects/              # Composants liés aux projets/tâches
-│   ├── documents/             # Explorateur de documents, upload
-│   ├── messages/              # Chat et conversations
-│   ├── copil/                 # COPIL, mailing groupé
-│   ├── calendar/              # Calendrier et réunions
-│   ├── crm/                   # Gestion clients
-│   ├── admin/                 # Panneau d'administration
-│   ├── search/                # Recherche globale
-│   ├── settings/              # Paramètres
-│   └── theme/                 # Toggle mode sombre/clair
-│
-├── hooks/                     # Hooks personnalisés (logique métier)
-│   ├── useMessages.ts         # Conversations, messages, temps réel
-│   ├── useMissions.ts         # CRUD missions, projets, clients
-│   ├── useProject.ts          # Projets, tâches, activités
-│   ├── useDocuments.ts        # GED, upload, versioning
+├── App.tsx                    # Point d'entrée, routage, AuthProvider
+├── stores/
+│   └── authStore.ts           # État global Zustand (session, profil)
+├── hooks/
+│   ├── useMissions.ts         # CRUD missions + projets + clients
+│   ├── useProject.ts          # CRUD projets, tâches, activités, notes
+│   ├── useDocuments.ts        # GED, upload, versioning, dossiers
+│   ├── useMessages.ts         # Messagerie temps réel + typing indicator
 │   ├── useTimesheets.ts       # Feuilles de temps, factures, notes de frais
-│   ├── useCommittees.ts       # COPIL/CODIR, réunions, mailing
+│   ├── useCommittees.ts       # COPIL, CODIR, mailing groupé
+│   ├── useCRM.ts              # CRM, contacts, portail client
+│   ├── useAdmin.ts            # KPIs, logs, paramètres organisation
 │   ├── useNotifications.ts    # Notifications temps réel
-│   ├── useCalendar.ts         # Réunions et calendrier
-│   ├── useCRM.ts              # Gestion clients
-│   ├── useAdmin.ts            # KPIs, logs, paramètres org
-│   ├── useDashboardData.ts    # Données du tableau de bord
-│   ├── useTaskSubmissions.ts  # Workflow validation/évaluation
-│   ├── useWorkspace.ts        # Bureau personnel
-│   ├── useOffline.ts          # Mode hors-ligne
-│   └── use-mobile.tsx         # Détection mobile
-│
-├── pages/                     # Pages (une par route)
-│   ├── LoginPage.tsx          # Connexion / Inscription
-│   ├── DashboardPage.tsx      # Tableau de bord
+│   ├── useDashboardData.ts    # Données tableau de bord
+│   └── useTaskSubmissions.ts  # Workflow validation, évaluation 1-4
+├── pages/
+│   ├── LoginPage.tsx          # Connexion + inscription par invitation
+│   ├── DashboardPage.tsx      # Tableau de bord principal
 │   ├── MissionsPage.tsx       # Liste des missions
 │   ├── MissionDetailPage.tsx  # Détail mission (onglets)
-│   ├── ProjectDetailPage.tsx  # Détail projet (tâches, docs)
-│   ├── DocumentsPage.tsx      # Explorateur de documents
-│   ├── MessagesPage.tsx       # Messagerie
-│   ├── CalendarPage.tsx       # Calendrier
-│   ├── TimesheetsPage.tsx     # Feuilles de temps
-│   ├── AdminPage.tsx          # Administration
-│   ├── FinancePage.tsx        # Finance (factures, frais)
-│   ├── CRMPage.tsx            # CRM Clients
-│   ├── WorkspacePage.tsx      # Bureau personnel
-│   ├── SettingsPage.tsx       # Paramètres utilisateur
-│   └── NotificationsPage.tsx  # Toutes les notifications
-│
-├── stores/                    # Stores Zustand (état global)
-│   ├── authStore.ts           # Session, user, profile
-│   └── offlineStore.ts        # Queue offline
-│
-├── types/                     # Types TypeScript personnalisés
-│   └── database.ts            # Grades, statuts, labels
-│
-├── integrations/supabase/     # ⚠️ FICHIERS AUTO-GÉNÉRÉS (ne pas modifier)
-│   ├── client.ts              # Instance du client Supabase
-│   └── types.ts               # Types auto-générés depuis la DB
-│
-├── lib/                       # Utilitaires
-│   ├── utils.ts               # Fonctions utilitaires (cn, etc.)
-│   ├── exportUtils.ts         # Export PDF/CSV
-│   ├── fileUtils.ts           # Manipulation fichiers
-│   ├── offlineDb.ts           # IndexedDB (Dexie)
-│   └── syncManager.ts         # Synchronisation offline
-│
-supabase/
-├── config.toml                # ⚠️ AUTO-GÉNÉRÉ (ne pas modifier)
-└── functions/                 # Edge Functions (backend serverless)
-    ├── send-group-email/      # Envoi emails groupés
-    ├── send-invitation/       # Envoi invitations
-    ├── meeting-reminders/     # Rappels de réunions
-    ├── budget-monitor/        # Surveillance budgets
-    ├── task-automation/       # Automatisation tâches
-    ├── timesheet-reminder/    # Rappels feuilles de temps
-    ├── send-satisfaction-survey/ # Enquêtes satisfaction
-    └── validate-portal-token/ # Validation portail client
+│   ├── ProjectDetailPage.tsx  # Détail projet (Kanban, activités, etc.)
+│   └── ...
+├── components/
+│   ├── auth/AuthGuard.tsx     # Protection des routes
+│   ├── layout/AppLayout.tsx   # Layout principal (sidebar + header)
+│   ├── layout/AppSidebar.tsx  # Barre latérale de navigation
+│   ├── layout/Header.tsx      # En-tête avec breadcrumb, recherche, notifs
+│   └── ...
+└── types/
+    └── database.ts            # Types métier, grades, labels
 ```
 
 ---
 
-## 3. POINT D'ENTRÉE ET CONFIGURATION
+## 2. POINT D'ENTRÉE — App.tsx
 
-### 3.1 `src/main.tsx` — Montage de l'application
+**Fichier** : `src/App.tsx`
 
-```typescript
-import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
-import "./index.css";
+Ce fichier est le cœur de l'application. Il configure :
+- Le **routage** (React Router)
+- Le **thème** (light/dark via next-themes)
+- Le **cache** (React Query)
+- L'**authentification** (AuthProvider)
 
-createRoot(document.getElementById("root")!).render(<App />);
-```
-
-**Explication** : Point d'entrée minimal. Monte le composant `<App />` dans le DOM et importe les styles CSS globaux.
-
-### 3.2 `src/App.tsx` — Configuration globale
-
-Ce fichier est le **cœur de l'application**. Il configure :
-
-1. **Providers (enveloppes globales)** :
-   - `ThemeProvider` : mode clair/sombre
-   - `QueryClientProvider` : cache React Query
-   - `TooltipProvider` : tooltips Shadcn
-   - `BrowserRouter` : navigation React Router
-   - `AuthProvider` : gestion de session (composant interne)
-
-2. **Routes** :
-   ```
-   /landing          → LandingPage (publique)
-   /login            → LoginPage (publique)
-   /register         → LoginPage (publique, mode inscription)
-   /portal/:token    → ClientPortalPage (publique)
-   /survey/:token    → SatisfactionSurveyPage (publique)
-   
-   [Routes protégées par AuthGuard + AppLayout]
-   /                 → DashboardPage
-   /missions         → MissionsPage
-   /missions/:id     → MissionDetailPage
-   /projects/:id     → ProjectDetailPage
-   /documents        → DocumentsPage
-   /messages         → MessagesPage
-   /calendar         → CalendarPage
-   /timesheets       → TimesheetsPage
-   /admin            → AdminPage
-   /admin/finance    → FinancePage
-   /admin/reviews    → PerformanceReviewsPage
-   /admin/clients    → CRMPage
-   /admin/clients/:id → ClientDetailPage
-   /workspace        → WorkspacePage
-   /notifications    → NotificationsPage
-   /settings         → SettingsPage
-   ```
-
-3. **AuthProvider** (composant interne) :
-   - Écoute les changements de session Supabase (`onAuthStateChange`)
-   - Crée/synchronise le profil utilisateur à la connexion
-   - Gère la présence en ligne (heartbeat toutes les 60s)
-   - Marque l'utilisateur hors-ligne à la déconnexion
-
-4. **`ensureUserProfile()`** : Fonction clé qui :
-   - Vérifie si le profil existe dans la table `profiles`
-   - Si un token d'invitation existe, récupère les infos (organisation, grade)
-   - Crée ou met à jour le profil via `upsert`
-
----
-
-## 4. SYSTÈME D'AUTHENTIFICATION
-
-### 4.1 Flux d'authentification
-
-```
-                    ┌─────────────────┐
-                    │   LoginPage     │
-                    │  /login         │
-                    └────────┬────────┘
-                             │
-                    ┌────────▼────────┐
-                    │  Connexion ou   │
-                    │  Inscription    │
-                    └────────┬────────┘
-                             │
-              ┌──────────────▼──────────────┐
-              │    Supabase Auth            │
-              │  signInWithPassword()       │
-              │  ou signUp()               │
-              └──────────────┬──────────────┘
-                             │
-              ┌──────────────▼──────────────┐
-              │   onAuthStateChange()       │
-              │   → ensureUserProfile()     │
-              │   → setUserOnline()         │
-              └──────────────┬──────────────┘
-                             │
-              ┌──────────────▼──────────────┐
-              │   AuthGuard vérifie          │
-              │   session + token serveur    │
-              │   → supabase.auth.getUser() │
-              └──────────────┬──────────────┘
-                             │
-              ┌──────────────▼──────────────┐
-              │   Redirection vers /        │
-              │   (DashboardPage)           │
-              └─────────────────────────────┘
-```
-
-### 4.2 `AuthGuard` (`src/components/auth/AuthGuard.tsx`)
+### Code source complet
 
 ```typescript
-const AuthGuard = ({ children }) => {
-  // 1. Vérifie si une session existe (côté client)
-  // 2. Vérifie le token côté serveur (supabase.auth.getUser())
-  // 3. Si invalide → déconnexion + redirection /login
-  // 4. Si valide → affiche les enfants (children)
+import { useEffect } from 'react';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from 'next-themes';
+import type { User } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/stores/authStore';
+import { GRADE_LEVELS } from '@/types/database';
+import type { Grade } from '@/types/database';
+
+// ... imports des pages (voir fichier complet)
+
+const queryClient = new QueryClient();
+
+// ─── Constantes pour l'hydratation du profil ───
+const INVITATION_META_KEYS = ['invitation_token', 'token', 'invite_token', 'invitation'] as const;
+const FALLBACK_GRADE: Grade = 'AUD';
+```
+
+### Explication : `ensureUserProfile`
+
+Cette fonction est **critique** — elle s'exécute à chaque connexion pour garantir que le profil utilisateur est complet dans la base de données.
+
+```typescript
+const ensureUserProfile = async (user: User) => {
+  // 1. Vérifie si le profil existe déjà
+  const { data: existingProfile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  // 2. Détermine si le profil est incomplet
+  const needsHydration =
+    !existingProfile ||
+    !existingProfile.organization_id ||
+    !existingProfile.grade ||
+    !existingProfile.grade_level ||
+    !existingProfile.full_name;
+
+  if (!needsHydration) return existingProfile;
+
+  // 3. Si un token d'invitation existe dans les métadonnées,
+  //    on récupère l'organisation et le grade depuis l'invitation
+  const metadata = user.user_metadata as Record<string, unknown> | null;
+  const invitationToken = getInvitationToken(metadata);
+
+  let invitationOrgId: string | null = null;
+  let invitationGrade: Grade | null = null;
+
+  if (invitationToken) {
+    const { data: invitationData } = await supabase.rpc(
+      'get_invitation_by_token', { _token: invitationToken }
+    );
+    const invitation = invitationData?.[0];
+    if (invitation?.organization_id) invitationOrgId = invitation.organization_id;
+    if (invitation?.grade && invitation.grade in GRADE_LEVELS) {
+      invitationGrade = invitation.grade as Grade;
+    }
+  }
+
+  // 4. Upsert le profil avec les données récupérées
+  const { data: syncedProfile } = await supabase
+    .from('profiles')
+    .upsert({
+      id: user.id,
+      email: existingProfile?.email || user.email,
+      full_name: existingProfile?.full_name || resolveFullName(user),
+      organization_id: existingProfile?.organization_id ?? invitationOrgId,
+      grade: nextGrade,
+      grade_level: existingProfile?.grade_level ?? GRADE_LEVELS[nextGrade],
+    })
+    .select('*')
+    .single();
+
+  return syncedProfile ?? existingProfile ?? null;
 };
 ```
 
-**Point clé** : La double vérification (client + serveur) empêche l'accès avec un token expiré ou volé.
+### Explication : `AuthProvider`
 
-### 4.3 `LoginPage` (`src/pages/LoginPage.tsx`)
+Le composant `AuthProvider` gère tout le cycle de vie de l'authentification :
 
-Fonctionnalités :
-- **Connexion** : email + mot de passe
-- **Inscription** : uniquement via lien d'invitation (token UUID dans l'URL)
-- **Validation de mot de passe** : 8 caractères min, majuscule, minuscule, chiffre
-- **Protection anti-brute-force** : Verrouillage après 5 tentatives (60s)
-- **Extraction de token** : Gère plusieurs formats d'URL (query, hash, path)
+```typescript
+const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const { setSession, setProfile, setLoading } = useAuthStore();
 
-### 4.4 Inscription par invitation
+  useEffect(() => {
+    let isMounted = true;
+    let heartbeatInterval: ReturnType<typeof setInterval> | null = null;
+    let currentUserId: string | null = null;
 
+    const syncSessionState = async (session, event?) => {
+      setSession(session);
+
+      if (!session?.user) {
+        // Déconnexion → marquer hors ligne
+        if (currentUserId) await setUserOffline(currentUserId);
+        if (heartbeatInterval) clearInterval(heartbeatInterval);
+        setProfile(null);
+        setLoading(false);
+        return;
+      }
+
+      // Hydrate le profil
+      const profile = await ensureUserProfile(session.user);
+      setProfile(profile);
+      setLoading(false);
+
+      // Marque l'utilisateur en ligne
+      if (!currentUserId || event === 'SIGNED_IN') {
+        currentUserId = session.user.id;
+        await setUserOnline(session.user.id);
+
+        // Heartbeat : met à jour last_seen_at toutes les 60 secondes
+        heartbeatInterval = setInterval(async () => {
+          await supabase
+            .from('profiles')
+            .update({ last_seen_at: new Date().toISOString() })
+            .eq('id', currentUserId);
+        }, 60_000);
+      }
+    };
+
+    // Écoute les changements d'état d'auth (connexion, déconnexion, refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => void syncSessionState(session, event)
+    );
+
+    // Récupère la session initiale
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      void syncSessionState(session, 'INITIAL_SESSION');
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+      if (heartbeatInterval) clearInterval(heartbeatInterval);
+      if (currentUserId) void setUserOffline(currentUserId);
+    };
+  }, [setSession, setProfile, setLoading]);
+
+  return <>{children}</>;
+};
 ```
-Admin clique "Inviter" → useInviteUser() → INSERT dans table invitations
-    → Edge Function send-invitation → Email avec lien
-    → Utilisateur clique le lien → /register?token=UUID
-    → LoginPage détecte le token → get_invitation_by_token (RPC)
-    → Affiche organisation + grade → Inscription Supabase
-    → ensureUserProfile() → Crée profil avec org + grade
+
+### Explication : Routage
+
+```typescript
+const App = () => (
+  <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              {/* Routes publiques */}
+              <Route path="/landing" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<LoginPage />} />
+              <Route path="/portal/:token" element={<ClientPortalPage />} />
+              <Route path="/survey/:token" element={<SatisfactionSurveyPage />} />
+
+              {/* Routes protégées — AuthGuard vérifie la session */}
+              <Route element={<AuthGuard><AppLayout /></AuthGuard>}>
+                <Route path="/" element={<DashboardPage />} />
+                <Route path="/missions" element={<MissionsPage />} />
+                <Route path="/missions/:id" element={<MissionDetailPage />} />
+                <Route path="/projects/:id" element={<ProjectDetailPage />} />
+                <Route path="/documents" element={<DocumentsPage />} />
+                <Route path="/messages" element={<MessagesPage />} />
+                <Route path="/calendar" element={<CalendarPage />} />
+                <Route path="/timesheets" element={<TimesheetsPage />} />
+                <Route path="/admin" element={<AdminPage />} />
+                {/* ... autres routes protégées */}
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ThemeProvider>
+);
+```
+
+**Points clés** :
+- Les routes publiques (`/login`, `/portal/:token`) sont en dehors de `AuthGuard`
+- Les routes protégées sont encapsulées dans `<AuthGuard><AppLayout /></AuthGuard>`
+- `AppLayout` utilise `<Outlet />` pour rendre les pages enfants
+
+---
+
+## 3. STORE GLOBAL — authStore.ts
+
+**Fichier** : `src/stores/authStore.ts`
+
+Ce store Zustand centralise l'état d'authentification accessible partout dans l'app.
+
+```typescript
+import { create } from 'zustand';
+import type { Session, User } from '@supabase/supabase-js';
+
+interface Profile {
+  id: string;
+  organization_id: string | null;
+  email: string;
+  full_name: string;
+  avatar_url: string | null;
+  phone: string | null;
+  grade: string | null;       // Ex: 'DA', 'DM', 'CM', 'AUD'...
+  grade_level: number | null;  // 1 (plus haut) → 8 (plus bas)
+  is_online: boolean;
+}
+
+interface AuthState {
+  session: Session | null;
+  user: User | null;
+  profile: Profile | null;
+  loading: boolean;
+  setSession: (session: Session | null) => void;
+  setProfile: (profile: Profile | null) => void;
+  setLoading: (loading: boolean) => void;
+  clear: () => void;
+}
+
+export const useAuthStore = create<AuthState>((set) => ({
+  session: null,
+  user: null,
+  profile: null,
+  loading: true,
+  setSession: (session) => set({ session, user: session?.user ?? null }),
+  setProfile: (profile) => set({ profile }),
+  setLoading: (loading) => set({ loading }),
+  clear: () => set({ session: null, user: null, profile: null }),
+}));
+```
+
+**Usage dans les composants** :
+```typescript
+const { profile } = useAuthStore();
+const gradeLevel = profile?.grade_level ?? 8;
+const isAdmin = gradeLevel <= 2; // DA ou DM
 ```
 
 ---
 
-## 5. LAYOUT ET NAVIGATION
+## 4. AUTHENTIFICATION — LoginPage.tsx
 
-### 5.1 `AppLayout` (`src/components/layout/AppLayout.tsx`)
+**Fichier** : `src/pages/LoginPage.tsx`
+
+### Fonctionnalités
+
+- **Connexion** par email/mot de passe
+- **Inscription** uniquement via un **lien d'invitation** (contenant un token UUID)
+- **Validation de mot de passe** (8 chars min, majuscule, minuscule, chiffre)
+- **Protection anti-brute-force** (verrouillage après 5 tentatives pendant 60s)
+- **Extraction du token** depuis l'URL (query params, hash, chemin)
+
+### Code source complet
+
+```typescript
+// Constantes de sécurité
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 60_000;
+
+// Validation du mot de passe
+const validatePassword = (pwd: string): string[] => {
+  const errors: string[] = [];
+  if (pwd.length < 8) errors.push('Au moins 8 caractères');
+  if (!/[A-Z]/.test(pwd)) errors.push('Une lettre majuscule');
+  if (!/[a-z]/.test(pwd)) errors.push('Une lettre minuscule');
+  if (!/[0-9]/.test(pwd)) errors.push('Un chiffre');
+  return errors;
+};
+
+// Extraction robuste du token d'invitation depuis l'URL
+const extractInvitationToken = (
+  searchParams, pathname, hash, href?
+): string | null => {
+  // Cherche dans ?token=xxx, puis dans le hash, puis dans le pathname
+  // Gère les double-encodages URL et les transformations par les passerelles mail
+  // ...
+};
+
+// Soumission du formulaire
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  // Vérification anti-brute-force
+  if (lockoutUntil && Date.now() < lockoutUntil) {
+    toast({ title: 'Trop de tentatives', variant: 'destructive' });
+    return;
+  }
+
+  // L'inscription nécessite obligatoirement un token d'invitation valide
+  if (isSignUp && !invitationToken) {
+    toast({ title: 'Invitation requise', variant: 'destructive' });
+    return;
+  }
+
+  if (isSignUp) {
+    // Inscription avec métadonnées (full_name + invitation_token)
+    const { error } = await supabase.auth.signUp({
+      email, password,
+      options: {
+        data: { full_name: fullName, invitation_token: invitationToken },
+        emailRedirectTo: window.location.origin,
+      },
+    });
+  } else {
+    // Connexion simple
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      // Compteur de tentatives échouées
+      const newAttempts = loginAttempts + 1;
+      if (newAttempts >= MAX_ATTEMPTS) {
+        setLockoutUntil(Date.now() + LOCKOUT_DURATION_MS);
+      }
+    }
+  }
+};
+```
+
+**Points clés** :
+- L'inscription n'est possible que via invitation (pas d'auto-inscription)
+- Le token est stocké dans `user_metadata` pour être lu par `ensureUserProfile` dans App.tsx
+- L'email est pré-rempli et verrouillé quand une invitation valide est détectée
+
+---
+
+## 5. GARDE D'AUTHENTIFICATION — AuthGuard.tsx
+
+**Fichier** : `src/components/auth/AuthGuard.tsx`
+
+```typescript
+const AuthGuard = ({ children }: { children: React.ReactNode }) => {
+  const { session, loading } = useAuthStore();
+  const [verified, setVerified] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (loading) return;
+
+    if (!session) {
+      navigate('/login', { replace: true });
+      return;
+    }
+
+    // Vérification côté serveur du token JWT
+    supabase.auth.getUser().then(({ data: { user }, error }) => {
+      if (error || !user) {
+        supabase.auth.signOut();
+        navigate('/login', { replace: true });
+      } else {
+        setVerified(true);
+      }
+    });
+  }, [session, loading, navigate]);
+
+  if (loading || (!verified && session)) {
+    return <Loading fullScreen message="Vérification de l'authentification..." />;
+  }
+
+  if (!session) return null;
+  return <>{children}</>;
+};
+```
+
+**Explication** :
+- Vérifie non seulement la session locale mais aussi le token côté serveur via `getUser()`
+- Cela empêche l'utilisation de tokens expirés ou révoqués
+- Affiche un écran de chargement pendant la vérification
+
+---
+
+## 6. LAYOUT — AppLayout, AppSidebar, Header
+
+### AppLayout.tsx
 
 ```typescript
 const AppLayout = () => (
   <SidebarProvider>
-    <AppSidebar />          {/* Barre latérale gauche */}
+    <AppSidebar />
     <SidebarInset>
-      <OfflineBanner />     {/* Bannière mode hors-ligne */}
-      <Header />            {/* En-tête avec recherche, notifications */}
-      <main>
-        <Outlet />          {/* Contenu de la page actuelle */}
+      <OfflineBanner />   {/* Bandeau "mode hors ligne" */}
+      <Header />
+      <main className="flex-1 overflow-auto p-6">
+        <Outlet />         {/* Rendu de la page active */}
       </main>
     </SidebarInset>
   </SidebarProvider>
 );
 ```
 
-### 5.2 `AppSidebar` — Navigation principale
-
-| Élément | Route | Icône |
-|---------|-------|-------|
-| Tableau de bord | `/` | LayoutDashboard |
-| Missions | `/missions` | Briefcase |
-| Documents | `/documents` | FileText |
-| Messagerie | `/messages` | MessageSquare |
-| Calendrier | `/calendar` | Calendar |
-| Feuilles de temps | `/timesheets` | Clock |
-| Bureau personnel | `/workspace` | Monitor |
-| Administration | `/admin` | Settings (grade ≤ 2) |
-
-**Règle d'accès** : L'onglet Administration n'apparaît que pour les grades DA et DM (`grade_level ≤ 2`).
-
----
-
-## 6. GESTION D'ÉTAT
-
-### 6.1 `authStore` (Zustand) — `src/stores/authStore.ts`
+### AppSidebar.tsx — Navigation latérale
 
 ```typescript
-interface AuthState {
-  session: Session | null;    // Session Supabase (JWT)
-  user: User | null;          // Objet User Supabase
-  profile: Profile | null;    // Profil enrichi (grade, org, etc.)
-  loading: boolean;
-  
-  setSession(s): void;
-  setProfile(p): void;
-  setLoading(l): void;
-  clear(): void;
-}
+const mainNav = [
+  { label: 'Tableau de bord', icon: LayoutDashboard, path: '/' },
+  { label: 'Missions', icon: Briefcase, path: '/missions' },
+  { label: 'Documents', icon: FileText, path: '/documents' },
+  { label: 'Messagerie', icon: MessageSquare, path: '/messages' },
+  { label: 'Calendrier', icon: Calendar, path: '/calendar' },
+  { label: 'Feuilles de temps', icon: Clock, path: '/timesheets' },
+];
+
+const AppSidebar = () => {
+  const { profile } = useAuthStore();
+  const gradeLevel = profile?.grade_level ?? 8;
+  const showAdmin = gradeLevel <= 2; // Seuls DA et DM voient "Administration"
+
+  return (
+    <Sidebar>
+      <SidebarHeader>
+        {/* Logo + nom MissionFlow */}
+      </SidebarHeader>
+      <SidebarContent>
+        {/* Navigation principale */}
+        {mainNav.map((item) => (
+          <SidebarMenuButton isActive={isActive(item.path)} onClick={() => navigate(item.path)}>
+            <item.icon /> {item.label}
+          </SidebarMenuButton>
+        ))}
+
+        {/* Section Administration — conditionnelle selon le grade */}
+        {showAdmin && (
+          <SidebarMenuButton onClick={() => navigate('/admin')}>
+            <Settings /> Administration
+          </SidebarMenuButton>
+        )}
+      </SidebarContent>
+      <SidebarFooter>
+        {/* Avatar + nom + grade + bouton déconnexion */}
+        {/* Indicateur "en ligne" (point vert) */}
+      </SidebarFooter>
+    </Sidebar>
+  );
+};
 ```
 
-**Usage dans les composants** :
-```typescript
-const { user, profile } = useAuthStore();
-const gradeLevel = profile?.grade_level ?? 8;
-const orgId = profile?.organization_id;
-```
-
-### 6.2 React Query — Cache et synchronisation
-
-Toute la logique de récupération de données utilise **React Query** via des hooks personnalisés :
+### Header.tsx — Fil d'Ariane, Recherche, Notifications
 
 ```typescript
-// Pattern standard
-export function useMyData(id) {
-  return useQuery({
-    queryKey: ['my-data', id],           // Clé de cache unique
-    queryFn: async () => {                // Fonction de fetch
-      const { data, error } = await supabase.from('table').select('*').eq('id', id);
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!id,                        // Ne fetch que si id existe
-  });
-}
-```
+const Header = () => {
+  const { profile } = useAuthStore();
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
 
-**Mutations (création/modification/suppression)** :
-```typescript
-export function useCreateMyData() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (values) => {
-      const { error } = await supabase.from('table').insert(values);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-data'] }); // Rafraîchit le cache
-      toast.success('Créé avec succès');
-    },
-  });
-}
+  return (
+    <header>
+      {/* Fil d'Ariane (breadcrumb) dynamique depuis l'URL */}
+      {/* Barre de recherche globale (⌘K) */}
+      {/* Toggle thème (clair/sombre) */}
+      {/* Dropdown des notifications avec badge compteur */}
+      {/* Dropdown profil utilisateur */}
+    </header>
+  );
+};
 ```
 
 ---
 
-## 7. HOOKS MÉTIER
+## 7. DASHBOARD — DashboardPage.tsx + useDashboardData.ts
 
-### 7.1 `useMissions.ts` — Gestion des missions
-
-| Hook | Description |
-|------|-------------|
-| `useMissions(filters)` | Liste des missions avec filtres (statut, type, priorité, client, recherche) |
-| `useMission(id)` | Détail d'une mission avec client, directeur, chef |
-| `useMissionMembers(missionId)` | Membres de la mission avec profils |
-| `useMissionProjects(missionId)` | Projets de la mission |
-| `useCreateMission()` | Création de mission (génère code MIS-YYYY-NNN) |
-| `useUpdateMission()` | Mise à jour d'une mission |
-| `useDeleteMission()` | Suppression |
-| `useAddMissionMember()` | Ajout d'un membre |
-| `useOrganizationUsers()` | Liste des utilisateurs de l'organisation |
-| `useClients()` | Liste des clients |
-| `useCreateProject()` | Création d'un projet (génère code PRJ-YYYY-NNN) |
-
-**Exemple de jointure Supabase** :
-```typescript
-const { data } = await supabase
-  .from('missions')
-  .select(`
-    *,
-    client:clients(id, name),
-    director:profiles!missions_director_id_fkey(id, full_name, avatar_url),
-    chief:profiles!missions_chief_id_fkey(id, full_name, avatar_url)
-  `)
-  .eq('organization_id', orgId);
-```
-
-### 7.2 `useProject.ts` — Projets et tâches
-
-| Hook | Description |
-|------|-------------|
-| `useProject(id)` | Détail du projet |
-| `useProjectMembers(projectId)` | Membres du projet |
-| `useProjectTasks(projectId)` | Tâches avec assignations |
-| `useProjectActivities(projectId)` | Arborescence des activités |
-| `useCreateTask()` | Création de tâche avec assignation |
-| `useUpdateTask()` | Mise à jour de tâche |
-| `useDeleteTask()` | Suppression |
-| `useCreateActivity()` | Création d'activité |
-| `useReorderActivities()` | Réorganisation drag & drop |
-| `useProjectPublications(projectId)` | Publications du projet |
-| `useProjectNotes(projectId)` | Notes personnelles/partagées |
-
-### 7.3 `useMessages.ts` — Messagerie
-
-| Hook/Fonction | Description |
-|--------------|-------------|
-| `useConversations()` | Liste des conversations avec dernier message et compteur non-lus |
-| `useMessages(conversationId)` | Messages avec profils expéditeurs et réponses |
-| `sendMessage` | Envoi d'un message (mutation) |
-| `editMessage` | Édition d'un message |
-| `deleteMessage` | Suppression |
-| `markAsRead` | Marquer comme lu |
-| `typingUsers` | Indicateur de saisie (broadcast Supabase) |
-| `sendTyping` | Envoyer signal "en train d'écrire" |
-| `useOrgMembers()` | Membres de l'organisation pour créer des conversations |
-
-**Temps réel** : Deux canaux Supabase par conversation :
-1. `postgres_changes` : Détecte les INSERT/UPDATE/DELETE de messages
-2. `broadcast` : Indicateur de saisie (typing)
-
-### 7.4 `useDocuments.ts` — Gestion documentaire
-
-| Hook | Description |
-|------|-------------|
-| `useDocuments(opts)` | Liste documents avec filtres (mission, projet, dossier, recherche) |
-| `useDocumentFolders(opts)` | Arborescence des dossiers |
-| `useUploadDocument()` | Upload fichier → Supabase Storage → enregistrement DB |
-| `useCreateFolder()` | Création de dossier |
-| `useDeleteDocument()` | Suppression fichier + Storage |
-| `useMoveDocument()` | Déplacement entre dossiers |
-| `useDocumentVersions()` | Historique des versions |
-| `downloadDocument()` | Téléchargement via Storage |
-| `logDocumentAccess()` | Traçabilité des accès |
-
-**Versioning** : Lors de l'upload, si un fichier du même nom existe dans le même dossier, le nouveau document est lié comme nouvelle version (`parent_version_id`, `version` incrémenté).
-
-### 7.5 `useTimesheets.ts` — Feuilles de temps et finance
-
-| Hook | Description |
-|------|-------------|
-| `useTimeEntries(weekStart)` | Entrées de la semaine |
-| `useUpsertTimeEntry()` | Créer/modifier une entrée |
-| `useSubmitTimesheet()` | Soumettre pour validation |
-| `useApproveTimeEntries()` | Approuver/rejeter (manager) |
-| `useTeamTimesheets(weekStart)` | Vue manager des soumissions |
-| `useDailyRates()` | Taux journaliers par grade |
-| `useExpenses(filters)` | Notes de frais |
-| `useCreateExpense()` | Créer une note de frais |
-| `useInvoices(filters)` | Factures |
-| `useCreateInvoice()` | Créer une facture (numéro FAC-YYYY-NNNN) |
-| `useMissionBudgetSummary()` | Rentabilité par mission |
-
-### 7.6 `useCommittees.ts` — COPIL/CODIR
-
-| Hook | Description |
-|------|-------------|
-| `useCommittees(missionId)` | Liste des comités |
-| `useCreateCommittee()` | Créer un comité |
-| `useCommitteeMembers(committeeId)` | Membres (internes + externes) |
-| `useAddCommitteeMember()` | Ajouter un membre |
-| `useCommitteeMeetings(committeeId)` | Réunions programmées |
-| `useCreateMeeting()` | Programmer une réunion |
-| `useMailingGroup(committeeId)` | Groupe de diffusion lié |
-| `useGroupEmails(groupId)` | Historique des emails envoyés |
-| `useCreateGroupEmail()` | Composer un email groupé |
-| `useSendGroupEmail()` | Envoyer via Edge Function |
-
-### 7.7 `useNotifications.ts` — Notifications
-
-- Fetch les 20 dernières notifications
-- Compteur de non-lues (`unreadCount`)
-- **Temps réel** : Écoute les INSERT sur `notifications` (filtre par user_id)
-- `markAsRead(id)` / `markAllAsRead()`
-- `getNavigationPath(notification)` : Détermine la route selon le type
-
-### 7.8 `useAdmin.ts` — Administration
-
-| Hook | Description |
-|------|-------------|
-| `useAdminKPIs()` | KPIs globaux (missions, utilisation, revenus, qualité) |
-| `useMissionsByMonth()` | Graphique missions par mois |
-| `useUtilizationByGrade()` | Taux d'utilisation par grade |
-| `useTaskStatusDistribution()` | Distribution des statuts de tâches |
-| `useActivityLogs(filters)` | Journal d'activité complet |
-| `useOrganization()` | Paramètres de l'organisation |
-| `useUpdateOrganization()` | Modifier les paramètres |
-| `useInviteUser()` | Inviter un utilisateur |
-| `useUpdateUserGrade()` | Modifier le grade d'un utilisateur |
-
----
-
-## 8. PAGES DE L'APPLICATION
-
-### 8.1 `DashboardPage` — Tableau de bord
-
-Affiche en un coup d'œil :
-- 4 cartes statistiques (missions actives, tâches, documents, heures)
-- Tâches urgentes avec deadlines
-- Prochaines réunions
-- Activité récente
-
-**Hook utilisé** : `useDashboardData()`
-
-### 8.2 `MissionsPage` — Liste des missions
-
-- Filtres : statut, type, priorité, client, recherche texte
-- Vue tableau avec badges de statut et priorité
-- Bouton de création (modal `MissionFormDialog`)
-
-### 8.3 `MissionDetailPage` — Détail mission
-
-Onglets :
-- **Vue d'ensemble** : KPIs, progression, timeline
-- **Projets** : Liste et création de projets
-- **Équipe** : Membres avec grades et rôles
-- **Budget** : Suivi budgétaire
-- **COPIL** : Comité de pilotage
-- **Paramètres** : Configuration de la mission
-
-### 8.4 `ProjectDetailPage` — Détail projet
-
-Onglets :
-- **Tâches** : Vue Kanban, tableau, compartiments
-- **Activités** : Arborescence hiérarchique
-- **Documents** : Fichiers du projet
-- **Équipe** : Membres du projet
-- **Publications** : Annonces et notes
-- **Notes** : Bloc-notes personnel/partagé
-- **Calendrier** : Réunions liées
-
-### 8.5 `MessagesPage` — Messagerie
-
-Layout deux panneaux :
-- **Gauche** (320px) : `ConversationList` — liste des conversations
-- **Droite** : `ChatArea` — zone de chat avec messages, input, typing indicator
-
-### 8.6 `TimesheetsPage` — Feuilles de temps
-
-- Grille hebdomadaire (lundi → dimanche)
-- Saisie des heures par mission/projet/tâche
-- Soumission et validation par le manager
-- Distinction heures facturables / non-facturables
-
-### 8.7 `AdminPage` — Administration
-
-Onglets :
-- **Dashboard** : KPIs, graphiques
-- **Utilisateurs** : Liste, invitation, modification grades
-- **Journal** : Logs d'activité avec filtres
-- **Paramètres** : Configuration organisation
-
----
-
-## 9. COMPOSANTS PRINCIPAUX
-
-### 9.1 Composants UI (Shadcn/UI)
-
-Tous les composants UI de base sont dans `src/components/ui/` :
-
-```
-Button, Card, Dialog, Select, Input, Textarea, Tabs, Table,
-Badge, Avatar, Tooltip, Popover, DropdownMenu, Sheet, Sidebar,
-Progress, Calendar, Checkbox, Switch, Slider, ScrollArea, etc.
-```
-
-**⚠️ Important** : Ne jamais utiliser de couleurs Tailwind directement (`text-blue-500`). Toujours utiliser les tokens sémantiques (`text-primary`, `bg-muted`, `text-destructive`, etc.).
-
-### 9.2 Composants métier clés
-
-| Composant | Fichier | Description |
-|-----------|---------|-------------|
-| `TaskKanbanView` | projects/ | Vue Kanban des tâches (todo → validated) |
-| `TaskTableView` | projects/ | Vue tableau des tâches |
-| `TaskDetailDialog` | projects/ | Détail d'une tâche (dialog) |
-| `TaskFormDialog` | projects/ | Formulaire création/édition tâche |
-| `DocumentExplorer` | documents/ | Explorateur de fichiers |
-| `UploadZone` | documents/ | Zone de drag & drop upload |
-| `FolderTree` | documents/ | Arborescence des dossiers |
-| `ConversationList` | messages/ | Liste des conversations |
-| `ChatArea` | messages/ | Zone de messagerie |
-| `CopilTab` | copil/ | Onglet COPIL complet |
-| `GroupMailComposer` | copil/ | Composition d'email groupé |
-| `MissionFormDialog` | missions/ | Formulaire de mission |
-| `GlobalSearch` | search/ | Recherche globale (Cmd+K) |
-
----
-
-## 10. BASE DE DONNÉES ET TYPES
-
-### 10.1 Tables principales
-
-| Table | Description | Clés étrangères principales |
-|-------|-------------|---------------------------|
-| `organizations` | Cabinets/entreprises | - |
-| `profiles` | Profils utilisateurs | `organization_id` |
-| `clients` | Clients du cabinet | `organization_id` |
-| `missions` | Missions (engagements) | `organization_id`, `client_id`, `director_id`, `chief_id` |
-| `mission_members` | Membres d'une mission | `mission_id`, `user_id` |
-| `projects` | Projets d'une mission | `mission_id`, `organization_id` |
-| `project_members` | Membres d'un projet | `project_id`, `user_id` |
-| `activities` | Activités (hiérarchie) | `project_id`, `parent_id` |
-| `tasks` | Tâches assignables | `project_id`, `activity_id` |
-| `task_assignments` | Assignation tâche→utilisateur | `task_id`, `user_id` |
-| `task_submissions` | Soumissions/corrections | `task_id`, `submitted_by` |
-| `documents` | Documents uploadés | `organization_id`, `mission_id`, `project_id`, `folder_id` |
-| `document_folders` | Dossiers | `organization_id`, `project_id`, `parent_id` |
-| `conversations` | Conversations chat | `organization_id` |
-| `conversation_members` | Membres d'une conversation | `conversation_id`, `user_id` |
-| `messages` | Messages chat | `conversation_id`, `sender_id` |
-| `committees` | COPIL/CODIR | `mission_id` |
-| `committee_members` | Membres du comité | `committee_id`, `user_id` |
-| `committee_meetings` | Réunions de comité | `committee_id` |
-| `time_entries` | Saisie des temps | `user_id`, `mission_id`, `project_id` |
-| `expenses` | Notes de frais | `user_id`, `mission_id` |
-| `invoices` | Factures | `organization_id`, `client_id` |
-| `notifications` | Notifications | `user_id` |
-| `activity_logs` | Journal d'activité | `user_id`, `organization_id` |
-| `mailing_groups` | Groupes de diffusion | `committee_id`, `organization_id` |
-| `group_emails` | Emails groupés | `group_id` |
-
-### 10.2 Types personnalisés (`src/types/database.ts`)
+### useDashboardData.ts — Agrégation des KPIs
 
 ```typescript
-// Grades hiérarchiques
-type Grade = 'DA' | 'DM' | 'CM' | 'SUP' | 'AS' | 'AUD' | 'AJ' | 'STG';
+export function useDashboardData() {
+  const { user, profile } = useAuthStore();
+  const isDirector = (profile?.grade_level ?? 8) <= 2;
 
-// Niveaux (1 = plus haut, 8 = plus bas)
-const GRADE_LEVELS = { DA: 1, DM: 2, CM: 3, SUP: 4, AS: 5, AUD: 6, AJ: 7, STG: 8 };
-
-// Statuts de mission
-type MissionStatus = 'draft' | 'planning' | 'active' | 'on_hold' | 'completed' | 'archived';
-
-// Statuts de tâche (workflow)
-type TaskStatus = 'todo' | 'in_progress' | 'in_review' | 'correction' | 'validated' | 'completed' | 'cancelled';
-
-// Priorités
-type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
-```
-
-### 10.3 Types auto-générés (`src/integrations/supabase/types.ts`)
-
-⚠️ **NE JAMAIS MODIFIER CE FICHIER**. Il est généré automatiquement à partir du schéma de la base de données. Utilisez-le pour le typage :
-
-```typescript
-import type { Database } from '@/integrations/supabase/types';
-type Mission = Database['public']['Tables']['missions']['Row'];
-type MissionInsert = Database['public']['Tables']['missions']['Insert'];
-```
-
-### 10.4 RLS (Row Level Security)
-
-Chaque table est protégée par des politiques RLS. Principes :
-- **Isolation par organisation** : `organization_id = profil utilisateur.organization_id`
-- **Isolation par mission** : Visible seulement si membre de la mission
-- **Contrôle par grade** : Certains documents masqués selon le grade
-- **Propriétaire** : L'auteur peut toujours voir ses propres données
-
----
-
-## 11. EDGE FUNCTIONS (BACKEND)
-
-### 11.1 `send-group-email`
-
-Envoie des emails groupés via Resend API :
-1. Récupère l'email depuis la table `group_emails`
-2. Récupère les destinataires depuis `mailing_group_recipients`
-3. Appelle l'API Resend pour chaque destinataire
-4. Met à jour le `delivery_report` et le `status`
-
-### 11.2 `send-invitation`
-
-Envoie un email d'invitation pour rejoindre l'organisation :
-- Reçoit `{ email, token, grade, organizationName }`
-- Génère un lien `/register?token=UUID`
-- Envoie via Resend
-
-### 11.3 `meeting-reminders`
-
-Envoie des rappels automatiques avant les réunions programmées.
-
-### 11.4 `budget-monitor`
-
-Surveille la consommation budgétaire des missions et crée des notifications si le seuil (80%) est dépassé.
-
-### 11.5 `task-automation`
-
-Automatise les actions sur les tâches :
-- Alertes de deadline (J-2)
-- Notifications de retard
-
-### 11.6 `timesheet-reminder`
-
-Rappels automatiques pour la saisie des feuilles de temps.
-
----
-
-## 12. THÈME ET DESIGN SYSTEM
-
-### 12.1 Variables CSS (`src/index.css`)
-
-Le thème utilise des **variables CSS HSL** :
-
-```css
-:root {
-  --background: 210 20% 98%;
-  --foreground: 222 47% 11%;
-  --primary: 224 76% 40%;        /* Bleu professionnel */
-  --secondary: 214 32% 91%;
-  --muted: 210 40% 96%;
-  --accent: 217 91% 60%;
-  --destructive: 0 84% 60%;     /* Rouge erreur */
-  --success: 142 71% 45%;       /* Vert succès */
-  --warning: 38 92% 50%;        /* Orange avertissement */
-  --sidebar-background: 222 47% 11%;  /* Sidebar sombre */
-}
-
-.dark {
-  /* Toutes les variables sont redéfinies pour le mode sombre */
-  --background: 222 47% 7%;
-  --foreground: 210 40% 98%;
-  /* ... */
-}
-```
-
-### 12.2 Polices
-
-- **Display** : Plus Jakarta Sans (titres, navigation)
-- **Body** : Inter (contenu, texte)
-
-### 12.3 Règles d'utilisation
-
-✅ **Correct** :
-```tsx
-<div className="bg-background text-foreground">
-<Button variant="default">  {/* utilise --primary */}
-<Badge className="bg-success text-success-foreground">
-```
-
-❌ **Incorrect** :
-```tsx
-<div className="bg-white text-black">     {/* Couleurs codées en dur */}
-<div className="bg-blue-500">             {/* Classe Tailwind directe */}
-```
-
----
-
-## 13. FONCTIONNALITÉS TEMPS RÉEL
-
-### 13.1 Messages en temps réel
-
-```typescript
-// Écoute les changements sur la table messages
-supabase
-  .channel(`messages:${conversationId}`)
-  .on('postgres_changes', {
-    event: '*',
-    schema: 'public',
-    table: 'messages',
-    filter: `conversation_id=eq.${conversationId}`,
-  }, () => {
-    queryClient.invalidateQueries({ queryKey: ['messages', conversationId] });
-  })
-  .subscribe();
-```
-
-### 13.2 Typing indicator (broadcast)
-
-```typescript
-// Envoi
-supabase.channel(`typing:${convId}`).send({
-  type: 'broadcast',
-  event: 'typing',
-  payload: { user_id, user_name },
-});
-
-// Réception
-supabase.channel(`typing:${convId}`).on('broadcast', { event: 'typing' }, (payload) => {
-  // Affiche "X est en train d'écrire..."
-  // Auto-suppression après 3 secondes
-});
-```
-
-### 13.3 Notifications en temps réel
-
-```typescript
-supabase
-  .channel('notifications-realtime')
-  .on('postgres_changes', {
-    event: 'INSERT',
-    schema: 'public',
-    table: 'notifications',
-    filter: `user_id=eq.${userId}`,
-  }, () => {
-    queryClient.invalidateQueries({ queryKey: ['notifications'] });
-  })
-  .subscribe();
-```
-
-### 13.4 Présence en ligne
-
-- **Heartbeat** : Toutes les 60 secondes, `last_seen_at` est mis à jour
-- **Connexion** : `is_online = true`, `last_login_at = now()`
-- **Déconnexion** : `is_online = false`, `last_seen_at = now()`
-
----
-
-## 14. GUIDE DE DÉVELOPPEMENT
-
-### 14.1 Installation locale
-
-```bash
-# 1. Cloner le repo
-git clone <URL_DU_REPO>
-cd missionflow
-
-# 2. Installer les dépendances
-npm install
-
-# 3. Lancer le serveur de développement
-npm run dev
-```
-
-### 14.2 Conventions de code
-
-| Convention | Description |
-|-----------|-------------|
-| **Nommage fichiers** | PascalCase pour composants (`TaskKanbanView.tsx`), camelCase pour hooks (`useProject.ts`) |
-| **Nommage composants** | PascalCase (`const TaskCard = ()`) |
-| **Nommage hooks** | Préfixe `use` (`useMessages`, `useMissions`) |
-| **Types** | Interfaces pour les objets, Types pour les unions |
-| **Imports** | Alias `@/` pointe vers `src/` |
-| **Styles** | Tailwind uniquement, tokens sémantiques du design system |
-| **Toast** | `toast.success()` / `toast.error()` via Sonner |
-| **Erreurs** | `try/catch` dans les mutations, messages utilisateur en français |
-
-### 14.3 Créer une nouvelle fonctionnalité
-
-1. **Si besoin de nouvelles tables** : Migration SQL via l'outil de migration Supabase
-2. **Créer un hook** dans `src/hooks/useMonModule.ts` avec les fonctions CRUD
-3. **Créer les composants** dans `src/components/monmodule/`
-4. **Créer la page** dans `src/pages/MonModulePage.tsx`
-5. **Ajouter la route** dans `src/App.tsx`
-6. **Ajouter le lien** dans `src/components/layout/AppSidebar.tsx`
-
-### 14.4 Pattern de création d'un hook CRUD
-
-```typescript
-// src/hooks/useMonModule.ts
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuthStore } from '@/stores/authStore';
-import { toast } from 'sonner';
-
-// LECTURE
-export function useMonModuleList() {
-  const profile = useAuthStore((s) => s.profile);
-  return useQuery({
-    queryKey: ['mon-module', profile?.organization_id],
+  // KPI 1 : Nombre de missions actives
+  const activeMissions = useQuery({
+    queryKey: ['dashboard', 'activeMissions'],
     queryFn: async () => {
-      if (!profile?.organization_id) return [];
-      const { data, error } = await supabase
-        .from('ma_table')
-        .select('*')
+      const { count } = await supabase
+        .from('missions')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'active');
+      return count ?? 0;
+    },
+  });
+
+  // KPI 2 : Tâches en cours de l'utilisateur
+  const myTasks = useQuery({
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('task_assignments')
+        .select('task_id, tasks!inner(status)', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .in('tasks.status', ['todo', 'in_progress', 'in_review', 'correction']);
+      return count ?? 0;
+    },
+  });
+
+  // KPI 3 : Documents uploadés cette semaine
+  // KPI 4 : Heures saisies cette semaine
+  // + Tâches urgentes (triées par deadline)
+  // + Prochaines réunions
+  // + Activité récente (logs)
+
+  return { activeMissions, myTasks, weeklyDocuments, weeklyHours,
+           urgentTasks, upcomingMeetings, recentActivity, isLoading };
+}
+```
+
+### DashboardPage.tsx
+
+```typescript
+const DashboardPage = () => {
+  const { profile } = useAuthStore();
+  const { activeMissions, myTasks, weeklyDocuments, weeklyHours,
+          urgentTasks, upcomingMeetings, recentActivity, isLoading } = useDashboardData();
+
+  return (
+    <div className="space-y-6">
+      {/* Salutation personnalisée */}
+      <h1>Bonjour, {profile?.full_name?.split(' ')[0]} 👋</h1>
+
+      {/* 4 cartes KPI */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card> Missions actives : {activeMissions} </Card>
+        <Card> Tâches en cours : {myTasks} </Card>
+        <Card> Documents cette semaine : {weeklyDocuments} </Card>
+        <Card> Heures cette semaine : {weeklyHours}h </Card>
+      </div>
+
+      {/* Tâches urgentes + Prochaines réunions */}
+      {/* Activité récente (timeline) */}
+    </div>
+  );
+};
+```
+
+---
+
+## 8. MISSIONS — MissionsPage.tsx + useMissions.ts
+
+### useMissions.ts — CRUD Missions
+
+```typescript
+// ─── Liste des missions avec filtres ───
+export function useMissions(filters: MissionFilters = {}) {
+  const profile = useAuthStore((s) => s.profile);
+
+  return useQuery({
+    queryKey: ['missions', filters, profile?.organization_id],
+    queryFn: async () => {
+      let query = supabase
+        .from('missions')
+        .select(`
+          *,
+          client:clients(id, name),
+          director:profiles!missions_director_id_fkey(id, full_name, avatar_url),
+          chief:profiles!missions_chief_id_fkey(id, full_name, avatar_url)
+        `)
         .eq('organization_id', profile.organization_id)
         .order('created_at', { ascending: false });
+
+      // Filtres dynamiques
+      if (filters.status && filters.status !== 'all') query = query.eq('status', filters.status);
+      if (filters.type && filters.type !== 'all') query = query.eq('type', filters.type);
+      if (filters.search) query = query.or(`name.ilike.%${filters.search}%,code.ilike.%${filters.search}%`);
+
+      const { data, error } = await query;
       if (error) throw error;
       return data ?? [];
     },
@@ -931,90 +685,905 @@ export function useMonModuleList() {
   });
 }
 
-// CRÉATION
-export function useCreateMonModule() {
-  const qc = useQueryClient();
-  const profile = useAuthStore((s) => s.profile);
-  
+// ─── Création de mission avec code auto-généré ───
+export function useCreateMission() {
   return useMutation({
-    mutationFn: async (values: { name: string; /* ... */ }) => {
-      const { data, error } = await supabase
-        .from('ma_table')
-        .insert({ ...values, organization_id: profile!.organization_id! })
-        .select()
-        .single();
-      if (error) throw error;
+    mutationFn: async (values) => {
+      // Génère le code : MIS-2026-001
+      const year = new Date().getFullYear();
+      const { count } = await supabase
+        .from('missions')
+        .select('*', { count: 'exact', head: true })
+        .eq('organization_id', profile.organization_id);
+      const code = `MIS-${year}-${String((count ?? 0) + 1).padStart(3, '0')}`;
+
+      // Insère la mission
+      const { data } = await supabase.from('missions').insert({
+        ...values, code, organization_id: profile.organization_id, status: 'draft',
+      }).select().single();
+
+      // Ajoute directeur et chef comme membres
+      if (values.director_id)
+        await supabase.from('mission_members').insert({
+          mission_id: data.id, user_id: values.director_id, role: 'director'
+        });
+
       return data;
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['mon-module'] });
-      toast.success('Élément créé');
+    onSuccess: () => toast.success('Mission créée avec succès'),
+  });
+}
+
+// ─── Autres hooks ───
+// useMission(id) — Détail d'une mission
+// useMissionMembers(missionId) — Membres de la mission
+// useMissionProjects(missionId) — Projets de la mission
+// useUpdateMission() — Mise à jour
+// useDeleteMission() — Suppression
+// useAddMissionMember() — Ajout de membre
+// useOrganizationUsers() — Liste des utilisateurs de l'organisation
+// useClients() — Liste des clients
+// useCreateProject() — Création de projet avec code auto-généré
+```
+
+### MissionsPage.tsx
+
+```typescript
+const MissionsPage = () => {
+  const profile = useAuthStore((s) => s.profile);
+  const [filters, setFilters] = useState<MissionFilters>({});
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  const { data: missions = [], isLoading } = useMissions(filters);
+
+  // Seuls les grades CM et au-dessus (grade_level ≤ 3) peuvent créer
+  const canCreate = profile?.grade_level != null && profile.grade_level <= 3;
+
+  return (
+    <div>
+      <h1>Missions</h1>
+      {/* Barre de filtres + export CSV/PDF */}
+      {/* Vue grille (MissionCard) ou tableau (MissionsTable) */}
+      {/* Pagination */}
+      {/* Dialog de création de mission */}
+    </div>
+  );
+};
+```
+
+---
+
+## 9. PROJETS ET TÂCHES — useProject.ts
+
+### Hooks principaux
+
+```typescript
+// ─── Détail d'un projet avec relations ───
+export function useProject(id: string | undefined) {
+  return useQuery({
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('projects')
+        .select(`
+          *,
+          lead:profiles!projects_lead_id_fkey(id, full_name, avatar_url, grade),
+          mission:missions!projects_mission_id_fkey(id, name, code)
+        `)
+        .eq('id', id).single();
+      return data;
     },
-    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+// ─── Tâches d'un projet avec assignations ───
+export function useProjectTasks(projectId: string | undefined) {
+  return useQuery({
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('tasks')
+        .select(`
+          *,
+          assignments:task_assignments(
+            id,
+            user:profiles!task_assignments_user_id_fkey(id, full_name, avatar_url)
+          )
+        `)
+        .eq('project_id', projectId)
+        .order('order_index', { ascending: true });
+      return data;
+    },
+  });
+}
+
+// ─── Activités hiérarchiques (Activité → Sous-activité → Sous-sous-activité) ───
+export function useProjectActivities(projectId: string | undefined) {
+  return useQuery({
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('activities')
+        .select('*')
+        .eq('project_id', projectId)
+        .order('order_index', { ascending: true });
+      return data;
+    },
+  });
+}
+
+// ─── Création de tâche avec assignation multiple ───
+export function useCreateTask() {
+  return useMutation({
+    mutationFn: async (values) => {
+      const { assigned_to, ...taskValues } = values;
+
+      // Crée la tâche
+      const { data } = await supabase.from('tasks').insert({
+        ...taskValues, created_by: profile.id,
+        status: 'todo', priority: 'medium',
+      }).select().single();
+
+      // Assigne à un ou plusieurs utilisateurs
+      if (assigned_to?.length > 0) {
+        const assignments = assigned_to.map((userId) => ({
+          task_id: data.id, user_id: userId, assigned_by: profile.id,
+        }));
+        await supabase.from('task_assignments').insert(assignments);
+      }
+
+      return data;
+    },
+  });
+}
+
+// Autres : useUpdateTask, useDeleteTask, useCreateActivity, useUpdateActivity,
+// useDeleteActivity, useReorderActivities, useAddProjectMember,
+// useProjectPublications, useCreatePublication, useProjectNotes, useCreateNote
+```
+
+---
+
+## 10. WORKFLOW DE VALIDATION — useTaskSubmissions.ts
+
+### Circuit de validation
+
+```
+Employé exécute → Soumet (in_review) → Chef examine
+  ↓                                         ↓
+  ← Corrections (correction) ←─── Option B : retourne avec commentaires
+                                   Option A : valide (note 1-4)
+```
+
+```typescript
+// ─── Historique des soumissions d'une tâche ───
+export function useTaskSubmissions(taskId: string | undefined) {
+  return useQuery({
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('task_submissions')
+        .select(`
+          *,
+          submitter:profiles!task_submissions_submitted_by_fkey(id, full_name, avatar_url, grade),
+          reviewer:profiles!task_submissions_reviewed_by_fkey(id, full_name, avatar_url, grade)
+        `)
+        .eq('task_id', taskId)
+        .order('created_at', { ascending: true });
+      return data;
+    },
+  });
+}
+
+// ─── Créer une soumission/validation/rejet ───
+export function useCreateSubmission() {
+  return useMutation({
+    mutationFn: async (values) => {
+      // type = 'submission' | 'correction' | 'validation' | 'rejection'
+      // rating = 1-4 (uniquement pour les validations)
+      const { data } = await supabase
+        .from('task_submissions')
+        .insert({
+          ...values,
+          submitted_by: profile.id,
+          reviewed_by: values.type === 'validation' ? profile.id : null,
+        })
+        .select().single();
+      return data;
+    },
+  });
+}
+
+// ─── Statistiques de performance d'un employé ───
+export function useEmployeePerformanceSummary(userId: string | undefined) {
+  return useQuery({
+    queryFn: async () => {
+      // 1. Récupère toutes les tâches assignées à l'utilisateur
+      // 2. Récupère les soumissions de type 'validation' avec notes
+      // 3. Calcule : note moyenne, nombre d'itérations moyen, distribution 1-4
+      return {
+        avgRating: 3.2,           // Moyenne des notes
+        avgIterations: 1.5,       // Nombre moyen de corrections avant validation
+        ratingDistribution: { 1: 2, 2: 5, 3: 10, 4: 8 },
+        timeline: [...],           // Historique des notes par date
+      };
+    },
   });
 }
 ```
 
-### 14.5 Fichiers à ne JAMAIS modifier
+---
 
-| Fichier | Raison |
-|---------|--------|
-| `src/integrations/supabase/client.ts` | Auto-généré |
-| `src/integrations/supabase/types.ts` | Auto-généré depuis la DB |
-| `supabase/config.toml` | Auto-géré |
-| `.env` | Auto-géré (variables Supabase) |
+## 11. DOCUMENTS (GED) — useDocuments.ts
 
-### 14.6 Commandes utiles
+### Fonctionnalités
 
-```bash
-npm run dev        # Serveur de développement (port 5173)
-npm run build      # Build de production
-npm run test       # Lancer les tests (Vitest)
-npm run lint       # Linting ESLint
+- Upload vers Supabase Storage avec chemin structuré
+- **Versioning automatique** (détecte les fichiers de même nom)
+- Dossiers hiérarchiques
+- Filtres par mission, projet, activité, statut
+- Journal d'accès (audit trail)
+
+```typescript
+// ─── Upload de document avec versioning ───
+export function useUploadDocument() {
+  return useMutation({
+    mutationFn: async (input) => {
+      // 1. Nettoie le nom de fichier (supprime accents et caractères spéciaux)
+      const sanitizedName = input.file.name
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9._-]/g, '_');
+
+      // 2. Construit le chemin : orgId/missionId/projectId/timestamp_filename
+      const filePath = `${orgId}/${missionId}/${projectId}/${Date.now()}_${sanitizedName}`;
+
+      // 3. Upload vers le bucket 'documents'
+      await supabase.storage.from('documents').upload(filePath, input.file, { upsert: false });
+
+      // 4. Vérifie si un fichier de même nom existe → versioning
+      const { data: existing } = await supabase
+        .from('documents')
+        .select('id, version')
+        .eq('name', input.file.name)
+        .eq('folder_id', input.folderId || '')
+        .order('version', { ascending: false })
+        .limit(1);
+
+      const version = existing?.[0]?.version ? existing[0].version + 1 : 1;
+      const parentVersionId = existing?.[0]?.id || null;
+
+      // 5. Enregistre les métadonnées en base
+      await supabase.from('documents').insert({
+        name: input.file.name,
+        file_path: filePath,
+        file_size: input.file.size,
+        mime_type: input.file.type,
+        version,
+        parent_version_id: parentVersionId,
+        visibility_grade: input.visibilityGrade || 8, // Visible par tous par défaut
+        status: 'draft',
+        // ...
+      });
+    },
+  });
+}
+
+// ─── Téléchargement de document ───
+export async function downloadDocument(filePath: string, fileName: string) {
+  const { data } = await supabase.storage.from('documents').download(filePath);
+  const url = URL.createObjectURL(data);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ─── Journal d'accès (audit trail) ───
+export async function logDocumentAccess(documentId: string, action: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  await supabase.from('document_access_log').insert({
+    document_id: documentId,
+    user_id: user.id,
+    action, // 'view', 'download', 'edit', 'delete'
+  });
+}
 ```
 
-### 14.7 Variables d'environnement
+---
 
-| Variable | Description |
+## 12. MESSAGERIE TEMPS RÉEL — useMessages.ts
+
+### Architecture
+
+- **Conversations** : individuelles, groupe, projet, mission
+- **Messages** : temps réel via `postgres_changes`
+- **Typing indicator** : via `broadcast` (Supabase Realtime)
+- **Compteur non-lus** : basé sur `last_read_at`
+
+```typescript
+// ─── Messages avec temps réel ───
+export function useMessages(conversationId: string | null) {
+  const [typingUsers, setTypingUsers] = useState<string[]>([]);
+
+  // Récupération initiale des messages avec profils expéditeurs
+  const { data: messages } = useQuery({
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: true })
+        .limit(100);
+
+      // Enrichit avec les profils des expéditeurs
+      const senderIds = [...new Set(data.map(m => m.sender_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url, is_online')
+        .in('id', senderIds);
+
+      return data.map(m => ({ ...m, sender: profileMap.get(m.sender_id) }));
+    },
+  });
+
+  // ─── Abonnement temps réel aux nouveaux messages ───
+  useEffect(() => {
+    const channel = supabase
+      .channel(`messages:${conversationId}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'messages',
+        filter: `conversation_id=eq.${conversationId}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['messages', conversationId] });
+      })
+      .subscribe();
+
+    return () => supabase.removeChannel(channel);
+  }, [conversationId]);
+
+  // ─── Typing indicator via broadcast ───
+  useEffect(() => {
+    const channel = supabase
+      .channel(`typing:${conversationId}`)
+      .on('broadcast', { event: 'typing' }, ({ payload }) => {
+        if (payload.user_id === user.id) return; // Ignore ses propres messages
+        setTypingUsers(prev => [...prev, payload.user_name]);
+        // Auto-clear après 3 secondes
+        setTimeout(() => {
+          setTypingUsers(prev => prev.filter(u => u !== payload.user_name));
+        }, 3000);
+      })
+      .subscribe();
+
+    return () => supabase.removeChannel(channel);
+  }, [conversationId]);
+
+  // ─── Envoi de message ───
+  const sendMessage = useMutation({
+    mutationFn: async ({ content, replyTo, attachments, mentions }) => {
+      await supabase.from('messages').insert({
+        conversation_id: conversationId,
+        sender_id: user.id,
+        content, reply_to: replyTo,
+        attachments: attachments || [],
+        mentions: mentions || [],
+      });
+    },
+  });
+
+  // ─── Marquer comme lu ───
+  const markAsRead = async () => {
+    await supabase
+      .from('conversation_members')
+      .update({ last_read_at: new Date().toISOString() })
+      .eq('conversation_id', conversationId)
+      .eq('user_id', user.id);
+  };
+
+  return { messages, sendMessage, editMessage, deleteMessage,
+           markAsRead, typingUsers, sendTyping };
+}
+```
+
+---
+
+## 13. TIMESHEETS ET FINANCE — useTimesheets.ts
+
+### Fonctionnalités
+
+- Saisie hebdomadaire des heures par mission/projet/tâche
+- Soumission et validation par le manager
+- Notes de frais avec catégories
+- Facturation avec numérotation automatique (FAC-2026-0001)
+- Calcul de rentabilité : heures × taux journalier par grade
+
+```typescript
+// ─── Saisie des heures ───
+export function useUpsertTimeEntry() {
+  return useMutation({
+    mutationFn: async (entry) => {
+      if (entry.id) {
+        // Mise à jour d'une entrée existante
+        await supabase.from('time_entries')
+          .update({ hours: entry.hours, description: entry.description })
+          .eq('id', entry.id);
+      } else {
+        // Nouvelle entrée
+        if (entry.hours <= 0) return;
+        await supabase.from('time_entries').insert({
+          ...entry, user_id: profile.id, organization_id: profile.organization_id,
+        });
+      }
+    },
+  });
+}
+
+// ─── Soumission de la feuille de temps ───
+export function useSubmitTimesheet() {
+  return useMutation({
+    mutationFn: async ({ weekStart, userId }) => {
+      await supabase.from('time_entries')
+        .update({ status: 'submitted' })
+        .eq('user_id', userId)
+        .eq('week_start', weekStart)
+        .eq('status', 'draft');
+    },
+  });
+}
+
+// ─── Calcul de rentabilité par mission ───
+export function useMissionBudgetSummary() {
+  return useQuery({
+    queryFn: async () => {
+      // 1. Récupère les missions actives avec budget
+      // 2. Récupère les time_entries validées/soumises
+      // 3. Récupère les taux journaliers par grade
+      // 4. Calcule : heures × (taux / 8) = coût
+      // 5. Compare coût réel vs budget
+      return missions.map(m => ({
+        ...m,
+        total_hours: 120,
+        total_cost: 15000000,      // FCFA
+        budget: 20000000,          // FCFA
+        consumed_pct: 75,          // 75% du budget consommé
+      }));
+    },
+  });
+}
+
+// ─── Création de facture ───
+export function useCreateInvoice() {
+  return useMutation({
+    mutationFn: async (values) => {
+      // Numérotation automatique : FAC-2026-0001
+      const { count } = await supabase.from('invoices')
+        .select('*', { count: 'exact', head: true })
+        .eq('organization_id', profile.organization_id);
+      const invoiceNumber = `FAC-${year}-${String((count ?? 0) + 1).padStart(4, '0')}`;
+
+      await supabase.from('invoices').insert({
+        ...values, invoice_number: invoiceNumber,
+        organization_id: profile.organization_id, status: 'draft',
+      });
+    },
+  });
+}
+```
+
+---
+
+## 14. COPIL / CODIR / MAILING — useCommittees.ts
+
+### COPIL = Comité de Pilotage (1 par mission)
+### CODIR = Comité de Direction (1 par cabinet)
+
+```typescript
+// ─── Liste des comités d'une mission ───
+export const useCommittees = (missionId?: string) => useQuery({
+  queryFn: async () => {
+    let q = supabase.from('committees').select('*, committee_members(count)');
+    if (missionId) q = q.eq('mission_id', missionId);
+    else q = q.is('mission_id', null); // CODIR (pas lié à une mission)
+    return q.order('created_at', { ascending: false });
+  },
+});
+
+// ─── Membres (internes + externes) ───
+export const useCommitteeMembers = (committeeId?: string) => useQuery({
+  queryFn: async () => {
+    return supabase
+      .from('committee_members')
+      .select('*, profiles:user_id(id, full_name, email, avatar_url, grade)')
+      .eq('committee_id', committeeId);
+    // Les membres externes ont is_external=true et external_email renseigné
+  },
+});
+
+// ─── Envoi d'email groupé via Edge Function ───
+export const useSendGroupEmail = () => useMutation({
+  mutationFn: async (emailId: string) => {
+    // Appelle l'Edge Function send-group-email
+    const { data, error } = await supabase.functions.invoke('send-group-email', {
+      body: { emailId },
+    });
+    if (error) throw error;
+    return data;
+  },
+  onSuccess: () => toast.success('Emails envoyés'),
+});
+```
+
+---
+
+## 15. CRM ET PORTAIL CLIENT — useCRM.ts
+
+```typescript
+// ─── CRUD Clients ───
+export function useClientsFullList() { /* Liste avec filtres par organisation */ }
+export function useCreateClient() { /* Création avec organization_id automatique */ }
+export function useUpdateClient() { /* Mise à jour */ }
+
+// ─── Contacts du client ───
+export function useClientContacts(clientId) { /* Liste des contacts */ }
+export function useCreateContact() { /* Ajout de contact */ }
+
+// ─── Historique des interactions ───
+export function useClientInteractions(clientId) { /* Réunions, appels, etc. */ }
+export function useCreateInteraction() { /* Nouvelle interaction */ }
+
+// ─── Portail client (accès sécurisé par token) ───
+export function useCreatePortalToken() {
+  return useMutation({
+    mutationFn: async ({ clientId, missionId }) => {
+      // Génère un token long et unique
+      const token = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '');
+      await supabase.from('client_portal_tokens').insert({
+        client_id: clientId, mission_id: missionId,
+        token, created_by: profile.id,
+      });
+    },
+  });
+}
+// Le client accède via /portal/<token> sans avoir besoin de compte
+
+// ─── Satisfaction client ───
+export function useSatisfactionStats() {
+  // Calcule : note moyenne, NPS (Net Promoter Score), nombre de réponses
+}
+```
+
+---
+
+## 16. ADMINISTRATION ET KPIs — useAdmin.ts
+
+```typescript
+export function useAdminKPIs() {
+  return useQuery({
+    queryFn: async () => {
+      return {
+        activeMissions: 12,        // Missions en cours
+        totalUsers: 45,            // Utilisateurs total
+        activeToday: 28,           // Connectés aujourd'hui
+        utilization: 78,           // Taux d'utilisation (%)
+        monthlyRevenue: 5000000,   // Revenus du mois (FCFA)
+        avgQuality: 3.2,           // Note moyenne des livrables (1-4)
+        avgSatisfaction: 4.1,      // Satisfaction client (1-5)
+        billableHours: 340,        // Heures facturables ce mois
+      };
+    },
+  });
+}
+
+// ─── Graphiques ───
+export function useMissionsByMonth() { /* Missions créées par mois/statut */ }
+export function useUtilizationByGrade() { /* Taux d'utilisation par grade */ }
+export function useTaskStatusDistribution() { /* Répartition des tâches par statut */ }
+
+// ─── Logs d'activité ───
+export function useActivityLogs(filters) {
+  // Filtrables par utilisateur, action, type d'entité, date
+  // Limité à 200 entrées, triées par date décroissante
+}
+
+// ─── Gestion des utilisateurs ───
+export function useUpdateUserGrade() {
+  // Permet au DA/DM de changer le grade d'un utilisateur
+}
+
+export function useInviteUser() {
+  return useMutation({
+    mutationFn: async ({ email, grade }) => {
+      // 1. Crée un token UUID unique
+      const token = crypto.randomUUID();
+
+      // 2. Enregistre l'invitation en base
+      await supabase.from('invitations').insert({
+        email, grade, token,
+        organization_id: profile.organization_id,
+        invited_by: profile.id,
+      });
+
+      // 3. Envoie l'email via Edge Function
+      await supabase.functions.invoke('send-invitation', {
+        body: { email, token, grade, organizationName: org.name },
+      });
+    },
+  });
+}
+```
+
+---
+
+## 17. NOTIFICATIONS — useNotifications.ts
+
+```typescript
+// Types de notifications supportés
+export const notificationLabels = {
+  task_assigned: 'Tâche assignée',
+  task_deadline_soon: 'Deadline proche',
+  task_overdue: 'Tâche en retard',
+  submission_received: 'Soumission reçue',
+  correction_needed: 'Correction demandée',
+  task_validated: 'Tâche validée',
+  meeting_invite: 'Invitation réunion',
+  document_shared: 'Document partagé',
+  budget_alert: 'Alerte budget',
+  // ...
+};
+
+export function useNotifications(limit = 20) {
+  const { user } = useAuthStore();
+
+  const { data: notifications } = useQuery({
+    queryFn: async () => {
+      return supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+    },
+    refetchInterval: 60000, // Rafraîchit toutes les 60s
+  });
+
+  // ─── Abonnement temps réel ───
+  useEffect(() => {
+    const channel = supabase
+      .channel('notifications-realtime')
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'notifications',
+        filter: `user_id=eq.${user.id}`,
+      }, () => {
+        queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      })
+      .subscribe();
+
+    return () => supabase.removeChannel(channel);
+  }, [user]);
+
+  const unreadCount = notifications.filter(n => !n.is_read).length;
+
+  // Navigation contextuelle selon le type de notification
+  const getNavigationPath = (notification) => {
+    switch (notification.entity_type) {
+      case 'task': return `/projects/${notification.entity_id}`;
+      case 'mission': return `/missions/${notification.entity_id}`;
+      case 'meeting': return '/calendar';
+      case 'document': return '/documents';
+      case 'conversation': return '/messages';
+    }
+  };
+
+  return { notifications, unreadCount, markAsRead, markAllAsRead, getNavigationPath };
+}
+```
+
+---
+
+## 18. EDGE FUNCTIONS (BACKEND)
+
+### send-invitation — Envoi d'email d'invitation
+
+**Fichier** : `supabase/functions/send-invitation/index.ts`
+
+```typescript
+Deno.serve(async (req) => {
+  // 1. Vérifie l'authentification (Bearer token)
+  // 2. Récupère les paramètres (email, token, grade, organizationName)
+  // 3. Construit le lien d'invitation : https://app.url/register?token=xxx
+  // 4. Si RESEND_API_KEY est configurée → envoie via Resend API
+  //    Sinon → simule l'envoi (log en console)
+  // 5. Email HTML avec bouton "Accepter l'invitation"
+});
+```
+
+### send-group-email — Mailing groupé COPIL/CODIR
+
+**Fichier** : `supabase/functions/send-group-email/index.ts`
+
+```typescript
+Deno.serve(async (req) => {
+  // 1. Vérifie l'authentification
+  // 2. Récupère l'email groupé depuis la DB (avec groupe + destinataires)
+  // 3. Collecte tous les destinataires :
+  //    - Membres du comité (internes : profil → email, externes : external_email)
+  //    - Destinataires du groupe de mailing
+  // 4. Met à jour le statut → 'sending'
+  // 5. Pour chaque destinataire :
+  //    - Envoie via Resend API (avec rate limiting : 600ms entre chaque)
+  //    - Attache les pièces jointes (URLs signées depuis Storage)
+  //    - Enregistre le résultat dans delivery_report
+  // 6. Met à jour le statut → 'sent' ou 'error'
+  // 7. Retourne le rapport : { sent: 5, errors: 1, deliveryReport: {...} }
+});
+```
+
+### Autres Edge Functions
+
+| Fonction | Description |
 |----------|-------------|
-| `VITE_SUPABASE_URL` | URL de l'API Supabase |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Clé publique (anon key) |
-| `VITE_SUPABASE_PROJECT_ID` | ID du projet |
+| `budget-monitor` | Vérifie les budgets et envoie des alertes si > 80% |
+| `meeting-reminders` | Envoie des rappels de réunion (15 min, 1h, 1 jour avant) |
+| `task-automation` | Automatise les alertes de deadline et les tâches de revue |
+| `timesheet-reminder` | Rappels quotidiens si timesheet non saisi |
+| `validate-portal-token` | Valide les tokens du portail client |
+| `send-satisfaction-survey` | Envoie les enquêtes de satisfaction |
 
 ---
 
-## ANNEXE : WORKFLOW DE VALIDATION DES TÂCHES
+## 19. DESIGN SYSTEM (CSS)
 
+**Fichier** : `src/index.css`
+
+### Tokens de couleur (HSL)
+
+```css
+:root {
+  /* Couleurs principales */
+  --primary: 224 76% 40%;           /* Bleu profond */
+  --primary-foreground: 210 40% 98%;
+
+  /* Sidebar (fond sombre) */
+  --sidebar-background: 222 47% 11%;
+  --sidebar-foreground: 210 40% 96%;
+  --sidebar-accent: 217 33% 17%;
+
+  /* Couleurs sémantiques */
+  --success: 142 71% 45%;           /* Vert */
+  --warning: 38 92% 50%;            /* Orange */
+  --info: 199 89% 48%;              /* Bleu clair */
+  --destructive: 0 84% 60%;         /* Rouge */
+}
+
+.dark {
+  --background: 222 47% 7%;         /* Fond très sombre */
+  --primary: 217 91% 60%;           /* Bleu plus vif en dark mode */
+  --card: 222 47% 11%;
+  /* ... */
+}
 ```
-┌─────────┐    ┌───────────┐    ┌───────────┐    ┌───────────────┐
-│  TODO   │───►│IN_PROGRESS│───►│ IN_REVIEW │───►│   VALIDATED   │
-└─────────┘    └───────────┘    └─────┬─────┘    │ (note 1-4)    │
-                                      │          └───────────────┘
-                                      ▼
-                                ┌───────────┐
-                                │CORRECTION │──► retour à IN_PROGRESS
-                                └───────────┘
+
+### Typographies
+
+```css
+@import url('...Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800...');
 ```
 
-1. Le chef de projet affecte une tâche (statut `todo`)
-2. L'employé commence le travail (`in_progress`)
-3. L'employé soumet son travail (`in_review`)
-4. Le chef examine :
-   - **Satisfaisant** → `validated` avec note (1-4)
-   - **À corriger** → `correction` avec commentaires
-5. L'employé corrige et resoumet
-6. Cycle jusqu'à validation finale
+- **Inter** : police de corps de texte
+- **Plus Jakarta Sans** : police d'affichage (titres, `.font-display`)
 
-**Échelle de notation** :
-| Note | Label |
-|------|-------|
-| 1 | Insuffisant |
-| 2 | Passable |
-| 3 | Bien |
-| 4 | Excellent |
+### Usage dans les composants
+
+```tsx
+// ✅ CORRECT : utilise les tokens sémantiques
+<div className="bg-card text-card-foreground border-border">
+<Badge className="bg-success text-success-foreground">
+
+// ❌ INCORRECT : couleurs en dur
+<div className="bg-white text-black">
+<Badge className="bg-green-500">
+```
 
 ---
 
-**FIN DE LA DOCUMENTATION TECHNIQUE**
+## 20. TYPES ET CONSTANTES — database.ts
 
-*Pour convertir en Word : Copiez ce contenu dans Google Docs, ou utilisez [Pandoc](https://pandoc.org) : `pandoc DOCUMENTATION_TECHNIQUE_MISSIONFLOW.md -o doc.docx`*
+**Fichier** : `src/types/database.ts`
+
+```typescript
+// Grades hiérarchiques du cabinet
+export type Grade = 'DA' | 'DM' | 'CM' | 'SUP' | 'AS' | 'AUD' | 'AJ' | 'STG';
+
+export const GRADE_LABELS: Record<Grade, string> = {
+  DA: 'Directeur Associé',
+  DM: 'Directeur de Mission',
+  CM: 'Chef de Mission',
+  SUP: 'Superviseur',
+  AS: 'Auditeur Senior',
+  AUD: 'Auditeur',
+  AJ: 'Auditeur Junior',
+  STG: 'Stagiaire',
+};
+
+export const GRADE_LEVELS: Record<Grade, number> = {
+  DA: 1, DM: 2, CM: 3, SUP: 4, AS: 5, AUD: 6, AJ: 7, STG: 8,
+};
+// Règle : grade_level ≤ N → accès aux données de grade_level > N
+
+// Statuts des entités
+export type MissionStatus = 'draft' | 'planning' | 'active' | 'on_hold' | 'completed' | 'archived';
+export type TaskStatus = 'todo' | 'in_progress' | 'in_review' | 'correction' | 'validated' | 'completed' | 'cancelled';
+export type DocumentStatus = 'draft' | 'in_review' | 'approved' | 'published' | 'archived';
+export type TimesheetStatus = 'draft' | 'submitted' | 'approved' | 'rejected';
+
+// Labels en français
+export const TASK_STATUS_LABELS: Record<TaskStatus, string> = {
+  todo: 'À faire',
+  in_progress: 'En cours',
+  in_review: 'En revue',
+  correction: 'Correction',
+  validated: 'Validé',
+  completed: 'Terminé',
+  cancelled: 'Annulé',
+};
+
+export const CURRENCY_LABELS: Record<Currency, string> = {
+  XOF: 'FCFA (UEMOA)',
+  XAF: 'FCFA (CEMAC)',
+  EUR: 'Euro',
+  USD: 'Dollar US',
+};
+```
+
+---
+
+## RÉSUMÉ DES PATTERNS ARCHITECTURAUX
+
+### 1. Pattern Hook CRUD
+
+Chaque module suit le même pattern :
+```typescript
+export function useEntityList(filters) { return useQuery({ ... }); }
+export function useEntity(id) { return useQuery({ ... }); }
+export function useCreateEntity() { return useMutation({ ... }); }
+export function useUpdateEntity() { return useMutation({ ... }); }
+export function useDeleteEntity() { return useMutation({ ... }); }
+```
+
+### 2. Isolation multi-tenant
+
+Toutes les requêtes filtrent par `organization_id` :
+```typescript
+.eq('organization_id', profile.organization_id)
+```
+
+### 3. Contrôle d'accès par grade
+
+```typescript
+const canCreate = profile?.grade_level <= 3;  // CM et au-dessus
+const showAdmin = profile?.grade_level <= 2;   // DA et DM seulement
+```
+
+### 4. Temps réel
+
+```typescript
+// Écoute les changements PostgreSQL
+supabase.channel('nom').on('postgres_changes', { event: 'INSERT', table: 'xxx' }, callback).subscribe();
+
+// Broadcast (pas de persistance)
+supabase.channel('typing:xxx').on('broadcast', { event: 'typing' }, callback).subscribe();
+```
+
+### 5. Invalidation de cache
+
+Après chaque mutation, le cache React Query est invalidé :
+```typescript
+onSuccess: () => {
+  queryClient.invalidateQueries({ queryKey: ['entity-list'] });
+  toast.success('Opération réussie');
+}
+```
+
+---
+
+**FIN DE LA DOCUMENTATION TECHNIQUE MISSIONFLOW v2.0**
+
+*Document généré le 4 Mars 2026*
