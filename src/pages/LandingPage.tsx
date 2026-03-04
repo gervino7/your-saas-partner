@@ -24,7 +24,7 @@ const plans = [
 ];
 
 const testimonials = [
-  { name: 'Koné Amadou', role: 'Associé, Cabinet KA Audit', text: 'MissionFlow a transformé notre façon de gérer les missions d\'audit. Le suivi des équipes est devenu un jeu d\'enfant.' },
+  { name: 'Koné Amadou', role: 'Associé, Cabinet KA Audit', text: 'Mission-DGC a transformé notre façon de gérer les missions d\'audit. Le suivi des équipes est devenu un jeu d\'enfant.' },
   { name: 'Marie-Claire Diallo', role: 'Directrice, MC Conseil', text: 'La gestion des COPIL et le mailing groupé nous font gagner un temps précieux avec nos clients.' },
   { name: 'Jean-Baptiste Ouédraogo', role: 'Chef de mission, Ernst & Co', text: 'Enfin un outil pensé pour les réalités africaines. Le mode hors-ligne est indispensable sur le terrain.' },
 ];
