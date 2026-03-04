@@ -176,7 +176,7 @@ const AdminPage = () => {
       <div className="flex-1 min-w-0">
         <div className="mb-6 flex items-center gap-3">
           {/* Mobile menu trigger */}
-          {isMobile && (
+          <div className="lg:hidden">
             <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon" className="h-9 w-9 shrink-0">
@@ -187,7 +187,7 @@ const AdminPage = () => {
                 <AdminSidebarContent activeSection={activeSection} onSelect={handleSelectSection} />
               </SheetContent>
             </Sheet>
-          )}
+          </div>
           <h1 className="text-xl font-bold font-display">{activeItem?.label}</h1>
         </div>
         {renderSection()}
