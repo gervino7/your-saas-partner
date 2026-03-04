@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Users as UsersIcon, CalendarDays, Mail } from 'lucide-react';
 import EmptyState from '@/components/common/EmptyState';
-import { useIsMobile } from '@/hooks/use-mobile';
+
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 // Lazy-loaded sections
