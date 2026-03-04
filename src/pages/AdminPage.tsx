@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Shield, BarChart3, Users, Briefcase, DollarSign, Star, Activity, Settings, ChevronLeft, Building2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Shield, BarChart3, Users, Briefcase, DollarSign, Star, Activity, Settings, Building2, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/authStore';
@@ -13,6 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Users as UsersIcon, CalendarDays, Mail } from 'lucide-react';
 import EmptyState from '@/components/common/EmptyState';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 // Lazy-loaded sections
 import AdminDashboard from '@/components/admin/AdminDashboard';
@@ -75,12 +77,43 @@ function CodirSection() {
   );
 }
 
+function AdminSidebarContent({
+  activeSection,
+  onSelect,
+}: {
+  activeSection: string;
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <div className="space-y-1">
+      <h2 className="text-lg font-bold font-display mb-4 px-2">Administration</h2>
+      {sections.map((s) => (
+        <button
+          key={s.id}
+          onClick={() => onSelect(s.id)}
+          className={cn(
+            'flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-sm transition-colors text-left',
+            activeSection === s.id
+              ? 'bg-primary text-primary-foreground font-medium'
+              : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+          )}
+        >
+          <s.icon className="h-4 w-4 shrink-0" />
+          <span>{s.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 const AdminPage = () => {
   const profile = useAuthStore((s) => s.profile);
   const gradeLevel = profile?.grade_level ?? 8;
   const canAccess = gradeLevel <= 2;
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('dashboard');
+  const isMobile = useIsMobile();
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   if (!canAccess) {
     return (
@@ -90,6 +123,11 @@ const AdminPage = () => {
       </div>
     );
   }
+
+  const handleSelectSection = (id: string) => {
+    setActiveSection(id);
+    setSheetOpen(false);
+  };
 
   const renderSection = () => {
     switch (activeSection) {
@@ -130,29 +168,29 @@ const AdminPage = () => {
 
   return (
     <div className="flex gap-6 min-h-[calc(100vh-8rem)]">
-      {/* Admin sidebar */}
-      <div className="w-56 shrink-0 space-y-1">
-        <h2 className="text-lg font-bold font-display mb-4 px-2">Administration</h2>
-        {sections.map((s) => (
-          <button
-            key={s.id}
-            onClick={() => setActiveSection(s.id)}
-            className={cn(
-              'flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-sm transition-colors text-left',
-              activeSection === s.id
-                ? 'bg-primary text-primary-foreground font-medium'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-            )}
-          >
-            <s.icon className="h-4 w-4 shrink-0" />
-            <span>{s.label}</span>
-          </button>
-        ))}
-      </div>
+      {/* Desktop sidebar */}
+      {!isMobile && (
+        <div className="w-56 shrink-0 space-y-1">
+          <AdminSidebarContent activeSection={activeSection} onSelect={handleSelectSection} />
+        </div>
+      )}
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <div className="mb-6">
+        <div className="mb-6 flex items-center gap-3">
+          {/* Mobile menu trigger */}
+          {isMobile && (
+            <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="h-9 w-9 shrink-0">
+                  <Menu className="h-4 w-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-64 p-4">
+                <AdminSidebarContent activeSection={activeSection} onSelect={handleSelectSection} />
+              </SheetContent>
+            </Sheet>
+          )}
           <h1 className="text-xl font-bold font-display">{activeItem?.label}</h1>
         </div>
         {renderSection()}

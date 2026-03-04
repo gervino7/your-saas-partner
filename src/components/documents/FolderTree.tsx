@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { ChevronRight, ChevronDown, Folder, FolderOpen, Plus, Pencil, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { FolderRow, useCreateFolder, useRenameFolder, useDeleteFolder } from '@/hooks/useDocuments';
+import { FolderRow, useCreateFolder, useRenameFolder, useDeleteFolder, useMoveDocument } from '@/hooks/useDocuments';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -10,6 +10,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
+import { toast } from 'sonner';
 
 interface FolderTreeProps {
   folders: FolderRow[];
@@ -25,10 +26,12 @@ export default function FolderTree({ folders, selectedFolderId, onSelectFolder, 
   const [newName, setNewName] = useState('');
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
 
   const createFolder = useCreateFolder();
   const renameFolder = useRenameFolder();
   const deleteFolder = useDeleteFolder();
+  const moveDocument = useMoveDocument();
 
   const toggle = (id: string) => {
     setExpanded((prev) => {
@@ -52,12 +55,35 @@ export default function FolderTree({ folders, selectedFolderId, onSelectFolder, 
     });
   };
 
+  const handleDragOver = useCallback((e: React.DragEvent, folderId: string | null) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverId(folderId);
+  }, []);
+
+  const handleDragLeave = useCallback(() => {
+    setDragOverId(null);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent, folderId: string | null) => {
+    e.preventDefault();
+    setDragOverId(null);
+    const docId = e.dataTransfer.getData('application/x-document-id');
+    const docName = e.dataTransfer.getData('application/x-document-name');
+    if (docId) {
+      moveDocument.mutate({ id: docId, folderId }, {
+        onSuccess: () => toast.success(`"${docName || 'Document'}" déplacé`),
+      });
+    }
+  }, [moveDocument]);
+
   const getChildren = (parentId: string | null) => folders.filter((f) => f.parent_id === parentId);
 
   const renderFolder = (folder: FolderRow, depth: number) => {
     const children = getChildren(folder.id);
     const isExpanded = expanded.has(folder.id);
     const isSelected = selectedFolderId === folder.id;
+    const isDragOver = dragOverId === folder.id;
     const count = documentCounts[folder.id] || 0;
 
     return (
@@ -67,10 +93,14 @@ export default function FolderTree({ folders, selectedFolderId, onSelectFolder, 
             <div
               className={cn(
                 'flex items-center gap-1 px-2 py-1.5 rounded-md text-sm cursor-pointer hover:bg-accent/10 transition-colors',
-                isSelected && 'bg-accent/20 text-accent-foreground font-medium'
+                isSelected && 'bg-accent/20 text-accent-foreground font-medium',
+                isDragOver && 'bg-primary/20 ring-2 ring-primary/40'
               )}
               style={{ paddingLeft: `${depth * 16 + 8}px` }}
               onClick={() => onSelectFolder(folder.id)}
+              onDragOver={(e) => handleDragOver(e, folder.id)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, folder.id)}
             >
               {children.length > 0 ? (
                 <button onClick={(e) => { e.stopPropagation(); toggle(folder.id); }} className="p-0.5">
@@ -133,9 +163,13 @@ export default function FolderTree({ folders, selectedFolderId, onSelectFolder, 
       <div
         className={cn(
           'flex items-center gap-2 px-2 py-1.5 rounded-md text-sm cursor-pointer hover:bg-accent/10',
-          selectedFolderId === null && 'bg-accent/20 font-medium'
+          selectedFolderId === null && 'bg-accent/20 font-medium',
+          dragOverId === '__root__' && 'bg-primary/20 ring-2 ring-primary/40'
         )}
         onClick={() => onSelectFolder(null)}
+        onDragOver={(e) => handleDragOver(e, '__root__' as any)}
+        onDragLeave={handleDragLeave}
+        onDrop={(e) => handleDrop(e, null)}
       >
         <FolderOpen className="h-4 w-4 text-accent" />
         <span>Tous les documents</span>
