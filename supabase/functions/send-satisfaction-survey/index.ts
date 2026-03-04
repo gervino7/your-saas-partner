@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${resendApiKey}` },
         body: JSON.stringify({
-          from: 'MissionFlow <onboarding@resend.dev>',
+          from: 'Mission-DGC <onboarding@resend.dev>',
           to: [contactEmail],
           subject: `Enquête de satisfaction — ${mission?.name || 'Mission'}`,
           html: `
