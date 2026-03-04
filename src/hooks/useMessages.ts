@@ -47,38 +47,66 @@ export function useConversations() {
       if (!user) return [];
 
       // Get user's conversations
-      const { data: memberData } = await supabase
+      const { data: memberData, error: memberError } = await supabase
         .from('conversation_members')
         .select('conversation_id, last_read_at')
         .eq('user_id', user.id);
 
+      if (memberError) {
+        console.error('Error fetching conversation members:', memberError);
+        throw memberError;
+      }
+
       if (!memberData?.length) return [];
 
-      const convIds = memberData.map((m) => m.conversation_id!);
-      const lastReadMap = new Map(memberData.map((m) => [m.conversation_id, m.last_read_at]));
+      const convIds = memberData.map((m) => m.conversation_id!).filter(Boolean);
+      if (!convIds.length) return [];
 
-      const { data: convs } = await supabase
+      const { data: convs, error: convsError } = await supabase
         .from('conversations')
         .select('*')
         .in('id', convIds);
 
+      if (convsError) {
+        console.error('Error fetching conversations:', convsError);
+        throw convsError;
+      }
+
       if (!convs?.length) return [];
 
-      // Get all members with profiles
+      // Get all members with profiles in parallel
       const { data: allMembers } = await supabase
         .from('conversation_members')
         .select('conversation_id, user_id, last_read_at')
         .in('conversation_id', convIds);
 
-      const memberUserIds = [...new Set((allMembers || []).map((m) => m.user_id!))];
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, full_name, avatar_url, is_online')
-        .in('id', memberUserIds);
+      const memberUserIds = [...new Set((allMembers || []).map((m) => m.user_id!).filter(Boolean))];
+      const { data: profiles } = memberUserIds.length
+        ? await supabase
+            .from('profiles')
+            .select('id, full_name, avatar_url, is_online')
+            .in('id', memberUserIds)
+        : { data: [] };
 
       const profileMap = new Map((profiles || []).map((p) => [p.id, p]));
 
-      // Get latest message per conversation
+      // Get latest message for ALL conversations in one query
+      // Use a simpler approach: get recent messages and pick the latest per conversation
+      const { data: recentMessages } = await supabase
+        .from('messages')
+        .select('id, content, created_at, sender_id, conversation_id')
+        .in('conversation_id', convIds)
+        .order('created_at', { ascending: false })
+        .limit(convIds.length * 2);
+
+      // Build last message map (first occurrence per conversation_id is the latest)
+      const lastMsgMap = new Map<string, typeof recentMessages extends (infer T)[] | null ? T : never>();
+      for (const msg of recentMessages || []) {
+        if (!lastMsgMap.has(msg.conversation_id!)) {
+          lastMsgMap.set(msg.conversation_id!, msg);
+        }
+      }
+
       const results: ConversationWithDetails[] = [];
 
       for (const conv of convs) {
@@ -95,19 +123,11 @@ export function useConversations() {
             };
           });
 
-        // Get last message
-        const { data: lastMsgs } = await supabase
-          .from('messages')
-          .select('content, created_at, sender_id')
-          .eq('conversation_id', conv.id)
-          .order('created_at', { ascending: false })
-          .limit(1);
-
-        const lastMsg = lastMsgs?.[0];
+        const lastMsg = lastMsgMap.get(conv.id);
         const senderProfile = lastMsg ? profileMap.get(lastMsg.sender_id!) : null;
 
-        // Count unread
-        const myLastRead = lastReadMap.get(conv.id);
+        // Count unread from last_read_at
+        const myLastRead = memberData.find((m) => m.conversation_id === conv.id)?.last_read_at;
         let unreadCount = 0;
         if (myLastRead) {
           const { count } = await supabase
@@ -180,6 +200,7 @@ export function useConversations() {
       const profile = useAuthStore.getState().profile;
       const conversationId = crypto.randomUUID();
 
+      // Step 1: Create conversation
       const { error: conversationError } = await supabase
         .from('conversations')
         .insert({
@@ -190,20 +211,41 @@ export function useConversations() {
           organization_id: profile?.organization_id || null,
         });
 
-      if (conversationError) throw conversationError;
+      if (conversationError) {
+        console.error('Error creating conversation:', conversationError);
+        throw conversationError;
+      }
 
-      // Add creator + selected members
-      const allMembers = [...new Set([user.id, ...memberIds])];
-      const { error: memberError } = await supabase
+      // Step 2: Add creator first (always passes RLS user_id = auth.uid())
+      const { error: creatorError } = await supabase
         .from('conversation_members')
-        .insert(
-          allMembers.map((uid) => ({
-            conversation_id: conversationId,
-            user_id: uid,
-          }))
-        );
+        .upsert({
+          conversation_id: conversationId,
+          user_id: user.id,
+        }, { onConflict: 'conversation_id,user_id' });
 
-      if (memberError) throw memberError;
+      if (creatorError) {
+        console.error('Error adding creator as member:', creatorError);
+        throw creatorError;
+      }
+
+      // Step 3: Add other members separately (uses is_conversation_creator check)
+      const otherMembers = memberIds.filter((uid) => uid !== user.id);
+      if (otherMembers.length > 0) {
+        const { error: memberError } = await supabase
+          .from('conversation_members')
+          .insert(
+            otherMembers.map((uid) => ({
+              conversation_id: conversationId,
+              user_id: uid,
+            }))
+          );
+
+        if (memberError) {
+          console.error('Error adding other members:', memberError);
+          throw memberError;
+        }
+      }
 
       return { id: conversationId };
     },
