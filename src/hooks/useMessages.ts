@@ -219,10 +219,10 @@ export function useConversations() {
       // Step 2: Add creator first (always passes RLS user_id = auth.uid())
       const { error: creatorError } = await supabase
         .from('conversation_members')
-        .insert({
+        .upsert({
           conversation_id: conversationId,
           user_id: user.id,
-        });
+        }, { onConflict: 'conversation_id,user_id' });
 
       if (creatorError) {
         console.error('Error adding creator as member:', creatorError);
