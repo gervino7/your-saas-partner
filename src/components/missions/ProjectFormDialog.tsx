@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -7,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useCreateProject, useOrganizationUsers } from '@/hooks/useMissions';
+import { useCreateProject, useUpdateProject, useOrganizationUsers } from '@/hooks/useMissions';
 
 const projectSchema = z.object({
   name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères').max(200),
@@ -24,11 +25,14 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   missionId: string;
+  project?: any; // existing project for edit mode
 }
 
-export default function ProjectFormDialog({ open, onOpenChange, missionId }: Props) {
+export default function ProjectFormDialog({ open, onOpenChange, missionId, project }: Props) {
   const createProject = useCreateProject();
+  const updateProject = useUpdateProject();
   const { data: users = [] } = useOrganizationUsers();
+  const isEdit = !!project;
 
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(projectSchema),
@@ -42,27 +46,53 @@ export default function ProjectFormDialog({ open, onOpenChange, missionId }: Pro
     },
   });
 
+  useEffect(() => {
+    if (project && open) {
+      form.reset({
+        name: project.name || '',
+        description: project.description || '',
+        lead_id: project.lead_id || '',
+        budget_allocated: project.budget_allocated ?? undefined,
+        start_date: project.start_date || '',
+        end_date: project.end_date || '',
+      });
+    } else if (!project && open) {
+      form.reset({
+        name: '',
+        description: '',
+        lead_id: '',
+        budget_allocated: undefined,
+        start_date: '',
+        end_date: '',
+      });
+    }
+  }, [project, open]);
+
   const onSubmit = async (values: ProjectFormValues) => {
     const cleaned = Object.fromEntries(
       Object.entries(values).filter(([, v]) => v !== '' && v !== undefined)
     );
 
-    await createProject.mutateAsync({
-      ...cleaned,
-      mission_id: missionId,
-    } as any);
+    if (isEdit) {
+      await updateProject.mutateAsync({ id: project.id, ...cleaned });
+    } else {
+      await createProject.mutateAsync({
+        ...cleaned,
+        mission_id: missionId,
+      } as any);
+    }
     onOpenChange(false);
     form.reset();
   };
 
-  // Leads can be grade <= 4 (Superviseur and above)
   const leads = users.filter((u: any) => u.grade_level && u.grade_level <= 4);
+  const isPending = createProject.isPending || updateProject.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display">Nouveau projet</DialogTitle>
+          <DialogTitle className="font-display">{isEdit ? 'Modifier le projet' : 'Nouveau projet'}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -128,8 +158,8 @@ export default function ProjectFormDialog({ open, onOpenChange, missionId }: Pro
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Annuler
               </Button>
-              <Button type="submit" disabled={createProject.isPending}>
-                {createProject.isPending ? 'Création...' : 'Créer le projet'}
+              <Button type="submit" disabled={isPending}>
+                {isPending ? (isEdit ? 'Mise à jour...' : 'Création...') : (isEdit ? 'Enregistrer' : 'Créer le projet')}
               </Button>
             </div>
           </form>

@@ -316,6 +316,51 @@ export function useCreateProject() {
   });
 }
 
+export function useUpdateProject() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, ...values }: { id: string; [key: string]: any }) => {
+      const { data, error } = await supabase
+        .from('projects')
+        .update(values)
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['mission-projects', data.mission_id] });
+      queryClient.invalidateQueries({ queryKey: ['project', data.id] });
+      toast.success('Projet mis à jour');
+    },
+    onError: (error: Error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+}
+
+export function useDeleteProject() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, missionId }: { id: string; missionId: string }) => {
+      const { error } = await supabase.from('projects').delete().eq('id', id);
+      if (error) throw error;
+      return missionId;
+    },
+    onSuccess: (missionId) => {
+      queryClient.invalidateQueries({ queryKey: ['mission-projects', missionId] });
+      queryClient.invalidateQueries({ queryKey: ['missions'] });
+      toast.success('Projet supprimé avec toutes ses tâches');
+    },
+    onError: (error: Error) => {
+      toast.error(`Erreur: ${error.message}`);
+    },
+  });
+}
+
 export function useClients() {
   const profile = useAuthStore((s) => s.profile);
 
