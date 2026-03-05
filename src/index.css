@@ -1,0 +1,119 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  :root {
+    --background: 216 18% 97%;
+    --foreground: 218 35% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 218 35% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 218 35% 8%;
+    --primary: 215 75% 35%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 216 12% 92%;
+    --secondary-foreground: 218 35% 8%;
+    --muted: 216 12% 95%;
+    --muted-foreground: 216 10% 44%;
+    --accent: 22 78% 55%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 65% 48%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 216 10% 89%;
+    --input: 216 10% 89%;
+    --ring: 215 75% 35%;
+    --radius: 0.625rem;
+    --sidebar-background: 218 35% 8%;
+    --sidebar-foreground: 216 14% 92%;
+    --sidebar-primary: 22 78% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 218 28% 14%;
+    --sidebar-accent-foreground: 216 14% 92%;
+    --sidebar-border: 218 28% 14%;
+    --sidebar-ring: 22 78% 55%;
+    --success: 152 56% 42%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 92% 15%;
+    --info: 205 75% 48%;
+    --info-foreground: 0 0% 100%;
+    --gradient-primary: linear-gradient(135deg, hsl(215 75% 32%), hsl(215 70% 48%));
+    --gradient-hero: linear-gradient(160deg, hsl(218 35% 8%) 0%, hsl(218 32% 16%) 50%, hsl(215 60% 26%) 100%);
+    --shadow-card: 0 1px 3px 0 hsl(218 35% 8% / 0.04), 0 1px 2px -1px hsl(218 35% 8% / 0.04);
+    --shadow-card-hover: 0 4px 12px -2px hsl(218 35% 8% / 0.08), 0 2px 6px -2px hsl(218 35% 8% / 0.04);
+    --shadow-elevated: 0 10px 30px -8px hsl(218 35% 8% / 0.12);
+  }
+  .dark {
+    --background: 218 22% 7%;
+    --foreground: 216 14% 95%;
+    --card: 218 22% 11%;
+    --card-foreground: 216 14% 95%;
+    --popover: 218 22% 11%;
+    --popover-foreground: 216 14% 95%;
+    --primary: 215 70% 48%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 218 22% 16%;
+    --secondary-foreground: 216 14% 95%;
+    --muted: 218 22% 16%;
+    --muted-foreground: 216 10% 58%;
+    --accent: 22 78% 55%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 58% 42%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 218 22% 16%;
+    --input: 218 22% 16%;
+    --ring: 215 70% 48%;
+    --sidebar-background: 218 35% 5%;
+    --sidebar-foreground: 216 14% 92%;
+    --sidebar-primary: 22 78% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 218 28% 12%;
+    --sidebar-accent-foreground: 216 14% 92%;
+    --sidebar-border: 218 28% 12%;
+    --sidebar-ring: 22 78% 55%;
+    --success: 152 56% 42%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 92% 15%;
+    --info: 205 75% 48%;
+    --info-foreground: 0 0% 100%;
+    --gradient-primary: linear-gradient(135deg, hsl(215 75% 32%), hsl(215 65% 52%));
+    --gradient-hero: linear-gradient(160deg, hsl(218 22% 5%) 0%, hsl(218 28% 12%) 50%, hsl(215 45% 22%) 100%);
+    --shadow-card: 0 1px 3px 0 hsl(0 0% 0% / 0.2), 0 1px 2px -1px hsl(0 0% 0% / 0.2);
+    --shadow-card-hover: 0 4px 12px -2px hsl(0 0% 0% / 0.3), 0 2px 6px -2px hsl(0 0% 0% / 0.2);
+    --shadow-elevated: 0 10px 30px -8px hsl(0 0% 0% / 0.4);
+  }
+}
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: "Inter", sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Plus Jakarta Sans", sans-serif;
+  }
+}
+@layer utilities {
+  .glass {
+    @apply bg-card/80 backdrop-blur-xl border border-border/50;
+  }
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  .shadow-card-hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+}
