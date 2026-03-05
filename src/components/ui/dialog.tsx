@@ -59,7 +59,7 @@ DialogHeader.displayName = "DialogHeader";
 const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex flex-col-reverse gap-2 bg-muted/40 border-t border-border/50 px-6 py-4 sm:flex-row sm:justify-end",
+      "flex flex-col-reverse gap-2 bg-muted/30 border-t border-border/40 px-6 py-4 sm:flex-row sm:justify-end",
       className,
     )}
     {...props}
