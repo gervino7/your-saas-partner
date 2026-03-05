@@ -93,7 +93,7 @@ const DashboardPage = () => {
           </CardHeader>
           <CardContent>
             {urgentTasks.length === 0 ? (
-              <p className="text-sm text-muted-foreground py-6 text-center">Aucune tâche urgente 🎉</p>
+              <p className="text-sm text-muted-foreground py-6 text-center">Aucune tâche urgente </p>
             ) : (
               <div className="space-y-2">
                 {urgentTasks.map((task: any) => (
