@@ -52,7 +52,7 @@ const DashboardPage = () => {
       {/* Greeting */}
       <div className="space-y-1">
         <h1 className="text-2xl font-bold font-display tracking-tight">Bienvenue, {firstName}</h1>
-        {/* <p className="text-muted-foreground">Voici un aperçu de votre activité</p> */}
+        {<p className="text-muted-foreground">Voici un aperçu de votre activité</p>}
       </div>
 
       {/* KPI Cards */}
