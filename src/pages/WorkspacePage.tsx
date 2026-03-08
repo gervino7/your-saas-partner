@@ -696,10 +696,15 @@ export default function WorkspacePage() {
                     </TableHeader>
                     <TableBody>
                       {currentPath !== '/' && (
-                        <TableRow className="cursor-pointer hover:bg-accent/5" onClick={navigateUp}>
+                        <TableRow className="cursor-pointer hover:bg-primary/[0.03]" onClick={navigateUp}>
                           <TableCell />
-                          <TableCell className="flex items-center gap-2 text-muted-foreground">
-                            <FolderOpen className="h-4 w-4" /> ..
+                          <TableCell>
+                            <div className="flex items-center gap-2.5">
+                              <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-muted/60 shrink-0">
+                                <FolderOpen className="h-4 w-4 text-muted-foreground" />
+                              </div>
+                              <span className="text-muted-foreground font-medium">..</span>
+                            </div>
                           </TableCell>
                           <TableCell className="hidden sm:table-cell" />
                           <TableCell className="hidden md:table-cell" />
