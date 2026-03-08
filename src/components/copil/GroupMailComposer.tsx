@@ -109,7 +109,7 @@ function EmailViewDialog({ email, open, onOpenChange }: { email: any; open: bool
         <DialogHeader>
           <DialogTitle>{email?.subject}</DialogTitle>
         </DialogHeader>
-        <div className="px-5 py-4 space-y-4 overflow-y-auto max-h-[65vh] bg-amber-50/70 dark:bg-amber-950/10">
+        <div className="px-5 py-4 space-y-4 overflow-y-auto max-h-[65vh] dialog-form-bg">
         <p className="text-xs text-muted-foreground">
           Envoyé le {email?.sent_at ? format(new Date(email.sent_at), 'dd/MM/yyyy à HH:mm', { locale: fr }) : email?.created_at ? format(new Date(email.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr }) : '—'}
           {' • '}{email?.profiles?.full_name ?? 'Inconnu'}
