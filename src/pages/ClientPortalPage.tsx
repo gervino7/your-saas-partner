@@ -3,19 +3,19 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Building2, FileText, Calendar, TrendingUp, Download,
-  CheckCircle2, Clock, BarChart3, FolderOpen, ChevronRight,
-  Shield
+  CheckCircle2, Clock, BarChart3, FolderOpen,
+  Shield, Sparkles, Award, Eye
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import Loading from '@/components/common/Loading';
-import EmptyState from '@/components/common/EmptyState';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import logoImg from '@/assets/logo.png';
 
 function usePortalData(token: string | undefined) {
   return useQuery({
@@ -97,8 +97,8 @@ const ClientPortalPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--gradient-hero)' }}>
-        <div className="bg-card rounded-2xl p-8 shadow-2xl">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(160deg, hsl(30 85% 45%) 0%, hsl(43 90% 55%) 50%, hsl(0 0% 94%) 100%)' }}>
+        <div className="bg-card rounded-2xl p-10 shadow-2xl text-center">
           <Loading />
           <p className="text-muted-foreground mt-4 text-sm">Chargement de votre portail…</p>
         </div>
@@ -108,7 +108,7 @@ const ClientPortalPage = () => {
 
   if (!data) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--gradient-hero)' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(160deg, hsl(30 85% 45%) 0%, hsl(43 90% 55%) 50%, hsl(0 0% 94%) 100%)' }}>
         <div className="bg-card rounded-2xl p-10 shadow-2xl max-w-md text-center space-y-4">
           <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
             <Shield className="h-8 w-8 text-destructive" />
@@ -127,69 +127,95 @@ const ClientPortalPage = () => {
   const clientData = client as any;
   const progress = missionData?.progress ?? 0;
   const completedProjects = projects.filter((p: any) => p.status === 'completed').length;
+  const upcomingMeetings = meetings.filter((m: any) => new Date(m.scheduled_at) > new Date()).length;
 
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Header */}
-      <header className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, hsl(30 90% 48%) 0%, hsl(43 95% 55%) 40%, hsl(45 60% 75%) 70%, hsl(0 0% 95%) 100%)' }}>
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" style={{ background: 'hsl(43 95% 60%)' }} />
-          <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2" style={{ background: 'hsl(30 90% 50%)' }} />
+      <header className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, hsl(28 85% 42%) 0%, hsl(35 92% 50%) 25%, hsl(43 95% 58%) 50%, hsl(45 55% 78%) 75%, hsl(0 0% 96%) 100%)' }}>
+        {/* Decorative elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[120px] translate-x-1/3 -translate-y-1/3" style={{ background: 'hsla(43,95%,65%,0.15)' }} />
+          <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full blur-[100px] -translate-x-1/4 translate-y-1/4" style={{ background: 'hsla(30,90%,50%,0.12)' }} />
+          <div className="absolute top-1/2 left-1/2 w-96 h-96 rounded-full blur-[140px] -translate-x-1/2 -translate-y-1/2" style={{ background: 'hsla(0,0%,100%,0.06)' }} />
         </div>
 
-        <div className="relative max-w-6xl mx-auto px-6 py-8">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl border flex items-center justify-center" style={{ background: 'hsla(0,0%,100%,0.2)', borderColor: 'hsla(0,0%,100%,0.3)' }}>
-                <Building2 className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <p className="text-sm font-medium" style={{ color: 'hsla(0,0%,100%,0.75)' }}>Portail Client</p>
-                <h1 className="text-2xl font-bold font-display text-white">{clientData?.name}</h1>
-              </div>
+        {/* Subtle pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
+
+        <div className="relative max-w-6xl mx-auto px-6 pt-6 pb-10">
+          {/* Top bar: Logo + Badge */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <img src={logoImg} alt="Logo" className="h-9 w-auto drop-shadow-md" />
+              <div className="h-6 w-px" style={{ background: 'hsla(0,0%,100%,0.25)' }} />
+              <span className="text-sm font-semibold tracking-wide uppercase" style={{ color: 'hsla(0,0%,100%,0.7)', letterSpacing: '0.08em' }}>Portail Client</span>
             </div>
-            <Badge className="text-sm px-3 py-1" style={{ background: 'hsla(0,0%,100%,0.2)', color: 'white', borderColor: 'hsla(0,0%,100%,0.3)' }}>
+            <Badge className="text-xs font-bold px-3 py-1.5 rounded-lg" style={{ background: 'hsla(0,0%,100%,0.2)', color: 'white', borderColor: 'hsla(0,0%,100%,0.3)', backdropFilter: 'blur(8px)' }}>
+              <Sparkles className="h-3 w-3 mr-1.5" />
               {missionData?.code}
             </Badge>
           </div>
 
-          {/* Mission info bar */}
-          <div className="mt-8 backdrop-blur-sm rounded-2xl p-6" style={{ background: 'hsla(0,0%,100%,0.15)', borderWidth: 1, borderColor: 'hsla(0,0%,100%,0.2)' }}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white font-display">{missionData?.name}</h2>
-              <span className="text-2xl font-bold text-white">{progress}%</span>
+          {/* Client name */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, hsla(0,0%,100%,0.3), hsla(0,0%,100%,0.1))', backdropFilter: 'blur(10px)', border: '1px solid hsla(0,0%,100%,0.25)' }}>
+                <Building2 className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-extrabold font-display text-white tracking-tight drop-shadow-sm">{clientData?.name}</h1>
+              </div>
             </div>
-            <div className="w-full rounded-full h-3 overflow-hidden" style={{ background: 'hsla(0,0%,100%,0.2)' }}>
+          </div>
+
+          {/* Mission Card */}
+          <div className="rounded-2xl p-6 shadow-lg" style={{ background: 'hsla(0,0%,100%,0.12)', backdropFilter: 'blur(16px)', border: '1px solid hsla(0,0%,100%,0.18)' }}>
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <Award className="h-4 w-4" style={{ color: 'hsla(43,95%,85%,0.9)' }} />
+                <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'hsla(0,0%,100%,0.55)' }}>Mission en cours</span>
+              </div>
+              <span className="text-3xl font-extrabold text-white tabular-nums">{progress}<span className="text-lg">%</span></span>
+            </div>
+            <h2 className="text-xl font-bold text-white font-display mb-4">{missionData?.name}</h2>
+
+            {/* Progress bar */}
+            <div className="w-full rounded-full h-3.5 overflow-hidden mb-1" style={{ background: 'hsla(0,0%,100%,0.12)' }}>
               <div
-                className="h-full rounded-full transition-all duration-700 ease-out"
+                className="h-full rounded-full transition-all duration-1000 ease-out"
                 style={{
                   width: `${progress}%`,
                   background: progress >= 80
-                    ? 'hsl(var(--success))'
+                    ? 'linear-gradient(90deg, hsl(152 56% 42%), hsl(152 56% 52%))'
                     : progress >= 40
-                      ? 'hsl(43 95% 55%)'
-                      : 'hsl(30 90% 50%)',
+                      ? 'linear-gradient(90deg, hsl(43 95% 50%), hsl(43 95% 65%))'
+                      : 'linear-gradient(90deg, hsl(30 90% 48%), hsl(30 90% 58%))',
+                  boxShadow: '0 0 12px hsla(43,95%,60%,0.3)',
                 }}
               />
             </div>
             {missionData?.description && (
-              <p className="text-sm mt-3 line-clamp-2" style={{ color: 'hsla(0,0%,100%,0.65)' }}>{missionData.description}</p>
+              <p className="text-sm mt-3 line-clamp-2" style={{ color: 'hsla(0,0%,100%,0.6)' }}>{missionData.description}</p>
             )}
 
             {/* Quick stats */}
-            <div className="grid grid-cols-3 gap-4 mt-6">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-white">{projects.length}</p>
-                <p className="text-xs mt-1" style={{ color: 'hsla(0,0%,100%,0.55)' }}>Projets</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-white">{completedProjects}</p>
-                <p className="text-xs mt-1" style={{ color: 'hsla(0,0%,100%,0.55)' }}>Terminés</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-white">{documents.length}</p>
-                <p className="text-xs mt-1" style={{ color: 'hsla(0,0%,100%,0.55)' }}>Livrables</p>
-              </div>
+            <div className="grid grid-cols-3 gap-3 mt-6">
+              {[
+                { value: projects.length, label: 'Projets', icon: BarChart3 },
+                { value: completedProjects, label: 'Terminés', icon: CheckCircle2 },
+                { value: documents.length, label: 'Livrables', icon: FileText },
+              ].map((stat) => (
+                <div
+                  key={stat.label}
+                  className="text-center rounded-xl py-3 px-2"
+                  style={{ background: 'hsla(0,0%,100%,0.08)', border: '1px solid hsla(0,0%,100%,0.1)' }}
+                >
+                  <stat.icon className="h-4 w-4 mx-auto mb-1.5" style={{ color: 'hsla(43,95%,80%,0.8)' }} />
+                  <p className="text-2xl font-extrabold text-white tabular-nums">{stat.value}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider mt-0.5" style={{ color: 'hsla(0,0%,100%,0.5)' }}>{stat.label}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -199,14 +225,17 @@ const ClientPortalPage = () => {
       <main className="max-w-6xl mx-auto px-6 py-8 -mt-2">
         <Tabs defaultValue="projects" className="space-y-6">
           <TabsList className="bg-muted/40 p-1 rounded-xl">
-            <TabsTrigger value="projects" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md">
-              <BarChart3 className="h-4 w-4 mr-2" /> Projets
+            <TabsTrigger value="projects" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md gap-2">
+              <BarChart3 className="h-4 w-4" /> Projets
             </TabsTrigger>
-            <TabsTrigger value="deliverables" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md">
-              <FolderOpen className="h-4 w-4 mr-2" /> Livrables
+            <TabsTrigger value="deliverables" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md gap-2">
+              <FolderOpen className="h-4 w-4" /> Livrables
             </TabsTrigger>
-            <TabsTrigger value="copil" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md">
-              <Calendar className="h-4 w-4 mr-2" /> COPIL
+            <TabsTrigger value="copil" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md gap-2">
+              <Calendar className="h-4 w-4" /> COPIL
+              {upcomingMeetings > 0 && (
+                <span className="ml-1 w-5 h-5 rounded-full bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center">{upcomingMeetings}</span>
+              )}
             </TabsTrigger>
           </TabsList>
 
@@ -214,9 +243,11 @@ const ClientPortalPage = () => {
           <TabsContent value="projects">
             {projects.length === 0 ? (
               <Card className="border-dashed">
-                <CardContent className="py-12 text-center">
-                  <BarChart3 className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
-                  <p className="text-muted-foreground">Aucun projet en cours pour cette mission.</p>
+                <CardContent className="py-16 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto mb-4">
+                    <BarChart3 className="h-7 w-7 text-muted-foreground/40" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">Aucun projet en cours pour cette mission.</p>
                 </CardContent>
               </Card>
             ) : (
@@ -224,25 +255,43 @@ const ClientPortalPage = () => {
                 {projects.map((p: any) => {
                   const cfg = statusConfig[p.status] || statusConfig.planning;
                   const Icon = cfg.icon;
+                  const prog = p.progress ?? 0;
                   return (
-                    <Card key={p.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                      <CardContent className="p-5">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex-1">
-                            <h3 className="font-semibold font-display text-base">{p.name}</h3>
-                            {p.code && <p className="text-xs text-muted-foreground mt-0.5">{p.code}</p>}
+                    <Card key={p.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 group">
+                      <CardContent className="p-0">
+                        {/* Colored top accent */}
+                        <div className="h-1" style={{
+                          background: p.status === 'completed'
+                            ? 'hsl(var(--success))'
+                            : p.status === 'active'
+                              ? 'linear-gradient(90deg, hsl(43 95% 50%), hsl(30 90% 50%))'
+                              : 'hsl(var(--muted-foreground) / 0.2)'
+                        }} />
+                        <div className="p-5">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex-1">
+                              <h3 className="font-semibold font-display text-base group-hover:text-primary transition-colors">{p.name}</h3>
+                              {p.code && <p className="text-xs text-muted-foreground mt-0.5">{p.code}</p>}
+                            </div>
+                            <Badge variant="outline" className={`${cfg.color} border text-xs font-medium`}>
+                              <Icon className="h-3 w-3 mr-1" />
+                              {cfg.label}
+                            </Badge>
                           </div>
-                          <Badge variant="outline" className={`${cfg.color} border text-xs font-medium`}>
-                            <Icon className="h-3 w-3 mr-1" />
-                            {cfg.label}
-                          </Badge>
-                        </div>
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Progression</span>
-                            <span className="font-bold">{p.progress ?? 0}%</span>
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Progression</span>
+                              <span className="font-bold tabular-nums">{prog}%</span>
+                            </div>
+                            <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden">
+                              <div className="h-full rounded-full transition-all duration-700" style={{
+                                width: `${prog}%`,
+                                background: prog >= 80
+                                  ? 'hsl(var(--success))'
+                                  : 'linear-gradient(90deg, hsl(43 95% 50%), hsl(30 90% 50%))',
+                              }} />
+                            </div>
                           </div>
-                          <Progress value={p.progress ?? 0} className="h-2.5" />
                         </div>
                       </CardContent>
                     </Card>
@@ -256,35 +305,42 @@ const ClientPortalPage = () => {
           <TabsContent value="deliverables">
             {documents.length === 0 ? (
               <Card className="border-dashed">
-                <CardContent className="py-12 text-center">
-                  <FolderOpen className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
-                  <p className="text-muted-foreground">Aucun livrable publié pour le moment.</p>
+                <CardContent className="py-16 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto mb-4">
+                    <FolderOpen className="h-7 w-7 text-muted-foreground/40" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">Aucun livrable publié pour le moment.</p>
                 </CardContent>
               </Card>
             ) : (
               <div className="space-y-3">
-                {documents.map((doc: any) => (
-                  <Card key={doc.id} className="hover:shadow-md transition-shadow duration-200">
+                {documents.map((doc: any, i: number) => (
+                  <Card key={doc.id} className="hover:shadow-md transition-all duration-200 group">
                     <CardContent className="p-4 flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <FileText className="h-5 w-5 text-primary" />
+                      <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm" style={{
+                        background: 'linear-gradient(135deg, hsl(43 95% 50%), hsl(30 90% 50%))',
+                      }}>
+                        <FileText className="h-5 w-5 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium truncate">{doc.name}</h4>
+                        <h4 className="font-medium truncate group-hover:text-primary transition-colors">{doc.name}</h4>
                         <div className="flex items-center gap-3 mt-1">
                           <span className="text-xs text-muted-foreground">
                             {format(new Date(doc.created_at), 'dd MMM yyyy', { locale: fr })}
                           </span>
                           {doc.file_size && (
-                            <span className="text-xs text-muted-foreground">{formatFileSize(doc.file_size)}</span>
+                            <>
+                              <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
+                              <span className="text-xs text-muted-foreground">{formatFileSize(doc.file_size)}</span>
+                            </>
                           )}
                         </div>
                       </div>
-                      <Badge className="bg-success/10 text-success border-success/20 border">
+                      <Badge className="bg-success/10 text-success border-success/20 border text-xs hidden sm:flex">
                         <CheckCircle2 className="h-3 w-3 mr-1" /> Publié
                       </Badge>
-                      <Button variant="ghost" size="icon" className="flex-shrink-0">
-                        <Download className="h-4 w-4" />
+                      <Button variant="outline" size="sm" className="rounded-lg gap-1.5 flex-shrink-0 text-xs">
+                        <Download className="h-3.5 w-3.5" /> Télécharger
                       </Button>
                     </CardContent>
                   </Card>
@@ -297,9 +353,11 @@ const ClientPortalPage = () => {
           <TabsContent value="copil">
             {meetings.length === 0 ? (
               <Card className="border-dashed">
-                <CardContent className="py-12 text-center">
-                  <Calendar className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
-                  <p className="text-muted-foreground">Aucune réunion COPIL programmée.</p>
+                <CardContent className="py-16 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto mb-4">
+                    <Calendar className="h-7 w-7 text-muted-foreground/40" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">Aucune réunion COPIL programmée.</p>
                 </CardContent>
               </Card>
             ) : (
@@ -308,17 +366,17 @@ const ClientPortalPage = () => {
                   const isCompleted = m.status === 'completed';
                   const isUpcoming = new Date(m.scheduled_at) > new Date();
                   return (
-                    <Card key={m.id} className="hover:shadow-md transition-shadow duration-200">
+                    <Card key={m.id} className={`hover:shadow-md transition-all duration-200 ${isUpcoming ? 'ring-1 ring-primary/20' : ''}`}>
                       <CardContent className="p-5">
                         <div className="flex items-start justify-between">
-                          <div className="space-y-1">
+                          <div className="space-y-1.5">
                             <h4 className="font-semibold font-display">{m.title}</h4>
                             <p className="text-sm text-muted-foreground flex items-center gap-1.5">
                               <Calendar className="h-3.5 w-3.5" />
                               {format(new Date(m.scheduled_at), "EEEE dd MMMM yyyy 'à' HH:mm", { locale: fr })}
                             </p>
                             {m.location && (
-                              <p className="text-xs text-muted-foreground">{m.location}</p>
+                              <p className="text-xs text-muted-foreground/70">{m.location}</p>
                             )}
                           </div>
                           <Badge
@@ -344,8 +402,8 @@ const ClientPortalPage = () => {
                           <>
                             <Separator className="my-3" />
                             <div>
-                              <p className="text-xs font-medium text-muted-foreground mb-1">Ordre du jour</p>
-                              <p className="text-sm whitespace-pre-line">{m.agenda}</p>
+                              <p className="text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">Ordre du jour</p>
+                              <p className="text-sm whitespace-pre-line leading-relaxed">{m.agenda}</p>
                             </div>
                           </>
                         )}
@@ -360,13 +418,16 @@ const ClientPortalPage = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t mt-12 py-6 px-6">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Mission-DGC — Portail client sécurisé
-          </p>
+      <footer className="border-t mt-16 py-8 px-6" style={{ background: 'hsl(var(--muted) / 0.3)' }}>
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <img src={logoImg} alt="Logo" className="h-7 w-auto opacity-60" />
+            <p className="text-xs text-muted-foreground">
+              © {new Date().getFullYear()} Mission-DGC — Portail client sécurisé
+            </p>
+          </div>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Shield className="h-3.5 w-3.5" /> Accès confidentiel
+            <Shield className="h-3.5 w-3.5" /> Données confidentielles • Accès autorisé uniquement
           </div>
         </div>
       </footer>
