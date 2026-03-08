@@ -434,12 +434,12 @@ function SubmitWorkDialog({ taskId, open, onClose, onSubmitted }: {
               <p className="text-xs text-muted-foreground mt-1">{files.length} fichier(s) sélectionné(s)</p>
             )}
           </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>Annuler</Button>
-            <Button onClick={handleSubmit} disabled={uploading || createSubmission.isPending}>
-              {uploading ? 'Envoi...' : 'Envoyer'}
-            </Button>
-          </div>
+        </div>
+        <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
+          <Button variant="outline" onClick={onClose}>Annuler</Button>
+          <Button onClick={handleSubmit} disabled={uploading || createSubmission.isPending}>
+            {uploading ? 'Envoi...' : 'Envoyer'}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
