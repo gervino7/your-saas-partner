@@ -59,6 +59,8 @@ const syncStatusConfig: Record<string, { label: string; icon: any; color: string
 };
 
 type ClipboardMode = 'copy' | 'cut' | null;
+type SortField = 'name' | 'size' | 'modified' | 'sync';
+type SortDir = 'asc' | 'desc';
 
 export default function WorkspacePage() {
   const { userId } = useParams<{ userId?: string }>();
