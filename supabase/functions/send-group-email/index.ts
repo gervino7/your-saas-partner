@@ -134,7 +134,7 @@ Deno.serve(async (req) => {
 
       try {
         const emailPayload: Record<string, any> = {
-          from: 'Mission-DGC <onboarding@resend.dev>',
+          from: 'MissionFlow <noreply@mamission.abodje.com>',
           to: [recipient.email],
           subject: email.subject,
           html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
