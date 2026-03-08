@@ -435,9 +435,9 @@ function SubmitWorkDialog({ taskId, open, onClose, onSubmitted }: {
             )}
           </div>
         </div>
-        <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
-          <Button variant="outline" onClick={onClose}>Annuler</Button>
-          <Button onClick={handleSubmit} disabled={uploading || createSubmission.isPending}>
+        <div className="px-5 py-3 border-t border-border/40 bg-muted/30 flex items-center justify-end gap-2">
+          <Button variant="outline" size="sm" className="h-9 px-4" onClick={onClose}>Annuler</Button>
+          <Button size="sm" className="h-9 px-5" onClick={handleSubmit} disabled={uploading || createSubmission.isPending}>
             {uploading ? 'Envoi...' : 'Envoyer'}
           </Button>
         </div>
