@@ -95,6 +95,7 @@ const MissionDetailPage = () => {
           <TabsTrigger value="team">Équipe</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="copil">COPIL</TabsTrigger>
+          <TabsTrigger value="gantt">Gantt</TabsTrigger>
           <TabsTrigger value="calendar">Calendrier</TabsTrigger>
           <TabsTrigger value="budget">Budget</TabsTrigger>
           {canManage && <TabsTrigger value="settings">Paramètres</TabsTrigger>}
