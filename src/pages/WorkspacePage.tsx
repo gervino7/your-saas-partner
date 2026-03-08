@@ -93,6 +93,10 @@ export default function WorkspacePage() {
   const [showMoveDialog, setShowMoveDialog] = useState(false);
   const [moveTarget, setMoveTarget] = useState('/');
 
+  // Sort state
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDir, setSortDir] = useState<SortDir>('asc');
+
   const { data: files = [], isLoading: filesLoading } = useWorkspaceFiles(workspace?.id, currentPath);
   const { data: pendingFiles = [] } = useWorkspacePendingFiles(workspace?.id);
   const { data: subordinates = [] } = useSubordinates();
