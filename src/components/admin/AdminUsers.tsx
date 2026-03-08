@@ -123,7 +123,7 @@ export default function AdminUsers() {
                               </Select>
                             </div>
                           </div>
-                          <div className="px-5 py-3 border-t border-amber-200/40 bg-amber-50/40 dark:border-border/40 dark:bg-muted/20 flex items-center justify-end gap-2">
+                          <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex items-center justify-end gap-2">
                             <Button size="sm" className="h-9 px-5" onClick={handleSaveGrade} disabled={updateGrade.isPending}>Enregistrer</Button>
                           </div>
                         </DialogContent>
