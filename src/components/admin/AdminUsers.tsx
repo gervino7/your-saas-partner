@@ -154,16 +154,20 @@ export default function AdminUsers() {
                             <Pencil className="h-3.5 w-3.5" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader><DialogTitle>Modifier le grade de {u.full_name}</DialogTitle></DialogHeader>
-                          <div className="space-y-4">
+                        <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
+                          <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
+                            <DialogTitle className="text-white">Modifier le grade de {u.full_name}</DialogTitle>
+                          </DialogHeader>
+                          <div className="px-6 py-5 space-y-5">
                             <Select value={editingUser?.grade || u.grade || 'AUD'} onValueChange={(v) => setEditingUser((prev) => prev ? { ...prev, grade: v as Grade } : null)}>
                               <SelectTrigger><SelectValue /></SelectTrigger>
                               <SelectContent>
                                 {GRADES.map((g) => <SelectItem key={g} value={g}>{g} — {GRADE_LABELS[g]}</SelectItem>)}
                               </SelectContent>
                             </Select>
-                            <Button className="w-full" onClick={handleSaveGrade} disabled={updateGrade.isPending}>Enregistrer</Button>
+                          </div>
+                          <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
+                            <Button onClick={handleSaveGrade} disabled={updateGrade.isPending}>Enregistrer</Button>
                           </div>
                         </DialogContent>
                       </Dialog>
