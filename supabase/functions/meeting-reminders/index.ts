@@ -116,7 +116,7 @@ Deno.serve(async (req) => {
                   Authorization: `Bearer ${resendKey}`,
                 },
                 body: JSON.stringify({
-                  from: "MissionFlow <onboarding@resend.dev>",
+                  from: "MissionFlow <noreply@mamission.abodje.com>",
                   to: [profile.email],
                   subject: `Rappel : ${meeting.title} — demain`,
                   html: `
