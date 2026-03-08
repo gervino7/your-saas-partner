@@ -74,7 +74,7 @@ export default function TaskFormDialog({ open, onOpenChange, projectId, members,
   const onSubmit = (values: FormValues) => {
     if (isEditing) {
       const { assigned_to, ...taskValues } = values;
-      updateTask.mutate({ id: editingTask.id, ...taskValues }, { onSuccess: () => { form.reset(); onOpenChange(false); } });
+      updateTask.mutate({ id: editingTask.id, assigned_to, ...taskValues }, { onSuccess: () => { form.reset(); onOpenChange(false); } });
     } else {
       createTask.mutate({ ...values, title: values.title, project_id: projectId }, { onSuccess: () => { form.reset(); onOpenChange(false); } });
     }
