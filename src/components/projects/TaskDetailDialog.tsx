@@ -580,16 +580,16 @@ function RejectDialog({ taskId, open, onClose, onRejected }: {
               className="mt-1"
             />
           </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>Annuler</Button>
-            <Button
-              variant="destructive"
-              onClick={handleReject}
-              disabled={!comment.trim() || uploading || createSubmission.isPending}
-            >
-              {uploading ? 'Envoi...' : 'Renvoyer'}
-            </Button>
-          </div>
+        </div>
+        <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
+          <Button variant="outline" onClick={onClose}>Annuler</Button>
+          <Button
+            variant="destructive"
+            onClick={handleReject}
+            disabled={!comment.trim() || uploading || createSubmission.isPending}
+          >
+            {uploading ? 'Envoi...' : 'Renvoyer'}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
