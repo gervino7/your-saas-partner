@@ -39,6 +39,7 @@ const ClientDetailPage = () => {
           <TabsTrigger value="contacts">Contacts</TabsTrigger>
           <TabsTrigger value="missions">Missions</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="portal">Portail</TabsTrigger>
           <TabsTrigger value="satisfaction">Satisfaction</TabsTrigger>
           <TabsTrigger value="history">Historique</TabsTrigger>
         </TabsList>
@@ -46,6 +47,7 @@ const ClientDetailPage = () => {
         <TabsContent value="contacts" className="mt-4"><ClientContactsTab clientId={client.id} /></TabsContent>
         <TabsContent value="missions" className="mt-4"><ClientMissionsTab clientId={client.id} /></TabsContent>
         <TabsContent value="documents" className="mt-4"><ClientDocumentsTab clientId={client.id} /></TabsContent>
+        <TabsContent value="portal" className="mt-4"><ClientPortalTab clientId={client.id} /></TabsContent>
         <TabsContent value="satisfaction" className="mt-4"><ClientSatisfactionTab clientId={client.id} /></TabsContent>
         <TabsContent value="history" className="mt-4"><ClientHistoryTab clientId={client.id} /></TabsContent>
       </Tabs>
