@@ -108,12 +108,12 @@ function EmailViewDialog({ email, open, onOpenChange }: { email: any; open: bool
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>{email?.subject}</DialogTitle>
-          <DialogDescription>
-            Envoyé le {email?.sent_at ? format(new Date(email.sent_at), 'dd/MM/yyyy à HH:mm', { locale: fr }) : email?.created_at ? format(new Date(email.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr }) : '—'}
-            {' • '}{email?.profiles?.full_name ?? 'Inconnu'}
-          </DialogDescription>
         </DialogHeader>
-        <div className="px-6 py-5 space-y-4 overflow-y-auto max-h-[65vh]">
+        <div className="px-5 py-4 space-y-4 overflow-y-auto max-h-[65vh] bg-accent/[0.03]">
+        <p className="text-xs text-muted-foreground">
+          Envoyé le {email?.sent_at ? format(new Date(email.sent_at), 'dd/MM/yyyy à HH:mm', { locale: fr }) : email?.created_at ? format(new Date(email.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr }) : '—'}
+          {' • '}{email?.profiles?.full_name ?? 'Inconnu'}
+        </p>
         <Separator />
         <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(email?.body ?? '', { ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'b', 'i', 'h1', 'h2', 'h3', 'h4', 'blockquote', 'a', 'span', 'div'], ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'style'] }) }} />
         {attachments.length > 0 && (
