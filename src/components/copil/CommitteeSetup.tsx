@@ -40,7 +40,7 @@ const CommitteeSetup = ({ missionId, canManage }: Props) => {
         <DialogHeader>
           <DialogTitle>Nouveau comité</DialogTitle>
         </DialogHeader>
-        <div className="px-6 py-5 space-y-5">
+        <div className="px-5 py-4 space-y-3 bg-amber-50/70 dark:bg-amber-950/10">
           <div>
             <Label>Type</Label>
             <Select value={form.type} onValueChange={(v) => setForm((p) => ({ ...p, type: v }))}>

@@ -732,7 +732,7 @@ export default function WorkspacePage() {
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
             <DialogTitle className="text-white font-display">Paramètres de synchronisation</DialogTitle>
           </DialogHeader>
-          <div className="px-6 py-5 space-y-5 overflow-y-auto max-h-[65vh]">
+          <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-amber-50/70 dark:bg-amber-950/10">
             <div>
               <Label className="text-sm">Chemin du répertoire local</Label>
               <Input value={workspace?.sync_folder_path || '~/MissionFlow/'} readOnly className="mt-1 bg-muted" />

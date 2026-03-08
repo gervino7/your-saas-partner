@@ -149,7 +149,7 @@ export default function ProjectFormDialog({ open, onOpenChange, missionId, proje
               </div>
             </div>
 
-            <div className="px-5 py-3 border-t border-border/40 bg-muted/30 flex items-center justify-end gap-2">
+            <div className="px-5 py-3 border-t border-amber-200/40 bg-amber-50/40 dark:border-border/40 dark:bg-muted/20 flex items-center justify-end gap-2">
               <Button type="button" variant="outline" size="sm" className="h-9 px-4" onClick={() => onOpenChange(false)}>
                 Annuler
               </Button>

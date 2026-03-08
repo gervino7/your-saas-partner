@@ -223,7 +223,7 @@ export default function DocumentExplorer({ missionId, projectId, activityId }: D
                 <DocumentStatusBadge status={previewDoc.status} />
               </DialogTitle>
             </DialogHeader>
-            <div className="px-6 py-5 overflow-auto max-h-[65vh]">
+            <div className="px-5 py-4 overflow-auto max-h-[65vh] bg-amber-50/70 dark:bg-amber-950/10">
               {previewDoc.mime_type?.startsWith('image/') ? (
                 <img
                   src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/authenticated/documents/${previewDoc.file_path}`}

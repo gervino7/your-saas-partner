@@ -69,7 +69,7 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>Ajouter un membre</DialogTitle></DialogHeader>
-          <div className="px-5 py-4 space-y-3 bg-accent/[0.03]">
+          <div className="px-5 py-4 space-y-3 bg-amber-50/70 dark:bg-amber-950/10">
             <div><Label>Utilisateur</Label>
               <Select value={selectedUser} onValueChange={setSelectedUser}>
                 <SelectTrigger><SelectValue placeholder="Sélectionner un utilisateur" /></SelectTrigger>
