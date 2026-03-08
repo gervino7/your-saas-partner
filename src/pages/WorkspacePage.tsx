@@ -346,16 +346,18 @@ export default function WorkspacePage() {
     const isSelected = selectedIds.has(file.id);
     const isDragOver = dragOverId === file.id;
     const isCut = clipboard.mode === 'cut' && clipboard.files.some(f => f.id === file.id);
+    const fileStyle = getFileIcon(file.file_name, !!file.is_folder);
+    const FileIcon = fileStyle.icon;
 
     const rowContent = (
       <TableRow
         key={file.id}
         className={cn(
-          'transition-colors',
+          'transition-all duration-150 group/row',
           file.is_folder && 'cursor-pointer',
-          isSelected && 'bg-accent/10',
-          isDragOver && file.is_folder && 'bg-accent/20 ring-2 ring-accent ring-inset',
-          isCut && 'opacity-50'
+          isSelected && 'bg-primary/[0.06] hover:bg-primary/[0.09]',
+          isDragOver && file.is_folder && 'bg-primary/10 ring-2 ring-primary/30 ring-inset',
+          isCut && 'opacity-40'
         )}
         draggable={isOwnWorkspace}
         onDragStart={(e) => handleDragStart(e, file)}
@@ -379,31 +381,38 @@ export default function WorkspacePage() {
           />
         </TableCell>
         <TableCell>
-          <div className="flex items-center gap-2">
-            {file.is_folder ? (
-              <Folder className="h-4 w-4 text-accent shrink-0" />
-            ) : (
-              <File className="h-4 w-4 text-muted-foreground shrink-0" />
-            )}
-            <span className="truncate">{file.file_name}</span>
+          <div className="flex items-center gap-2.5">
+            <div className={cn('flex items-center justify-center h-8 w-8 rounded-lg shrink-0', fileStyle.bg)}>
+              <FileIcon className={cn('h-4 w-4', fileStyle.color)} />
+            </div>
+            <div className="min-w-0">
+              <span className={cn('truncate block font-medium text-sm', file.is_folder && 'text-primary')}>
+                {file.file_name}
+              </span>
+              {!file.is_folder && (
+                <span className="text-[11px] text-muted-foreground uppercase tracking-wider">
+                  {file.file_name.split('.').pop()}
+                </span>
+              )}
+            </div>
           </div>
         </TableCell>
-        <TableCell className="hidden sm:table-cell text-muted-foreground text-sm">
+        <TableCell className="hidden sm:table-cell text-muted-foreground text-sm tabular-nums">
           {file.is_folder ? '—' : formatFileSize(file.file_size || 0)}
         </TableCell>
-        <TableCell className="hidden md:table-cell text-muted-foreground text-sm">
+        <TableCell className="hidden md:table-cell text-muted-foreground text-sm tabular-nums">
           {formatDate(file.last_modified_remote || file.updated_at)}
         </TableCell>
         <TableCell className="hidden md:table-cell">
-          <span className={`flex items-center gap-1 text-xs ${sync.color}`}>
-            <SyncIcon className="h-3.5 w-3.5" /> {sync.label}
+          <span className={cn('inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full', sync.color, sync.bg)}>
+            <SyncIcon className="h-3 w-3" /> {sync.label}
           </span>
         </TableCell>
         <TableCell onClick={(e) => e.stopPropagation()}>
           {isOwnWorkspace ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7">
+                <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover/row:opacity-100 transition-opacity">
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
