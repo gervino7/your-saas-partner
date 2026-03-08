@@ -18,7 +18,8 @@ import MissionSettingsTab from '@/components/missions/MissionSettingsTab';
 import EmptyState from '@/components/common/EmptyState';
 import CopilTab from '@/components/copil/CopilTab';
 import MissionCalendarTab from '@/components/missions/MissionCalendarTab';
-import { FileText, Calendar } from 'lucide-react';
+import MissionGanttTab from '@/components/missions/MissionGanttTab';
+import { FileText, Calendar, BarChart3 } from 'lucide-react';
 
 const MissionDetailPage = () => {
   const { id } = useParams();
