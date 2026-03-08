@@ -94,7 +94,7 @@ const MeetingsSection = ({ committeeId, canManage }: Props) => {
             <DialogTrigger asChild><Button size="sm"><Plus className="h-4 w-4 mr-2" /> Programmer</Button></DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader><DialogTitle>Programmer une réunion</DialogTitle></DialogHeader>
-              <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-accent/[0.03]">
+              <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-amber-50/70 dark:bg-amber-950/10">
                 <div><Label>Titre</Label><Input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></div>
                 <div><Label>Ordre du jour</Label><Textarea value={form.agenda} onChange={(e) => setForm((p) => ({ ...p, agenda: e.target.value }))} rows={3} /></div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
