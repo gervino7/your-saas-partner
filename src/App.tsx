@@ -224,6 +224,7 @@ const App = () => (
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<LoginPage />} />
               <Route path="/portal/:token" element={<ClientPortalPage />} />
+              <Route path="/copil-portal/:committeeId" element={<CopilPortalPage />} />
               <Route path="/survey/:token" element={<SatisfactionSurveyPage />} />
               <Route element={<AuthGuard><AppLayout /></AuthGuard>}>
                 <Route path="/" element={<DashboardPage />} />
