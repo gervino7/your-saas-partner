@@ -39,26 +39,13 @@ export default function AdminUsers() {
 
   const handleSaveGrade = () => {
     if (!editingUser) return;
-    updateGrade.mutate({
-      userId: editingUser.id,
-      grade: editingUser.grade,
-      grade_level: GRADE_LEVELS[editingUser.grade],
-    });
+    updateGrade.mutate({ userId: editingUser.id, grade: editingUser.grade, grade_level: GRADE_LEVELS[editingUser.grade] });
     setEditingUser(null);
   };
 
   const handleInvite = () => {
     if (!inviteEmail.trim()) return;
-    inviteUser.mutate(
-      { email: inviteEmail.trim(), grade: inviteGrade },
-      {
-        onSuccess: () => {
-          setInviteOpen(false);
-          setInviteEmail('');
-          setInviteGrade('AUD');
-        },
-      }
-    );
+    inviteUser.mutate({ email: inviteEmail.trim(), grade: inviteGrade }, { onSuccess: () => { setInviteOpen(false); setInviteEmail(''); setInviteGrade('AUD'); } });
   };
 
   return (
@@ -66,42 +53,25 @@ export default function AdminUsers() {
       <div className="flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Rechercher un utilisateur..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8 h-9" />
+          <Input placeholder="Rechercher un utilisateur..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8" />
         </div>
         <Select value={filterGrade} onValueChange={setFilterGrade}>
-          <SelectTrigger className="w-[160px] h-9"><SelectValue placeholder="Grade" /></SelectTrigger>
+          <SelectTrigger className="w-[160px]"><SelectValue placeholder="Grade" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tous les grades</SelectItem>
             {GRADES.map((g) => <SelectItem key={g} value={g}>{g} — {GRADE_LABELS[g]}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-[140px] h-9"><SelectValue placeholder="Statut" /></SelectTrigger>
+          <SelectTrigger className="w-[140px]"><SelectValue placeholder="Statut" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tous</SelectItem>
             <SelectItem value="online">En ligne</SelectItem>
             <SelectItem value="offline">Hors ligne</SelectItem>
           </SelectContent>
         </Select>
-        <ExportMenu
-          data={filtered.map((u: any) => ({
-            nom: u.full_name ?? '',
-            email: u.email ?? '',
-            grade: u.grade ?? '',
-            statut: u.is_online ? 'En ligne' : 'Hors ligne',
-          }))}
-          filename="utilisateurs"
-          columns={[
-            { key: 'nom', label: 'Nom' },
-            { key: 'email', label: 'Email' },
-            { key: 'grade', label: 'Grade' },
-            { key: 'statut', label: 'Statut' },
-          ]}
-          title="Liste des utilisateurs"
-        />
-        <Button size="sm" variant="default" onClick={() => setInviteOpen(true)}>
-          <UserPlus className="h-4 w-4 mr-1" /> Inviter
-        </Button>
+        <ExportMenu data={filtered.map((u: any) => ({ nom: u.full_name ?? '', email: u.email ?? '', grade: u.grade ?? '', statut: u.is_online ? 'En ligne' : 'Hors ligne' }))} filename="utilisateurs" columns={[{ key: 'nom', label: 'Nom' }, { key: 'email', label: 'Email' }, { key: 'grade', label: 'Grade' }, { key: 'statut', label: 'Statut' }]} title="Liste des utilisateurs" />
+        <Button size="sm" variant="default" onClick={() => setInviteOpen(true)}><UserPlus className="h-4 w-4 mr-1" /> Inviter</Button>
       </div>
 
       <Card>
@@ -127,26 +97,15 @@ export default function AdminUsers() {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <div className="relative">
-                          <Avatar className="h-7 w-7">
-                            <AvatarImage src={u.avatar_url} />
-                            <AvatarFallback className="text-xs">{u.full_name?.charAt(0)?.toUpperCase()}</AvatarFallback>
-                          </Avatar>
-                          {u.is_online && (
-                            <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-success" />
-                          )}
+                          <Avatar className="h-7 w-7"><AvatarImage src={u.avatar_url} /><AvatarFallback className="text-xs">{u.full_name?.charAt(0)?.toUpperCase()}</AvatarFallback></Avatar>
+                          {u.is_online && (<span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-success" />)}
                         </div>
                         <span className="text-sm font-medium">{u.full_name}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">{u.email}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="text-xs">{u.grade || '—'}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={u.is_online ? 'default' : 'secondary'} className="text-[10px]">
-                        {u.is_online ? 'En ligne' : 'Hors ligne'}
-                      </Badge>
-                    </TableCell>
+                    <TableCell><Badge variant="outline" className="text-xs">{u.grade || '—'}</Badge></TableCell>
+                    <TableCell><Badge variant={u.is_online ? 'default' : 'secondary'} className="text-[10px]">{u.is_online ? 'En ligne' : 'Hors ligne'}</Badge></TableCell>
                     <TableCell>
                       <Dialog>
                         <DialogTrigger asChild>
@@ -154,20 +113,18 @@ export default function AdminUsers() {
                             <Pencil className="h-3.5 w-3.5" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
-                          <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
-                            <DialogTitle className="text-white">Modifier le grade de {u.full_name}</DialogTitle>
-                          </DialogHeader>
-                          <div className="px-6 py-5 space-y-5">
-                            <Select value={editingUser?.grade || u.grade || 'AUD'} onValueChange={(v) => setEditingUser((prev) => prev ? { ...prev, grade: v as Grade } : null)}>
-                              <SelectTrigger><SelectValue /></SelectTrigger>
-                              <SelectContent>
-                                {GRADES.map((g) => <SelectItem key={g} value={g}>{g} — {GRADE_LABELS[g]}</SelectItem>)}
-                              </SelectContent>
-                            </Select>
+                        <DialogContent className="max-w-sm">
+                          <DialogHeader><DialogTitle>Modifier le grade de {u.full_name}</DialogTitle></DialogHeader>
+                          <div className="px-5 py-4 space-y-3 bg-accent/[0.03]">
+                            <div><Label>Grade</Label>
+                              <Select value={editingUser?.grade || u.grade || 'AUD'} onValueChange={(v) => setEditingUser((prev) => prev ? { ...prev, grade: v as Grade } : null)}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>{GRADES.map((g) => <SelectItem key={g} value={g}>{g} — {GRADE_LABELS[g]}</SelectItem>)}</SelectContent>
+                              </Select>
+                            </div>
                           </div>
-                          <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
-                            <Button onClick={handleSaveGrade} disabled={updateGrade.isPending}>Enregistrer</Button>
+                          <div className="px-5 py-3 border-t border-border/40 bg-muted/30 flex items-center justify-end gap-2">
+                            <Button size="sm" className="h-9 px-5" onClick={handleSaveGrade} disabled={updateGrade.isPending}>Enregistrer</Button>
                           </div>
                         </DialogContent>
                       </Dialog>
@@ -182,36 +139,20 @@ export default function AdminUsers() {
 
       {/* Invite Dialog */}
       <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
-        <DialogContent className="max-w-sm overflow-hidden border-0 shadow-2xl rounded-2xl">
-          <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
-            <DialogTitle className="text-white font-display">Inviter un collaborateur</DialogTitle>
-          </DialogHeader>
-          <div className="px-6 py-5 space-y-5 overflow-y-auto max-h-[65vh]">
-            <div className="space-y-1.5">
-              <Label htmlFor="invite-email">Email</Label>
-              <Input
-                id="invite-email"
-                type="email"
-                placeholder="nom@cabinet.com"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>Grade</Label>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>Inviter un collaborateur</DialogTitle></DialogHeader>
+          <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-accent/[0.03]">
+            <div><Label>Email</Label><Input type="email" placeholder="nom@cabinet.com" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} /></div>
+            <div><Label>Grade</Label>
               <Select value={inviteGrade} onValueChange={(v) => setInviteGrade(v as Grade)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {GRADES.map((g) => (
-                    <SelectItem key={g} value={g}>{g} — {GRADE_LABELS[g]}</SelectItem>
-                  ))}
-                </SelectContent>
+                <SelectContent>{GRADES.map((g) => (<SelectItem key={g} value={g}>{g} — {GRADE_LABELS[g]}</SelectItem>))}</SelectContent>
               </Select>
             </div>
           </div>
-          <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setInviteOpen(false)}>Annuler</Button>
-            <Button onClick={handleInvite} disabled={inviteUser.isPending || !inviteEmail.trim()}>
+          <div className="px-5 py-3 border-t border-border/40 bg-muted/30 flex items-center justify-end gap-2">
+            <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => setInviteOpen(false)}>Annuler</Button>
+            <Button size="sm" className="h-9 px-5" onClick={handleInvite} disabled={inviteUser.isPending || !inviteEmail.trim()}>
               {inviteUser.isPending ? 'Envoi...' : 'Envoyer l\'invitation'}
             </Button>
           </div>

@@ -394,8 +394,8 @@ const GroupMailComposer = ({ committeeId, committeeName, missionName, canManage 
               </div>
             </div>
           </div>
-          <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
-            <Button variant="outline" onClick={() => { setComposeOpen(false); setEditEmail(null); }}>Annuler</Button>
+          <div className="px-5 py-3 border-t border-border/40 bg-muted/30 flex items-center justify-end gap-2">
+            <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => { setComposeOpen(false); setEditEmail(null); }}>Annuler</Button>
             <Button
               onClick={editEmail ? handleEditResend : handleSend}
               disabled={!form.body || sendEmail.isPending || createEmail.isPending}
