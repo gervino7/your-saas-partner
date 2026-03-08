@@ -142,7 +142,7 @@ export default function CalendarGrid({ events, onDateClick, onEventClick, onCrea
 
       {/* Month View */}
       {view === 'month' && (
-        <div className="bg-card border border-border/50 rounded-2xl overflow-hidden shadow-[var(--shadow-card)]">
+        <div className="bg-background border border-border/50 rounded-2xl overflow-hidden shadow-[var(--shadow-card)]">
           {/* Day headers */}
           <div className="grid grid-cols-7 border-b border-border/40">
             {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((d) => (
