@@ -35,7 +35,7 @@ interface TaskFormDialogProps {
   members: any[];
   activities: any[];
   tasks: any[];
-  editingTask?: any;
+  taskToEdit?: any;
 }
 
 function SectionHeader({ icon: Icon, label }: { icon: any; label: string }) {
