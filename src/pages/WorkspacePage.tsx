@@ -728,11 +728,11 @@ export default function WorkspacePage() {
 
       {/* Settings dialog */}
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="font-display">Paramètres de synchronisation</DialogTitle>
+        <DialogContent className="max-w-md overflow-hidden border-0 shadow-2xl rounded-2xl">
+          <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
+            <DialogTitle className="text-white font-display">Paramètres de synchronisation</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="px-6 py-5 space-y-5 overflow-y-auto max-h-[65vh]">
             <div>
               <Label className="text-sm">Chemin du répertoire local</Label>
               <Input value={workspace?.sync_folder_path || '~/MissionFlow/'} readOnly className="mt-1 bg-muted" />

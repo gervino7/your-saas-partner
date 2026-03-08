@@ -65,9 +65,11 @@ export default function ClientContactsTab({ clientId }: { clientId: string }) {
       </CardContent>
 
       <Dialog open={showAdd} onOpenChange={setShowAdd}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Nouveau contact</DialogTitle></DialogHeader>
-          <div className="grid gap-3">
+        <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
+          <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
+            <DialogTitle className="text-white">Nouveau contact</DialogTitle>
+          </DialogHeader>
+          <div className="px-6 py-5 space-y-5 overflow-y-auto max-h-[65vh]">
             <div><Label>Nom *</Label><Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} /></div>
             <div><Label>Poste</Label><Input value={form.position} onChange={e => setForm(f => ({ ...f, position: e.target.value }))} /></div>
             <div className="grid grid-cols-2 gap-3">
@@ -78,6 +80,9 @@ export default function ClientContactsTab({ clientId }: { clientId: string }) {
               <input type="checkbox" checked={form.is_primary} onChange={e => setForm(f => ({ ...f, is_primary: e.target.checked }))} />
               Contact principal
             </label>
+          </div>
+          <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setShowAdd(false)}>Annuler</Button>
             <Button onClick={handleAdd} disabled={create.isPending}>Ajouter</Button>
           </div>
         </DialogContent>

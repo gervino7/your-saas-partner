@@ -182,12 +182,12 @@ export default function AdminUsers() {
 
       {/* Invite Dialog */}
       <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="font-display">Inviter un collaborateur</DialogTitle>
+        <DialogContent className="max-w-sm overflow-hidden border-0 shadow-2xl rounded-2xl">
+          <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
+            <DialogTitle className="text-white font-display">Inviter un collaborateur</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
+          <div className="px-6 py-5 space-y-5 overflow-y-auto max-h-[65vh]">
+            <div className="space-y-1.5">
               <Label htmlFor="invite-email">Email</Label>
               <Input
                 id="invite-email"
@@ -197,7 +197,7 @@ export default function AdminUsers() {
                 onChange={(e) => setInviteEmail(e.target.value)}
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Label>Grade</Label>
               <Select value={inviteGrade} onValueChange={(v) => setInviteGrade(v as Grade)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
@@ -208,12 +208,12 @@ export default function AdminUsers() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setInviteOpen(false)}>Annuler</Button>
-              <Button onClick={handleInvite} disabled={inviteUser.isPending || !inviteEmail.trim()}>
-                {inviteUser.isPending ? 'Envoi...' : 'Envoyer l\'invitation'}
-              </Button>
-            </div>
+          </div>
+          <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setInviteOpen(false)}>Annuler</Button>
+            <Button onClick={handleInvite} disabled={inviteUser.isPending || !inviteEmail.trim()}>
+              {inviteUser.isPending ? 'Envoi...' : 'Envoyer l\'invitation'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
