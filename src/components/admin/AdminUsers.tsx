@@ -115,7 +115,7 @@ export default function AdminUsers() {
                         </DialogTrigger>
                         <DialogContent className="max-w-sm">
                           <DialogHeader><DialogTitle>Modifier le grade de {u.full_name}</DialogTitle></DialogHeader>
-                          <div className="px-5 py-4 space-y-3 bg-amber-50/70 dark:bg-amber-950/10">
+                          <div className="px-5 py-4 space-y-3 dialog-form-bg">
                             <div><Label>Grade</Label>
                               <Select value={editingUser?.grade || u.grade || 'AUD'} onValueChange={(v) => setEditingUser((prev) => prev ? { ...prev, grade: v as Grade } : null)}>
                                 <SelectTrigger><SelectValue /></SelectTrigger>
