@@ -17,3 +17,9 @@ verify_jwt = false
 
 [functions.budget-monitor]
 verify_jwt = false
+
+[functions.copil-portal-auth]
+verify_jwt = false
+
+[functions.validate-portal-token]
+verify_jwt = false

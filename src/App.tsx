@@ -31,6 +31,7 @@ import FinancePage from '@/pages/FinancePage';
 import CRMPage from '@/pages/CRMPage';
 import ClientDetailPage from '@/pages/ClientDetailPage';
 import ClientPortalPage from '@/pages/ClientPortalPage';
+import CopilPortalPage from '@/pages/CopilPortalPage';
 import SatisfactionSurveyPage from '@/pages/SatisfactionSurveyPage';
 import NotificationsPage from '@/pages/NotificationsPage';
 import NotFound from '@/pages/NotFound';
@@ -223,6 +224,7 @@ const App = () => (
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<LoginPage />} />
               <Route path="/portal/:token" element={<ClientPortalPage />} />
+              <Route path="/copil-portal/:committeeId" element={<CopilPortalPage />} />
               <Route path="/survey/:token" element={<SatisfactionSurveyPage />} />
               <Route element={<AuthGuard><AppLayout /></AuthGuard>}>
                 <Route path="/" element={<DashboardPage />} />

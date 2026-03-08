@@ -2,13 +2,16 @@ import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Users, CalendarDays, Mail } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Shield, Users, CalendarDays, Mail, FileText, Link2, Copy, Check } from 'lucide-react';
 import { useCommittees } from '@/hooks/useCommittees';
 import CommitteeSetup from './CommitteeSetup';
 import MembersList from './MembersList';
 import MeetingsSection from './MeetingsSection';
 import GroupMailComposer from './GroupMailComposer';
+import CopilDocuments from './CopilDocuments';
 import EmptyState from '@/components/common/EmptyState';
+import { toast } from 'sonner';
 
 const FREQ_LABELS: Record<string, string> = {
   weekly: 'Hebdomadaire', biweekly: 'Bimensuelle', monthly: 'Mensuelle', on_demand: 'À la demande',
@@ -23,8 +26,18 @@ interface Props {
 const CopilTab = ({ missionId, missionName, canManage }: Props) => {
   const { data: committees, isLoading } = useCommittees(missionId);
   const [selectedId, setSelectedId] = useState<string | undefined>();
+  const [copied, setCopied] = useState(false);
 
   const selected = committees?.find((c: any) => c.id === selectedId) ?? committees?.[0];
+
+  const portalUrl = selected ? `${window.location.origin}/copil-portal/${selected.id}` : '';
+
+  const copyPortalLink = () => {
+    navigator.clipboard.writeText(portalUrl);
+    setCopied(true);
+    toast.success('Lien du portail copié');
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   if (isLoading) return <div className="animate-pulse space-y-4"><div className="h-32 bg-muted rounded-lg" /></div>;
 
@@ -42,7 +55,7 @@ const CopilTab = ({ missionId, missionName, canManage }: Props) => {
   return (
     <div className="space-y-6">
       {/* Committee selector + create button */}
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3">
           {committees.length > 1 ? (
             <Select value={selected?.id} onValueChange={setSelectedId}>
@@ -61,7 +74,15 @@ const CopilTab = ({ missionId, missionName, canManage }: Props) => {
           <Badge variant="outline">{selected?.type === 'copil' ? 'COPIL' : 'CODIR'}</Badge>
           <Badge variant="secondary">{FREQ_LABELS[selected?.meeting_frequency ?? 'monthly']}</Badge>
         </div>
-        <CommitteeSetup missionId={missionId} canManage={canManage} />
+        <div className="flex items-center gap-2">
+          {selected && (
+            <Button variant="outline" size="sm" onClick={copyPortalLink}>
+              {copied ? <Check className="h-4 w-4 mr-1" /> : <Link2 className="h-4 w-4 mr-1" />}
+              {copied ? 'Copié !' : 'Lien portail externe'}
+            </Button>
+          )}
+          <CommitteeSetup missionId={missionId} canManage={canManage} />
+        </div>
       </div>
 
       {selected && (
@@ -69,6 +90,7 @@ const CopilTab = ({ missionId, missionName, canManage }: Props) => {
           <TabsList>
             <TabsTrigger value="members" className="flex items-center gap-1"><Users className="h-4 w-4" /> Membres</TabsTrigger>
             <TabsTrigger value="meetings" className="flex items-center gap-1"><CalendarDays className="h-4 w-4" /> Réunions</TabsTrigger>
+            <TabsTrigger value="documents" className="flex items-center gap-1"><FileText className="h-4 w-4" /> Documents</TabsTrigger>
             <TabsTrigger value="mailing" className="flex items-center gap-1"><Mail className="h-4 w-4" /> Mailing</TabsTrigger>
           </TabsList>
           <TabsContent value="members" className="mt-4">
@@ -76,6 +98,9 @@ const CopilTab = ({ missionId, missionName, canManage }: Props) => {
           </TabsContent>
           <TabsContent value="meetings" className="mt-4">
             <MeetingsSection committeeId={selected.id} canManage={canManage} />
+          </TabsContent>
+          <TabsContent value="documents" className="mt-4">
+            <CopilDocuments committeeId={selected.id} missionId={missionId} canManage={canManage} />
           </TabsContent>
           <TabsContent value="mailing" className="mt-4">
             <GroupMailComposer
