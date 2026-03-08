@@ -150,6 +150,7 @@ function EmailViewDialog({ email, open, onOpenChange }: { email: any; open: bool
             </div>
           </>
         )}
+        </div>
       </DialogContent>
     </Dialog>
   );
