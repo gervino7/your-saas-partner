@@ -142,9 +142,9 @@ export default function CalendarGrid({ events, onDateClick, onEventClick, onCrea
 
       {/* Month View */}
       {view === 'month' && (
-        <div className="bg-background border border-border/50 rounded-2xl overflow-hidden shadow-[var(--shadow-card)]">
+        <div className="border border-border/50 rounded-2xl overflow-hidden shadow-[var(--shadow-card)]">
           {/* Day headers */}
-          <div className="grid grid-cols-7 border-b border-border/40">
+          <div className="grid grid-cols-7 bg-muted border-b border-border/40">
             {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((d) => (
               <div key={d} className="py-2.5 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                 {d}
@@ -163,8 +163,8 @@ export default function CalendarGrid({ events, onDateClick, onEventClick, onCrea
                   onClick={() => dayEvents.length === 0 ? onDateClick(day) : undefined}
                   className={cn(
                     'min-h-[100px] border-b border-r border-border/30 p-1.5 cursor-pointer transition-colors',
-                    inMonth ? 'bg-background hover:bg-muted/30' : 'bg-muted/40',
-                    !inMonth && 'opacity-60',
+                    inMonth ? 'bg-card hover:bg-card/80' : 'bg-secondary',
+                    !inMonth && 'opacity-70',
                   )}
                 >
                   <div className={cn(
