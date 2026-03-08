@@ -88,7 +88,7 @@ export default function TaskFormDialog({ open, onOpenChange, projectId, members,
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-amber-50/70 dark:bg-amber-950/10">
+            <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] dialog-form-bg">
               <div>
                 <SectionHeader icon={Info} label="Informations générales" />
                 <div className="space-y-3">
@@ -253,7 +253,7 @@ export default function TaskFormDialog({ open, onOpenChange, projectId, members,
               </div>
             </div>
 
-            <div className="px-5 py-3 border-t border-amber-200/40 bg-amber-50/40 dark:border-border/40 dark:bg-muted/20 flex items-center justify-end gap-2">
+            <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex items-center justify-end gap-2">
               <Button variant="outline" type="button" size="sm" className="h-9 px-4" onClick={() => onOpenChange(false)}>Annuler</Button>
               <Button type="submit" size="sm" className="h-9 px-5" disabled={createTask.isPending || updateTask.isPending}>
                 {(createTask.isPending || updateTask.isPending) ? (isEditing ? 'Mise à jour...' : 'Création...') : (isEditing ? 'Enregistrer' : 'Créer')}

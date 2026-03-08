@@ -36,7 +36,7 @@ export default function ClientFormDialog({ open, onOpenChange }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader><DialogTitle>Nouveau client</DialogTitle></DialogHeader>
-        <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-amber-50/70 dark:bg-amber-950/10">
+        <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] dialog-form-bg">
           <div>
             <SectionHeader icon={Info} label="Informations générales" />
             <div className="space-y-3">
@@ -67,7 +67,7 @@ export default function ClientFormDialog({ open, onOpenChange }: Props) {
 
           <div><Label>Notes</Label><Textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} /></div>
         </div>
-        <div className="px-5 py-3 border-t border-amber-200/40 bg-amber-50/40 dark:border-border/40 dark:bg-muted/20 flex items-center justify-end gap-2">
+        <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex items-center justify-end gap-2">
           <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => onOpenChange(false)}>Annuler</Button>
           <Button size="sm" className="h-9 px-5" onClick={handleSubmit} disabled={create.isPending}>
             {create.isPending ? 'Création…' : 'Créer le client'}

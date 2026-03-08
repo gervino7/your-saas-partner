@@ -109,7 +109,7 @@ function EmailViewDialog({ email, open, onOpenChange }: { email: any; open: bool
         <DialogHeader>
           <DialogTitle>{email?.subject}</DialogTitle>
         </DialogHeader>
-        <div className="px-5 py-4 space-y-4 overflow-y-auto max-h-[65vh] bg-amber-50/70 dark:bg-amber-950/10">
+        <div className="px-5 py-4 space-y-4 overflow-y-auto max-h-[65vh] dialog-form-bg">
         <p className="text-xs text-muted-foreground">
           Envoyé le {email?.sent_at ? format(new Date(email.sent_at), 'dd/MM/yyyy à HH:mm', { locale: fr }) : email?.created_at ? format(new Date(email.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr }) : '—'}
           {' • '}{email?.profiles?.full_name ?? 'Inconnu'}
@@ -353,7 +353,7 @@ const GroupMailComposer = ({ committeeId, committeeName, missionName, canManage 
           <DialogHeader>
             <DialogTitle>{editEmail ? 'Modifier et renvoyer' : `Envoyer au ${committeeName}`}</DialogTitle>
           </DialogHeader>
-          <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-amber-50/70 dark:bg-amber-950/10">
+          <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] dialog-form-bg">
             <div>
               <Label>Destinataires ({recipients.length})</Label>
               <div className="flex flex-wrap gap-1 mt-1 p-2 border rounded-md bg-muted/50 max-h-24 overflow-y-auto">
@@ -394,7 +394,7 @@ const GroupMailComposer = ({ committeeId, committeeName, missionName, canManage 
               </div>
             </div>
           </div>
-          <div className="px-5 py-3 border-t border-amber-200/40 bg-amber-50/40 dark:border-border/40 dark:bg-muted/20 flex items-center justify-end gap-2">
+          <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex items-center justify-end gap-2">
             <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => { setComposeOpen(false); setEditEmail(null); }}>Annuler</Button>
             <Button
               onClick={editEmail ? handleEditResend : handleSend}

@@ -53,7 +53,7 @@ const MembersList = ({ committeeId, canManage }: Props) => {
             <DialogTrigger asChild><Button size="sm"><UserPlus className="h-4 w-4 mr-2" /> Ajouter</Button></DialogTrigger>
             <DialogContent className="max-w-md">
               <DialogHeader><DialogTitle>Ajouter un membre</DialogTitle></DialogHeader>
-              <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-amber-50/70 dark:bg-amber-950/10">
+              <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] dialog-form-bg">
                 <Tabs value={tab} onValueChange={setTab}>
                   <TabsList className="w-full">
                     <TabsTrigger value="internal" className="flex-1">Interne</TabsTrigger>
