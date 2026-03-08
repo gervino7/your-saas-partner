@@ -48,13 +48,15 @@ Deno.serve(async (req) => {
       }
 
       // Verify this email is a member of the committee (external)
-      const { data: member } = await admin
+      // Use ilike for case-insensitive comparison
+      const { data: members } = await admin
         .from("committee_members")
         .select("id, external_name, committee_id")
         .eq("committee_id", committee_id)
         .eq("is_external", true)
-        .eq("external_email", email.toLowerCase().trim())
-        .single();
+        .ilike("external_email", email.trim());
+
+      const member = members && members.length > 0 ? members[0] : null;
 
       if (!member) {
         return new Response(JSON.stringify({ error: "Email non autorisé pour ce comité" }), {
