@@ -198,30 +198,32 @@ export default function DocumentExplorer({ missionId, projectId, activityId }: D
 
       {/* Upload dialog */}
       <Dialog open={showUpload} onOpenChange={setShowUpload}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="font-display">Uploader des documents</DialogTitle>
+        <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
+          <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
+            <DialogTitle className="text-white font-display">Uploader des documents</DialogTitle>
           </DialogHeader>
-          <UploadZone
-            folderId={selectedFolderId}
-            missionId={missionId}
-            projectId={projectId}
-            activityId={activityId}
-          />
+          <div className="px-6 py-5">
+            <UploadZone
+              folderId={selectedFolderId}
+              missionId={missionId}
+              projectId={projectId}
+              activityId={activityId}
+            />
+          </div>
         </DialogContent>
       </Dialog>
 
       {/* Preview dialog */}
       {previewDoc && (
         <Dialog open={!!previewDoc} onOpenChange={() => setActionDialog(null)}>
-          <DialogContent className="max-w-3xl max-h-[80vh]">
-            <DialogHeader>
-              <DialogTitle className="font-display flex items-center gap-2">
+          <DialogContent className="max-w-3xl overflow-hidden border-0 shadow-2xl rounded-2xl">
+            <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
+              <DialogTitle className="text-white font-display flex items-center gap-2">
                 {previewDoc.name}
                 <DocumentStatusBadge status={previewDoc.status} />
               </DialogTitle>
             </DialogHeader>
-            <div className="overflow-auto">
+            <div className="px-6 py-5 overflow-auto max-h-[65vh]">
               {previewDoc.mime_type?.startsWith('image/') ? (
                 <img
                   src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/authenticated/documents/${previewDoc.file_path}`}

@@ -143,9 +143,11 @@ const MeetingsSection = ({ committeeId, canManage }: Props) => {
             <DialogTrigger asChild>
               <Button size="sm"><Plus className="h-4 w-4 mr-2" /> Programmer</Button>
             </DialogTrigger>
-            <DialogContent>
-              <DialogHeader><DialogTitle>Programmer une réunion</DialogTitle></DialogHeader>
-              <div className="space-y-4">
+            <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
+              <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
+                <DialogTitle className="text-white">Programmer une réunion</DialogTitle>
+              </DialogHeader>
+              <div className="px-6 py-5 space-y-5 overflow-y-auto max-h-[65vh]">
                 <div><Label>Titre</Label><Input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></div>
                 <div><Label>Ordre du jour</Label><Textarea value={form.agenda} onChange={(e) => setForm((p) => ({ ...p, agenda: e.target.value }))} rows={4} /></div>
                 <div className="grid grid-cols-2 gap-4">
@@ -154,7 +156,10 @@ const MeetingsSection = ({ committeeId, canManage }: Props) => {
                 </div>
                 <div><Label>Lieu</Label><Input value={form.location} onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))} placeholder="Salle de réunion ou adresse" /></div>
                 <div><Label>Lien visio</Label><Input value={form.meeting_link} onChange={(e) => setForm((p) => ({ ...p, meeting_link: e.target.value }))} placeholder="https://meet.jit.si/..." /></div>
-                <Button onClick={handleCreate} disabled={!form.title || !form.scheduled_at || createMeeting.isPending} className="w-full">
+              </div>
+              <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
+                <Button variant="outline" onClick={() => setOpen(false)}>Annuler</Button>
+                <Button onClick={handleCreate} disabled={!form.title || !form.scheduled_at || createMeeting.isPending}>
                   Programmer
                 </Button>
               </div>

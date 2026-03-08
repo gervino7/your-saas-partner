@@ -61,52 +61,56 @@ const MembersList = ({ committeeId, canManage }: Props) => {
             <DialogTrigger asChild>
               <Button size="sm"><UserPlus className="h-4 w-4 mr-2" /> Ajouter</Button>
             </DialogTrigger>
-            <DialogContent>
-              <DialogHeader><DialogTitle>Ajouter un membre</DialogTitle></DialogHeader>
-              <Tabs value={tab} onValueChange={setTab}>
-                <TabsList className="w-full">
-                  <TabsTrigger value="internal" className="flex-1">Interne</TabsTrigger>
-                  <TabsTrigger value="external" className="flex-1">Externe</TabsTrigger>
-                </TabsList>
-                <TabsContent value="internal" className="space-y-4 mt-4">
-                  <div>
-                    <Label>Membre</Label>
-                    <Select value={internalForm.user_id} onValueChange={(v) => setInternalForm((p) => ({ ...p, user_id: v }))}>
-                      <SelectTrigger><SelectValue placeholder="Sélectionner..." /></SelectTrigger>
-                      <SelectContent>
-                        {availableMembers?.map((m: any) => (
-                          <SelectItem key={m.id} value={m.id}>{m.full_name} ({m.grade})</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Rôle</Label>
-                    <Select value={internalForm.role} onValueChange={(v) => setInternalForm((p) => ({ ...p, role: v }))}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {ROLES.map((r) => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button onClick={handleAddInternal} disabled={!internalForm.user_id || addMember.isPending} className="w-full">Ajouter</Button>
-                </TabsContent>
-                <TabsContent value="external" className="space-y-4 mt-4">
-                  <div><Label>Nom</Label><Input value={externalForm.name} onChange={(e) => setExternalForm((p) => ({ ...p, name: e.target.value }))} /></div>
-                  <div><Label>Email</Label><Input type="email" value={externalForm.email} onChange={(e) => setExternalForm((p) => ({ ...p, email: e.target.value }))} /></div>
-                  <div><Label>Téléphone</Label><Input value={externalForm.phone} onChange={(e) => setExternalForm((p) => ({ ...p, phone: e.target.value }))} /></div>
-                  <div>
-                    <Label>Rôle</Label>
-                    <Select value={externalForm.role} onValueChange={(v) => setExternalForm((p) => ({ ...p, role: v }))}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {ROLES.map((r) => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button onClick={handleAddExternal} disabled={!externalForm.name || !externalForm.email || addMember.isPending} className="w-full">Ajouter</Button>
-                </TabsContent>
-              </Tabs>
+            <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
+              <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
+                <DialogTitle className="text-white">Ajouter un membre</DialogTitle>
+              </DialogHeader>
+              <div className="px-6 py-5 space-y-5 overflow-y-auto max-h-[65vh]">
+                <Tabs value={tab} onValueChange={setTab}>
+                  <TabsList className="w-full">
+                    <TabsTrigger value="internal" className="flex-1">Interne</TabsTrigger>
+                    <TabsTrigger value="external" className="flex-1">Externe</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="internal" className="space-y-4 mt-4">
+                    <div>
+                      <Label>Membre</Label>
+                      <Select value={internalForm.user_id} onValueChange={(v) => setInternalForm((p) => ({ ...p, user_id: v }))}>
+                        <SelectTrigger><SelectValue placeholder="Sélectionner..." /></SelectTrigger>
+                        <SelectContent>
+                          {availableMembers?.map((m: any) => (
+                            <SelectItem key={m.id} value={m.id}>{m.full_name} ({m.grade})</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Rôle</Label>
+                      <Select value={internalForm.role} onValueChange={(v) => setInternalForm((p) => ({ ...p, role: v }))}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {ROLES.map((r) => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button onClick={handleAddInternal} disabled={!internalForm.user_id || addMember.isPending} className="w-full">Ajouter</Button>
+                  </TabsContent>
+                  <TabsContent value="external" className="space-y-4 mt-4">
+                    <div><Label>Nom</Label><Input value={externalForm.name} onChange={(e) => setExternalForm((p) => ({ ...p, name: e.target.value }))} /></div>
+                    <div><Label>Email</Label><Input type="email" value={externalForm.email} onChange={(e) => setExternalForm((p) => ({ ...p, email: e.target.value }))} /></div>
+                    <div><Label>Téléphone</Label><Input value={externalForm.phone} onChange={(e) => setExternalForm((p) => ({ ...p, phone: e.target.value }))} /></div>
+                    <div>
+                      <Label>Rôle</Label>
+                      <Select value={externalForm.role} onValueChange={(v) => setExternalForm((p) => ({ ...p, role: v }))}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {ROLES.map((r) => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button onClick={handleAddExternal} disabled={!externalForm.name || !externalForm.email || addMember.isPending} className="w-full">Ajouter</Button>
+                  </TabsContent>
+                </Tabs>
+              </div>
             </DialogContent>
           </Dialog>
         )}

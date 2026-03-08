@@ -696,39 +696,43 @@ export default function WorkspacePage() {
 
       {/* New folder dialog */}
       <Dialog open={showNewFolder} onOpenChange={setShowNewFolder}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="font-display">Nouveau dossier</DialogTitle>
+        <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
+          <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
+            <DialogTitle className="text-white font-display">Nouveau dossier</DialogTitle>
           </DialogHeader>
-          <Input value={newFolderName} onChange={(e) => setNewFolderName(e.target.value)} placeholder="Nom du dossier" onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()} autoFocus />
-          <DialogFooter>
+          <div className="px-6 py-5 space-y-5">
+            <Input value={newFolderName} onChange={(e) => setNewFolderName(e.target.value)} placeholder="Nom du dossier" onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()} autoFocus />
+          </div>
+          <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
             <Button variant="outline" onClick={() => setShowNewFolder(false)}>Annuler</Button>
             <Button onClick={handleCreateFolder} disabled={!newFolderName.trim()}>Créer</Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 
       {/* Rename dialog */}
       <Dialog open={!!renamingFile} onOpenChange={() => setRenamingFile(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="font-display">Renommer</DialogTitle>
+        <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
+          <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
+            <DialogTitle className="text-white font-display">Renommer</DialogTitle>
           </DialogHeader>
-          <Input value={renameValue} onChange={(e) => setRenameValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleRename()} autoFocus />
-          <DialogFooter>
+          <div className="px-6 py-5 space-y-5">
+            <Input value={renameValue} onChange={(e) => setRenameValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleRename()} autoFocus />
+          </div>
+          <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
             <Button variant="outline" onClick={() => setRenamingFile(null)}>Annuler</Button>
             <Button onClick={handleRename} disabled={!renameValue.trim()}>Renommer</Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 
       {/* Settings dialog */}
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="font-display">Paramètres de synchronisation</DialogTitle>
+        <DialogContent className="max-w-md overflow-hidden border-0 shadow-2xl rounded-2xl">
+          <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
+            <DialogTitle className="text-white font-display">Paramètres de synchronisation</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="px-6 py-5 space-y-5 overflow-y-auto max-h-[65vh]">
             <div>
               <Label className="text-sm">Chemin du répertoire local</Label>
               <Input value={workspace?.sync_folder_path || '~/MissionFlow/'} readOnly className="mt-1 bg-muted" />

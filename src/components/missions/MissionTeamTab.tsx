@@ -91,13 +91,13 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
       )}
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Ajouter un membre</DialogTitle>
+        <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
+          <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
+            <DialogTitle className="text-white">Ajouter un membre</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="px-6 py-5 space-y-5 overflow-y-auto max-h-[65vh]">
             <div>
-              <label className="text-sm font-medium">Utilisateur</label>
+              <label className="text-sm font-medium text-foreground/80">Utilisateur</label>
               <Select value={selectedUser} onValueChange={setSelectedUser}>
                 <SelectTrigger><SelectValue placeholder="Sélectionner un utilisateur" /></SelectTrigger>
                 <SelectContent>
@@ -110,7 +110,7 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium">Rôle</label>
+              <label className="text-sm font-medium text-foreground/80">Rôle</label>
               <Select value={selectedRole} onValueChange={setSelectedRole}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -120,12 +120,12 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setAddOpen(false)}>Annuler</Button>
-              <Button onClick={handleAdd} disabled={!selectedUser || addMember.isPending}>
-                {addMember.isPending ? 'Ajout...' : 'Ajouter'}
-              </Button>
-            </div>
+          </div>
+          <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setAddOpen(false)}>Annuler</Button>
+            <Button onClick={handleAdd} disabled={!selectedUser || addMember.isPending}>
+              {addMember.isPending ? 'Ajout...' : 'Ajouter'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
