@@ -686,7 +686,7 @@ export default function WorkspacePage() {
                           <TableCell />
                         </TableRow>
                       )}
-                      {filteredFiles.map(renderFileRow)}
+                      {sortedFiles.map(renderFileRow)}
                     </TableBody>
                   </Table>
                 )}
