@@ -40,79 +40,46 @@ export default function MeetingFormDialog({ open, onOpenChange, onSubmit, member
   const [participantSearch, setParticipantSearch] = useState('');
 
   const filteredMembers = members.filter(
-    (m) =>
-      !selectedParticipants.includes(m.id) &&
-      (m.full_name.toLowerCase().includes(participantSearch.toLowerCase()) ||
-        m.email.toLowerCase().includes(participantSearch.toLowerCase()))
+    (m) => !selectedParticipants.includes(m.id) &&
+      (m.full_name.toLowerCase().includes(participantSearch.toLowerCase()) || m.email.toLowerCase().includes(participantSearch.toLowerCase()))
   );
 
   const handleSubmit = () => {
-    if (!title.trim() || !date) {
-      toast.error('Veuillez remplir le titre et la date');
-      return;
-    }
+    if (!title.trim() || !date) { toast.error('Veuillez remplir le titre et la date'); return; }
     onSubmit({
-      title: title.trim(),
-      description: description.trim() || undefined,
-      scheduled_at: new Date(date).toISOString(),
-      duration_minutes: parseInt(duration),
-      type,
-      location: type === 'in_person' ? location : undefined,
-      recurrence,
-      participants: selectedParticipants,
+      title: title.trim(), description: description.trim() || undefined,
+      scheduled_at: new Date(date).toISOString(), duration_minutes: parseInt(duration),
+      type, location: type === 'in_person' ? location : undefined, recurrence, participants: selectedParticipants,
     });
   };
 
   const toggleParticipant = (id: string) => {
-    setSelectedParticipants((prev) =>
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
-    );
+    setSelectedParticipants((prev) => prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]);
   };
 
   const resetForm = () => {
-    setTitle('');
-    setDescription('');
-    setDate('');
-    setDuration('60');
-    setType('video');
-    setLocation('');
-    setRecurrence('none');
-    setSelectedParticipants([]);
-    setParticipantSearch('');
+    setTitle(''); setDescription(''); setDate(''); setDuration('60'); setType('video');
+    setLocation(''); setRecurrence('none'); setSelectedParticipants([]); setParticipantSearch('');
   };
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) resetForm(); onOpenChange(o); }}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Nouvelle réunion</DialogTitle>
         </DialogHeader>
 
-        <div className="px-6 py-5 space-y-5 overflow-y-auto max-h-[65vh]">
-          <div>
-            <Label>Titre *</Label>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Réunion d'équipe..." />
-          </div>
+        <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-accent/[0.03]">
+          <div><Label>Titre *</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Réunion d'équipe..." /></div>
+          <div><Label>Description / Ordre du jour</Label><Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder="Points à aborder..." /></div>
 
-          <div>
-            <Label>Description / Ordre du jour</Label>
-            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder="Points à aborder..." />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Date et heure *</Label>
-              <Input type="datetime-local" value={date} onChange={(e) => setDate(e.target.value)} />
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+            <div><Label>Date et heure *</Label><Input type="datetime-local" value={date} onChange={(e) => setDate(e.target.value)} /></div>
             <div>
               <Label>Durée</Label>
               <Select value={duration} onValueChange={setDuration}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {DURATIONS.map((d) => (
-                    <SelectItem key={d.value} value={String(d.value)}>{d.label}</SelectItem>
-                  ))}
-                </SelectContent>
+                <SelectContent>{DURATIONS.map((d) => (<SelectItem key={d.value} value={String(d.value)}>{d.label}</SelectItem>))}</SelectContent>
               </Select>
             </div>
           </div>
@@ -125,32 +92,15 @@ export default function MeetingFormDialog({ open, onOpenChange, onSubmit, member
                 { value: 'audio', label: 'Audio', icon: Phone },
                 { value: 'in_person', label: 'En personne', icon: MapPin },
               ].map((t) => (
-                <Button
-                  key={t.value}
-                  variant={type === t.value ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setType(t.value)}
-                  className="flex-1"
-                >
-                  <t.icon className="h-3.5 w-3.5 mr-1.5" />
-                  {t.label}
+                <Button key={t.value} variant={type === t.value ? 'default' : 'outline'} size="sm" onClick={() => setType(t.value)} className="flex-1">
+                  <t.icon className="h-3.5 w-3.5 mr-1.5" />{t.label}
                 </Button>
               ))}
             </div>
           </div>
 
-          {type === 'in_person' && (
-            <div>
-              <Label>Lieu</Label>
-              <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Salle de conférence..." />
-            </div>
-          )}
-
-          {type !== 'in_person' && (
-            <p className="text-xs text-muted-foreground">
-              Un lien Jitsi Meet sera généré automatiquement.
-            </p>
-          )}
+          {type === 'in_person' && (<div><Label>Lieu</Label><Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Salle de conférence..." /></div>)}
+          {type !== 'in_person' && (<p className="text-xs text-muted-foreground">Un lien Jitsi Meet sera généré automatiquement.</p>)}
 
           <div>
             <Label>Récurrence</Label>
@@ -174,43 +124,31 @@ export default function MeetingFormDialog({ open, onOpenChange, onSubmit, member
                   return (
                     <Badge key={id} variant="secondary" className="gap-1 pr-1">
                       {member?.full_name || 'Inconnu'}
-                      <button onClick={() => toggleParticipant(id)} className="ml-0.5 rounded-full hover:bg-muted p-0.5">
-                        <X className="h-3 w-3" />
-                      </button>
+                      <button onClick={() => toggleParticipant(id)} className="ml-0.5 rounded-full hover:bg-muted p-0.5"><X className="h-3 w-3" /></button>
                     </Badge>
                   );
                 })}
               </div>
             )}
-            <Input
-              value={participantSearch}
-              onChange={(e) => setParticipantSearch(e.target.value)}
-              placeholder="Rechercher un membre..."
-              className="mb-2"
-            />
-            <ScrollArea className="h-32 border rounded-md">
+            <Input value={participantSearch} onChange={(e) => setParticipantSearch(e.target.value)} placeholder="Rechercher un membre..." className="mb-2" />
+            <ScrollArea className="h-32 border border-border/50 rounded-md">
               <div className="p-2 space-y-1">
                 {filteredMembers.map((m) => (
                   <label key={m.id} className="flex items-center gap-2 p-1.5 rounded hover:bg-muted cursor-pointer text-sm">
-                    <Checkbox
-                      checked={selectedParticipants.includes(m.id)}
-                      onCheckedChange={() => toggleParticipant(m.id)}
-                    />
+                    <Checkbox checked={selectedParticipants.includes(m.id)} onCheckedChange={() => toggleParticipant(m.id)} />
                     <span className="flex-1">{m.full_name}</span>
                     {m.grade && <span className="text-xs text-muted-foreground">{m.grade}</span>}
                   </label>
                 ))}
-                {filteredMembers.length === 0 && (
-                  <p className="text-xs text-muted-foreground text-center py-4">Aucun membre trouvé</p>
-                )}
+                {filteredMembers.length === 0 && (<p className="text-xs text-muted-foreground text-center py-4">Aucun membre trouvé</p>)}
               </div>
             </ScrollArea>
           </div>
         </div>
 
-        <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
-          <Button variant="outline" onClick={() => { resetForm(); onOpenChange(false); }}>Annuler</Button>
-          <Button onClick={handleSubmit} disabled={isSubmitting}>
+        <div className="px-5 py-3 border-t border-border/40 bg-muted/30 flex items-center justify-end gap-2">
+          <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => { resetForm(); onOpenChange(false); }}>Annuler</Button>
+          <Button size="sm" className="h-9 px-5" onClick={handleSubmit} disabled={isSubmitting}>
             {isSubmitting ? 'Création...' : 'Créer la réunion'}
           </Button>
         </div>

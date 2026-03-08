@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCreateMission, useUpdateMission, useOrganizationUsers, useClients } from '@/hooks/useMissions';
 import { MISSION_TYPE_LABELS, CURRENCY_LABELS } from '@/types/database';
 import type { MissionType, Currency } from '@/types/database';
+import { Info, Users, Wallet, CalendarDays } from 'lucide-react';
 
 const missionSchema = z.object({
   name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères').max(200),
@@ -31,6 +32,15 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   mission?: any;
+}
+
+function SectionHeader({ icon: Icon, label }: { icon: any; label: string }) {
+  return (
+    <div className="text-xs font-bold text-primary uppercase tracking-wider pb-2 mb-3 border-b border-primary/15 flex items-center gap-2">
+      <Icon className="h-3.5 w-3.5" />
+      {label}
+    </div>
+  );
 }
 
 export default function MissionFormDialog({ open, onOpenChange, mission }: Props) {
@@ -77,44 +87,69 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle className="font-display">
+          <DialogTitle>
             {isEdit ? 'Modifier la mission' : 'Nouvelle mission'}
           </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="px-6 py-5 space-y-5 overflow-y-auto max-h-[65vh]">
+            <div className="px-5 py-4 space-y-4 overflow-y-auto max-h-[65vh] bg-accent/[0.03]">
               {/* Section: Informations générales */}
-              <div className="pl-4 border-l-2 border-primary/20 space-y-4">
-                <h4 className="text-sm font-bold text-primary uppercase tracking-wider mb-3">Informations générales</h4>
-                <FormField control={form.control} name="name" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nom de la mission *</FormLabel>
-                    <FormControl><Input placeholder="Audit des comptes 2025" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-
-                <FormField control={form.control} name="description" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl><Textarea placeholder="Description de la mission..." rows={3} {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField control={form.control} name="type" render={({ field }) => (
+              <div>
+                <SectionHeader icon={Info} label="Informations générales" />
+                <div className="space-y-3">
+                  <FormField control={form.control} name="name" render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Type de mission</FormLabel>
+                      <FormLabel>Nom de la mission *</FormLabel>
+                      <FormControl><Input placeholder="Audit des comptes 2025" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                    <FormField control={form.control} name="type" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Type de mission</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl><SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger></FormControl>
+                          <SelectContent>
+                            {Object.entries(MISSION_TYPE_LABELS).map(([key, label]) => (
+                              <SelectItem key={key} value={key}>{label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+
+                    <FormField control={form.control} name="priority" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Priorité</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                          <SelectContent>
+                            <SelectItem value="low">Basse</SelectItem>
+                            <SelectItem value="medium">Moyenne</SelectItem>
+                            <SelectItem value="high">Haute</SelectItem>
+                            <SelectItem value="urgent">Urgente</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
+
+                  <FormField control={form.control} name="client_id" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Client</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl><SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger></FormControl>
+                        <FormControl><SelectTrigger><SelectValue placeholder="Sélectionner un client" /></SelectTrigger></FormControl>
                         <SelectContent>
-                          {Object.entries(MISSION_TYPE_LABELS).map(([key, label]) => (
-                            <SelectItem key={key} value={key}>{label}</SelectItem>
+                          {clients.map((c: any) => (
+                            <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -122,45 +157,20 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
                     </FormItem>
                   )} />
 
-                  <FormField control={form.control} name="priority" render={({ field }) => (
+                  <FormField control={form.control} name="description" render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Priorité</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                        <SelectContent>
-                          <SelectItem value="low">Basse</SelectItem>
-                          <SelectItem value="medium">Moyenne</SelectItem>
-                          <SelectItem value="high">Haute</SelectItem>
-                          <SelectItem value="urgent">Urgente</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl><Textarea placeholder="Description de la mission..." rows={3} {...field} /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
                 </div>
-
-                <FormField control={form.control} name="client_id" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Client</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl><SelectTrigger><SelectValue placeholder="Sélectionner un client" /></SelectTrigger></FormControl>
-                      <SelectContent>
-                        {clients.map((c: any) => (
-                          <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )} />
               </div>
 
-              <div className="border-t border-border/30" />
-
               {/* Section: Équipe de direction */}
-              <div className="pl-4 border-l-2 border-primary/20 space-y-4">
-                <h4 className="text-sm font-bold text-primary uppercase tracking-wider mb-3">Équipe de direction</h4>
-                <div className="grid grid-cols-2 gap-4">
+              <div>
+                <SectionHeader icon={Users} label="Équipe de direction" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
                   <FormField control={form.control} name="director_id" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Directeur de Mission</FormLabel>
@@ -193,14 +203,12 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
                 </div>
               </div>
 
-              <div className="border-t border-border/30" />
-
               {/* Section: Budget */}
-              <div className="pl-4 border-l-2 border-primary/20 space-y-4">
-                <h4 className="text-sm font-bold text-primary uppercase tracking-wider mb-3">Budget</h4>
-                <div className="grid grid-cols-3 gap-4">
+              <div>
+                <SectionHeader icon={Wallet} label="Budget & Finance" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3">
                   <FormField control={form.control} name="budget_amount" render={({ field }) => (
-                    <FormItem className="col-span-2">
+                    <FormItem className="md:col-span-2">
                       <FormLabel>Montant</FormLabel>
                       <FormControl><Input type="number" placeholder="0" {...field} /></FormControl>
                       <FormMessage />
@@ -224,12 +232,10 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
                 </div>
               </div>
 
-              <div className="border-t border-border/30" />
-
               {/* Section: Planification */}
-              <div className="pl-4 border-l-2 border-primary/20 space-y-4">
-                <h4 className="text-sm font-bold text-primary uppercase tracking-wider mb-3">Planification</h4>
-                <div className="grid grid-cols-2 gap-4">
+              <div>
+                <SectionHeader icon={CalendarDays} label="Planification" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
                   <FormField control={form.control} name="start_date" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Date de début</FormLabel>
@@ -249,12 +255,14 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
               </div>
             </div>
 
-            <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <div className="px-5 py-3 border-t border-border/40 bg-muted/30 flex items-center justify-end gap-2">
+              <Button type="button" variant="outline" size="sm" className="h-9 px-4" onClick={() => onOpenChange(false)}>
                 Annuler
               </Button>
               <Button
                 type="submit"
+                size="sm"
+                className="h-9 px-5"
                 disabled={createMission.isPending || updateMission.isPending}
               >
                 {createMission.isPending || updateMission.isPending ? 'En cours...' : isEdit ? 'Mettre à jour' : 'Créer la mission'}
