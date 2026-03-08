@@ -17,6 +17,7 @@ import MissionBudgetTab from '@/components/missions/MissionBudgetTab';
 import MissionSettingsTab from '@/components/missions/MissionSettingsTab';
 import EmptyState from '@/components/common/EmptyState';
 import CopilTab from '@/components/copil/CopilTab';
+import MissionCalendarTab from '@/components/missions/MissionCalendarTab';
 import { FileText, Calendar } from 'lucide-react';
 
 const MissionDetailPage = () => {
