@@ -393,16 +393,15 @@ const GroupMailComposer = ({ committeeId, committeeName, missionName, canManage 
                 </Button>
               </div>
             </div>
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => { setComposeOpen(false); setEditEmail(null); }}>Annuler</Button>
-              <Button
-                onClick={editEmail ? handleEditResend : handleSend}
-                disabled={!form.body || sendEmail.isPending || createEmail.isPending}
-              >
-                <Send className="h-4 w-4 mr-2" />{sendEmail.isPending ? 'Envoi...' : editEmail ? 'Renvoyer' : 'Envoyer'}
-              </Button>
-            </div>
+          </div>
+          <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
+            <Button variant="outline" onClick={() => { setComposeOpen(false); setEditEmail(null); }}>Annuler</Button>
+            <Button
+              onClick={editEmail ? handleEditResend : handleSend}
+              disabled={!form.body || sendEmail.isPending || createEmail.isPending}
+            >
+              <Send className="h-4 w-4 mr-2" />{sendEmail.isPending ? 'Envoi...' : editEmail ? 'Renvoyer' : 'Envoyer'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
