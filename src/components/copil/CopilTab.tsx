@@ -71,7 +71,7 @@ const CopilTab = ({ missionId, missionName, canManage }: Props) => {
         <div className="flex items-center gap-3">
           {committees.length > 1 ? (
             <Select value={selected?.id} onValueChange={setSelectedId}>
-              <SelectTrigger className="w-[260px]">
+              <SelectTrigger className="w-[260px] text-gold font-bold">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
