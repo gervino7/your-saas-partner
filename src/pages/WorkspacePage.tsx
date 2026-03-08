@@ -4,7 +4,8 @@ import {
   HardDrive, Upload, FolderPlus, RefreshCw, Settings, ChevronRight,
   File, Folder, FolderOpen, Download, Trash2, Pencil, MoreHorizontal,
   AlertTriangle, Clock, CheckCircle2, XCircle, ArrowUpCircle, ArrowDownCircle,
-  Search, Info, Copy, Scissors, ClipboardPaste, Share2, Move, CheckSquare, Square
+  Search, Info, Copy, Scissors, ClipboardPaste, Share2, Move, CheckSquare, Square,
+  ArrowUp, ArrowDown, ChevronsUpDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
