@@ -60,9 +60,10 @@ interface TaskDetailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   projectLeadId?: string | null;
+  onEdit?: (task: any) => void;
 }
 
-export default function TaskDetailDialog({ task, open, onOpenChange, projectLeadId }: TaskDetailDialogProps) {
+export default function TaskDetailDialog({ task, open, onOpenChange, projectLeadId, onEdit }: TaskDetailDialogProps) {
   const profile = useAuthStore((s) => s.profile);
   const updateTask = useUpdateTask();
   const { data: submissions = [], isLoading: subsLoading } = useTaskSubmissions(task?.id);
