@@ -81,7 +81,7 @@ const CopilTab = ({ missionId, missionName, canManage }: Props) => {
               </SelectContent>
             </Select>
           ) : (
-            <h3 className="text-lg font-semibold">{selected?.name}</h3>
+            <h3 className="text-lg font-bold text-gold">{selected?.name}</h3>
           )}
           <Badge variant="outline">{selected?.type === 'copil' ? 'COPIL' : 'CODIR'}</Badge>
           <Badge variant="secondary">{FREQ_LABELS[selected?.meeting_frequency ?? 'monthly']}</Badge>
