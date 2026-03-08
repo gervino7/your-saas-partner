@@ -662,6 +662,7 @@ export default function WorkspacePage() {
                     {isOwnWorkspace && <p className="text-xs mt-1">Glissez-déposez des fichiers ici pour les ajouter</p>}
                   </div>
                 ) : (
+                  <div className="bg-card rounded-xl border border-border shadow-card overflow-hidden">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -715,6 +716,7 @@ export default function WorkspacePage() {
                       {sortedFiles.map(renderFileRow)}
                     </TableBody>
                   </Table>
+                  </div>
                 )}
               </div>
             </ContextMenuTrigger>
