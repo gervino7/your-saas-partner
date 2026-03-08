@@ -198,16 +198,18 @@ export default function DocumentExplorer({ missionId, projectId, activityId }: D
 
       {/* Upload dialog */}
       <Dialog open={showUpload} onOpenChange={setShowUpload}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="font-display">Uploader des documents</DialogTitle>
+        <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
+          <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
+            <DialogTitle className="text-white font-display">Uploader des documents</DialogTitle>
           </DialogHeader>
-          <UploadZone
-            folderId={selectedFolderId}
-            missionId={missionId}
-            projectId={projectId}
-            activityId={activityId}
-          />
+          <div className="px-6 py-5">
+            <UploadZone
+              folderId={selectedFolderId}
+              missionId={missionId}
+              projectId={projectId}
+              activityId={activityId}
+            />
+          </div>
         </DialogContent>
       </Dialog>
 
