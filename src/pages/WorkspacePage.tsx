@@ -712,15 +712,17 @@ export default function WorkspacePage() {
 
       {/* Rename dialog */}
       <Dialog open={!!renamingFile} onOpenChange={() => setRenamingFile(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="font-display">Renommer</DialogTitle>
+        <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
+          <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
+            <DialogTitle className="text-white font-display">Renommer</DialogTitle>
           </DialogHeader>
-          <Input value={renameValue} onChange={(e) => setRenameValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleRename()} autoFocus />
-          <DialogFooter>
+          <div className="px-6 py-5 space-y-5">
+            <Input value={renameValue} onChange={(e) => setRenameValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleRename()} autoFocus />
+          </div>
+          <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
             <Button variant="outline" onClick={() => setRenamingFile(null)}>Annuler</Button>
             <Button onClick={handleRename} disabled={!renameValue.trim()}>Renommer</Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 
