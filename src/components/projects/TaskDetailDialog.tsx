@@ -84,11 +84,11 @@ export default function TaskDetailDialog({ task, open, onOpenChange, projectLead
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1.5 flex-1">
-              <DialogTitle className="text-lg font-display">{task.title}</DialogTitle>
+              <DialogTitle className="text-base">{task.title}</DialogTitle>
               <div className="flex items-center gap-2 flex-wrap">
                 <Badge className={statusColors[status] ?? ''}>{TASK_STATUS_LABELS[status as keyof typeof TASK_STATUS_LABELS] ?? status}</Badge>
                 <Badge variant="outline" className={priorityColors[task.priority] ?? ''}>
@@ -412,7 +412,7 @@ function SubmitWorkDialog({ taskId, open, onClose, onSubmitted }: {
         <DialogHeader>
           <DialogTitle>Soumettre au chef de projet</DialogTitle>
         </DialogHeader>
-        <div className="px-6 py-5 space-y-5">
+        <div className="px-5 py-4 space-y-3 bg-accent/[0.03]">
           <div>
             <Label>Commentaire</Label>
             <Textarea
@@ -435,9 +435,9 @@ function SubmitWorkDialog({ taskId, open, onClose, onSubmitted }: {
             )}
           </div>
         </div>
-        <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
-          <Button variant="outline" onClick={onClose}>Annuler</Button>
-          <Button onClick={handleSubmit} disabled={uploading || createSubmission.isPending}>
+        <div className="px-5 py-3 border-t border-border/40 bg-muted/30 flex items-center justify-end gap-2">
+          <Button variant="outline" size="sm" className="h-9 px-4" onClick={onClose}>Annuler</Button>
+          <Button size="sm" className="h-9 px-5" onClick={handleSubmit} disabled={uploading || createSubmission.isPending}>
             {uploading ? 'Envoi...' : 'Envoyer'}
           </Button>
         </div>
@@ -472,7 +472,7 @@ function ValidateDialog({ taskId, open, onClose, onValidated }: {
         <DialogHeader>
           <DialogTitle>Valider et noter</DialogTitle>
         </DialogHeader>
-        <div className="px-6 py-5 space-y-5">
+        <div className="px-5 py-4 space-y-3 bg-accent/[0.03]">
           <div>
             <Label>Évaluation</Label>
             <div className="grid grid-cols-2 gap-2 mt-2">
@@ -506,9 +506,9 @@ function ValidateDialog({ taskId, open, onClose, onValidated }: {
             />
           </div>
         </div>
-        <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
-          <Button variant="outline" onClick={onClose}>Annuler</Button>
-          <Button onClick={handleValidate} disabled={createSubmission.isPending}>
+        <div className="px-5 py-3 border-t border-border/40 bg-muted/30 flex items-center justify-end gap-2">
+          <Button variant="outline" size="sm" className="h-9 px-4" onClick={onClose}>Annuler</Button>
+          <Button size="sm" className="h-9 px-5" onClick={handleValidate} disabled={createSubmission.isPending}>
             {createSubmission.isPending ? 'Validation...' : 'Valider et noter'}
           </Button>
         </div>
@@ -561,7 +561,7 @@ function RejectDialog({ taskId, open, onClose, onRejected }: {
         <DialogHeader>
           <DialogTitle>Renvoyer pour correction</DialogTitle>
         </DialogHeader>
-        <div className="px-6 py-5 space-y-5">
+        <div className="px-5 py-4 space-y-3 bg-accent/[0.03]">
           <div>
             <Label>Commentaires et amendements *</Label>
             <Textarea
@@ -581,13 +581,9 @@ function RejectDialog({ taskId, open, onClose, onRejected }: {
             />
           </div>
         </div>
-        <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
-          <Button variant="outline" onClick={onClose}>Annuler</Button>
-          <Button
-            variant="destructive"
-            onClick={handleReject}
-            disabled={!comment.trim() || uploading || createSubmission.isPending}
-          >
+        <div className="px-5 py-3 border-t border-border/40 bg-muted/30 flex items-center justify-end gap-2">
+          <Button variant="outline" size="sm" className="h-9 px-4" onClick={onClose}>Annuler</Button>
+          <Button variant="destructive" size="sm" className="h-9 px-5" onClick={handleReject} disabled={!comment.trim() || uploading || createSubmission.isPending}>
             {uploading ? 'Envoi...' : 'Renvoyer'}
           </Button>
         </div>

@@ -19,10 +19,7 @@ const ROLES = [
   { value: 'member', label: 'Membre' },
 ];
 
-interface Props {
-  committeeId: string;
-  canManage: boolean;
-}
+interface Props { committeeId: string; canManage: boolean; }
 
 const MembersList = ({ committeeId, canManage }: Props) => {
   const { data: members, isLoading } = useCommitteeMembers(committeeId);
@@ -36,17 +33,12 @@ const MembersList = ({ committeeId, canManage }: Props) => {
 
   const handleAddInternal = async () => {
     await addMember.mutateAsync({ committee_id: committeeId, user_id: internalForm.user_id, role: internalForm.role, is_external: false });
-    setInternalForm({ user_id: '', role: 'member' });
-    setOpen(false);
+    setInternalForm({ user_id: '', role: 'member' }); setOpen(false);
   };
 
   const handleAddExternal = async () => {
-    await addMember.mutateAsync({
-      committee_id: committeeId, is_external: true, role: externalForm.role,
-      external_name: externalForm.name, external_email: externalForm.email, external_phone: externalForm.phone,
-    });
-    setExternalForm({ name: '', email: '', phone: '', role: 'member' });
-    setOpen(false);
+    await addMember.mutateAsync({ committee_id: committeeId, is_external: true, role: externalForm.role, external_name: externalForm.name, external_email: externalForm.email, external_phone: externalForm.phone });
+    setExternalForm({ name: '', email: '', phone: '', role: 'member' }); setOpen(false);
   };
 
   const existingUserIds = new Set(members?.filter((m: any) => !m.is_external).map((m: any) => m.user_id));
@@ -58,56 +50,41 @@ const MembersList = ({ committeeId, canManage }: Props) => {
         <CardTitle className="text-lg">Membres du comité</CardTitle>
         {canManage && (
           <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm"><UserPlus className="h-4 w-4 mr-2" /> Ajouter</Button>
-            </DialogTrigger>
-            <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
-              <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
-                <DialogTitle className="text-white">Ajouter un membre</DialogTitle>
-              </DialogHeader>
-              <div className="px-6 py-5 space-y-5 overflow-y-auto max-h-[65vh]">
+            <DialogTrigger asChild><Button size="sm"><UserPlus className="h-4 w-4 mr-2" /> Ajouter</Button></DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader><DialogTitle>Ajouter un membre</DialogTitle></DialogHeader>
+              <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-accent/[0.03]">
                 <Tabs value={tab} onValueChange={setTab}>
                   <TabsList className="w-full">
                     <TabsTrigger value="internal" className="flex-1">Interne</TabsTrigger>
                     <TabsTrigger value="external" className="flex-1">Externe</TabsTrigger>
                   </TabsList>
-                  <TabsContent value="internal" className="space-y-4 mt-4">
-                    <div>
-                      <Label>Membre</Label>
+                  <TabsContent value="internal" className="space-y-3 mt-4">
+                    <div><Label>Membre</Label>
                       <Select value={internalForm.user_id} onValueChange={(v) => setInternalForm((p) => ({ ...p, user_id: v }))}>
                         <SelectTrigger><SelectValue placeholder="Sélectionner..." /></SelectTrigger>
-                        <SelectContent>
-                          {availableMembers?.map((m: any) => (
-                            <SelectItem key={m.id} value={m.id}>{m.full_name} ({m.grade})</SelectItem>
-                          ))}
-                        </SelectContent>
+                        <SelectContent>{availableMembers?.map((m: any) => (<SelectItem key={m.id} value={m.id}>{m.full_name} ({m.grade})</SelectItem>))}</SelectContent>
                       </Select>
                     </div>
-                    <div>
-                      <Label>Rôle</Label>
+                    <div><Label>Rôle</Label>
                       <Select value={internalForm.role} onValueChange={(v) => setInternalForm((p) => ({ ...p, role: v }))}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {ROLES.map((r) => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
-                        </SelectContent>
+                        <SelectContent>{ROLES.map((r) => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
-                    <Button onClick={handleAddInternal} disabled={!internalForm.user_id || addMember.isPending} className="w-full">Ajouter</Button>
+                    <Button size="sm" className="w-full h-9" onClick={handleAddInternal} disabled={!internalForm.user_id || addMember.isPending}>Ajouter</Button>
                   </TabsContent>
-                  <TabsContent value="external" className="space-y-4 mt-4">
+                  <TabsContent value="external" className="space-y-3 mt-4">
                     <div><Label>Nom</Label><Input value={externalForm.name} onChange={(e) => setExternalForm((p) => ({ ...p, name: e.target.value }))} /></div>
                     <div><Label>Email</Label><Input type="email" value={externalForm.email} onChange={(e) => setExternalForm((p) => ({ ...p, email: e.target.value }))} /></div>
                     <div><Label>Téléphone</Label><Input value={externalForm.phone} onChange={(e) => setExternalForm((p) => ({ ...p, phone: e.target.value }))} /></div>
-                    <div>
-                      <Label>Rôle</Label>
+                    <div><Label>Rôle</Label>
                       <Select value={externalForm.role} onValueChange={(v) => setExternalForm((p) => ({ ...p, role: v }))}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {ROLES.map((r) => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
-                        </SelectContent>
+                        <SelectContent>{ROLES.map((r) => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
-                    <Button onClick={handleAddExternal} disabled={!externalForm.name || !externalForm.email || addMember.isPending} className="w-full">Ajouter</Button>
+                    <Button size="sm" className="w-full h-9" onClick={handleAddExternal} disabled={!externalForm.name || !externalForm.email || addMember.isPending}>Ajouter</Button>
                   </TabsContent>
                 </Tabs>
               </div>
@@ -130,36 +107,16 @@ const MembersList = ({ committeeId, canManage }: Props) => {
             {members?.map((m: any) => (
               <TableRow key={m.id}>
                 <TableCell className="flex items-center gap-2">
-                  <Avatar className="h-7 w-7">
-                    <AvatarFallback className="text-xs">
-                      {(m.is_external ? m.external_name : m.profiles?.full_name)?.charAt(0) ?? '?'}
-                    </AvatarFallback>
-                  </Avatar>
+                  <Avatar className="h-7 w-7"><AvatarFallback className="text-xs">{(m.is_external ? m.external_name : m.profiles?.full_name)?.charAt(0) ?? '?'}</AvatarFallback></Avatar>
                   {m.is_external ? m.external_name : m.profiles?.full_name}
                 </TableCell>
-                <TableCell className="text-muted-foreground text-sm">
-                  {m.is_external ? m.external_email : m.profiles?.email}
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline">{ROLES.find((r) => r.value === m.role)?.label ?? m.role}</Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={m.is_external ? 'secondary' : 'default'} className="text-xs">
-                    {m.is_external ? 'Externe' : 'Interne'}
-                  </Badge>
-                </TableCell>
-                {canManage && (
-                  <TableCell>
-                    <Button variant="ghost" size="icon" onClick={() => removeMember.mutate({ id: m.id, committeeId })}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </TableCell>
-                )}
+                <TableCell className="text-muted-foreground text-sm">{m.is_external ? m.external_email : m.profiles?.email}</TableCell>
+                <TableCell><Badge variant="outline">{ROLES.find((r) => r.value === m.role)?.label ?? m.role}</Badge></TableCell>
+                <TableCell><Badge variant={m.is_external ? 'secondary' : 'default'} className="text-xs">{m.is_external ? 'Externe' : 'Interne'}</Badge></TableCell>
+                {canManage && (<TableCell><Button variant="ghost" size="icon" onClick={() => removeMember.mutate({ id: m.id, committeeId })}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>)}
               </TableRow>
             ))}
-            {(!members || members.length === 0) && (
-              <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Aucun membre</TableCell></TableRow>
-            )}
+            {(!members || members.length === 0) && (<TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Aucun membre</TableCell></TableRow>)}
           </TableBody>
         </Table>
       </CardContent>

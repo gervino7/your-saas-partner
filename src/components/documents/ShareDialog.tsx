@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -27,12 +28,7 @@ export default function ShareDialog({ doc, open, onClose }: Props) {
     queryKey: ['org_users', profile?.organization_id],
     enabled: !!profile?.organization_id && open,
     queryFn: async () => {
-      const { data } = await supabase
-        .from('profiles')
-        .select('id, full_name, email')
-        .eq('organization_id', profile!.organization_id!)
-        .neq('id', profile!.id)
-        .order('full_name');
+      const { data } = await supabase.from('profiles').select('id, full_name, email').eq('organization_id', profile!.organization_id!).neq('id', profile!.id).order('full_name');
       return data || [];
     },
   });
@@ -41,10 +37,7 @@ export default function ShareDialog({ doc, open, onClose }: Props) {
     queryKey: ['doc_shares', doc?.id],
     enabled: !!doc?.id && open,
     queryFn: async () => {
-      const { data } = await supabase
-        .from('document_shares')
-        .select('*, shared_user:profiles!document_shares_shared_with_fkey(full_name)')
-        .eq('document_id', doc!.id);
+      const { data } = await supabase.from('document_shares').select('*, shared_user:profiles!document_shares_shared_with_fkey(full_name)').eq('document_id', doc!.id);
       return data || [];
     },
   });
@@ -52,54 +45,30 @@ export default function ShareDialog({ doc, open, onClose }: Props) {
   const addShare = useMutation({
     mutationFn: async () => {
       if (!selectedUserId || !doc) return;
-      const { error } = await supabase.from('document_shares').insert({
-        document_id: doc.id,
-        shared_with: selectedUserId,
-        shared_by: profile!.id,
-        permission,
-      });
+      const { error } = await supabase.from('document_shares').insert({ document_id: doc.id, shared_with: selectedUserId, shared_by: profile!.id, permission });
       if (error) throw error;
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['doc_shares', doc?.id] });
-      toast({ title: 'Partage ajouté' });
-      setSelectedUserId('');
-    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['doc_shares', doc?.id] }); toast({ title: 'Partage ajouté' }); setSelectedUserId(''); },
   });
 
-  const filteredUsers = orgUsers.filter(
-    (u: any) => u.full_name?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredUsers = orgUsers.filter((u: any) => u.full_name?.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-display flex items-center gap-2">
-            <Share2 className="h-5 w-5" /> Partager — {doc?.name}
+          <DialogTitle className="flex items-center gap-2">
+            <Share2 className="h-4 w-4" /> Partager — {doc?.name}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="px-6 py-5 space-y-5">
-          <div className="flex gap-2">
-            <Input
-              placeholder="Rechercher un utilisateur..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="flex-1"
-            />
-          </div>
+        <div className="px-5 py-4 space-y-3 bg-accent/[0.03]">
+          <div><Label>Rechercher un utilisateur</Label><Input placeholder="Rechercher..." value={search} onChange={(e) => setSearch(e.target.value)} /></div>
 
           {search && filteredUsers.length > 0 && (
-            <div className="max-h-32 overflow-y-auto border rounded-md">
+            <div className="max-h-32 overflow-y-auto border border-border/50 rounded-md">
               {filteredUsers.map((u: any) => (
-                <div
-                  key={u.id}
-                  className={`flex items-center justify-between px-3 py-2 hover:bg-muted cursor-pointer text-sm ${
-                    selectedUserId === u.id ? 'bg-accent/10' : ''
-                  }`}
-                  onClick={() => { setSelectedUserId(u.id); setSearch(u.full_name); }}
-                >
+                <div key={u.id} className={`flex items-center justify-between px-3 py-2 hover:bg-muted cursor-pointer text-sm ${selectedUserId === u.id ? 'bg-primary/5' : ''}`} onClick={() => { setSelectedUserId(u.id); setSearch(u.full_name); }}>
                   <span>{u.full_name}</span>
                 </div>
               ))}
@@ -108,18 +77,14 @@ export default function ShareDialog({ doc, open, onClose }: Props) {
 
           <div className="flex gap-2">
             <Select value={permission} onValueChange={setPermission}>
-              <SelectTrigger className="w-32">
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="read">Lecture</SelectItem>
                 <SelectItem value="write">Écriture</SelectItem>
                 <SelectItem value="admin">Admin</SelectItem>
               </SelectContent>
             </Select>
-            <Button onClick={() => addShare.mutate()} disabled={!selectedUserId}>
-              Partager
-            </Button>
+            <Button size="sm" className="h-9" onClick={() => addShare.mutate()} disabled={!selectedUserId}>Partager</Button>
           </div>
 
           {shares.length > 0 && (
