@@ -170,18 +170,18 @@ const ClientPortalPage = () => {
           </div>
 
           {/* Mission Card */}
-          <div className="rounded-2xl p-6 shadow-lg" style={{ background: 'hsla(0,0%,100%,0.12)', backdropFilter: 'blur(16px)', border: '1px solid hsla(0,0%,100%,0.18)' }}>
+          <div className="rounded-2xl p-6 shadow-xl" style={{ background: 'hsla(40,30%,97%,0.95)', backdropFilter: 'blur(16px)', border: '1px solid hsla(40,40%,88%,0.6)' }}>
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
-                <Award className="h-4 w-4" style={{ color: 'hsla(43,95%,85%,0.9)' }} />
-                <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'hsla(0,0%,100%,0.55)' }}>Mission en cours</span>
+                <Award className="h-4 w-4" style={{ color: 'hsl(35,85%,48%)' }} />
+                <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'hsl(35,30%,45%)' }}>Mission en cours</span>
               </div>
-              <span className="text-3xl font-extrabold text-white tabular-nums">{progress}<span className="text-lg">%</span></span>
+              <span className="text-3xl font-extrabold tabular-nums" style={{ color: 'hsl(30,80%,40%)' }}>{progress}<span className="text-lg">%</span></span>
             </div>
-            <h2 className="text-xl font-bold text-white font-display mb-4">{missionData?.name}</h2>
+            <h2 className="text-xl font-bold font-display mb-4" style={{ color: 'hsl(218,35%,15%)' }}>{missionData?.name}</h2>
 
             {/* Progress bar */}
-            <div className="w-full rounded-full h-3.5 overflow-hidden mb-1" style={{ background: 'hsla(0,0%,100%,0.12)' }}>
+            <div className="w-full rounded-full h-3.5 overflow-hidden mb-1" style={{ background: 'hsl(40,25%,90%)' }}>
               <div
                 className="h-full rounded-full transition-all duration-1000 ease-out"
                 style={{
@@ -189,14 +189,14 @@ const ClientPortalPage = () => {
                   background: progress >= 80
                     ? 'linear-gradient(90deg, hsl(152 56% 42%), hsl(152 56% 52%))'
                     : progress >= 40
-                      ? 'linear-gradient(90deg, hsl(43 95% 50%), hsl(43 95% 65%))'
+                      ? 'linear-gradient(90deg, hsl(35 90% 48%), hsl(43 95% 55%))'
                       : 'linear-gradient(90deg, hsl(30 90% 48%), hsl(30 90% 58%))',
-                  boxShadow: '0 0 12px hsla(43,95%,60%,0.3)',
+                  boxShadow: '0 0 10px hsla(43,90%,55%,0.25)',
                 }}
               />
             </div>
             {missionData?.description && (
-              <p className="text-sm mt-3 line-clamp-2" style={{ color: 'hsla(0,0%,100%,0.6)' }}>{missionData.description}</p>
+              <p className="text-sm mt-3 line-clamp-2" style={{ color: 'hsl(218,15%,50%)' }}>{missionData.description}</p>
             )}
 
             {/* Quick stats */}
@@ -209,11 +209,11 @@ const ClientPortalPage = () => {
                 <div
                   key={stat.label}
                   className="text-center rounded-xl py-3 px-2"
-                  style={{ background: 'hsla(0,0%,100%,0.08)', border: '1px solid hsla(0,0%,100%,0.1)' }}
+                  style={{ background: 'hsl(40,30%,94%)', border: '1px solid hsl(40,25%,88%)' }}
                 >
-                  <stat.icon className="h-4 w-4 mx-auto mb-1.5" style={{ color: 'hsla(43,95%,80%,0.8)' }} />
-                  <p className="text-2xl font-extrabold text-white tabular-nums">{stat.value}</p>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider mt-0.5" style={{ color: 'hsla(0,0%,100%,0.5)' }}>{stat.label}</p>
+                  <stat.icon className="h-4 w-4 mx-auto mb-1.5" style={{ color: 'hsl(35,80%,48%)' }} />
+                  <p className="text-2xl font-extrabold tabular-nums" style={{ color: 'hsl(218,35%,15%)' }}>{stat.value}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider mt-0.5" style={{ color: 'hsl(218,10%,55%)' }}>{stat.label}</p>
                 </div>
               ))}
             </div>
