@@ -4,7 +4,8 @@ import {
   HardDrive, Upload, FolderPlus, RefreshCw, Settings, ChevronRight,
   File, Folder, FolderOpen, Download, Trash2, Pencil, MoreHorizontal,
   AlertTriangle, Clock, CheckCircle2, XCircle, ArrowUpCircle, ArrowDownCircle,
-  Search, Info, Copy, Scissors, ClipboardPaste, Share2, Move, CheckSquare, Square
+  Search, Info, Copy, Scissors, ClipboardPaste, Share2, Move, CheckSquare, Square,
+  ArrowUp, ArrowDown, ChevronsUpDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -58,6 +59,8 @@ const syncStatusConfig: Record<string, { label: string; icon: any; color: string
 };
 
 type ClipboardMode = 'copy' | 'cut' | null;
+type SortField = 'name' | 'size' | 'modified' | 'sync';
+type SortDir = 'asc' | 'desc';
 
 export default function WorkspacePage() {
   const { userId } = useParams<{ userId?: string }>();
@@ -89,6 +92,10 @@ export default function WorkspacePage() {
   // Move dialog
   const [showMoveDialog, setShowMoveDialog] = useState(false);
   const [moveTarget, setMoveTarget] = useState('/');
+
+  // Sort state
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortDir, setSortDir] = useState<SortDir>('asc');
 
   const { data: files = [], isLoading: filesLoading } = useWorkspaceFiles(workspace?.id, currentPath);
   const { data: pendingFiles = [] } = useWorkspacePendingFiles(workspace?.id);
@@ -156,6 +163,49 @@ export default function WorkspacePage() {
   const filteredFiles = search
     ? files.filter(f => f.file_name.toLowerCase().includes(search.toLowerCase()))
     : files;
+
+  // Sort logic: folders first, then by selected field
+  const toggleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDir('asc');
+    }
+  };
+
+  const sortedFiles = [...filteredFiles].sort((a, b) => {
+    // Folders always first
+    if (a.is_folder && !b.is_folder) return -1;
+    if (!a.is_folder && b.is_folder) return 1;
+
+    let cmp = 0;
+    switch (sortField) {
+      case 'name':
+        cmp = a.file_name.localeCompare(b.file_name, 'fr', { sensitivity: 'base' });
+        break;
+      case 'size':
+        cmp = (a.file_size || 0) - (b.file_size || 0);
+        break;
+      case 'modified': {
+        const da = new Date(a.last_modified_remote || a.updated_at || 0).getTime();
+        const db = new Date(b.last_modified_remote || b.updated_at || 0).getTime();
+        cmp = da - db;
+        break;
+      }
+      case 'sync':
+        cmp = (a.sync_status || '').localeCompare(b.sync_status || '');
+        break;
+    }
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) return <ChevronsUpDown className="h-3 w-3 ml-1 opacity-40" />;
+    return sortDir === 'asc'
+      ? <ArrowUp className="h-3 w-3 ml-1 text-primary" />
+      : <ArrowDown className="h-3 w-3 ml-1 text-primary" />;
+  };
 
   const settings = workspace?.settings || {};
 
@@ -600,10 +650,26 @@ export default function WorkspacePage() {
                             onCheckedChange={selectAll}
                           />
                         </TableHead>
-                        <TableHead>Nom</TableHead>
-                        <TableHead className="hidden sm:table-cell">Taille</TableHead>
-                        <TableHead className="hidden md:table-cell">Modifié</TableHead>
-                        <TableHead className="hidden md:table-cell">Sync</TableHead>
+                        <TableHead>
+                          <button className="flex items-center font-semibold hover:text-primary transition-colors" onClick={() => toggleSort('name')}>
+                            Nom <SortIcon field="name" />
+                          </button>
+                        </TableHead>
+                        <TableHead className="hidden sm:table-cell">
+                          <button className="flex items-center font-semibold hover:text-primary transition-colors" onClick={() => toggleSort('size')}>
+                            Taille <SortIcon field="size" />
+                          </button>
+                        </TableHead>
+                        <TableHead className="hidden md:table-cell">
+                          <button className="flex items-center font-semibold hover:text-primary transition-colors" onClick={() => toggleSort('modified')}>
+                            Modifié <SortIcon field="modified" />
+                          </button>
+                        </TableHead>
+                        <TableHead className="hidden md:table-cell">
+                          <button className="flex items-center font-semibold hover:text-primary transition-colors" onClick={() => toggleSort('sync')}>
+                            Sync <SortIcon field="sync" />
+                          </button>
+                        </TableHead>
                         <TableHead className="w-10" />
                       </TableRow>
                     </TableHeader>
@@ -620,7 +686,7 @@ export default function WorkspacePage() {
                           <TableCell />
                         </TableRow>
                       )}
-                      {filteredFiles.map(renderFileRow)}
+                      {sortedFiles.map(renderFileRow)}
                     </TableBody>
                   </Table>
                 )}
