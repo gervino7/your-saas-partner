@@ -84,11 +84,11 @@ export default function TaskDetailDialog({ task, open, onOpenChange, projectLead
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1.5 flex-1">
-              <DialogTitle className="text-lg font-display">{task.title}</DialogTitle>
+              <DialogTitle className="text-base">{task.title}</DialogTitle>
               <div className="flex items-center gap-2 flex-wrap">
                 <Badge className={statusColors[status] ?? ''}>{TASK_STATUS_LABELS[status as keyof typeof TASK_STATUS_LABELS] ?? status}</Badge>
                 <Badge variant="outline" className={priorityColors[task.priority] ?? ''}>
