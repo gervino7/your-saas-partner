@@ -89,7 +89,7 @@ const SatisfactionSurveyPage = () => {
       nps_score: form.nps_score,
       comments: form.comments || null,
       submitted_at: new Date().toISOString(),
-    }).eq('id', survey.id);
+    }).eq('token', token!);
 
     if (error) { toast.error('Erreur lors de la soumission'); return; }
     setSubmitted(true);
