@@ -25,7 +25,7 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   missionId: string;
-  project?: any; // existing project for edit mode
+  project?: any;
 }
 
 export default function ProjectFormDialog({ open, onOpenChange, missionId, project }: Props) {
@@ -90,71 +90,73 @@ export default function ProjectFormDialog({ open, onOpenChange, missionId, proje
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="font-display">{isEdit ? 'Modifier le projet' : 'Nouveau projet'}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField control={form.control} name="name" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nom du projet *</FormLabel>
-                <FormControl><Input placeholder="Revue des processus comptables" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-
-            <FormField control={form.control} name="description" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl><Textarea placeholder="Description du projet..." rows={3} {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-
-            <FormField control={form.control} name="lead_id" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Chef de projet</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl><SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger></FormControl>
-                  <SelectContent>
-                    {leads.map((u: any) => (
-                      <SelectItem key={u.id} value={u.id}>{u.full_name} ({u.grade})</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )} />
-
-            <FormField control={form.control} name="budget_allocated" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Budget alloué (FCFA)</FormLabel>
-                <FormControl><Input type="number" placeholder="0" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField control={form.control} name="start_date" render={({ field }) => (
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <div className="px-6 py-5 space-y-5 overflow-y-auto max-h-[65vh]">
+              <FormField control={form.control} name="name" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Date de début</FormLabel>
-                  <FormControl><Input type="date" {...field} /></FormControl>
+                  <FormLabel>Nom du projet *</FormLabel>
+                  <FormControl><Input placeholder="Revue des processus comptables" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
 
-              <FormField control={form.control} name="end_date" render={({ field }) => (
+              <FormField control={form.control} name="description" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Date de fin</FormLabel>
-                  <FormControl><Input type="date" {...field} /></FormControl>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl><Textarea placeholder="Description du projet..." rows={3} {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
+
+              <FormField control={form.control} name="lead_id" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Chef de projet</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger></FormControl>
+                    <SelectContent>
+                      {leads.map((u: any) => (
+                        <SelectItem key={u.id} value={u.id}>{u.full_name} ({u.grade})</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="budget_allocated" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Budget alloué (FCFA)</FormLabel>
+                  <FormControl><Input type="number" placeholder="0" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField control={form.control} name="start_date" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Date de début</FormLabel>
+                    <FormControl><Input type="date" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                <FormField control={form.control} name="end_date" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Date de fin</FormLabel>
+                    <FormControl><Input type="date" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-4">
+            <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Annuler
               </Button>

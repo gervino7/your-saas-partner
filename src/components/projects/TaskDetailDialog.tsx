@@ -84,7 +84,7 @@ export default function TaskDetailDialog({ task, open, onOpenChange, projectLead
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1.5 flex-1">
@@ -117,7 +117,7 @@ export default function TaskDetailDialog({ task, open, onOpenChange, projectLead
         </DialogHeader>
 
         {/* Action buttons */}
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap px-6">
           {isAssignee && status === 'todo' && (
             <Button size="sm" onClick={handleStart} disabled={updateTask.isPending}>
               <Play className="h-4 w-4 mr-1" /> Démarrer
@@ -140,7 +140,7 @@ export default function TaskDetailDialog({ task, open, onOpenChange, projectLead
           )}
         </div>
 
-        <Tabs defaultValue="details" className="mt-2">
+        <Tabs defaultValue="details" className="mt-2 px-6 pb-5">
           <TabsList className="w-full justify-start">
             <TabsTrigger value="details" className="gap-1"><FileText className="h-3.5 w-3.5" /> Détails</TabsTrigger>
             <TabsTrigger value="submissions" className="gap-1"><History className="h-3.5 w-3.5" /> Soumissions</TabsTrigger>
@@ -412,7 +412,7 @@ function SubmitWorkDialog({ taskId, open, onClose, onSubmitted }: {
         <DialogHeader>
           <DialogTitle>Soumettre au chef de projet</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <div className="px-6 py-5 space-y-5">
           <div>
             <Label>Commentaire</Label>
             <Textarea
@@ -434,12 +434,12 @@ function SubmitWorkDialog({ taskId, open, onClose, onSubmitted }: {
               <p className="text-xs text-muted-foreground mt-1">{files.length} fichier(s) sélectionné(s)</p>
             )}
           </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>Annuler</Button>
-            <Button onClick={handleSubmit} disabled={uploading || createSubmission.isPending}>
-              {uploading ? 'Envoi...' : 'Envoyer'}
-            </Button>
-          </div>
+        </div>
+        <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
+          <Button variant="outline" onClick={onClose}>Annuler</Button>
+          <Button onClick={handleSubmit} disabled={uploading || createSubmission.isPending}>
+            {uploading ? 'Envoi...' : 'Envoyer'}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -472,7 +472,7 @@ function ValidateDialog({ taskId, open, onClose, onValidated }: {
         <DialogHeader>
           <DialogTitle>Valider et noter</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <div className="px-6 py-5 space-y-5">
           <div>
             <Label>Évaluation</Label>
             <div className="grid grid-cols-2 gap-2 mt-2">
@@ -505,12 +505,12 @@ function ValidateDialog({ taskId, open, onClose, onValidated }: {
               rows={3}
             />
           </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>Annuler</Button>
-            <Button onClick={handleValidate} disabled={createSubmission.isPending}>
-              {createSubmission.isPending ? 'Validation...' : 'Valider et noter'}
-            </Button>
-          </div>
+        </div>
+        <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
+          <Button variant="outline" onClick={onClose}>Annuler</Button>
+          <Button onClick={handleValidate} disabled={createSubmission.isPending}>
+            {createSubmission.isPending ? 'Validation...' : 'Valider et noter'}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -561,7 +561,7 @@ function RejectDialog({ taskId, open, onClose, onRejected }: {
         <DialogHeader>
           <DialogTitle>Renvoyer pour correction</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <div className="px-6 py-5 space-y-5">
           <div>
             <Label>Commentaires et amendements *</Label>
             <Textarea
@@ -580,16 +580,16 @@ function RejectDialog({ taskId, open, onClose, onRejected }: {
               className="mt-1"
             />
           </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>Annuler</Button>
-            <Button
-              variant="destructive"
-              onClick={handleReject}
-              disabled={!comment.trim() || uploading || createSubmission.isPending}
-            >
-              {uploading ? 'Envoi...' : 'Renvoyer'}
-            </Button>
-          </div>
+        </div>
+        <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
+          <Button variant="outline" onClick={onClose}>Annuler</Button>
+          <Button
+            variant="destructive"
+            onClick={handleReject}
+            disabled={!comment.trim() || uploading || createSubmission.isPending}
+          >
+            {uploading ? 'Envoi...' : 'Renvoyer'}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

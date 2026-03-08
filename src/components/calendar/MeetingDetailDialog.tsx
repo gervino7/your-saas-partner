@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -20,12 +20,6 @@ interface MeetingDetailDialogProps {
   onDelete?: (meetingId: string) => void;
   members?: { id: string; full_name: string }[];
 }
-
-const typeIcons: Record<string, any> = {
-  video: Video,
-  audio: Phone,
-  in_person: MapPin,
-};
 
 const eventTypeLabels: Record<string, string> = {
   meeting: 'Réunion',
@@ -76,7 +70,7 @@ export default function MeetingDetailDialog({ open, onOpenChange, event, onRespo
           </div>
         </DialogHeader>
 
-        <div className="space-y-3">
+        <div className="px-6 py-5 space-y-3">
           <div className="flex items-center gap-2 text-sm">
             <CalendarDays className="h-4 w-4 text-muted-foreground" />
             <span>{format(event.start, "EEEE d MMMM yyyy", { locale: fr })}</span>
@@ -119,7 +113,6 @@ export default function MeetingDetailDialog({ open, onOpenChange, event, onRespo
                 </div>
               </div>
 
-              {/* Respond buttons */}
               {myParticipation && !isOrganizer && onRespond && (
                 <>
                   <Separator />
@@ -144,7 +137,6 @@ export default function MeetingDetailDialog({ open, onOpenChange, event, onRespo
                 </>
               )}
 
-              {/* Join button */}
               {meetingLink && meta.type !== 'in_person' && (
                 <>
                   <Separator />
@@ -159,7 +151,6 @@ export default function MeetingDetailDialog({ open, onOpenChange, event, onRespo
                 </>
               )}
 
-              {/* Post-meeting summary */}
               {isPast && isOrganizer && (
                 <>
                   <Separator />
@@ -186,11 +177,11 @@ export default function MeetingDetailDialog({ open, onOpenChange, event, onRespo
         </div>
 
         {isOrganizer && onDelete && (
-          <DialogFooter>
+          <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
             <Button variant="destructive" size="sm" onClick={() => { onDelete(meta.id); onOpenChange(false); }}>
               Supprimer
             </Button>
-          </DialogFooter>
+          </div>
         )}
       </DialogContent>
     </Dialog>

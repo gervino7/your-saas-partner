@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Shield } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useCreateCommittee, useMissionMembers } from '@/hooks/useCommittees';
 
 interface Props {
@@ -41,7 +40,7 @@ const CommitteeSetup = ({ missionId, canManage }: Props) => {
         <DialogHeader>
           <DialogTitle>Nouveau comité</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <div className="px-6 py-5 space-y-5">
           <div>
             <Label>Type</Label>
             <Select value={form.type} onValueChange={(v) => setForm((p) => ({ ...p, type: v }))}>
@@ -85,7 +84,10 @@ const CommitteeSetup = ({ missionId, canManage }: Props) => {
             <Label>Description</Label>
             <Textarea value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} />
           </div>
-          <Button onClick={handleSubmit} disabled={!form.name || create.isPending} className="w-full">
+        </div>
+        <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
+          <Button variant="outline" onClick={() => setOpen(false)}>Annuler</Button>
+          <Button onClick={handleSubmit} disabled={!form.name || create.isPending}>
             {create.isPending ? 'Création...' : 'Créer le comité'}
           </Button>
         </div>
