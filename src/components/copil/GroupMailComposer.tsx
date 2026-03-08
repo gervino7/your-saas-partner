@@ -353,7 +353,7 @@ const GroupMailComposer = ({ committeeId, committeeName, missionName, canManage 
           <DialogHeader>
             <DialogTitle>{editEmail ? 'Modifier et renvoyer' : `Envoyer au ${committeeName}`}</DialogTitle>
           </DialogHeader>
-          <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-accent/[0.03]">
+          <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-amber-50/70 dark:bg-amber-950/10">
             <div>
               <Label>Destinataires ({recipients.length})</Label>
               <div className="flex flex-wrap gap-1 mt-1 p-2 border rounded-md bg-muted/50 max-h-24 overflow-y-auto">
