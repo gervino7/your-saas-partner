@@ -716,7 +716,7 @@ export default function WorkspacePage() {
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
             <DialogTitle className="text-white font-display">Renommer</DialogTitle>
           </DialogHeader>
-          <div className="px-6 py-5 space-y-5">
+          <div className="px-5 py-4 space-y-3 bg-amber-50/70 dark:bg-amber-950/10">
             <Input value={renameValue} onChange={(e) => setRenameValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleRename()} autoFocus />
           </div>
           <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
