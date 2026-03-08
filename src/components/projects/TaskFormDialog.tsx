@@ -47,7 +47,7 @@ function SectionHeader({ icon: Icon, label }: { icon: any; label: string }) {
   );
 }
 
-export default function TaskFormDialog({ open, onOpenChange, projectId, members, activities, tasks, editingTask }: TaskFormDialogProps) {
+export default function TaskFormDialog({ open, onOpenChange, projectId, members, activities, tasks, taskToEdit }: TaskFormDialogProps) {
   const createTask = useCreateTask();
   const updateTask = useUpdateTask();
   const isEditing = !!editingTask;
