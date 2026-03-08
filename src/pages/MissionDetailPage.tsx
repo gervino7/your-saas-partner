@@ -124,11 +124,7 @@ const MissionDetailPage = () => {
         </TabsContent>
 
         <TabsContent value="calendar" className="mt-6">
-          <EmptyState
-            icon={Calendar}
-            title="Calendrier"
-            description="Le calendrier de la mission sera implémenté prochainement."
-          />
+          <MissionCalendarTab missionId={mission.id} />
         </TabsContent>
 
         <TabsContent value="budget" className="mt-6">
