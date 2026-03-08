@@ -205,15 +205,17 @@ export default function ClientSatisfactionTab({ clientId }: { clientId: string }
 
       {/* Send survey dialog */}
       <Dialog open={sendOpen} onOpenChange={setSendOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Envoyer une enquête de satisfaction</DialogTitle>
+        <DialogContent className="max-w-md p-0 rounded-2xl shadow-2xl overflow-hidden">
+          <DialogHeader className="bg-amber-600 dark:bg-amber-700 px-6 py-4 rounded-t-2xl">
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Send className="h-5 w-5" /> Envoyer une enquête de satisfaction
+            </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label>Mission *</Label>
+          <div className="px-6 py-5 space-y-4">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">Mission *</Label>
               <Select value={selectedMissionId} onValueChange={setSelectedMissionId}>
-                <SelectTrigger>
+                <SelectTrigger className="h-11 border-2 border-border/40 bg-white dark:bg-card">
                   <SelectValue placeholder="Sélectionner une mission..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -230,14 +232,14 @@ export default function ClientSatisfactionTab({ clientId }: { clientId: string }
               </Select>
             </div>
 
-            <div>
-              <Label>Nom du destinataire</Label>
-              <Input value={contactName} onChange={e => setContactName(e.target.value)} placeholder="Nom du contact client" />
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">Nom du destinataire</Label>
+              <Input className="h-11 border-2 border-border/40 bg-white dark:bg-card" value={contactName} onChange={e => setContactName(e.target.value)} placeholder="Nom du contact client" />
             </div>
 
-            <div>
-              <Label>Email du destinataire *</Label>
-              <Input type="email" value={contactEmail} onChange={e => setContactEmail(e.target.value)} placeholder="email@client.com" />
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">Email du destinataire *</Label>
+              <Input className="h-11 border-2 border-border/40 bg-white dark:bg-card" type="email" value={contactEmail} onChange={e => setContactEmail(e.target.value)} placeholder="email@client.com" />
               {(contacts ?? []).length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-2">
                   {(contacts ?? []).filter((c: any) => c.email).map((c: any) => (
@@ -256,8 +258,8 @@ export default function ClientSatisfactionTab({ clientId }: { clientId: string }
             </div>
 
             {lastSurveyLink && (
-              <div className="bg-muted/50 rounded-lg p-3 space-y-2">
-                <p className="text-sm font-medium text-success">✓ Enquête créée et email envoyé</p>
+              <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 rounded-xl p-3 space-y-2">
+                <p className="text-sm font-medium text-amber-700 dark:text-amber-400">✓ Enquête créée et email envoyé</p>
                 <div className="flex items-center gap-2">
                   <Input value={lastSurveyLink} readOnly className="text-xs" />
                   <Button variant="outline" size="icon" onClick={copyLink}><Copy className="h-4 w-4" /></Button>
@@ -266,16 +268,15 @@ export default function ClientSatisfactionTab({ clientId }: { clientId: string }
                 <p className="text-xs text-muted-foreground">Vous pouvez partager ce lien directement si l'email n'arrive pas.</p>
               </div>
             )}
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setSendOpen(false)}>Fermer</Button>
-              {!lastSurveyLink && (
-                <Button onClick={handleSend} disabled={sending || !selectedMissionId || !contactEmail}>
-                  <Send className="h-4 w-4 mr-2" />
-                  {sending ? 'Envoi...' : 'Envoyer'}
-                </Button>
-              )}
-            </div>
+          </div>
+          <div className="bg-muted/30 border-t px-6 py-4 flex justify-end gap-2 rounded-b-2xl">
+            <Button variant="outline" className="rounded-xl" onClick={() => setSendOpen(false)}>Fermer</Button>
+            {!lastSurveyLink && (
+              <Button className="rounded-xl shadow-md bg-amber-600 hover:bg-amber-700 text-white" onClick={handleSend} disabled={sending || !selectedMissionId || !contactEmail}>
+                <Send className="h-4 w-4 mr-2" />
+                {sending ? 'Envoi...' : 'Envoyer'}
+              </Button>
+            )}
           </div>
         </DialogContent>
       </Dialog>
