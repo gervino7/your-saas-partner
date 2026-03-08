@@ -716,6 +716,7 @@ export default function WorkspacePage() {
                       {sortedFiles.map(renderFileRow)}
                     </TableBody>
                   </Table>
+                  </div>
                 )}
               </div>
             </ContextMenuTrigger>
