@@ -131,35 +131,35 @@ const ClientPortalPage = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Header */}
-      <header className="relative overflow-hidden" style={{ background: 'var(--gradient-hero)' }}>
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-primary blur-3xl translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-accent blur-3xl -translate-x-1/2 translate-y-1/2" />
+      <header className="relative overflow-hidden" style={{ background: 'linear-gradient(135deg, hsl(30 90% 48%) 0%, hsl(43 95% 55%) 40%, hsl(45 60% 75%) 70%, hsl(0 0% 95%) 100%)' }}>
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2" style={{ background: 'hsl(43 95% 60%)' }} />
+          <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2" style={{ background: 'hsl(30 90% 50%)' }} />
         </div>
 
         <div className="relative max-w-6xl mx-auto px-6 py-8">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center">
-                <Building2 className="h-6 w-6 text-primary-foreground" />
+              <div className="w-12 h-12 rounded-xl border flex items-center justify-center" style={{ background: 'hsla(0,0%,100%,0.2)', borderColor: 'hsla(0,0%,100%,0.3)' }}>
+                <Building2 className="h-6 w-6 text-white" />
               </div>
               <div>
-                <p className="text-sm text-primary-foreground/60 font-medium">Portail Client</p>
-                <h1 className="text-2xl font-bold font-display text-primary-foreground">{clientData?.name}</h1>
+                <p className="text-sm font-medium" style={{ color: 'hsla(0,0%,100%,0.75)' }}>Portail Client</p>
+                <h1 className="text-2xl font-bold font-display text-white">{clientData?.name}</h1>
               </div>
             </div>
-            <Badge className="bg-primary/20 text-primary-foreground border-primary/30 text-sm px-3 py-1">
+            <Badge className="text-sm px-3 py-1" style={{ background: 'hsla(0,0%,100%,0.2)', color: 'white', borderColor: 'hsla(0,0%,100%,0.3)' }}>
               {missionData?.code}
             </Badge>
           </div>
 
           {/* Mission info bar */}
-          <div className="mt-8 bg-card/10 backdrop-blur-sm rounded-2xl border border-primary-foreground/10 p-6">
+          <div className="mt-8 backdrop-blur-sm rounded-2xl p-6" style={{ background: 'hsla(0,0%,100%,0.15)', borderWidth: 1, borderColor: 'hsla(0,0%,100%,0.2)' }}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-primary-foreground font-display">{missionData?.name}</h2>
-              <span className="text-2xl font-bold text-primary-foreground">{progress}%</span>
+              <h2 className="text-lg font-semibold text-white font-display">{missionData?.name}</h2>
+              <span className="text-2xl font-bold text-white">{progress}%</span>
             </div>
-            <div className="w-full bg-primary-foreground/10 rounded-full h-3 overflow-hidden">
+            <div className="w-full rounded-full h-3 overflow-hidden" style={{ background: 'hsla(0,0%,100%,0.2)' }}>
               <div
                 className="h-full rounded-full transition-all duration-700 ease-out"
                 style={{
@@ -167,28 +167,28 @@ const ClientPortalPage = () => {
                   background: progress >= 80
                     ? 'hsl(var(--success))'
                     : progress >= 40
-                      ? 'hsl(var(--primary))'
-                      : 'hsl(var(--accent))',
+                      ? 'hsl(43 95% 55%)'
+                      : 'hsl(30 90% 50%)',
                 }}
               />
             </div>
             {missionData?.description && (
-              <p className="text-sm text-primary-foreground/60 mt-3 line-clamp-2">{missionData.description}</p>
+              <p className="text-sm mt-3 line-clamp-2" style={{ color: 'hsla(0,0%,100%,0.65)' }}>{missionData.description}</p>
             )}
 
             {/* Quick stats */}
             <div className="grid grid-cols-3 gap-4 mt-6">
               <div className="text-center">
-                <p className="text-2xl font-bold text-primary-foreground">{projects.length}</p>
-                <p className="text-xs text-primary-foreground/50 mt-1">Projets</p>
+                <p className="text-2xl font-bold text-white">{projects.length}</p>
+                <p className="text-xs mt-1" style={{ color: 'hsla(0,0%,100%,0.55)' }}>Projets</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-primary-foreground">{completedProjects}</p>
-                <p className="text-xs text-primary-foreground/50 mt-1">Terminés</p>
+                <p className="text-2xl font-bold text-white">{completedProjects}</p>
+                <p className="text-xs mt-1" style={{ color: 'hsla(0,0%,100%,0.55)' }}>Terminés</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-primary-foreground">{documents.length}</p>
-                <p className="text-xs text-primary-foreground/50 mt-1">Livrables</p>
+                <p className="text-2xl font-bold text-white">{documents.length}</p>
+                <p className="text-xs mt-1" style={{ color: 'hsla(0,0%,100%,0.55)' }}>Livrables</p>
               </div>
             </div>
           </div>
