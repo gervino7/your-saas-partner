@@ -140,7 +140,7 @@ export default function TaskDetailDialog({ task, open, onOpenChange, projectLead
           )}
         </div>
 
-        <Tabs defaultValue="details" className="mt-2">
+        <Tabs defaultValue="details" className="mt-2 px-6 pb-5">
           <TabsList className="w-full justify-start">
             <TabsTrigger value="details" className="gap-1"><FileText className="h-3.5 w-3.5" /> Détails</TabsTrigger>
             <TabsTrigger value="submissions" className="gap-1"><History className="h-3.5 w-3.5" /> Soumissions</TabsTrigger>
