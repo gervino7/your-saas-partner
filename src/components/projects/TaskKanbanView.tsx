@@ -101,6 +101,7 @@ export default function TaskKanbanView({ tasks, projectLeadId, onEditTask }: { t
       open={!!selectedTask}
       onOpenChange={(open) => !open && setSelectedTask(null)}
       projectLeadId={projectLeadId}
+      onEdit={onEditTask}
     />
     </>
   );
