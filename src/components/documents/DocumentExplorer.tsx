@@ -202,7 +202,7 @@ export default function DocumentExplorer({ missionId, projectId, activityId }: D
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
             <DialogTitle className="text-white font-display">Uploader des documents</DialogTitle>
           </DialogHeader>
-          <div className="px-5 py-4 bg-amber-50/70 dark:bg-amber-950/10">
+          <div className="px-5 py-4 dialog-form-bg">
             <UploadZone
               folderId={selectedFolderId}
               missionId={missionId}
