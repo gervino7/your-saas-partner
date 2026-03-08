@@ -800,6 +800,50 @@ export type Database = {
           },
         ]
       }
+      copil_access_tokens: {
+        Row: {
+          committee_id: string
+          created_at: string | null
+          email: string
+          id: string
+          otp_code: string
+          otp_expires_at: string
+          session_expires_at: string | null
+          session_token: string | null
+          verified: boolean | null
+        }
+        Insert: {
+          committee_id: string
+          created_at?: string | null
+          email: string
+          id?: string
+          otp_code: string
+          otp_expires_at: string
+          session_expires_at?: string | null
+          session_token?: string | null
+          verified?: boolean | null
+        }
+        Update: {
+          committee_id?: string
+          created_at?: string | null
+          email?: string
+          id?: string
+          otp_code?: string
+          otp_expires_at?: string
+          session_expires_at?: string | null
+          session_token?: string | null
+          verified?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "copil_access_tokens_committee_id_fkey"
+            columns: ["committee_id"]
+            isOneToOne: false
+            referencedRelation: "committees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_rates: {
         Row: {
           created_at: string | null
@@ -1061,6 +1105,7 @@ export type Database = {
         Row: {
           activity_id: string | null
           checksum: string | null
+          committee_id: string | null
           created_at: string | null
           file_path: string
           file_size: number | null
@@ -1083,6 +1128,7 @@ export type Database = {
         Insert: {
           activity_id?: string | null
           checksum?: string | null
+          committee_id?: string | null
           created_at?: string | null
           file_path: string
           file_size?: number | null
@@ -1105,6 +1151,7 @@ export type Database = {
         Update: {
           activity_id?: string | null
           checksum?: string | null
+          committee_id?: string | null
           created_at?: string | null
           file_path?: string
           file_size?: number | null
@@ -1130,6 +1177,13 @@ export type Database = {
             columns: ["activity_id"]
             isOneToOne: false
             referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_committee_id_fkey"
+            columns: ["committee_id"]
+            isOneToOne: false
+            referencedRelation: "committees"
             referencedColumns: ["id"]
           },
           {
