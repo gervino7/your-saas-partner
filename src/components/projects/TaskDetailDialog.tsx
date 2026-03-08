@@ -84,7 +84,7 @@ export default function TaskDetailDialog({ task, open, onOpenChange, projectLead
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1.5 flex-1">
