@@ -177,7 +177,7 @@ export default function MeetingDetailDialog({ open, onOpenChange, event, onRespo
         </div>
 
         {isOrganizer && onDelete && (
-          <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
+          <div className="px-5 py-3 border-t border-amber-200/40 bg-amber-50/40 dark:border-border/40 dark:bg-muted/20 flex justify-end gap-3">
             <Button variant="destructive" size="sm" onClick={() => { onDelete(meta.id); onOpenChange(false); }}>
               Supprimer
             </Button>
