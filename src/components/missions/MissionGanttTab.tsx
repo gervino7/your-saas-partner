@@ -52,21 +52,30 @@ function useGanttData(missionId: string) {
   return useQuery({
     queryKey: ['gantt-data', missionId],
     queryFn: async () => {
-      const [projectsRes, activitiesRes, tasksRes] = await Promise.all([
-        supabase
-          .from('projects')
-          .select('id, name, code, status, start_date, end_date, progress, mission_id')
-          .eq('mission_id', missionId)
-          .order('created_at'),
+      // First fetch projects
+      const projectsRes = await supabase
+        .from('projects')
+        .select('id, name, code, status, start_date, end_date, progress, mission_id')
+        .eq('mission_id', missionId)
+        .order('created_at');
+
+      const projectIds = projectsRes.data?.map(p => p.id) ?? [];
+
+      if (projectIds.length === 0) {
+        return { projects: projectsRes.data ?? [], activities: [], tasks: [] };
+      }
+
+      // Then fetch activities and tasks in parallel
+      const [activitiesRes, tasksRes] = await Promise.all([
         supabase
           .from('activities')
           .select('id, name, code, status, planned_start_date, planned_end_date, actual_start_date, actual_end_date, progress, project_id, parent_id, depth')
-          .in('project_id', (await supabase.from('projects').select('id').eq('mission_id', missionId)).data?.map(p => p.id) ?? [])
+          .in('project_id', projectIds)
           .order('order_index'),
         supabase
           .from('tasks')
           .select('id, title, status, priority, start_date, due_date, project_id, activity_id')
-          .in('project_id', (await supabase.from('projects').select('id').eq('mission_id', missionId)).data?.map(p => p.id) ?? [])
+          .in('project_id', projectIds)
           .order('order_index'),
       ]);
 

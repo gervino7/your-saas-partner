@@ -140,9 +140,10 @@ export function useCreateTask() {
 
 export function useUpdateTask() {
   const queryClient = useQueryClient();
+  const profile = useAuthStore((s) => s.profile);
 
   return useMutation({
-    mutationFn: async ({ id, ...values }: { id: string; [key: string]: any }) => {
+    mutationFn: async ({ id, assigned_to, ...values }: { id: string; assigned_to?: string[]; [key: string]: any }) => {
       const { data, error } = await supabase
         .from('tasks')
         .update(values)
@@ -150,6 +151,22 @@ export function useUpdateTask() {
         .select()
         .single();
       if (error) throw error;
+
+      // Handle reassignment if assigned_to is provided
+      if (assigned_to !== undefined && profile) {
+        // Remove existing assignments
+        await supabase.from('task_assignments').delete().eq('task_id', id);
+        // Insert new assignments
+        if (assigned_to.length > 0) {
+          const assignments = assigned_to.map((userId) => ({
+            task_id: id,
+            user_id: userId,
+            assigned_by: profile.id,
+          }));
+          await supabase.from('task_assignments').insert(assignments);
+        }
+      }
+
       return data;
     },
     onSuccess: (data) => {
