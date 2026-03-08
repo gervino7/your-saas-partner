@@ -31,6 +31,7 @@ import FinancePage from '@/pages/FinancePage';
 import CRMPage from '@/pages/CRMPage';
 import ClientDetailPage from '@/pages/ClientDetailPage';
 import ClientPortalPage from '@/pages/ClientPortalPage';
+import CopilPortalPage from '@/pages/CopilPortalPage';
 import SatisfactionSurveyPage from '@/pages/SatisfactionSurveyPage';
 import NotificationsPage from '@/pages/NotificationsPage';
 import NotFound from '@/pages/NotFound';
