@@ -50,13 +50,25 @@ function formatDate(d: string | null) {
   return format(new Date(d), 'dd MMM yyyy HH:mm', { locale: fr });
 }
 
-const syncStatusConfig: Record<string, { label: string; icon: any; color: string }> = {
-  synced: { label: 'Synchronisé', icon: CheckCircle2, color: 'text-emerald-500' },
-  pending_upload: { label: 'En attente d\'upload', icon: ArrowUpCircle, color: 'text-amber-500' },
-  pending_download: { label: 'En attente de téléchargement', icon: ArrowDownCircle, color: 'text-blue-500' },
-  conflict: { label: 'Conflit', icon: AlertTriangle, color: 'text-destructive' },
-  error: { label: 'Erreur', icon: XCircle, color: 'text-destructive' },
+const syncStatusConfig: Record<string, { label: string; icon: any; color: string; bg: string }> = {
+  synced: { label: 'Synchronisé', icon: CheckCircle2, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30' },
+  pending_upload: { label: 'Upload en attente', icon: ArrowUpCircle, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/30' },
+  pending_download: { label: 'Téléchargement', icon: ArrowDownCircle, color: 'text-primary', bg: 'bg-primary/5' },
+  conflict: { label: 'Conflit', icon: AlertTriangle, color: 'text-destructive', bg: 'bg-destructive/5' },
+  error: { label: 'Erreur', icon: XCircle, color: 'text-destructive', bg: 'bg-destructive/5' },
 };
+
+function getFileIcon(fileName: string, isFolder: boolean) {
+  if (isFolder) return { icon: Folder, color: 'text-primary', bg: 'bg-primary/10' };
+  const ext = fileName.split('.').pop()?.toLowerCase() || '';
+  if (['pdf'].includes(ext)) return { icon: File, color: 'text-red-500 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-950/30' };
+  if (['doc', 'docx', 'odt', 'rtf'].includes(ext)) return { icon: File, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/30' };
+  if (['xls', 'xlsx', 'csv', 'ods'].includes(ext)) return { icon: File, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30' };
+  if (['ppt', 'pptx', 'odp'].includes(ext)) return { icon: File, color: 'text-orange-500 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-950/30' };
+  if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(ext)) return { icon: File, color: 'text-violet-500 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-950/30' };
+  if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) return { icon: File, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/30' };
+  return { icon: File, color: 'text-muted-foreground', bg: 'bg-muted/50' };
+}
 
 type ClipboardMode = 'copy' | 'cut' | null;
 type SortField = 'name' | 'size' | 'modified' | 'sync';
