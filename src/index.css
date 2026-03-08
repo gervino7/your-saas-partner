@@ -122,4 +122,10 @@
   .dark .dialog-form-bg {
     background: hsl(218 22% 13%);
   }
+  .dialog-footer-bg {
+    background: linear-gradient(180deg, hsl(43 80% 87%) 0%, hsl(40 75% 84%) 100%);
+  }
+  .dark .dialog-footer-bg {
+    background: hsl(218 22% 11%);
+  }
 }
