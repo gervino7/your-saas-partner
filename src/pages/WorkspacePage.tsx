@@ -50,13 +50,25 @@ function formatDate(d: string | null) {
   return format(new Date(d), 'dd MMM yyyy HH:mm', { locale: fr });
 }
 
-const syncStatusConfig: Record<string, { label: string; icon: any; color: string }> = {
-  synced: { label: 'Synchronisé', icon: CheckCircle2, color: 'text-emerald-500' },
-  pending_upload: { label: 'En attente d\'upload', icon: ArrowUpCircle, color: 'text-amber-500' },
-  pending_download: { label: 'En attente de téléchargement', icon: ArrowDownCircle, color: 'text-blue-500' },
-  conflict: { label: 'Conflit', icon: AlertTriangle, color: 'text-destructive' },
-  error: { label: 'Erreur', icon: XCircle, color: 'text-destructive' },
+const syncStatusConfig: Record<string, { label: string; icon: any; color: string; bg: string }> = {
+  synced: { label: 'Synchronisé', icon: CheckCircle2, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30' },
+  pending_upload: { label: 'Upload en attente', icon: ArrowUpCircle, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/30' },
+  pending_download: { label: 'Téléchargement', icon: ArrowDownCircle, color: 'text-primary', bg: 'bg-primary/5' },
+  conflict: { label: 'Conflit', icon: AlertTriangle, color: 'text-destructive', bg: 'bg-destructive/5' },
+  error: { label: 'Erreur', icon: XCircle, color: 'text-destructive', bg: 'bg-destructive/5' },
 };
+
+function getFileIcon(fileName: string, isFolder: boolean) {
+  if (isFolder) return { icon: Folder, color: 'text-primary', bg: 'bg-primary/10' };
+  const ext = fileName.split('.').pop()?.toLowerCase() || '';
+  if (['pdf'].includes(ext)) return { icon: File, color: 'text-red-500 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-950/30' };
+  if (['doc', 'docx', 'odt', 'rtf'].includes(ext)) return { icon: File, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/30' };
+  if (['xls', 'xlsx', 'csv', 'ods'].includes(ext)) return { icon: File, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30' };
+  if (['ppt', 'pptx', 'odp'].includes(ext)) return { icon: File, color: 'text-orange-500 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-950/30' };
+  if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(ext)) return { icon: File, color: 'text-violet-500 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-950/30' };
+  if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) return { icon: File, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/30' };
+  return { icon: File, color: 'text-muted-foreground', bg: 'bg-muted/50' };
+}
 
 type ClipboardMode = 'copy' | 'cut' | null;
 type SortField = 'name' | 'size' | 'modified' | 'sync';
@@ -334,16 +346,18 @@ export default function WorkspacePage() {
     const isSelected = selectedIds.has(file.id);
     const isDragOver = dragOverId === file.id;
     const isCut = clipboard.mode === 'cut' && clipboard.files.some(f => f.id === file.id);
+    const fileStyle = getFileIcon(file.file_name, !!file.is_folder);
+    const FileIcon = fileStyle.icon;
 
     const rowContent = (
       <TableRow
         key={file.id}
         className={cn(
-          'transition-colors',
+          'transition-all duration-150 group/row',
           file.is_folder && 'cursor-pointer',
-          isSelected && 'bg-accent/10',
-          isDragOver && file.is_folder && 'bg-accent/20 ring-2 ring-accent ring-inset',
-          isCut && 'opacity-50'
+          isSelected && 'bg-primary/[0.06] hover:bg-primary/[0.09]',
+          isDragOver && file.is_folder && 'bg-primary/10 ring-2 ring-primary/30 ring-inset',
+          isCut && 'opacity-40'
         )}
         draggable={isOwnWorkspace}
         onDragStart={(e) => handleDragStart(e, file)}
@@ -367,31 +381,38 @@ export default function WorkspacePage() {
           />
         </TableCell>
         <TableCell>
-          <div className="flex items-center gap-2">
-            {file.is_folder ? (
-              <Folder className="h-4 w-4 text-accent shrink-0" />
-            ) : (
-              <File className="h-4 w-4 text-muted-foreground shrink-0" />
-            )}
-            <span className="truncate">{file.file_name}</span>
+          <div className="flex items-center gap-2.5">
+            <div className={cn('flex items-center justify-center h-8 w-8 rounded-lg shrink-0', fileStyle.bg)}>
+              <FileIcon className={cn('h-4 w-4', fileStyle.color)} />
+            </div>
+            <div className="min-w-0">
+              <span className={cn('truncate block font-medium text-sm', file.is_folder && 'text-primary')}>
+                {file.file_name}
+              </span>
+              {!file.is_folder && (
+                <span className="text-[11px] text-muted-foreground uppercase tracking-wider">
+                  {file.file_name.split('.').pop()}
+                </span>
+              )}
+            </div>
           </div>
         </TableCell>
-        <TableCell className="hidden sm:table-cell text-muted-foreground text-sm">
+        <TableCell className="hidden sm:table-cell text-muted-foreground text-sm tabular-nums">
           {file.is_folder ? '—' : formatFileSize(file.file_size || 0)}
         </TableCell>
-        <TableCell className="hidden md:table-cell text-muted-foreground text-sm">
+        <TableCell className="hidden md:table-cell text-muted-foreground text-sm tabular-nums">
           {formatDate(file.last_modified_remote || file.updated_at)}
         </TableCell>
         <TableCell className="hidden md:table-cell">
-          <span className={`flex items-center gap-1 text-xs ${sync.color}`}>
-            <SyncIcon className="h-3.5 w-3.5" /> {sync.label}
+          <span className={cn('inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full', sync.color, sync.bg)}>
+            <SyncIcon className="h-3 w-3" /> {sync.label}
           </span>
         </TableCell>
         <TableCell onClick={(e) => e.stopPropagation()}>
           {isOwnWorkspace ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7">
+                <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover/row:opacity-100 transition-opacity">
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -675,10 +696,15 @@ export default function WorkspacePage() {
                     </TableHeader>
                     <TableBody>
                       {currentPath !== '/' && (
-                        <TableRow className="cursor-pointer hover:bg-accent/5" onClick={navigateUp}>
+                        <TableRow className="cursor-pointer hover:bg-primary/[0.03]" onClick={navigateUp}>
                           <TableCell />
-                          <TableCell className="flex items-center gap-2 text-muted-foreground">
-                            <FolderOpen className="h-4 w-4" /> ..
+                          <TableCell>
+                            <div className="flex items-center gap-2.5">
+                              <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-muted/60 shrink-0">
+                                <FolderOpen className="h-4 w-4 text-muted-foreground" />
+                              </div>
+                              <span className="text-muted-foreground font-medium">..</span>
+                            </div>
                           </TableCell>
                           <TableCell className="hidden sm:table-cell" />
                           <TableCell className="hidden md:table-cell" />
