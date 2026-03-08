@@ -11,6 +11,7 @@ import TaskTableView from './TaskTableView';
 import TaskGroupedView from './TaskCompartmentView';
 import TaskFormDialog from './TaskFormDialog';
 import EmptyState from '@/components/common/EmptyState';
+import ProjectGanttView from './ProjectGanttView';
 
 type ViewMode = 'kanban' | 'table' | 'compartment' | 'assignee' | 'gantt';
 
@@ -108,7 +109,7 @@ export default function TasksTab({ projectId }: { projectId: string }) {
           {view === 'table' && <TaskTableView tasks={filteredTasks} projectLeadId={projectLeadId} />}
           {view === 'compartment' && <TaskGroupedView tasks={filteredTasks} groupBy="compartment" />}
           {view === 'assignee' && <TaskGroupedView tasks={filteredTasks} groupBy="assignee" />}
-          {view === 'gantt' && <GanttPlaceholder />}
+          {view === 'gantt' && <ProjectGanttView tasks={filteredTasks} activities={activities} />}
         </>
       )}
 
@@ -124,14 +125,3 @@ export default function TasksTab({ projectId }: { projectId: string }) {
   );
 }
 
-function GanttPlaceholder() {
-  return (
-    <div className="flex items-center justify-center h-64 border rounded-lg bg-muted/20">
-      <div className="text-center text-muted-foreground">
-        <BarChart3 className="h-12 w-12 mx-auto mb-3 opacity-30" />
-        <p className="text-sm font-medium">Vue Gantt</p>
-        <p className="text-xs">Bientôt disponible</p>
-      </div>
-    </div>
-  );
-}

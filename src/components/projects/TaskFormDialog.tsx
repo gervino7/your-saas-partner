@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -55,6 +55,21 @@ export default function TaskFormDialog({ open, onOpenChange, projectId, members,
     resolver: zodResolver(schema),
     defaultValues: { status: 'todo', priority: 'medium', assigned_to: [] },
   });
+
+  const assignableMembers = useMemo(() => {
+    const seen = new Set<string>();
+    return members
+      .map((member: any) => {
+        const id = member.user?.id ?? member.user_id ?? '';
+        const name = member.user?.full_name ?? member.user?.email ?? `Utilisateur ${id.slice(0, 8)}`;
+        return { id, name };
+      })
+      .filter((member: { id: string }) => {
+        if (!member.id || seen.has(member.id)) return false;
+        seen.add(member.id);
+        return true;
+      });
+  }, [members]);
 
   useEffect(() => {
     if (editingTask && open) {
@@ -220,35 +235,41 @@ export default function TaskFormDialog({ open, onOpenChange, projectId, members,
                     )} />
                   )}
 
-                  {members.length > 0 && (
-                    <FormField control={form.control} name="assigned_to" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Assigné à</FormLabel>
-                        <div className="flex flex-wrap gap-2 p-2 border border-border/50 rounded-md min-h-[40px] bg-white dark:bg-background">
-                          {members.map((m: any) => {
-                            const selected = field.value?.includes(m.user?.id);
+                  <FormField control={form.control} name="assigned_to" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Assigner à</FormLabel>
+                      {assignableMembers.length > 0 ? (
+                        <div className="flex flex-wrap gap-2 p-2 border border-border rounded-md min-h-[44px] bg-card">
+                          {assignableMembers.map((member) => {
+                            const selected = field.value?.includes(member.id);
                             return (
                               <button
                                 type="button"
-                                key={m.user?.id}
+                                key={member.id}
                                 onClick={() => {
-                                  const id = m.user?.id;
-                                  if (selected) field.onChange(field.value.filter((v: string) => v !== id));
-                                  else field.onChange([...(field.value || []), id]);
+                                  if (selected) field.onChange((field.value || []).filter((value: string) => value !== member.id));
+                                  else field.onChange([...(field.value || []), member.id]);
                                 }}
-                                className={`px-2 py-1 rounded-full text-xs transition-colors ${
-                                  selected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                                }`}
+                                className={cn(
+                                  'px-2.5 py-1 rounded-full text-xs border transition-colors cursor-pointer',
+                                  selected
+                                    ? 'bg-primary text-primary-foreground border-primary'
+                                    : 'bg-card text-foreground border-border hover:bg-accent'
+                                )}
                               >
-                                {m.user?.full_name}
+                                {member.name}
                               </button>
                             );
                           })}
                         </div>
-                        <FormMessage />
-                      </FormItem>
-                    )} />
-                  )}
+                      ) : (
+                        <div className="p-3 rounded-md border border-dashed border-border text-xs text-muted-foreground bg-muted/20">
+                          Aucun membre assignable trouvé. Ajoutez des membres dans l'onglet Équipe.
+                        </div>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )} />
                 </div>
               </div>
             </div>
@@ -265,3 +286,4 @@ export default function TaskFormDialog({ open, onOpenChange, projectId, members,
     </Dialog>
   );
 }
+
