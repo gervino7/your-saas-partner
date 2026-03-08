@@ -207,6 +207,8 @@ export default function WorkspacePage() {
       : <ArrowDown className="h-3 w-3 ml-1 text-primary" />;
   };
 
+  const settings = workspace?.settings || {};
+
   // Selection helpers
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => {
