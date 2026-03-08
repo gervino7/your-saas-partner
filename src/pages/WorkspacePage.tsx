@@ -164,7 +164,48 @@ export default function WorkspacePage() {
     ? files.filter(f => f.file_name.toLowerCase().includes(search.toLowerCase()))
     : files;
 
-  const settings = workspace?.settings || {};
+  // Sort logic: folders first, then by selected field
+  const toggleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDir('asc');
+    }
+  };
+
+  const sortedFiles = [...filteredFiles].sort((a, b) => {
+    // Folders always first
+    if (a.is_folder && !b.is_folder) return -1;
+    if (!a.is_folder && b.is_folder) return 1;
+
+    let cmp = 0;
+    switch (sortField) {
+      case 'name':
+        cmp = a.file_name.localeCompare(b.file_name, 'fr', { sensitivity: 'base' });
+        break;
+      case 'size':
+        cmp = (a.file_size || 0) - (b.file_size || 0);
+        break;
+      case 'modified': {
+        const da = new Date(a.last_modified_remote || a.updated_at || 0).getTime();
+        const db = new Date(b.last_modified_remote || b.updated_at || 0).getTime();
+        cmp = da - db;
+        break;
+      }
+      case 'sync':
+        cmp = (a.sync_status || '').localeCompare(b.sync_status || '');
+        break;
+    }
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) return <ChevronsUpDown className="h-3 w-3 ml-1 opacity-40" />;
+    return sortDir === 'asc'
+      ? <ArrowUp className="h-3 w-3 ml-1 text-primary" />
+      : <ArrowDown className="h-3 w-3 ml-1 text-primary" />;
+  };
 
   // Selection helpers
   const toggleSelect = (id: string) => {
