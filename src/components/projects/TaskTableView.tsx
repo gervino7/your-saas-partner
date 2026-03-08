@@ -94,6 +94,7 @@ export default function TaskTableView({ tasks, projectLeadId, onEditTask }: { ta
       open={!!selectedTask}
       onOpenChange={(open) => !open && setSelectedTask(null)}
       projectLeadId={projectLeadId}
+      onEdit={onEditTask}
     />
     </>
   );
