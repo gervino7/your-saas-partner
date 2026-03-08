@@ -70,7 +70,7 @@ export default function MeetingDetailDialog({ open, onOpenChange, event, onRespo
           </div>
         </DialogHeader>
 
-        <div className="px-5 py-4 space-y-3 bg-amber-50/70 dark:bg-amber-950/10">
+        <div className="px-5 py-4 space-y-3 dialog-form-bg">
           <div className="flex items-center gap-2 text-sm">
             <CalendarDays className="h-4 w-4 text-muted-foreground" />
             <span>{format(event.start, "EEEE d MMMM yyyy", { locale: fr })}</span>

@@ -36,7 +36,7 @@ export default function ClientFormDialog({ open, onOpenChange }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader><DialogTitle>Nouveau client</DialogTitle></DialogHeader>
-        <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-amber-50/70 dark:bg-amber-950/10">
+        <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] dialog-form-bg">
           <div>
             <SectionHeader icon={Info} label="Informations générales" />
             <div className="space-y-3">
