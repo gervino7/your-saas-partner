@@ -141,7 +141,7 @@ export default function AdminUsers() {
       <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Inviter un collaborateur</DialogTitle></DialogHeader>
-          <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-accent/[0.03]">
+          <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-amber-50/70 dark:bg-amber-950/10">
             <div><Label>Email</Label><Input type="email" placeholder="nom@cabinet.com" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} /></div>
             <div><Label>Grade</Label>
               <Select value={inviteGrade} onValueChange={(v) => setInviteGrade(v as Grade)}>
