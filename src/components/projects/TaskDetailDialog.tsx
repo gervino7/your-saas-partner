@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import {
   FileText, History, Paperclip, Activity, Play, Send, Check, RotateCcw,
-  Star, Upload, Download, Clock, User,
+  Star, Upload, Download, Clock, User, Pencil,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -60,9 +60,10 @@ interface TaskDetailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   projectLeadId?: string | null;
+  onEdit?: (task: any) => void;
 }
 
-export default function TaskDetailDialog({ task, open, onOpenChange, projectLeadId }: TaskDetailDialogProps) {
+export default function TaskDetailDialog({ task, open, onOpenChange, projectLeadId, onEdit }: TaskDetailDialogProps) {
   const profile = useAuthStore((s) => s.profile);
   const updateTask = useUpdateTask();
   const { data: submissions = [], isLoading: subsLoading } = useTaskSubmissions(task?.id);
@@ -113,6 +114,11 @@ export default function TaskDetailDialog({ task, open, onOpenChange, projectLead
                 ))}
               </div>
             </div>
+            {onEdit && (
+              <Button size="sm" variant="outline" onClick={() => { onEdit(task); onOpenChange(false); }}>
+                <Pencil className="h-4 w-4 mr-1" /> Modifier
+              </Button>
+            )}
           </div>
         </DialogHeader>
 

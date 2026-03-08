@@ -35,7 +35,7 @@ interface TaskFormDialogProps {
   members: any[];
   activities: any[];
   tasks: any[];
-  editingTask?: any;
+  taskToEdit?: any;
 }
 
 function SectionHeader({ icon: Icon, label }: { icon: any; label: string }) {
@@ -47,10 +47,10 @@ function SectionHeader({ icon: Icon, label }: { icon: any; label: string }) {
   );
 }
 
-export default function TaskFormDialog({ open, onOpenChange, projectId, members, activities, tasks, editingTask }: TaskFormDialogProps) {
+export default function TaskFormDialog({ open, onOpenChange, projectId, members, activities, tasks, taskToEdit }: TaskFormDialogProps) {
   const createTask = useCreateTask();
   const updateTask = useUpdateTask();
-  const isEditing = !!editingTask;
+  const isEditing = !!taskToEdit;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -73,24 +73,24 @@ export default function TaskFormDialog({ open, onOpenChange, projectId, members,
   }, [members]);
 
   useEffect(() => {
-    if (editingTask && open) {
+    if (taskToEdit && open) {
       form.reset({
-        title: editingTask.title ?? '', description: editingTask.description ?? '',
-        status: editingTask.status ?? 'todo', priority: editingTask.priority ?? 'medium',
-        due_date: editingTask.due_date ?? '', start_date: editingTask.start_date ?? '',
-        estimated_hours: editingTask.estimated_hours ?? undefined, compartment: editingTask.compartment ?? '',
-        activity_id: editingTask.activity_id ?? '', parent_task_id: editingTask.parent_task_id ?? '',
-        assigned_to: editingTask.assignments?.map((a: any) => a.user?.id).filter(Boolean) ?? [],
+        title: taskToEdit.title ?? '', description: taskToEdit.description ?? '',
+        status: taskToEdit.status ?? 'todo', priority: taskToEdit.priority ?? 'medium',
+        due_date: taskToEdit.due_date ?? '', start_date: taskToEdit.start_date ?? '',
+        estimated_hours: taskToEdit.estimated_hours ?? undefined, compartment: taskToEdit.compartment ?? '',
+        activity_id: taskToEdit.activity_id ?? '', parent_task_id: taskToEdit.parent_task_id ?? '',
+        assigned_to: taskToEdit.assignments?.map((a: any) => a.user?.id || a.user_id).filter(Boolean) ?? [],
       });
-    } else if (!editingTask && open) {
+    } else if (!taskToEdit && open) {
       form.reset({ status: 'todo', priority: 'medium', assigned_to: [] });
     }
-  }, [editingTask, open]);
+  }, [taskToEdit, open]);
 
   const onSubmit = (values: FormValues) => {
     if (isEditing) {
       const { assigned_to, ...taskValues } = values;
-      updateTask.mutate({ id: editingTask.id, assigned_to, ...taskValues }, { onSuccess: () => { form.reset(); onOpenChange(false); } });
+      updateTask.mutate({ id: taskToEdit.id, assigned_to, ...taskValues }, { onSuccess: () => { form.reset(); onOpenChange(false); } });
     } else {
       createTask.mutate({ ...values, title: values.title, project_id: projectId }, { onSuccess: () => { form.reset(); onOpenChange(false); } });
     }

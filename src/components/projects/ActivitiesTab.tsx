@@ -446,7 +446,7 @@ export default function ActivitiesTab({ projectId }: { projectId: string }) {
         members={members}
         activities={activities}
         tasks={tasks}
-        editingTask={editingTask}
+        taskToEdit={editingTask}
       />
     </div>
   );
