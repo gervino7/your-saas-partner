@@ -11,6 +11,7 @@ import ClientMissionsTab from '@/components/crm/ClientMissionsTab';
 import ClientDocumentsTab from '@/components/crm/ClientDocumentsTab';
 import ClientSatisfactionTab from '@/components/crm/ClientSatisfactionTab';
 import ClientHistoryTab from '@/components/crm/ClientHistoryTab';
+import ClientPortalTab from '@/components/crm/ClientPortalTab';
 
 const ClientDetailPage = () => {
   const { id } = useParams<{ id: string }>();
