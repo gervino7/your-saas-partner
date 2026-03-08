@@ -59,14 +59,18 @@ export default function MissionCard({ mission }: MissionCardProps) {
             <Progress value={mission.progress ?? 0} className="h-1.5" />
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Calendar className="h-3 w-3" />
-              {mission.start_date ? format(new Date(mission.start_date), 'dd MMM', { locale: fr }) : '—'}
-              {' — '}
-              {mission.end_date ? format(new Date(mission.end_date), 'dd MMM yyyy', { locale: fr }) : '—'}
+          <div className="flex items-center justify-between gap-1">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground min-w-0 truncate">
+              <Calendar className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate">
+                {mission.start_date ? format(new Date(mission.start_date), 'dd MMM', { locale: fr }) : '—'}
+                {' — '}
+                {mission.end_date ? format(new Date(mission.end_date), 'dd MMM yyyy', { locale: fr }) : '—'}
+              </span>
             </div>
-            <PriorityBadge priority={mission.priority} />
+            <div className="flex-shrink-0">
+              <PriorityBadge priority={mission.priority} />
+            </div>
           </div>
         </CardContent>
       </Card>

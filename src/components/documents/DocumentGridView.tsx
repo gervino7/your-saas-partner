@@ -22,21 +22,23 @@ export default function DocumentGridView({ documents, onAction }: Props) {
       {documents.map((doc) => (
         <div
           key={doc.id}
-          className="group bg-card rounded-lg border p-3 hover:shadow-md transition-shadow cursor-pointer"
+          className="group bg-card rounded-lg border p-3 hover:shadow-md transition-shadow cursor-pointer overflow-hidden min-w-0"
           draggable
           onDragStart={(e) => handleDragStart(e, doc)}
           onClick={() => onAction('preview', doc)}
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-2xl">{getFileIcon(doc.mime_type)}</span>
+            <span className="text-2xl flex-shrink-0">{getFileIcon(doc.mime_type)}</span>
             <DocumentActions doc={doc} onAction={onAction} />
           </div>
           <p className="text-sm font-medium truncate" title={doc.name}>{doc.name}</p>
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-xs text-muted-foreground">{formatFileSize(doc.file_size)}</span>
-            <DocumentStatusBadge status={doc.status} />
+          <div className="flex items-center justify-between mt-1 gap-1">
+            <span className="text-xs text-muted-foreground flex-shrink-0">{formatFileSize(doc.file_size)}</span>
+            <div className="flex-shrink-0">
+              <DocumentStatusBadge status={doc.status} />
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-muted-foreground mt-1 truncate">
             {doc.created_at ? format(new Date(doc.created_at), 'dd MMM yyyy', { locale: fr }) : ''}
           </p>
           {doc.version && doc.version > 1 && (
