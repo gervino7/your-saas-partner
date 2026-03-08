@@ -650,10 +650,26 @@ export default function WorkspacePage() {
                             onCheckedChange={selectAll}
                           />
                         </TableHead>
-                        <TableHead>Nom</TableHead>
-                        <TableHead className="hidden sm:table-cell">Taille</TableHead>
-                        <TableHead className="hidden md:table-cell">Modifié</TableHead>
-                        <TableHead className="hidden md:table-cell">Sync</TableHead>
+                        <TableHead>
+                          <button className="flex items-center font-semibold hover:text-primary transition-colors" onClick={() => toggleSort('name')}>
+                            Nom <SortIcon field="name" />
+                          </button>
+                        </TableHead>
+                        <TableHead className="hidden sm:table-cell">
+                          <button className="flex items-center font-semibold hover:text-primary transition-colors" onClick={() => toggleSort('size')}>
+                            Taille <SortIcon field="size" />
+                          </button>
+                        </TableHead>
+                        <TableHead className="hidden md:table-cell">
+                          <button className="flex items-center font-semibold hover:text-primary transition-colors" onClick={() => toggleSort('modified')}>
+                            Modifié <SortIcon field="modified" />
+                          </button>
+                        </TableHead>
+                        <TableHead className="hidden md:table-cell">
+                          <button className="flex items-center font-semibold hover:text-primary transition-colors" onClick={() => toggleSort('sync')}>
+                            Sync <SortIcon field="sync" />
+                          </button>
+                        </TableHead>
                         <TableHead className="w-10" />
                       </TableRow>
                     </TableHeader>
