@@ -67,13 +67,17 @@ export default function ClientHistoryTab({ clientId }: { clientId: string }) {
       </CardContent>
 
       <Dialog open={showAdd} onOpenChange={setShowAdd}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Nouvelle interaction</DialogTitle></DialogHeader>
-          <div className="grid gap-3">
-            <div>
-              <Label>Type</Label>
+        <DialogContent className="max-w-md p-0 rounded-2xl shadow-2xl overflow-hidden">
+          <DialogHeader className="bg-amber-600 dark:bg-amber-700 px-6 py-4 rounded-t-2xl">
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Plus className="h-5 w-5" /> Nouvelle interaction
+            </DialogTitle>
+          </DialogHeader>
+          <div className="px-6 py-5 space-y-4">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">Type</Label>
               <Select value={form.type} onValueChange={v => setForm(f => ({ ...f, type: v }))}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-11 border-2 border-border/40 bg-white dark:bg-card"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="meeting">Réunion</SelectItem>
                   <SelectItem value="email">Email</SelectItem>
@@ -82,9 +86,18 @@ export default function ClientHistoryTab({ clientId }: { clientId: string }) {
                 </SelectContent>
               </Select>
             </div>
-            <div><Label>Titre *</Label><Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} /></div>
-            <div><Label>Description</Label><Textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} /></div>
-            <Button onClick={handleAdd} disabled={create.isPending}>Ajouter</Button>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">Titre *</Label>
+              <Input className="h-11 border-2 border-border/40 bg-white dark:bg-card" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">Description</Label>
+              <Textarea className="border-2 border-border/40 bg-white dark:bg-card" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+            </div>
+          </div>
+          <div className="bg-muted/30 border-t px-6 py-4 flex justify-end gap-2 rounded-b-2xl">
+            <Button variant="outline" className="rounded-xl" onClick={() => setShowAdd(false)}>Annuler</Button>
+            <Button className="rounded-xl shadow-md bg-amber-600 hover:bg-amber-700 text-white" onClick={handleAdd} disabled={create.isPending}>Ajouter</Button>
           </div>
         </DialogContent>
       </Dialog>
