@@ -23,9 +23,20 @@ export default function TasksTab({ projectId }: { projectId: string }) {
   const projectLeadId = project?.lead_id ?? null;
   const [view, setView] = useState<ViewMode>('kanban');
   const [formOpen, setFormOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<any | null>(null);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterPriority, setFilterPriority] = useState('all');
+
+  const handleEditTask = (task: any) => {
+    setEditingTask(task);
+    setFormOpen(true);
+  };
+
+  const handleCloseForm = (open: boolean) => {
+    setFormOpen(open);
+    if (!open) setEditingTask(null);
+  };
 
   const filteredTasks = useMemo(() => {
     let result = tasks;
