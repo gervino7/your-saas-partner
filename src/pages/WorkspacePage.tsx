@@ -700,7 +700,7 @@ export default function WorkspacePage() {
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
             <DialogTitle className="text-white font-display">Nouveau dossier</DialogTitle>
           </DialogHeader>
-          <div className="px-5 py-4 space-y-3 bg-amber-50/70 dark:bg-amber-950/10">
+          <div className="px-5 py-4 space-y-3 dialog-form-bg">
             <Input value={newFolderName} onChange={(e) => setNewFolderName(e.target.value)} placeholder="Nom du dossier" onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()} autoFocus />
           </div>
           <div className="px-5 py-3 border-t border-amber-200/40 bg-amber-50/40 dark:border-border/40 dark:bg-muted/20 flex justify-end gap-3">
