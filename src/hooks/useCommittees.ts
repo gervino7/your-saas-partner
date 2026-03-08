@@ -51,6 +51,19 @@ export const useUpdateCommittee = () => {
   });
 };
 
+export const useDeleteCommittee = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, missionId }: { id: string; missionId?: string | null }) => {
+      const { error } = await supabase.from('committees').delete().eq('id', id);
+      if (error) throw error;
+      return missionId;
+    },
+    onSuccess: (missionId) => { qc.invalidateQueries({ queryKey: ['committees', missionId] }); toast.success('Comité supprimé'); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+};
+
 // ── Committee Members ──
 export const useCommitteeMembers = (committeeId?: string) =>
   useQuery({

@@ -3,9 +3,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Shield, Users, CalendarDays, Mail, FileText, Link2, Copy, Check } from 'lucide-react';
-import { useCommittees } from '@/hooks/useCommittees';
+import { Shield, Users, CalendarDays, Mail, FileText, Link2, Copy, Check, Pencil, Trash2 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { useCommittees, useDeleteCommittee } from '@/hooks/useCommittees';
 import CommitteeSetup from './CommitteeSetup';
+import CommitteeEditDialog from './CommitteeEditDialog';
 import MembersList from './MembersList';
 import MeetingsSection from './MeetingsSection';
 import GroupMailComposer from './GroupMailComposer';
@@ -27,6 +29,9 @@ const CopilTab = ({ missionId, missionName, canManage }: Props) => {
   const { data: committees, isLoading } = useCommittees(missionId);
   const [selectedId, setSelectedId] = useState<string | undefined>();
   const [copied, setCopied] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const deleteCommittee = useDeleteCommittee();
 
   const selected = committees?.find((c: any) => c.id === selectedId) ?? committees?.[0];
 
@@ -37,6 +42,13 @@ const CopilTab = ({ missionId, missionName, canManage }: Props) => {
     setCopied(true);
     toast.success('Lien du portail copié');
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDelete = async () => {
+    if (!selected) return;
+    await deleteCommittee.mutateAsync({ id: selected.id, missionId });
+    setSelectedId(undefined);
+    setDeleteOpen(false);
   };
 
   if (isLoading) return <div className="animate-pulse space-y-4"><div className="h-32 bg-muted rounded-lg" /></div>;
@@ -54,7 +66,7 @@ const CopilTab = ({ missionId, missionName, canManage }: Props) => {
 
   return (
     <div className="space-y-6">
-      {/* Committee selector + create button */}
+      {/* Committee selector + actions */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3">
           {committees.length > 1 ? (
@@ -80,6 +92,16 @@ const CopilTab = ({ missionId, missionName, canManage }: Props) => {
               {copied ? <Check className="h-4 w-4 mr-1" /> : <Link2 className="h-4 w-4 mr-1" />}
               {copied ? 'Copié !' : 'Lien portail externe'}
             </Button>
+          )}
+          {canManage && selected && (
+            <>
+              <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+                <Pencil className="h-4 w-4 mr-1" /> Modifier
+              </Button>
+              <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => setDeleteOpen(true)}>
+                <Trash2 className="h-4 w-4 mr-1" /> Supprimer
+              </Button>
+            </>
           )}
           <CommitteeSetup missionId={missionId} canManage={canManage} />
         </div>
@@ -112,6 +134,29 @@ const CopilTab = ({ missionId, missionName, canManage }: Props) => {
           </TabsContent>
         </Tabs>
       )}
+
+      {/* Edit dialog */}
+      {selected && (
+        <CommitteeEditDialog committee={selected} open={editOpen} onOpenChange={setEditOpen} />
+      )}
+
+      {/* Delete confirmation */}
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer le comité</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer « {selected?.name} » ? Cette action supprimera également tous les membres, réunions et documents associés. Cette action est irréversible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deleteCommittee.isPending ? 'Suppression...' : 'Supprimer'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
