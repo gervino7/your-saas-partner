@@ -561,7 +561,7 @@ function RejectDialog({ taskId, open, onClose, onRejected }: {
         <DialogHeader>
           <DialogTitle>Renvoyer pour correction</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <div className="px-6 py-5 space-y-5">
           <div>
             <Label>Commentaires et amendements *</Label>
             <Textarea
