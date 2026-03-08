@@ -472,7 +472,7 @@ function ValidateDialog({ taskId, open, onClose, onValidated }: {
         <DialogHeader>
           <DialogTitle>Valider et noter</DialogTitle>
         </DialogHeader>
-        <div className="px-5 py-4 space-y-3 bg-accent/[0.03]">
+        <div className="px-5 py-4 space-y-3 bg-amber-50/70 dark:bg-amber-950/10">
           <div>
             <Label>Évaluation</Label>
             <div className="grid grid-cols-2 gap-2 mt-2">
