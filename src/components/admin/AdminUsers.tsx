@@ -115,7 +115,7 @@ export default function AdminUsers() {
                         </DialogTrigger>
                         <DialogContent className="max-w-sm">
                           <DialogHeader><DialogTitle>Modifier le grade de {u.full_name}</DialogTitle></DialogHeader>
-                          <div className="px-5 py-4 space-y-3 bg-accent/[0.03]">
+                          <div className="px-5 py-4 space-y-3 bg-amber-50/70 dark:bg-amber-950/10">
                             <div><Label>Grade</Label>
                               <Select value={editingUser?.grade || u.grade || 'AUD'} onValueChange={(v) => setEditingUser((prev) => prev ? { ...prev, grade: v as Grade } : null)}>
                                 <SelectTrigger><SelectValue /></SelectTrigger>
@@ -123,7 +123,7 @@ export default function AdminUsers() {
                               </Select>
                             </div>
                           </div>
-                          <div className="px-5 py-3 border-t border-border/40 bg-muted/30 flex items-center justify-end gap-2">
+                          <div className="px-5 py-3 border-t border-amber-200/40 bg-amber-50/40 dark:border-border/40 dark:bg-muted/20 flex items-center justify-end gap-2">
                             <Button size="sm" className="h-9 px-5" onClick={handleSaveGrade} disabled={updateGrade.isPending}>Enregistrer</Button>
                           </div>
                         </DialogContent>
@@ -141,7 +141,7 @@ export default function AdminUsers() {
       <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Inviter un collaborateur</DialogTitle></DialogHeader>
-          <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-accent/[0.03]">
+          <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-amber-50/70 dark:bg-amber-950/10">
             <div><Label>Email</Label><Input type="email" placeholder="nom@cabinet.com" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} /></div>
             <div><Label>Grade</Label>
               <Select value={inviteGrade} onValueChange={(v) => setInviteGrade(v as Grade)}>
@@ -150,7 +150,7 @@ export default function AdminUsers() {
               </Select>
             </div>
           </div>
-          <div className="px-5 py-3 border-t border-border/40 bg-muted/30 flex items-center justify-end gap-2">
+          <div className="px-5 py-3 border-t border-amber-200/40 bg-amber-50/40 dark:border-border/40 dark:bg-muted/20 flex items-center justify-end gap-2">
             <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => setInviteOpen(false)}>Annuler</Button>
             <Button size="sm" className="h-9 px-5" onClick={handleInvite} disabled={inviteUser.isPending || !inviteEmail.trim()}>
               {inviteUser.isPending ? 'Envoi...' : 'Envoyer l\'invitation'}

@@ -31,7 +31,7 @@ interface Props {
 
 function SectionHeader({ icon: Icon, label }: { icon: any; label: string }) {
   return (
-    <div className="text-xs font-bold text-primary uppercase tracking-wider pb-2 mb-3 border-b border-primary/15 flex items-center gap-2">
+    <div className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider pb-2 mb-3 border-b border-amber-200/60 dark:border-amber-800/30 flex items-center gap-2">
       <Icon className="h-3.5 w-3.5" />
       {label}
     </div>
@@ -80,7 +80,7 @@ export default function ProjectFormDialog({ open, onOpenChange, missionId, proje
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="px-5 py-4 space-y-4 overflow-y-auto max-h-[65vh] bg-accent/[0.03]">
+            <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-amber-50/70 dark:bg-amber-950/10">
               <div>
                 <SectionHeader icon={Info} label="Informations générales" />
                 <div className="space-y-3">
@@ -149,7 +149,7 @@ export default function ProjectFormDialog({ open, onOpenChange, missionId, proje
               </div>
             </div>
 
-            <div className="px-5 py-3 border-t border-border/40 bg-muted/30 flex items-center justify-end gap-2">
+            <div className="px-5 py-3 border-t border-amber-200/40 bg-amber-50/40 dark:border-border/40 dark:bg-muted/20 flex items-center justify-end gap-2">
               <Button type="button" variant="outline" size="sm" className="h-9 px-4" onClick={() => onOpenChange(false)}>
                 Annuler
               </Button>

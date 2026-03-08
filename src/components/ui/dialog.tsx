@@ -59,7 +59,7 @@ DialogHeader.displayName = "DialogHeader";
 const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "px-5 py-3 border-t border-border/40 bg-muted/30 flex items-center justify-end gap-2",
+      "px-5 py-3 border-t border-amber-200/40 bg-amber-50/40 dark:border-border/40 dark:bg-muted/20 flex items-center justify-end gap-2",
       className,
     )}
     {...props}
