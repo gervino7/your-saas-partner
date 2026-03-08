@@ -59,10 +59,10 @@ export default function TaskKanbanView({ tasks, projectLeadId }: { tasks: any[];
                   draggable
                   onDragStart={(e) => e.dataTransfer.setData('taskId', task.id)}
                   onClick={() => setSelectedTask(task)}
-                  className="p-3 cursor-pointer hover:shadow-md transition-shadow"
+                  className="p-3 cursor-pointer hover:shadow-md transition-shadow overflow-hidden"
                 >
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium leading-tight">{task.title}</p>
+                  <div className="space-y-2 min-w-0">
+                    <p className="text-sm font-medium leading-tight line-clamp-2">{task.title}</p>
                     <div className="flex items-center gap-2 flex-wrap">
                       <Badge variant="outline" className={`text-[10px] ${priorityColors[task.priority] ?? ''}`}>
                         {TASK_PRIORITY_LABELS[task.priority as keyof typeof TASK_PRIORITY_LABELS] ?? task.priority}

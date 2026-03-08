@@ -19,19 +19,21 @@ function initials(name: string) {
 export default function MissionCard({ mission }: MissionCardProps) {
   return (
     <Link to={`/missions/${mission.id}`}>
-      <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+      <Card className="hover:shadow-md transition-shadow cursor-pointer h-full overflow-hidden">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
-              <p className="text-xs text-muted-foreground font-mono">{mission.code}</p>
-              <h3 className="font-semibold font-display text-sm mt-1 truncate">{mission.name}</h3>
+              <p className="text-xs text-muted-foreground font-mono truncate">{mission.code}</p>
+              <h3 className="font-semibold font-display text-sm mt-1 truncate" title={mission.name}>{mission.name}</h3>
             </div>
-            <MissionStatusBadge status={mission.status ?? 'draft'} />
+            <div className="flex-shrink-0">
+              <MissionStatusBadge status={mission.status ?? 'draft'} />
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
           {mission.client && (
-            <p className="text-xs text-muted-foreground">Client : {mission.client.name}</p>
+            <p className="text-xs text-muted-foreground truncate">Client : {mission.client.name}</p>
           )}
 
           <div className="flex items-center gap-2">
@@ -57,14 +59,18 @@ export default function MissionCard({ mission }: MissionCardProps) {
             <Progress value={mission.progress ?? 0} className="h-1.5" />
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Calendar className="h-3 w-3" />
-              {mission.start_date ? format(new Date(mission.start_date), 'dd MMM', { locale: fr }) : '—'}
-              {' — '}
-              {mission.end_date ? format(new Date(mission.end_date), 'dd MMM yyyy', { locale: fr }) : '—'}
+          <div className="flex items-center justify-between gap-1">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground min-w-0 truncate">
+              <Calendar className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate">
+                {mission.start_date ? format(new Date(mission.start_date), 'dd MMM', { locale: fr }) : '—'}
+                {' — '}
+                {mission.end_date ? format(new Date(mission.end_date), 'dd MMM yyyy', { locale: fr }) : '—'}
+              </span>
             </div>
-            <PriorityBadge priority={mission.priority} />
+            <div className="flex-shrink-0">
+              <PriorityBadge priority={mission.priority} />
+            </div>
           </div>
         </CardContent>
       </Card>
