@@ -163,8 +163,8 @@ export default function CalendarGrid({ events, onDateClick, onEventClick, onCrea
                   onClick={() => dayEvents.length === 0 ? onDateClick(day) : undefined}
                   className={cn(
                     'min-h-[100px] border-b border-r border-border/30 p-1.5 cursor-pointer transition-colors',
-                    inMonth ? 'bg-card hover:bg-muted/20' : 'bg-muted/10',
-                    !inMonth && 'opacity-50',
+                    inMonth ? 'bg-background hover:bg-muted/30' : 'bg-muted/40',
+                    !inMonth && 'opacity-60',
                   )}
                 >
                   <div className={cn(
