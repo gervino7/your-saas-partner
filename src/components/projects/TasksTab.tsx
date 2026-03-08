@@ -126,11 +126,12 @@ export default function TasksTab({ projectId }: { projectId: string }) {
 
       <TaskFormDialog
         open={formOpen}
-        onOpenChange={setFormOpen}
+        onOpenChange={handleCloseForm}
         projectId={projectId}
         members={members}
         activities={activities}
         tasks={tasks}
+        taskToEdit={editingTask}
       />
     </div>
   );
