@@ -505,12 +505,12 @@ function ValidateDialog({ taskId, open, onClose, onValidated }: {
               rows={3}
             />
           </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>Annuler</Button>
-            <Button onClick={handleValidate} disabled={createSubmission.isPending}>
-              {createSubmission.isPending ? 'Validation...' : 'Valider et noter'}
-            </Button>
-          </div>
+        </div>
+        <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
+          <Button variant="outline" onClick={onClose}>Annuler</Button>
+          <Button onClick={handleValidate} disabled={createSubmission.isPending}>
+            {createSubmission.isPending ? 'Validation...' : 'Valider et noter'}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
