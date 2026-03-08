@@ -125,6 +125,10 @@ const MissionDetailPage = () => {
           <CopilTab missionId={mission.id} missionName={mission.name} canManage={canManage} />
         </TabsContent>
 
+        <TabsContent value="gantt" className="mt-6">
+          <MissionGanttTab missionId={mission.id} />
+        </TabsContent>
+
         <TabsContent value="calendar" className="mt-6">
           <MissionCalendarTab missionId={mission.id} />
         </TabsContent>
