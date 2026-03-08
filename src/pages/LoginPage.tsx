@@ -235,60 +235,95 @@ const LoginPage = () => {
   return (
     <div className="flex min-h-screen">
       {/* Left panel - branding */}
-      <div className="hidden lg:flex lg:w-[45%] gradient-hero relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 -left-10 w-72 h-72 rounded-full bg-primary/30 blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-primary/20 blur-3xl" />
+      <div className="hidden lg:flex lg:w-[48%] relative overflow-hidden" style={{ background: 'linear-gradient(160deg, hsl(218 35% 6%) 0%, hsl(218 32% 14%) 40%, hsl(215 55% 22%) 100%)' }}>
+        {/* Decorative elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-24 -right-24 w-[500px] h-[500px] rounded-full opacity-[0.07]" style={{ background: 'radial-gradient(circle, hsl(22 78% 55%), transparent 70%)' }} />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full opacity-[0.05]" style={{ background: 'radial-gradient(circle, hsl(215 75% 50%), transparent 70%)' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-[0.03]" style={{ background: 'radial-gradient(circle, hsl(0 0% 100%), transparent 60%)' }} />
+          {/* Grid pattern */}
+          <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(hsl(0 0% 100%) 1px, transparent 1px), linear-gradient(90deg, hsl(0 0% 100%) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
         </div>
-        <div className="relative z-10 flex flex-col justify-between p-12 text-white">
+
+        <div className="relative z-10 flex flex-col justify-between p-14 text-white w-full">
+          {/* Logo */}
           <div className="flex items-center gap-3">
-            <img src={logoImg} alt="Mission-DGC" className="h-10 w-10 rounded-xl object-contain" />
-            <span className="font-display font-bold text-xl">Mission-DGC</span>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl shadow-lg" style={{ background: 'linear-gradient(135deg, hsl(22 78% 55%), hsl(22 78% 45%))' }}>
+              <img src={logoImg} alt="Mission-DGC" className="h-8 w-8 rounded-lg object-contain" />
+            </div>
+            <div>
+              <span className="font-display font-bold text-lg tracking-tight">Mission-DGC</span>
+              <p className="text-[11px] text-white/40 -mt-0.5">by D&G CONSEIL</p>
+            </div>
           </div>
-          <div className="space-y-6 max-w-md">
-            <h2 className="font-display text-3xl font-bold leading-tight">
-              Gérez vos missions de conseil avec excellence
-            </h2>
-            <p className="text-white/70 text-lg leading-relaxed">
-              La plateforme tout-en-un pour les cabinets d'audit et de conseil en Afrique francophone.
-            </p>
-            <div className="space-y-4 pt-4">
+
+          {/* Hero content */}
+          <div className="space-y-8 max-w-lg">
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-medium tracking-wide uppercase" style={{ background: 'hsl(22 78% 55% / 0.15)', color: 'hsl(22 78% 65%)' }}>
+                <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" />
+                Plateforme SaaS
+              </div>
+              <h2 className="font-display text-[2.5rem] font-extrabold leading-[1.1] tracking-tight">
+                Gérez vos missions
+                <br />
+                <span style={{ color: 'hsl(22 78% 58%)' }}>avec excellence</span>
+              </h2>
+              <p className="text-white/50 text-base leading-relaxed max-w-sm">
+                La plateforme tout-en-un pour les cabinets d'audit et de conseil en Afrique francophone.
+              </p>
+            </div>
+
+            <div className="space-y-3">
               {[
-                'Suivi des missions en temps réel',
-                'Gouvernance COPIL intégrée',
-                'Gestion documentaire avancée',
+                { icon: '📊', text: 'Suivi des missions en temps réel' },
+                { icon: '🏛️', text: 'Gouvernance COPIL intégrée' },
+                { icon: '📁', text: 'Gestion documentaire avancée' },
+                { icon: '👥', text: 'Collaboration d\'équipe fluide' },
               ].map((feature) => (
-                <div key={feature} className="flex items-center gap-3 text-white/80">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15">
-                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
+                <div key={feature.text} className="flex items-center gap-3 group">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl text-sm transition-transform group-hover:scale-110" style={{ background: 'hsl(0 0% 100% / 0.06)' }}>
+                    {feature.icon}
                   </div>
-                  <span className="text-sm">{feature}</span>
+                  <span className="text-sm text-white/65 group-hover:text-white/85 transition-colors">{feature.text}</span>
                 </div>
               ))}
             </div>
           </div>
-          <p className="text-white/40 text-xs">© {new Date().getFullYear()} D&G CONSEIL</p>
+
+          {/* Footer */}
+          <div className="flex items-center justify-between">
+            <p className="text-white/25 text-xs">© {new Date().getFullYear()} D&G CONSEIL — Tous droits réservés</p>
+            <div className="flex items-center gap-1.5">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-1.5 rounded-full transition-all" style={{ width: i === 1 ? '24px' : '6px', background: i === 1 ? 'hsl(22 78% 55%)' : 'hsl(0 0% 100% / 0.15)' }} />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Right panel - form */}
-      <div className="flex-1 flex items-center justify-center bg-background p-6 sm:p-8">
-        <div className="w-full max-w-[420px] space-y-8">
+      <div className="flex-1 flex items-center justify-center bg-background p-6 sm:p-8 relative">
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: 'radial-gradient(hsl(215 75% 35%) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+
+        <div className="relative z-10 w-full max-w-[420px] space-y-8">
           {/* Mobile logo */}
           <div className="text-center lg:hidden">
-            <img src={logoImg} alt="Mission-DGC" className="mx-auto mb-2 h-12 w-12 rounded-xl object-contain" />
+            <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl shadow-lg mb-3" style={{ background: 'var(--gradient-primary)' }}>
+              <img src={logoImg} alt="Mission-DGC" className="h-9 w-9 rounded-lg object-contain" />
+            </div>
             <h1 className="text-xl font-bold font-display">Mission-DGC</h1>
             <p className="text-sm text-muted-foreground">Plateforme de gestion de missions</p>
           </div>
 
           {/* Desktop header */}
           <div className="hidden lg:block space-y-2">
-            <h1 className="text-2xl font-bold font-display tracking-tight">
+            <h1 className="text-[1.75rem] font-extrabold font-display tracking-tight text-foreground">
               {isSignUp ? 'Créer un compte' : 'Bon retour !'}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-[15px]">
               {invitationToken
                 ? 'Complétez votre inscription pour rejoindre l\'équipe'
                 : isSignUp
@@ -297,8 +332,8 @@ const LoginPage = () => {
             </p>
           </div>
 
-          <Card className="shadow-elevated border-border/50">
-            <CardHeader className="lg:hidden">
+          <Card className="shadow-elevated border-border/40 rounded-2xl overflow-hidden">
+            <CardHeader className="lg:hidden pb-2">
               <CardTitle className="font-display text-lg">{isSignUp ? 'Créer un compte' : 'Connexion'}</CardTitle>
               <CardDescription>
                 {invitationToken
@@ -341,38 +376,45 @@ const LoginPage = () => {
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {isSignUp && (
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       <Label htmlFor="fullName" className="text-sm font-medium">Nom complet</Label>
                       <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
                         <Input
                           id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)}
                           placeholder="Jean Dupont" required maxLength={255}
-                          className="pl-10 h-11 bg-muted/30 border-border/60 focus:bg-background transition-colors"
+                          className="pl-10 h-11 bg-muted/30 border-border/50 focus:bg-background transition-colors rounded-xl"
                         />
                       </div>
                     </div>
                   )}
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <Label htmlFor="email" className="text-sm font-medium">Adresse email</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
                       <Input
                         id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                         placeholder="jean@cabinet.com" required disabled={isSignUp && !!invitationToken}
-                        className="pl-10 h-11 bg-muted/30 border-border/60 focus:bg-background transition-colors"
+                        className="pl-10 h-11 bg-muted/30 border-border/50 focus:bg-background transition-colors rounded-xl"
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password" className="text-sm font-medium">Mot de passe</Label>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password" className="text-sm font-medium">Mot de passe</Label>
+                      {!isSignUp && (
+                        <button type="button" className="text-xs text-primary hover:text-primary/80 font-medium transition-colors">
+                          Mot de passe oublié ?
+                        </button>
+                      )}
+                    </div>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
                       <Input
                         id="password" type="password" value={password}
                         onChange={(e) => handlePasswordChange(e.target.value)}
                         placeholder="••••••••" required minLength={8}
-                        className="pl-10 h-11 bg-muted/30 border-border/60 focus:bg-background transition-colors"
+                        className="pl-10 h-11 bg-muted/30 border-border/50 focus:bg-background transition-colors rounded-xl"
                       />
                     </div>
                     {isSignUp && passwordErrors.length > 0 && password.length > 0 && (
@@ -386,9 +428,13 @@ const LoginPage = () => {
                       </ul>
                     )}
                   </div>
-                  <Button type="submit" className="w-full h-11 text-sm font-semibold gradient-primary hover:opacity-90 transition-opacity" disabled={loading || isLocked || signUpBlocked}>
+
+                  <Button type="submit" className="w-full h-12 text-sm font-semibold rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/25 transition-all" disabled={loading || isLocked || signUpBlocked} style={{ background: 'var(--gradient-primary)' }}>
                     {loading ? (
-                      'Chargement...'
+                      <span className="flex items-center gap-2">
+                        <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Chargement...
+                      </span>
                     ) : isLocked ? (
                       'Veuillez patienter...'
                     ) : isSignUp ? (
@@ -399,19 +445,36 @@ const LoginPage = () => {
                   </Button>
                 </form>
               )}
+
               {!isForcedSignUp && (
-                <div className="mt-6 text-center text-sm">
+                <div className="mt-6 pt-6 border-t border-border/40 text-center text-sm">
+                  <span className="text-muted-foreground">
+                    {isSignUp ? 'Déjà un compte ?' : 'Pas encore de compte ?'}
+                  </span>{' '}
                   <button
                     type="button"
                     onClick={() => { setIsSignUp(!isSignUp); setPasswordErrors([]); }}
-                    className="text-primary hover:text-primary/80 font-medium transition-colors"
+                    className="text-primary hover:text-primary/80 font-semibold transition-colors"
                   >
-                    {isSignUp ? 'Déjà un compte ? Se connecter' : "Pas encore de compte ? S'inscrire"}
+                    {isSignUp ? 'Se connecter' : "S'inscrire"}
                   </button>
                 </div>
               )}
             </CardContent>
           </Card>
+
+          {/* Trust badges */}
+          <div className="flex items-center justify-center gap-6 text-muted-foreground/40">
+            <div className="flex items-center gap-1.5 text-[11px]">
+              <Shield className="h-3.5 w-3.5" />
+              <span>Chiffré SSL</span>
+            </div>
+            <div className="h-3 w-px bg-border" />
+            <div className="flex items-center gap-1.5 text-[11px]">
+              <Lock className="h-3.5 w-3.5" />
+              <span>Données sécurisées</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
