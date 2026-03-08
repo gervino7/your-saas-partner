@@ -7,7 +7,7 @@ import { ChevronRight, ChevronDown, Folder, FolderOpen, CheckSquare, Layers, Zoo
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
-import { ScrollArea, ScrollAreaViewport } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import Loading from '@/components/common/Loading';
 import EmptyState from '@/components/common/EmptyState';
 import { cn } from '@/lib/utils';
