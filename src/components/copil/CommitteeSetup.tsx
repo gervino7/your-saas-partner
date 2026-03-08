@@ -85,7 +85,7 @@ const CommitteeSetup = ({ missionId, canManage }: Props) => {
             <Textarea value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} />
           </div>
         </div>
-        <div className="px-5 py-3 border-t border-amber-200/40 bg-amber-50/40 dark:border-border/40 dark:bg-muted/20 flex justify-end gap-3">
+        <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex justify-end gap-3">
           <Button variant="outline" onClick={() => setOpen(false)}>Annuler</Button>
           <Button onClick={handleSubmit} disabled={!form.name || create.isPending}>
             {create.isPending ? 'Création...' : 'Créer le comité'}
