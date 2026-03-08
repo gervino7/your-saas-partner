@@ -96,7 +96,7 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="px-5 py-4 space-y-4 overflow-y-auto max-h-[65vh] bg-accent/[0.03]">
+            <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-amber-50/70 dark:bg-amber-950/10">
               {/* Section: Informations générales */}
               <div>
                 <SectionHeader icon={Info} label="Informations générales" />
