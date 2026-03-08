@@ -29,7 +29,9 @@ export default function DocumentGridView({ documents, onAction }: Props) {
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-2xl flex-shrink-0">{getFileIcon(doc.mime_type)}</span>
-            <DocumentActions doc={doc} onAction={onAction} />
+            <div onClick={(e) => e.stopPropagation()}>
+              <DocumentActions doc={doc} onAction={onAction} />
+            </div>
           </div>
           <p className="text-sm font-medium truncate" title={doc.name}>{doc.name}</p>
           <div className="flex items-center justify-between mt-1 gap-1">
