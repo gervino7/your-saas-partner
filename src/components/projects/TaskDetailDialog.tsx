@@ -117,7 +117,7 @@ export default function TaskDetailDialog({ task, open, onOpenChange, projectLead
         </DialogHeader>
 
         {/* Action buttons */}
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap px-6">
           {isAssignee && status === 'todo' && (
             <Button size="sm" onClick={handleStart} disabled={updateTask.isPending}>
               <Play className="h-4 w-4 mr-1" /> Démarrer
