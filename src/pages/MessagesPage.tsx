@@ -69,7 +69,7 @@ const MessagesPage = () => {
   }, []);
 
   return (
-    <div className="h-[calc(100svh-3.5rem)] md:h-[calc(100vh-4rem)] overflow-hidden rounded-lg border border-border bg-card">
+    <div className="h-[calc(100svh-3.5rem)] md:h-[calc(100vh-4rem)] overflow-hidden rounded-2xl border border-border/50 bg-card shadow-lg shadow-black/[0.03]">
       {/* Mobile + tablet: one pane at a time for max content width */}
       <div className="h-full lg:hidden">
         {activeConvId && activeConv ? (
