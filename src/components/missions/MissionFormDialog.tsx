@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -77,7 +77,7 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="font-display">
             {isEdit ? 'Modifier la mission' : 'Nouvelle mission'}
@@ -85,52 +85,69 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="px-6 py-6 space-y-0">
-            {/* Section: Informations générales */}
-            <div className="pl-4 border-l-2 border-primary/20 space-y-4">
-              <h4 className="text-sm font-bold text-primary uppercase tracking-wider mb-3">Informations générales</h4>
-              <FormField control={form.control} name="name" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nom de la mission *</FormLabel>
-                  <FormControl><Input placeholder="Audit des comptes 2025" {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-
-              <FormField control={form.control} name="description" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl><Textarea placeholder="Description de la mission..." rows={3} {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormField control={form.control} name="type" render={({ field }) => (
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <div className="px-6 py-5 space-y-5 overflow-y-auto max-h-[65vh]">
+              {/* Section: Informations générales */}
+              <div className="pl-4 border-l-2 border-primary/20 space-y-4">
+                <h4 className="text-sm font-bold text-primary uppercase tracking-wider mb-3">Informations générales</h4>
+                <FormField control={form.control} name="name" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Type de mission</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl><SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger></FormControl>
-                      <SelectContent>
-                        {Object.entries(MISSION_TYPE_LABELS).map(([key, label]) => (
-                          <SelectItem key={key} value={key}>{label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Nom de la mission *</FormLabel>
+                    <FormControl><Input placeholder="Audit des comptes 2025" {...field} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
 
-                <FormField control={form.control} name="priority" render={({ field }) => (
+                <FormField control={form.control} name="description" render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Priorité</FormLabel>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl><Textarea placeholder="Description de la mission..." rows={3} {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField control={form.control} name="type" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Type de mission</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl><SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          {Object.entries(MISSION_TYPE_LABELS).map(([key, label]) => (
+                            <SelectItem key={key} value={key}>{label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+
+                  <FormField control={form.control} name="priority" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Priorité</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          <SelectItem value="low">Basse</SelectItem>
+                          <SelectItem value="medium">Moyenne</SelectItem>
+                          <SelectItem value="high">Haute</SelectItem>
+                          <SelectItem value="urgent">Urgente</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
+
+                <FormField control={form.control} name="client_id" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Client</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                      <FormControl><SelectTrigger><SelectValue placeholder="Sélectionner un client" /></SelectTrigger></FormControl>
                       <SelectContent>
-                        <SelectItem value="low">Basse</SelectItem>
-                        <SelectItem value="medium">Moyenne</SelectItem>
-                        <SelectItem value="high">Haute</SelectItem>
-                        <SelectItem value="urgent">Urgente</SelectItem>
+                        {clients.map((c: any) => (
+                          <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -138,128 +155,113 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
                 )} />
               </div>
 
-              <FormField control={form.control} name="client_id" render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Client</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl><SelectTrigger><SelectValue placeholder="Sélectionner un client" /></SelectTrigger></FormControl>
-                    <SelectContent>
-                      {clients.map((c: any) => (
-                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )} />
+              <div className="border-t border-border/30" />
+
+              {/* Section: Équipe de direction */}
+              <div className="pl-4 border-l-2 border-primary/20 space-y-4">
+                <h4 className="text-sm font-bold text-primary uppercase tracking-wider mb-3">Équipe de direction</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField control={form.control} name="director_id" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Directeur de Mission</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl><SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          {directors.map((u: any) => (
+                            <SelectItem key={u.id} value={u.id}>{u.full_name} ({u.grade})</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+
+                  <FormField control={form.control} name="chief_id" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Chef de Mission</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl><SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          {chiefs.map((u: any) => (
+                            <SelectItem key={u.id} value={u.id}>{u.full_name} ({u.grade})</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
+              </div>
+
+              <div className="border-t border-border/30" />
+
+              {/* Section: Budget */}
+              <div className="pl-4 border-l-2 border-primary/20 space-y-4">
+                <h4 className="text-sm font-bold text-primary uppercase tracking-wider mb-3">Budget</h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <FormField control={form.control} name="budget_amount" render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Montant</FormLabel>
+                      <FormControl><Input type="number" placeholder="0" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+
+                  <FormField control={form.control} name="budget_currency" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Devise</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          {Object.entries(CURRENCY_LABELS).map(([key, label]) => (
+                            <SelectItem key={key} value={key}>{label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
+              </div>
+
+              <div className="border-t border-border/30" />
+
+              {/* Section: Planification */}
+              <div className="pl-4 border-l-2 border-primary/20 space-y-4">
+                <h4 className="text-sm font-bold text-primary uppercase tracking-wider mb-3">Planification</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField control={form.control} name="start_date" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Date de début</FormLabel>
+                      <FormControl><Input type="date" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+
+                  <FormField control={form.control} name="end_date" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Date de fin</FormLabel>
+                      <FormControl><Input type="date" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
+              </div>
             </div>
 
-            <div className="border-t border-border/30 my-6" />
-
-            {/* Section: Équipe de direction */}
-            <div className="pl-4 border-l-2 border-primary/20 space-y-4">
-              <h4 className="text-sm font-bold text-primary uppercase tracking-wider mb-3">Équipe de direction</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <FormField control={form.control} name="director_id" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Directeur de Mission</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl><SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger></FormControl>
-                      <SelectContent>
-                        {directors.map((u: any) => (
-                          <SelectItem key={u.id} value={u.id}>{u.full_name} ({u.grade})</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-
-                <FormField control={form.control} name="chief_id" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Chef de Mission</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl><SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger></FormControl>
-                      <SelectContent>
-                        {chiefs.map((u: any) => (
-                          <SelectItem key={u.id} value={u.id}>{u.full_name} ({u.grade})</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              </div>
-            </div>
-
-            <div className="border-t border-border/30 my-6" />
-
-            {/* Section: Budget */}
-            <div className="pl-4 border-l-2 border-primary/20 space-y-4">
-              <h4 className="text-sm font-bold text-primary uppercase tracking-wider mb-3">Budget</h4>
-              <div className="grid grid-cols-3 gap-4">
-                <FormField control={form.control} name="budget_amount" render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Montant</FormLabel>
-                    <FormControl><Input type="number" placeholder="0" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-
-                <FormField control={form.control} name="budget_currency" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Devise</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                      <SelectContent>
-                        {Object.entries(CURRENCY_LABELS).map(([key, label]) => (
-                          <SelectItem key={key} value={key}>{label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              </div>
-            </div>
-
-            <div className="border-t border-border/30 my-6" />
-
-            {/* Section: Planification */}
-            <div className="pl-4 border-l-2 border-primary/20 space-y-4">
-              <h4 className="text-sm font-bold text-primary uppercase tracking-wider mb-3">Planification</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <FormField control={form.control} name="start_date" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Date de début</FormLabel>
-                    <FormControl><Input type="date" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-
-                <FormField control={form.control} name="end_date" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Date de fin</FormLabel>
-                    <FormControl><Input type="date" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              </div>
+            <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Annuler
+              </Button>
+              <Button
+                type="submit"
+                disabled={createMission.isPending || updateMission.isPending}
+              >
+                {createMission.isPending || updateMission.isPending ? 'En cours...' : isEdit ? 'Mettre à jour' : 'Créer la mission'}
+              </Button>
             </div>
           </form>
         </Form>
-
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Annuler
-          </Button>
-          <Button
-            onClick={form.handleSubmit(onSubmit)}
-            disabled={createMission.isPending || updateMission.isPending}
-          >
-            {createMission.isPending || updateMission.isPending ? 'En cours...' : isEdit ? 'Mettre à jour' : 'Créer la mission'}
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

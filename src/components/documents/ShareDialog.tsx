@@ -8,7 +8,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DocumentRow } from '@/hooks/useDocuments';
 import { toast } from '@/hooks/use-toast';
-import { Share2, Trash2 } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 
 interface Props {
   doc: DocumentRow | null;
@@ -80,7 +80,7 @@ export default function ShareDialog({ doc, open, onClose }: Props) {
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="px-6 py-5 space-y-5">
           <div className="flex gap-2">
             <Input
               placeholder="Rechercher un utilisateur..."

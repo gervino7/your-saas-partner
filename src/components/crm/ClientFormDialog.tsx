@@ -26,7 +26,7 @@ export default function ClientFormDialog({ open, onOpenChange }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader><DialogTitle>Nouveau client</DialogTitle></DialogHeader>
-        <div className="grid gap-4">
+        <div className="px-6 py-5 space-y-5 overflow-y-auto max-h-[65vh]">
           <div><Label>Nom de l'entreprise *</Label><Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} /></div>
           <div className="grid grid-cols-2 gap-3">
             <div><Label>Secteur</Label><Input value={form.industry} onChange={e => setForm(f => ({ ...f, industry: e.target.value }))} /></div>
@@ -42,6 +42,9 @@ export default function ClientFormDialog({ open, onOpenChange }: Props) {
           </div>
           <div><Label>Adresse</Label><Input value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} /></div>
           <div><Label>Notes</Label><Textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} /></div>
+        </div>
+        <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Annuler</Button>
           <Button onClick={handleSubmit} disabled={create.isPending}>
             {create.isPending ? 'Création…' : 'Créer le client'}
           </Button>

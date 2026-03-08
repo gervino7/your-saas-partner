@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -83,12 +83,12 @@ export default function MeetingFormDialog({ open, onOpenChange, onSubmit, member
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) resetForm(); onOpenChange(o); }}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Nouvelle réunion</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="px-6 py-5 space-y-5 overflow-y-auto max-h-[65vh]">
           <div>
             <Label>Titre *</Label>
             <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Réunion d'équipe..." />
@@ -208,12 +208,12 @@ export default function MeetingFormDialog({ open, onOpenChange, onSubmit, member
           </div>
         </div>
 
-        <DialogFooter>
+        <div className="px-6 py-4 border-t border-border/40 bg-muted/20 flex justify-end gap-3">
           <Button variant="outline" onClick={() => { resetForm(); onOpenChange(false); }}>Annuler</Button>
           <Button onClick={handleSubmit} disabled={isSubmitting}>
             {isSubmitting ? 'Création...' : 'Créer la réunion'}
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

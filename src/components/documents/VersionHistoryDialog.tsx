@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { formatFileSize } from '@/lib/fileUtils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Download, RotateCcw } from 'lucide-react';
+import { Download } from 'lucide-react';
 
 interface Props {
   doc: DocumentRow | null;
@@ -29,7 +29,7 @@ export default function VersionHistoryDialog({ doc, open, onClose }: Props) {
         <DialogHeader>
           <DialogTitle className="font-display">Historique des versions — {doc.name}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-2 max-h-80 overflow-y-auto">
+        <div className="px-6 py-5 space-y-2 max-h-[65vh] overflow-y-auto">
           {versions.map((v) => (
             <div key={v.id} className="flex items-center justify-between p-3 rounded-md bg-muted/50">
               <div>
