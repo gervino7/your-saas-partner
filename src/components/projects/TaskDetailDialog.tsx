@@ -114,6 +114,11 @@ export default function TaskDetailDialog({ task, open, onOpenChange, projectLead
                 ))}
               </div>
             </div>
+            {onEdit && (
+              <Button size="sm" variant="outline" onClick={() => { onEdit(task); onOpenChange(false); }}>
+                <Pencil className="h-4 w-4 mr-1" /> Modifier
+              </Button>
+            )}
           </div>
         </DialogHeader>
 
