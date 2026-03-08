@@ -69,7 +69,7 @@ export default function MeetingFormDialog({ open, onOpenChange, onSubmit, member
           <DialogTitle>Nouvelle réunion</DialogTitle>
         </DialogHeader>
 
-        <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-accent/[0.03]">
+        <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] bg-amber-50/70 dark:bg-amber-950/10">
           <div><Label>Titre *</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Réunion d'équipe..." /></div>
           <div><Label>Description / Ordre du jour</Label><Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder="Points à aborder..." /></div>
 
