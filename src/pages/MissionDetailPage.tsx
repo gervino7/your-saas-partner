@@ -18,7 +18,8 @@ import MissionSettingsTab from '@/components/missions/MissionSettingsTab';
 import EmptyState from '@/components/common/EmptyState';
 import CopilTab from '@/components/copil/CopilTab';
 import MissionCalendarTab from '@/components/missions/MissionCalendarTab';
-import { FileText, Calendar } from 'lucide-react';
+import MissionGanttTab from '@/components/missions/MissionGanttTab';
+import { FileText, Calendar, BarChart3 } from 'lucide-react';
 
 const MissionDetailPage = () => {
   const { id } = useParams();
@@ -94,6 +95,7 @@ const MissionDetailPage = () => {
           <TabsTrigger value="team">Équipe</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="copil">COPIL</TabsTrigger>
+          <TabsTrigger value="gantt">Gantt</TabsTrigger>
           <TabsTrigger value="calendar">Calendrier</TabsTrigger>
           <TabsTrigger value="budget">Budget</TabsTrigger>
           {canManage && <TabsTrigger value="settings">Paramètres</TabsTrigger>}
@@ -121,6 +123,10 @@ const MissionDetailPage = () => {
 
         <TabsContent value="copil" className="mt-6">
           <CopilTab missionId={mission.id} missionName={mission.name} canManage={canManage} />
+        </TabsContent>
+
+        <TabsContent value="gantt" className="mt-6">
+          <MissionGanttTab missionId={mission.id} />
         </TabsContent>
 
         <TabsContent value="calendar" className="mt-6">
