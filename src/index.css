@@ -116,4 +116,10 @@
   .gradient-hero {
     background: var(--gradient-hero);
   }
+  .dialog-form-bg {
+    background: linear-gradient(180deg, hsl(45 100% 93%) 0%, hsl(43 90% 88%) 40%, hsl(40 85% 85%) 100%);
+  }
+  .dark .dialog-form-bg {
+    background: hsl(218 22% 13%);
+  }
 }
