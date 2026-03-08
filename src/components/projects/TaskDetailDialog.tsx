@@ -412,7 +412,7 @@ function SubmitWorkDialog({ taskId, open, onClose, onSubmitted }: {
         <DialogHeader>
           <DialogTitle>Soumettre au chef de projet</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <div className="px-6 py-5 space-y-5">
           <div>
             <Label>Commentaire</Label>
             <Textarea
