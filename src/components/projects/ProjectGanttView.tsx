@@ -181,10 +181,10 @@ export default function ProjectGanttView({ tasks, activities }: ProjectGanttView
           <Button size="sm" variant={zoom === 'month' ? 'default' : 'outline'} onClick={() => setZoom('month')}>Mois</Button>
         </div>
 
-        <div className="border rounded-lg overflow-hidden bg-card">
-          <div className="flex">
-            <div className="border-r bg-muted/30 flex-shrink-0" style={{ width: LABEL_WIDTH }}>
-              <div className="h-14 border-b px-3 flex items-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+        <div className="border rounded-lg overflow-hidden bg-card" style={{ maxHeight }}>
+          <div className="flex h-full">
+            <div className="border-r bg-muted/30 flex-shrink-0 overflow-y-auto" style={{ width: LABEL_WIDTH }}>
+              <div className="h-12 border-b px-2 flex items-center text-[10px] font-semibold text-muted-foreground uppercase tracking-wider sticky top-0 bg-muted/30 z-10">
                 Activités & tâches
               </div>
               {rows.map((row) => (
