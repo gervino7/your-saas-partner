@@ -228,7 +228,7 @@ export default function ProjectGanttView({ tasks, activities }: ProjectGanttView
                       return (
                         <div
                           key={month.toISOString()}
-                          className="absolute h-7 border-r text-[10px] font-semibold text-muted-foreground uppercase flex items-center justify-center"
+                          className="absolute h-6 border-r text-[9px] font-semibold text-muted-foreground uppercase flex items-center justify-center"
                           style={{ left: monthStart * colWidth, width: monthDays * colWidth }}
                         >
                           {format(month, 'MMM yyyy', { locale: fr })}
