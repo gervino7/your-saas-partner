@@ -236,11 +236,11 @@ export default function ProjectGanttView({ tasks, activities }: ProjectGanttView
                       );
                     })}
                   </div>
-                  <div className="h-7 flex">
+                  <div className="h-6 flex">
                     {days.map((day, index) => (
                       <div
                         key={`${day.toISOString()}-${index}`}
-                        className={cn('border-r text-[9px] flex items-center justify-center', isWeekend(day) ? 'bg-muted/40 text-muted-foreground/60' : 'text-muted-foreground')}
+                        className={cn('border-r text-[8px] flex items-center justify-center', isWeekend(day) ? 'bg-muted/40 text-muted-foreground/60' : 'text-muted-foreground')}
                         style={{ width: colWidth }}
                       >
                         {zoom === 'day' ? format(day, 'd', { locale: fr }) : zoom === 'week' && day.getDay() === 1 ? format(day, 'd MMM', { locale: fr }) : zoom === 'month' && day.getDate() === 1 ? format(day, 'd', { locale: fr }) : ''}
