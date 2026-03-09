@@ -159,9 +159,10 @@ export default function ProjectGanttView({ tasks, activities }: ProjectGanttView
 
   const colWidth = COL_WIDTHS[zoom];
   const totalWidth = days.length * colWidth;
-  const ROW_HEIGHT = 36;
-  const LABEL_WIDTH = 300;
+  const ROW_HEIGHT = 30;
+  const LABEL_WIDTH = 260;
   const todayOffset = differenceInDays(new Date(), timelineStart) * colWidth;
+  const maxHeight = Math.min(rows.length * ROW_HEIGHT + 56, 420);
 
   const getBarStyle = (row: GanttRow) => {
     if (!row.startDate || !row.endDate) return null;
@@ -180,46 +181,46 @@ export default function ProjectGanttView({ tasks, activities }: ProjectGanttView
           <Button size="sm" variant={zoom === 'month' ? 'default' : 'outline'} onClick={() => setZoom('month')}>Mois</Button>
         </div>
 
-        <div className="border rounded-lg overflow-hidden bg-card">
-          <div className="flex">
-            <div className="border-r bg-muted/30 flex-shrink-0" style={{ width: LABEL_WIDTH }}>
-              <div className="h-14 border-b px-3 flex items-center text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+        <div className="border rounded-lg overflow-hidden bg-card" style={{ maxHeight }}>
+          <div className="flex h-full">
+            <div className="border-r bg-muted/30 flex-shrink-0 overflow-y-auto" style={{ width: LABEL_WIDTH }}>
+              <div className="h-12 border-b px-2 flex items-center text-[10px] font-semibold text-muted-foreground uppercase tracking-wider sticky top-0 bg-muted/30 z-10">
                 Activités & tâches
               </div>
               {rows.map((row) => (
                 <div
                   key={row.id}
-                  className={cn('border-b px-2 flex items-center gap-2 hover:bg-muted/40', row.type === 'activity' && 'bg-muted/20')}
-                  style={{ height: ROW_HEIGHT, paddingLeft: 8 + row.depth * 16 }}
+                  className={cn('border-b px-1.5 flex items-center gap-1.5 hover:bg-muted/40', row.type === 'activity' && 'bg-muted/20')}
+                  style={{ height: ROW_HEIGHT, paddingLeft: 6 + row.depth * 12 }}
                 >
                   {row.type === 'activity' ? (
                     <button type="button" onClick={() => toggleCollapse(row.id)} className="p-0.5 rounded hover:bg-muted">
                       {collapsed.has(row.id) ? (
-                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                        <ChevronRight className="h-3 w-3 text-muted-foreground" />
                       ) : (
-                        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                        <ChevronDown className="h-3 w-3 text-muted-foreground" />
                       )}
                     </button>
                   ) : (
-                    <span className="w-4" />
+                    <span className="w-3" />
                   )}
 
                   {row.type === 'activity' ? (
-                    <Folder className="h-3.5 w-3.5 text-primary" />
+                    <Folder className="h-3 w-3 text-primary shrink-0" />
                   ) : (
-                    <CheckSquare className="h-3.5 w-3.5 text-muted-foreground" />
+                    <CheckSquare className="h-3 w-3 text-muted-foreground shrink-0" />
                   )}
 
-                  <span className="text-xs truncate">{row.label}</span>
-                  {row.code && <Badge variant="outline" className="text-[10px] font-mono ml-auto">{row.code}</Badge>}
+                  <span className="text-[11px] truncate flex-1">{row.label}</span>
+                  {row.code && <Badge variant="outline" className="text-[9px] font-mono px-1 py-0">{row.code}</Badge>}
                 </div>
               ))}
             </div>
 
-            <div className="flex-1 overflow-x-auto">
+            <div className="flex-1 overflow-x-auto overflow-y-auto">
               <div style={{ width: totalWidth, minWidth: '100%' }}>
-                <div className="h-14 border-b">
-                  <div className="h-7 flex border-b relative">
+                <div className="h-12 border-b sticky top-0 bg-card z-10">
+                  <div className="h-6 flex border-b relative">
                     {months.map((month, index) => {
                       const monthStart = Math.max(0, differenceInDays(month, timelineStart));
                       const nextMonth = index < months.length - 1 ? months[index + 1] : timelineEnd;
@@ -227,7 +228,7 @@ export default function ProjectGanttView({ tasks, activities }: ProjectGanttView
                       return (
                         <div
                           key={month.toISOString()}
-                          className="absolute h-7 border-r text-[10px] font-semibold text-muted-foreground uppercase flex items-center justify-center"
+                          className="absolute h-6 border-r text-[9px] font-semibold text-muted-foreground uppercase flex items-center justify-center"
                           style={{ left: monthStart * colWidth, width: monthDays * colWidth }}
                         >
                           {format(month, 'MMM yyyy', { locale: fr })}
@@ -235,11 +236,11 @@ export default function ProjectGanttView({ tasks, activities }: ProjectGanttView
                       );
                     })}
                   </div>
-                  <div className="h-7 flex">
+                  <div className="h-6 flex">
                     {days.map((day, index) => (
                       <div
                         key={`${day.toISOString()}-${index}`}
-                        className={cn('border-r text-[9px] flex items-center justify-center', isWeekend(day) ? 'bg-muted/40 text-muted-foreground/60' : 'text-muted-foreground')}
+                        className={cn('border-r text-[8px] flex items-center justify-center', isWeekend(day) ? 'bg-muted/40 text-muted-foreground/60' : 'text-muted-foreground')}
                         style={{ width: colWidth }}
                       >
                         {zoom === 'day' ? format(day, 'd', { locale: fr }) : zoom === 'week' && day.getDay() === 1 ? format(day, 'd MMM', { locale: fr }) : zoom === 'month' && day.getDate() === 1 ? format(day, 'd', { locale: fr }) : ''}
@@ -261,8 +262,8 @@ export default function ProjectGanttView({ tasks, activities }: ProjectGanttView
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <div
-                                className={cn('absolute rounded-sm top-1.5', row.type === 'activity' ? 'h-4' : 'h-3', STATUS_BAR_CLASS[row.status] ?? 'bg-primary')}
-                                style={{ left: bar.left, width: Math.max(bar.width, 4), top: row.type === 'activity' ? 8 : 10 }}
+                                className={cn('absolute rounded-sm', row.type === 'activity' ? 'h-3' : 'h-2.5', STATUS_BAR_CLASS[row.status] ?? 'bg-primary')}
+                                style={{ left: bar.left, width: Math.max(bar.width, 4), top: row.type === 'activity' ? 8 : 9 }}
                               >
                                 {row.progress > 0 && row.progress < 100 && (
                                   <div className="absolute inset-y-0 left-0 rounded-l-sm bg-background/30" style={{ width: `${row.progress}%` }} />

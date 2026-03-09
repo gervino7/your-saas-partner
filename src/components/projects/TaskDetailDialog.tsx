@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import {
   FileText, History, Paperclip, Activity, Play, Send, Check, RotateCcw,
-  Star, Upload, Download, Clock, User, Pencil,
+  Star, Upload, Download, Clock, User, Pencil, Trash2,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -61,9 +61,10 @@ interface TaskDetailDialogProps {
   onOpenChange: (open: boolean) => void;
   projectLeadId?: string | null;
   onEdit?: (task: any) => void;
+  onDelete?: (task: any) => void;
 }
 
-export default function TaskDetailDialog({ task, open, onOpenChange, projectLeadId, onEdit }: TaskDetailDialogProps) {
+export default function TaskDetailDialog({ task, open, onOpenChange, projectLeadId, onEdit, onDelete }: TaskDetailDialogProps) {
   const profile = useAuthStore((s) => s.profile);
   const updateTask = useUpdateTask();
   const { data: submissions = [], isLoading: subsLoading } = useTaskSubmissions(task?.id);
@@ -114,11 +115,28 @@ export default function TaskDetailDialog({ task, open, onOpenChange, projectLead
                 ))}
               </div>
             </div>
-            {onEdit && (
-              <Button size="sm" variant="outline" onClick={() => { onEdit(task); onOpenChange(false); }}>
-                <Pencil className="h-4 w-4 mr-1" /> Modifier
-              </Button>
-            )}
+            <div className="flex gap-2">
+              {onEdit && (
+                <Button size="sm" variant="outline" onClick={() => { onEdit(task); onOpenChange(false); }}>
+                  <Pencil className="h-4 w-4 mr-1" /> Modifier
+                </Button>
+              )}
+              {onDelete && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-destructive hover:bg-destructive/10"
+                  onClick={() => {
+                    if (confirm(`Supprimer la tâche "${task.title}" ?`)) {
+                      onDelete(task);
+                      onOpenChange(false);
+                    }
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </DialogHeader>
 

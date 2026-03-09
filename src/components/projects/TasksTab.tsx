@@ -4,8 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Plus, Search, Kanban, Table2, LayoutGrid, Users, BarChart3 } from 'lucide-react';
-import { useProjectTasks, useProjectActivities, useProject } from '@/hooks/useProject';
-import { useProjectMembers } from '@/hooks/useProject';
+import { useProjectTasks, useProjectActivities, useProject, useProjectMembers, useDeleteTask } from '@/hooks/useProject';
 import TaskKanbanView from './TaskKanbanView';
 import TaskTableView from './TaskTableView';
 import TaskGroupedView from './TaskCompartmentView';
@@ -20,6 +19,7 @@ export default function TasksTab({ projectId }: { projectId: string }) {
   const { data: activities = [] } = useProjectActivities(projectId);
   const { data: members = [] } = useProjectMembers(projectId);
   const { data: project } = useProject(projectId);
+  const deleteTask = useDeleteTask();
   const projectLeadId = project?.lead_id ?? null;
   const [view, setView] = useState<ViewMode>('kanban');
   const [formOpen, setFormOpen] = useState(false);
@@ -36,6 +36,10 @@ export default function TasksTab({ projectId }: { projectId: string }) {
   const handleCloseForm = (open: boolean) => {
     setFormOpen(open);
     if (!open) setEditingTask(null);
+  };
+
+  const handleDeleteTask = (task: any) => {
+    deleteTask.mutate({ id: task.id, projectId });
   };
 
   const filteredTasks = useMemo(() => {
@@ -116,8 +120,8 @@ export default function TasksTab({ projectId }: { projectId: string }) {
         />
       ) : (
         <>
-          {view === 'kanban' && <TaskKanbanView tasks={filteredTasks} projectLeadId={projectLeadId} onEditTask={handleEditTask} />}
-          {view === 'table' && <TaskTableView tasks={filteredTasks} projectLeadId={projectLeadId} onEditTask={handleEditTask} />}
+          {view === 'kanban' && <TaskKanbanView tasks={filteredTasks} projectLeadId={projectLeadId} onEditTask={handleEditTask} onDeleteTask={handleDeleteTask} />}
+          {view === 'table' && <TaskTableView tasks={filteredTasks} projectLeadId={projectLeadId} onEditTask={handleEditTask} onDeleteTask={handleDeleteTask} />}
           {view === 'compartment' && <TaskGroupedView tasks={filteredTasks} groupBy="compartment" />}
           {view === 'assignee' && <TaskGroupedView tasks={filteredTasks} groupBy="assignee" />}
           {view === 'gantt' && <ProjectGanttView tasks={filteredTasks} activities={activities} />}

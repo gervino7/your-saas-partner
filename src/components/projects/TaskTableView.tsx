@@ -27,7 +27,7 @@ function initials(name: string) {
   return name?.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2) ?? '?';
 }
 
-export default function TaskTableView({ tasks, projectLeadId, onEditTask }: { tasks: any[]; projectLeadId?: string | null; onEditTask?: (task: any) => void }) {
+export default function TaskTableView({ tasks, projectLeadId, onEditTask, onDeleteTask }: { tasks: any[]; projectLeadId?: string | null; onEditTask?: (task: any) => void; onDeleteTask?: (task: any) => void }) {
   const [selectedTask, setSelectedTask] = useState<any>(null);
 
   return (
@@ -95,6 +95,7 @@ export default function TaskTableView({ tasks, projectLeadId, onEditTask }: { ta
       onOpenChange={(open) => !open && setSelectedTask(null)}
       projectLeadId={projectLeadId}
       onEdit={onEditTask}
+      onDelete={onDeleteTask}
     />
     </>
   );

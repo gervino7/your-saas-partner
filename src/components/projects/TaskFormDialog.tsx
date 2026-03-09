@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -10,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { useCreateTask, useUpdateTask } from '@/hooks/useProject';
 import { Info, CalendarDays, Settings } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 const schema = z.object({
   title: z.string().min(1, 'Titre requis').default(''),
@@ -240,26 +240,26 @@ export default function TaskFormDialog({ open, onOpenChange, projectId, members,
                     <FormItem>
                       <FormLabel>Assigner à</FormLabel>
                       {assignableMembers.length > 0 ? (
-                        <div className="flex flex-wrap gap-2 p-2 border border-border rounded-md min-h-[44px] bg-card">
+                        <div className="border border-border rounded-md p-3 bg-card max-h-48 overflow-y-auto space-y-2">
                           {assignableMembers.map((member) => {
-                            const selected = field.value?.includes(member.id);
+                            const checked = field.value?.includes(member.id);
                             return (
-                              <button
-                                type="button"
+                              <label
                                 key={member.id}
-                                onClick={() => {
-                                  if (selected) field.onChange((field.value || []).filter((value: string) => value !== member.id));
-                                  else field.onChange([...(field.value || []), member.id]);
-                                }}
-                                className={cn(
-                                  'px-2.5 py-1 rounded-full text-xs border transition-colors cursor-pointer',
-                                  selected
-                                    ? 'bg-primary text-primary-foreground border-primary'
-                                    : 'bg-card text-foreground border-border hover:bg-accent'
-                                )}
+                                className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 p-1.5 rounded-md transition-colors"
                               >
-                                {member.name}
-                              </button>
+                                <Checkbox
+                                  checked={checked}
+                                  onCheckedChange={(isChecked) => {
+                                    if (isChecked) {
+                                      field.onChange([...(field.value || []), member.id]);
+                                    } else {
+                                      field.onChange((field.value || []).filter((v: string) => v !== member.id));
+                                    }
+                                  }}
+                                />
+                                <span className="text-sm">{member.name}</span>
+                              </label>
                             );
                           })}
                         </div>
