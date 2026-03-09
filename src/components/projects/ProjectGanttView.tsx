@@ -217,10 +217,10 @@ export default function ProjectGanttView({ tasks, activities }: ProjectGanttView
               ))}
             </div>
 
-            <div className="flex-1 overflow-x-auto">
+            <div className="flex-1 overflow-x-auto overflow-y-auto">
               <div style={{ width: totalWidth, minWidth: '100%' }}>
-                <div className="h-14 border-b">
-                  <div className="h-7 flex border-b relative">
+                <div className="h-12 border-b sticky top-0 bg-card z-10">
+                  <div className="h-6 flex border-b relative">
                     {months.map((month, index) => {
                       const monthStart = Math.max(0, differenceInDays(month, timelineStart));
                       const nextMonth = index < months.length - 1 ? months[index + 1] : timelineEnd;
