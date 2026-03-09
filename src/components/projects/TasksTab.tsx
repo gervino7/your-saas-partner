@@ -38,6 +38,10 @@ export default function TasksTab({ projectId }: { projectId: string }) {
     if (!open) setEditingTask(null);
   };
 
+  const handleDeleteTask = (task: any) => {
+    deleteTask.mutate({ id: task.id, projectId });
+  };
+
   const filteredTasks = useMemo(() => {
     let result = tasks;
     if (search) {
