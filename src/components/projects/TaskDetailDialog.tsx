@@ -64,7 +64,7 @@ interface TaskDetailDialogProps {
   onDelete?: (task: any) => void;
 }
 
-export default function TaskDetailDialog({ task, open, onOpenChange, projectLeadId, onEdit }: TaskDetailDialogProps) {
+export default function TaskDetailDialog({ task, open, onOpenChange, projectLeadId, onEdit, onDelete }: TaskDetailDialogProps) {
   const profile = useAuthStore((s) => s.profile);
   const updateTask = useUpdateTask();
   const { data: submissions = [], isLoading: subsLoading } = useTaskSubmissions(task?.id);
