@@ -56,17 +56,33 @@ export default function TaskGroupedView({ tasks, groupBy, onEditTask, onDeleteTa
           </CollapsibleTrigger>
           <CollapsibleContent className="pl-6 space-y-2 pt-2">
             {groupTasks.map((task) => (
-              <Card key={task.id} className="p-3">
+              <Card key={task.id} className="p-3 group/task hover:bg-muted/30 transition-colors">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <p className="text-sm font-medium">{task.title}</p>
-                    <Badge variant="outline" className={`text-[10px] ${priorityColors[task.priority] ?? ''}`}>
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{task.title}</p>
+                    <Badge variant="outline" className={`text-[10px] shrink-0 ${priorityColors[task.priority] ?? ''}`}>
                       {TASK_PRIORITY_LABELS[task.priority as keyof typeof TASK_PRIORITY_LABELS] ?? task.priority}
                     </Badge>
                   </div>
-                  <Badge variant="outline" className="text-[10px]">
-                    {TASK_STATUS_LABELS[task.status as keyof typeof TASK_STATUS_LABELS] ?? task.status}
-                  </Badge>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Badge variant="outline" className="text-[10px]">
+                      {TASK_STATUS_LABELS[task.status as keyof typeof TASK_STATUS_LABELS] ?? task.status}
+                    </Badge>
+                    {(onEditTask || onDeleteTask) && (
+                      <div className="flex gap-1 opacity-0 group-hover/task:opacity-100 transition-opacity">
+                        {onEditTask && (
+                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onEditTask(task)}>
+                            <Pencil className="h-3 w-3" />
+                          </Button>
+                        )}
+                        {onDeleteTask && (
+                          <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => onDeleteTask(task)}>
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 {groupBy === 'compartment' && task.assignments?.length > 0 && (
                   <div className="flex -space-x-1 mt-2">
