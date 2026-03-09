@@ -19,6 +19,7 @@ export default function TasksTab({ projectId }: { projectId: string }) {
   const { data: activities = [] } = useProjectActivities(projectId);
   const { data: members = [] } = useProjectMembers(projectId);
   const { data: project } = useProject(projectId);
+  const deleteTask = useDeleteTask();
   const projectLeadId = project?.lead_id ?? null;
   const [view, setView] = useState<ViewMode>('kanban');
   const [formOpen, setFormOpen] = useState(false);
