@@ -159,9 +159,10 @@ export default function ProjectGanttView({ tasks, activities }: ProjectGanttView
 
   const colWidth = COL_WIDTHS[zoom];
   const totalWidth = days.length * colWidth;
-  const ROW_HEIGHT = 36;
-  const LABEL_WIDTH = 300;
+  const ROW_HEIGHT = 30;
+  const LABEL_WIDTH = 260;
   const todayOffset = differenceInDays(new Date(), timelineStart) * colWidth;
+  const maxHeight = Math.min(rows.length * ROW_HEIGHT + 56, 420);
 
   const getBarStyle = (row: GanttRow) => {
     if (!row.startDate || !row.endDate) return null;
