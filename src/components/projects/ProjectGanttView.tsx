@@ -262,8 +262,8 @@ export default function ProjectGanttView({ tasks, activities }: ProjectGanttView
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <div
-                                className={cn('absolute rounded-sm top-1.5', row.type === 'activity' ? 'h-4' : 'h-3', STATUS_BAR_CLASS[row.status] ?? 'bg-primary')}
-                                style={{ left: bar.left, width: Math.max(bar.width, 4), top: row.type === 'activity' ? 8 : 10 }}
+                                className={cn('absolute rounded-sm', row.type === 'activity' ? 'h-3' : 'h-2.5', STATUS_BAR_CLASS[row.status] ?? 'bg-primary')}
+                                style={{ left: bar.left, width: Math.max(bar.width, 4), top: row.type === 'activity' ? 8 : 9 }}
                               >
                                 {row.progress > 0 && row.progress < 100 && (
                                   <div className="absolute inset-y-0 left-0 rounded-l-sm bg-background/30" style={{ width: `${row.progress}%` }} />

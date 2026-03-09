@@ -115,11 +115,28 @@ export default function TaskDetailDialog({ task, open, onOpenChange, projectLead
                 ))}
               </div>
             </div>
-            {onEdit && (
-              <Button size="sm" variant="outline" onClick={() => { onEdit(task); onOpenChange(false); }}>
-                <Pencil className="h-4 w-4 mr-1" /> Modifier
-              </Button>
-            )}
+            <div className="flex gap-2">
+              {onEdit && (
+                <Button size="sm" variant="outline" onClick={() => { onEdit(task); onOpenChange(false); }}>
+                  <Pencil className="h-4 w-4 mr-1" /> Modifier
+                </Button>
+              )}
+              {onDelete && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-destructive hover:bg-destructive/10"
+                  onClick={() => {
+                    if (confirm(`Supprimer la tâche "${task.title}" ?`)) {
+                      onDelete(task);
+                      onOpenChange(false);
+                    }
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </DialogHeader>
 
