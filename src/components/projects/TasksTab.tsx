@@ -122,8 +122,8 @@ export default function TasksTab({ projectId }: { projectId: string }) {
         <>
           {view === 'kanban' && <TaskKanbanView tasks={filteredTasks} projectLeadId={projectLeadId} onEditTask={handleEditTask} onDeleteTask={handleDeleteTask} />}
           {view === 'table' && <TaskTableView tasks={filteredTasks} projectLeadId={projectLeadId} onEditTask={handleEditTask} onDeleteTask={handleDeleteTask} />}
-          {view === 'compartment' && <TaskGroupedView tasks={filteredTasks} groupBy="compartment" />}
-          {view === 'assignee' && <TaskGroupedView tasks={filteredTasks} groupBy="assignee" />}
+          {view === 'compartment' && <TaskGroupedView tasks={filteredTasks} groupBy="compartment" onEditTask={handleEditTask} onDeleteTask={handleDeleteTask} />}
+          {view === 'assignee' && <TaskGroupedView tasks={filteredTasks} groupBy="assignee" onEditTask={handleEditTask} onDeleteTask={handleDeleteTask} />}
           {view === 'gantt' && <ProjectGanttView tasks={filteredTasks} activities={activities} />}
         </>
       )}
