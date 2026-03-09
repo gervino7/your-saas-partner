@@ -22,7 +22,7 @@ function initials(name: string) {
   return name?.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2) ?? '?';
 }
 
-export default function TaskKanbanView({ tasks, projectLeadId, onEditTask }: { tasks: any[]; projectLeadId?: string | null; onEditTask?: (task: any) => void }) {
+export default function TaskKanbanView({ tasks, projectLeadId, onEditTask, onDeleteTask }: { tasks: any[]; projectLeadId?: string | null; onEditTask?: (task: any) => void; onDeleteTask?: (task: any) => void }) {
   const updateTask = useUpdateTask();
   const [selectedTask, setSelectedTask] = useState<any>(null);
 
