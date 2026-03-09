@@ -190,29 +190,29 @@ export default function ProjectGanttView({ tasks, activities }: ProjectGanttView
               {rows.map((row) => (
                 <div
                   key={row.id}
-                  className={cn('border-b px-2 flex items-center gap-2 hover:bg-muted/40', row.type === 'activity' && 'bg-muted/20')}
-                  style={{ height: ROW_HEIGHT, paddingLeft: 8 + row.depth * 16 }}
+                  className={cn('border-b px-1.5 flex items-center gap-1.5 hover:bg-muted/40', row.type === 'activity' && 'bg-muted/20')}
+                  style={{ height: ROW_HEIGHT, paddingLeft: 6 + row.depth * 12 }}
                 >
                   {row.type === 'activity' ? (
                     <button type="button" onClick={() => toggleCollapse(row.id)} className="p-0.5 rounded hover:bg-muted">
                       {collapsed.has(row.id) ? (
-                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                        <ChevronRight className="h-3 w-3 text-muted-foreground" />
                       ) : (
-                        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                        <ChevronDown className="h-3 w-3 text-muted-foreground" />
                       )}
                     </button>
                   ) : (
-                    <span className="w-4" />
+                    <span className="w-3" />
                   )}
 
                   {row.type === 'activity' ? (
-                    <Folder className="h-3.5 w-3.5 text-primary" />
+                    <Folder className="h-3 w-3 text-primary shrink-0" />
                   ) : (
-                    <CheckSquare className="h-3.5 w-3.5 text-muted-foreground" />
+                    <CheckSquare className="h-3 w-3 text-muted-foreground shrink-0" />
                   )}
 
-                  <span className="text-xs truncate">{row.label}</span>
-                  {row.code && <Badge variant="outline" className="text-[10px] font-mono ml-auto">{row.code}</Badge>}
+                  <span className="text-[11px] truncate flex-1">{row.label}</span>
+                  {row.code && <Badge variant="outline" className="text-[9px] font-mono px-1 py-0">{row.code}</Badge>}
                 </div>
               ))}
             </div>
