@@ -1,8 +1,9 @@
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Pencil, Trash2 } from 'lucide-react';
 import { TASK_STATUS_LABELS, TASK_PRIORITY_LABELS } from '@/types/database';
 
 const priorityColors: Record<string, string> = {
@@ -19,9 +20,11 @@ function initials(name: string) {
 interface GroupedViewProps {
   tasks: any[];
   groupBy: 'compartment' | 'assignee';
+  onEditTask?: (task: any) => void;
+  onDeleteTask?: (task: any) => void;
 }
 
-export default function TaskGroupedView({ tasks, groupBy }: GroupedViewProps) {
+export default function TaskGroupedView({ tasks, groupBy, onEditTask, onDeleteTask }: GroupedViewProps) {
   const groups: Record<string, any[]> = {};
 
   if (groupBy === 'compartment') {
