@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { useCreateTask, useUpdateTask } from '@/hooks/useProject';
 import { Info, CalendarDays, Settings } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 const schema = z.object({
   title: z.string().min(1, 'Titre requis').default(''),
