@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import {
   FileText, History, Paperclip, Activity, Play, Send, Check, RotateCcw,
-  Star, Upload, Download, Clock, User, Pencil,
+  Star, Upload, Download, Clock, User, Pencil, Trash2,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
