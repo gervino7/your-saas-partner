@@ -61,6 +61,7 @@ interface TaskDetailDialogProps {
   onOpenChange: (open: boolean) => void;
   projectLeadId?: string | null;
   onEdit?: (task: any) => void;
+  onDelete?: (task: any) => void;
 }
 
 export default function TaskDetailDialog({ task, open, onOpenChange, projectLeadId, onEdit }: TaskDetailDialogProps) {
