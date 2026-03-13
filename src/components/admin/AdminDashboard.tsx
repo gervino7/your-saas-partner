@@ -15,16 +15,16 @@ const COLORS = [
 
 function KPICard({ icon: Icon, label, value, sub }: { icon: any; label: string; value: string; sub?: string }) {
   return (
-    <Card>
-      <CardContent className="pt-6">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <Icon className="h-5 w-5 text-primary" />
+    <Card className="overflow-hidden">
+      <CardContent className="pt-4 pb-3 px-3">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="shrink-0 p-1.5 rounded-lg bg-primary/10">
+            <Icon className="h-4 w-4 text-primary" />
           </div>
-          <div>
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <p className="text-xl font-bold">{value}</p>
-            {sub && <p className="text-[10px] text-muted-foreground">{sub}</p>}
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] leading-tight text-muted-foreground truncate">{label}</p>
+            <p className="text-sm font-bold leading-tight truncate" title={value}>{value}</p>
+            {sub && <p className="text-[9px] leading-tight text-muted-foreground truncate">{sub}</p>}
           </div>
         </div>
       </CardContent>
