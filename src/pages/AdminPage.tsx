@@ -21,6 +21,7 @@ import AdminDashboard from '@/components/admin/AdminDashboard';
 import AdminUsers from '@/components/admin/AdminUsers';
 import AdminActivityLogs from '@/components/admin/AdminActivityLogs';
 import AdminSettings from '@/components/admin/AdminSettings';
+import AdminGrades from '@/components/admin/AdminGrades';
 
 const sections = [
   { id: 'dashboard', label: 'Tableau de bord', icon: BarChart3 },
