@@ -159,6 +159,7 @@ const AdminPage = () => {
             <Button onClick={() => navigate('/admin/reviews')}>Voir les évaluations</Button>
           </div>
         );
+      case 'grades': return <AdminGrades />;
       case 'logs': return <AdminActivityLogs />;
       case 'settings': return <AdminSettings />;
       default: return null;
