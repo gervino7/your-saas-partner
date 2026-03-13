@@ -2139,6 +2139,53 @@ export type Database = {
           },
         ]
       }
+      organization_grades: {
+        Row: {
+          code: string
+          created_at: string | null
+          currency: string | null
+          daily_rate: number | null
+          id: string
+          is_active: boolean | null
+          label: string
+          level: number
+          organization_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          currency?: string | null
+          daily_rate?: number | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          level: number
+          organization_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          currency?: string | null
+          daily_rate?: number | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          level?: number
+          organization_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_grades_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           created_at: string | null
