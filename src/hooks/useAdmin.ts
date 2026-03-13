@@ -282,6 +282,42 @@ export function useUpdateUserGrade() {
   });
 }
 
+export function useUpdateUserProfile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, full_name, phone, grade, grade_level }: { userId: string; full_name: string; phone?: string; grade: string; grade_level: number }) => {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ full_name, phone: phone || null, grade, grade_level })
+        .eq('id', userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['org-users'] });
+      toast.success('Utilisateur mis à jour');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+
+export function useDeleteUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      const { data, error } = await supabase.functions.invoke('delete-user', {
+        body: { userId },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['org-users'] });
+      toast.success('Utilisateur supprimé');
+    },
+    onError: (e: Error) => toast.error(`Erreur : ${e.message}`),
+  });
+}
+
 export function useInviteUser() {
   const qc = useQueryClient();
   const profile = useAuthStore((s) => s.profile);
