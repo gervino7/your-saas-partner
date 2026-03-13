@@ -21,6 +21,7 @@ import AdminDashboard from '@/components/admin/AdminDashboard';
 import AdminUsers from '@/components/admin/AdminUsers';
 import AdminActivityLogs from '@/components/admin/AdminActivityLogs';
 import AdminSettings from '@/components/admin/AdminSettings';
+import AdminGrades from '@/components/admin/AdminGrades';
 
 const sections = [
   { id: 'dashboard', label: 'Tableau de bord', icon: BarChart3 },
@@ -30,6 +31,7 @@ const sections = [
   { id: 'codir', label: 'Comité de Direction', icon: Shield },
   { id: 'finance', label: 'Finance', icon: DollarSign },
   { id: 'reviews', label: 'Évaluations', icon: Star },
+  { id: 'grades', label: 'Grades', icon: Shield },
   { id: 'logs', label: 'Journaux d\'activité', icon: Activity },
   { id: 'settings', label: 'Paramètres', icon: Settings },
 ];
@@ -157,6 +159,7 @@ const AdminPage = () => {
             <Button onClick={() => navigate('/admin/reviews')}>Voir les évaluations</Button>
           </div>
         );
+      case 'grades': return <AdminGrades />;
       case 'logs': return <AdminActivityLogs />;
       case 'settings': return <AdminSettings />;
       default: return null;
