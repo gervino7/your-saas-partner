@@ -7,24 +7,37 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Search, UserPlus, Pencil } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Search, UserPlus, Pencil, Trash2 } from 'lucide-react';
 import ExportMenu from '@/components/common/ExportMenu';
 import { useOrganizationUsers } from '@/hooks/useMissions';
-import { useUpdateUserGrade, useInviteUser } from '@/hooks/useAdmin';
+import { useUpdateUserProfile, useDeleteUser, useInviteUser } from '@/hooks/useAdmin';
 import { GRADE_LABELS, GRADE_LEVELS } from '@/types/database';
 import type { Grade } from '@/types/database';
+import { useAuthStore } from '@/stores/authStore';
 
 const GRADES = Object.keys(GRADE_LABELS) as Grade[];
 
+interface EditingUser {
+  id: string;
+  full_name: string;
+  phone: string;
+  grade: Grade;
+}
+
 export default function AdminUsers() {
   const { data: users = [], isLoading } = useOrganizationUsers();
-  const updateGrade = useUpdateUserGrade();
+  const updateUser = useUpdateUserProfile();
+  const deleteUser = useDeleteUser();
   const inviteUser = useInviteUser();
+  const currentUserId = useAuthStore((s) => s.profile?.id);
   const [search, setSearch] = useState('');
   const [filterGrade, setFilterGrade] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [editingUser, setEditingUser] = useState<{ id: string; grade: Grade } | null>(null);
+  const [editingUser, setEditingUser] = useState<EditingUser | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteGrade, setInviteGrade] = useState<Grade>('AUD');
@@ -37,10 +50,27 @@ export default function AdminUsers() {
     return true;
   });
 
-  const handleSaveGrade = () => {
+  const handleOpenEdit = (u: any) => {
+    setEditingUser({
+      id: u.id,
+      full_name: u.full_name || '',
+      phone: u.phone || '',
+      grade: (u.grade as Grade) || 'AUD',
+    });
+    setEditOpen(true);
+  };
+
+  const handleSaveEdit = () => {
     if (!editingUser) return;
-    updateGrade.mutate({ userId: editingUser.id, grade: editingUser.grade, grade_level: GRADE_LEVELS[editingUser.grade] });
-    setEditingUser(null);
+    updateUser.mutate(
+      { userId: editingUser.id, full_name: editingUser.full_name, phone: editingUser.phone, grade: editingUser.grade, grade_level: GRADE_LEVELS[editingUser.grade] },
+      { onSuccess: () => setEditOpen(false) }
+    );
+  };
+
+  const handleConfirmDelete = () => {
+    if (!deleteTarget) return;
+    deleteUser.mutate(deleteTarget.id, { onSuccess: () => setDeleteTarget(null) });
   };
 
   const handleInvite = () => {
@@ -83,7 +113,7 @@ export default function AdminUsers() {
                 <TableHead>Email</TableHead>
                 <TableHead>Grade</TableHead>
                 <TableHead>Statut</TableHead>
-                <TableHead className="w-20" />
+                <TableHead className="w-24">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -107,27 +137,16 @@ export default function AdminUsers() {
                     <TableCell><Badge variant="outline" className="text-xs">{u.grade || '—'}</Badge></TableCell>
                     <TableCell><Badge variant={u.is_online ? 'default' : 'secondary'} className="text-[10px]">{u.is_online ? 'En ligne' : 'Hors ligne'}</Badge></TableCell>
                     <TableCell>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditingUser({ id: u.id, grade: (u.grade as Grade) || 'AUD' })}>
-                            <Pencil className="h-3.5 w-3.5" />
+                      <div className="flex items-center gap-1">
+                        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleOpenEdit(u)} title="Modifier">
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                        {u.id !== currentUserId && (
+                          <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => setDeleteTarget({ id: u.id, name: u.full_name })} title="Supprimer">
+                            <Trash2 className="h-3.5 w-3.5" />
                           </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-sm">
-                          <DialogHeader><DialogTitle>Modifier le grade de {u.full_name}</DialogTitle></DialogHeader>
-                          <div className="px-5 py-4 space-y-3 dialog-form-bg">
-                            <div><Label>Grade</Label>
-                              <Select value={editingUser?.grade || u.grade || 'AUD'} onValueChange={(v) => setEditingUser((prev) => prev ? { ...prev, grade: v as Grade } : null)}>
-                                <SelectTrigger><SelectValue /></SelectTrigger>
-                                <SelectContent>{GRADES.map((g) => <SelectItem key={g} value={g}>{g} — {GRADE_LABELS[g]}</SelectItem>)}</SelectContent>
-                              </Select>
-                            </div>
-                          </div>
-                          <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex items-center justify-end gap-2">
-                            <Button size="sm" className="h-9 px-5" onClick={handleSaveGrade} disabled={updateGrade.isPending}>Enregistrer</Button>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -136,6 +155,54 @@ export default function AdminUsers() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Edit Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>Modifier l'utilisateur</DialogTitle></DialogHeader>
+          <div className="px-5 py-4 space-y-3 dialog-form-bg">
+            <div>
+              <Label>Nom complet</Label>
+              <Input value={editingUser?.full_name ?? ''} onChange={(e) => setEditingUser((prev) => prev ? { ...prev, full_name: e.target.value } : null)} />
+            </div>
+            <div>
+              <Label>Téléphone</Label>
+              <Input value={editingUser?.phone ?? ''} onChange={(e) => setEditingUser((prev) => prev ? { ...prev, phone: e.target.value } : null)} placeholder="+225 XX XX XX XX" />
+            </div>
+            <div>
+              <Label>Grade</Label>
+              <Select value={editingUser?.grade || 'AUD'} onValueChange={(v) => setEditingUser((prev) => prev ? { ...prev, grade: v as Grade } : null)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{GRADES.map((g) => <SelectItem key={g} value={g}>{g} — {GRADE_LABELS[g]}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex items-center justify-end gap-2">
+            <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => setEditOpen(false)}>Annuler</Button>
+            <Button size="sm" className="h-9 px-5" onClick={handleSaveEdit} disabled={updateUser.isPending || !editingUser?.full_name?.trim()}>
+              {updateUser.isPending ? 'Enregistrement...' : 'Enregistrer'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer l'utilisateur</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer <strong>{deleteTarget?.name}</strong> ? Cette action est irréversible et supprimera toutes les données associées à cet utilisateur.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90" disabled={deleteUser.isPending}>
+              {deleteUser.isPending ? 'Suppression...' : 'Supprimer'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Invite Dialog */}
       <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
