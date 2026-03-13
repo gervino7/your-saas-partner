@@ -31,6 +31,7 @@ const sections = [
   { id: 'codir', label: 'Comité de Direction', icon: Shield },
   { id: 'finance', label: 'Finance', icon: DollarSign },
   { id: 'reviews', label: 'Évaluations', icon: Star },
+  { id: 'grades', label: 'Grades', icon: Shield },
   { id: 'logs', label: 'Journaux d\'activité', icon: Activity },
   { id: 'settings', label: 'Paramètres', icon: Settings },
 ];
