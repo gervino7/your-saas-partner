@@ -276,6 +276,15 @@ export default function WorkspacePage() {
     bulkDelete.mutate(selectedFiles, { onSuccess: () => setSelectedIds(new Set()) });
   };
 
+  const handleSyncAll = async () => {
+    if (!pendingFiles.length) {
+      toast({ title: 'Aucun élément en attente de synchronisation' });
+      return;
+    }
+
+    await Promise.all(pendingFiles.map((file) => forceSync.mutateAsync(file.id)));
+  };
+
   // Drag & drop between folders
   const handleDragStart = (e: React.DragEvent, file: WorkspaceFile) => {
     if (!isOwnWorkspace) return;
@@ -529,8 +538,14 @@ export default function WorkspacePage() {
               <Button variant="outline" size="sm" onClick={() => setShowSettings(true)}>
                 <Settings className="h-4 w-4 mr-1" /> Paramètres
               </Button>
-              <Button variant="outline" size="sm" disabled>
-                <RefreshCw className="h-4 w-4 mr-1" /> Synchroniser
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSyncAll}
+                disabled={forceSync.isPending}
+              >
+                <RefreshCw className={`h-4 w-4 mr-1 ${forceSync.isPending ? 'animate-spin' : ''}`} />
+                {forceSync.isPending ? 'Synchronisation...' : 'Synchroniser'}
               </Button>
             </>
           )}
