@@ -12,8 +12,11 @@ const OfflineBanner = () => {
 
   const handleSync = async () => {
     setSyncing(true);
-    await syncNow();
-    setSyncing(false);
+    try {
+      await syncNow();
+    } finally {
+      setSyncing(false);
+    }
   };
 
   return (
