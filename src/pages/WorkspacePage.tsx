@@ -538,8 +538,14 @@ export default function WorkspacePage() {
               <Button variant="outline" size="sm" onClick={() => setShowSettings(true)}>
                 <Settings className="h-4 w-4 mr-1" /> Paramètres
               </Button>
-              <Button variant="outline" size="sm" disabled>
-                <RefreshCw className="h-4 w-4 mr-1" /> Synchroniser
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSyncAll}
+                disabled={forceSync.isPending}
+              >
+                <RefreshCw className={`h-4 w-4 mr-1 ${forceSync.isPending ? 'animate-spin' : ''}`} />
+                {forceSync.isPending ? 'Synchronisation...' : 'Synchroniser'}
               </Button>
             </>
           )}
