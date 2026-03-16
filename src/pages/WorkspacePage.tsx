@@ -276,6 +276,15 @@ export default function WorkspacePage() {
     bulkDelete.mutate(selectedFiles, { onSuccess: () => setSelectedIds(new Set()) });
   };
 
+  const handleSyncAll = async () => {
+    if (!pendingFiles.length) {
+      toast({ title: 'Aucun élément en attente de synchronisation' });
+      return;
+    }
+
+    await Promise.all(pendingFiles.map((file) => forceSync.mutateAsync(file.id)));
+  };
+
   // Drag & drop between folders
   const handleDragStart = (e: React.DragEvent, file: WorkspaceFile) => {
     if (!isOwnWorkspace) return;
