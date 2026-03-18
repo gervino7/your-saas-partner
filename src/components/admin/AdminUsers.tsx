@@ -123,10 +123,10 @@ export default function AdminUsers() {
             <TableBody>
               {isLoading ? (
                 <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Chargement...</TableCell></TableRow>
-              ) : filtered.length === 0 ? (
+              ) : sortedUsers.length === 0 ? (
                 <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Aucun utilisateur trouvé</TableCell></TableRow>
               ) : (
-                filtered.map((u: any) => (
+                sortedUsers.map((u: any) => (
                   <TableRow key={u.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
