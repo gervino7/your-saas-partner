@@ -10,6 +10,8 @@ import { useOrganizationUsers } from '@/hooks/useMissions';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import ExportMenu from '@/components/common/ExportMenu';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
 const ACTION_LABELS: Record<string, string> = {
   login: 'Connexion',
