@@ -40,6 +40,8 @@ const CRMPage = () => {
     return true;
   });
 
+  const { sorted: sortedClients, sort, handleSort } = useTableSort(filtered);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
