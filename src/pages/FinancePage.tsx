@@ -359,6 +359,7 @@ function ExpensesTab() {
 function InvoicesTab() {
   const [statusFilter, setStatusFilter] = useState('all');
   const { data: invoices = [] } = useInvoices({ status: statusFilter });
+  const { sorted: sortedInvoices, sort: invSort, handleSort: handleInvSort } = useTableSort(invoices);
   const { data: missions = [] } = useMissions();
   const { data: clients = [] } = useClients();
   const createInvoice = useCreateInvoice();
