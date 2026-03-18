@@ -311,20 +311,20 @@ function ExpensesTab() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Employé</TableHead>
-                <TableHead>Catégorie</TableHead>
-                <TableHead>Mission</TableHead>
-                <TableHead className="text-right">Montant</TableHead>
-                <TableHead>Statut</TableHead>
+                <SortableTableHead sortKey="date" currentSort={expSort} onSort={handleExpSort}>Date</SortableTableHead>
+                <SortableTableHead sortKey="user.full_name" currentSort={expSort} onSort={handleExpSort}>Employé</SortableTableHead>
+                <SortableTableHead sortKey="category" currentSort={expSort} onSort={handleExpSort}>Catégorie</SortableTableHead>
+                <SortableTableHead sortKey="mission.name" currentSort={expSort} onSort={handleExpSort}>Mission</SortableTableHead>
+                <SortableTableHead sortKey="amount" currentSort={expSort} onSort={handleExpSort} className="text-right">Montant</SortableTableHead>
+                <SortableTableHead sortKey="status" currentSort={expSort} onSort={handleExpSort}>Statut</SortableTableHead>
                 {isSuperior && <TableHead className="w-24" />}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {expenses.length === 0 && (
+              {sortedExpenses.length === 0 && (
                 <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-6">Aucune note de frais</TableCell></TableRow>
               )}
-              {expenses.map((exp: any) => (
+              {sortedExpenses.map((exp: any) => (
                 <TableRow key={exp.id}>
                   <TableCell className="text-sm">{format(new Date(exp.date), 'dd/MM/yyyy')}</TableCell>
                   <TableCell className="text-sm">{exp.user?.full_name || '—'}</TableCell>
