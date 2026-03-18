@@ -24,12 +24,6 @@ const CRMPage = () => {
   const [countryFilter, setCountryFilter] = useState('all');
   const [showCreate, setShowCreate] = useState(false);
 
-  if (gradeLevel > 4) {
-    return <EmptyState icon={Building2} title="Accès restreint" description="Cette section est réservée aux superviseurs et grades supérieurs." />;
-  }
-
-  if (isLoading) return <Loading />;
-
   const sectors = [...new Set((clients ?? []).map(c => c.industry).filter(Boolean))];
   const countries = [...new Set((clients ?? []).map(c => c.country).filter(Boolean))];
 
@@ -41,6 +35,12 @@ const CRMPage = () => {
   });
 
   const { sorted: sortedClients, sort, handleSort } = useTableSort(filtered);
+
+  if (gradeLevel > 4) {
+    return <EmptyState icon={Building2} title="Accès restreint" description="Cette section est réservée aux superviseurs et grades supérieurs." />;
+  }
+
+  if (isLoading) return <Loading />;
 
   return (
     <div className="space-y-6">
