@@ -15,6 +15,8 @@ import { fr } from 'date-fns/locale';
 import { Plus, Link2, Unlink } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
 const statusLabels: Record<string, string> = { draft: 'Brouillon', planning: 'Planification', active: 'Active', paused: 'En pause', completed: 'Terminée', archived: 'Archivée' };
 const statusColors: Record<string, string> = { draft: 'secondary', planning: 'outline', active: 'default', completed: 'default', paused: 'secondary', archived: 'secondary' };
