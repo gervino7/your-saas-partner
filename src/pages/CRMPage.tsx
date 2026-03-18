@@ -11,6 +11,8 @@ import { useAuthStore } from '@/stores/authStore';
 import EmptyState from '@/components/common/EmptyState';
 import Loading from '@/components/common/Loading';
 import ClientFormDialog from '@/components/crm/ClientFormDialog';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
 const CRMPage = () => {
   const profile = useAuthStore((s) => s.profile);
@@ -37,6 +39,8 @@ const CRMPage = () => {
     if (countryFilter !== 'all' && c.country !== countryFilter) return false;
     return true;
   });
+
+  const { sorted: sortedClients, sort, handleSort } = useTableSort(filtered);
 
   return (
     <div className="space-y-6">
@@ -77,16 +81,16 @@ const CRMPage = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nom</TableHead>
-                <TableHead>Secteur</TableHead>
-                <TableHead>Contact principal</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Pays</TableHead>
+                <SortableTableHead sortKey="name" currentSort={sort} onSort={handleSort}>Nom</SortableTableHead>
+                <SortableTableHead sortKey="industry" currentSort={sort} onSort={handleSort}>Secteur</SortableTableHead>
+                <SortableTableHead sortKey="contact_name" currentSort={sort} onSort={handleSort}>Contact principal</SortableTableHead>
+                <SortableTableHead sortKey="contact_email" currentSort={sort} onSort={handleSort}>Email</SortableTableHead>
+                <SortableTableHead sortKey="country" currentSort={sort} onSort={handleSort}>Pays</SortableTableHead>
                 <TableHead className="w-[100px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map(client => (
+              {sortedClients.map(client => (
                 <TableRow key={client.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/admin/clients/${client.id}`)}>
                   <TableCell className="font-medium">{client.name}</TableCell>
                   <TableCell>{client.industry ? <Badge variant="outline">{client.industry}</Badge> : '—'}</TableCell>

@@ -15,6 +15,8 @@ import { fr } from 'date-fns/locale';
 import { Plus, Link2, Unlink } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
 const statusLabels: Record<string, string> = { draft: 'Brouillon', planning: 'Planification', active: 'Active', paused: 'En pause', completed: 'Terminée', archived: 'Archivée' };
 const statusColors: Record<string, string> = { draft: 'secondary', planning: 'outline', active: 'default', completed: 'default', paused: 'secondary', archived: 'secondary' };
@@ -53,6 +55,8 @@ export default function ClientMissionsTab({ clientId }: { clientId: string }) {
     qc.invalidateQueries({ queryKey: ['missions'] });
   };
 
+  const { sorted: sortedMissions, sort, handleSort } = useTableSort(missions ?? []);
+
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between">
@@ -73,17 +77,17 @@ export default function ClientMissionsTab({ clientId }: { clientId: string }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Code</TableHead>
-                <TableHead>Nom</TableHead>
-                <TableHead>Statut</TableHead>
+                <SortableTableHead sortKey="code" currentSort={sort} onSort={handleSort}>Code</SortableTableHead>
+                <SortableTableHead sortKey="name" currentSort={sort} onSort={handleSort}>Nom</SortableTableHead>
+                <SortableTableHead sortKey="status" currentSort={sort} onSort={handleSort}>Statut</SortableTableHead>
                 <TableHead>Chef de mission</TableHead>
-                <TableHead>Dates</TableHead>
-                <TableHead>Progression</TableHead>
+                <SortableTableHead sortKey="start_date" currentSort={sort} onSort={handleSort}>Dates</SortableTableHead>
+                <SortableTableHead sortKey="progress" currentSort={sort} onSort={handleSort}>Progression</SortableTableHead>
                 <TableHead className="w-10"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {missions.map((m: any) => (
+              {sortedMissions.map((m: any) => (
                 <TableRow key={m.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/missions/${m.id}`)}>
                   <TableCell className="font-mono text-xs">{m.code}</TableCell>
                   <TableCell className="font-medium">{m.name}</TableCell>

@@ -16,6 +16,8 @@ import { useUpdateUserProfile, useDeleteUser, useInviteUser } from '@/hooks/useA
 import { GRADE_LABELS, GRADE_LEVELS } from '@/types/database';
 import type { Grade } from '@/types/database';
 import { useAuthStore } from '@/stores/authStore';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
 const GRADES = Object.keys(GRADE_LABELS) as Grade[];
 
@@ -49,6 +51,8 @@ export default function AdminUsers() {
     if (filterStatus === 'offline' && u.is_online) return false;
     return true;
   });
+
+  const { sorted: sortedUsers, sort, handleSort } = useTableSort(filtered);
 
   const handleOpenEdit = (u: any) => {
     setEditingUser({
@@ -109,20 +113,20 @@ export default function AdminUsers() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Utilisateur</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Grade</TableHead>
-                <TableHead>Statut</TableHead>
+                <SortableTableHead sortKey="full_name" currentSort={sort} onSort={handleSort}>Utilisateur</SortableTableHead>
+                <SortableTableHead sortKey="email" currentSort={sort} onSort={handleSort}>Email</SortableTableHead>
+                <SortableTableHead sortKey="grade" currentSort={sort} onSort={handleSort}>Grade</SortableTableHead>
+                <SortableTableHead sortKey="is_online" currentSort={sort} onSort={handleSort}>Statut</SortableTableHead>
                 <TableHead className="w-24">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Chargement...</TableCell></TableRow>
-              ) : filtered.length === 0 ? (
+              ) : sortedUsers.length === 0 ? (
                 <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Aucun utilisateur trouvé</TableCell></TableRow>
               ) : (
-                filtered.map((u: any) => (
+                sortedUsers.map((u: any) => (
                   <TableRow key={u.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">

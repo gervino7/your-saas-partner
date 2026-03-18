@@ -10,6 +10,8 @@ import { useOrganizationUsers } from '@/hooks/useMissions';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import ExportMenu from '@/components/common/ExportMenu';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
 const ACTION_LABELS: Record<string, string> = {
   login: 'Connexion',
@@ -88,52 +90,60 @@ export default function AdminActivityLogs() {
         />
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Utilisateur</TableHead>
-                <TableHead>Action</TableHead>
-                <TableHead>Entité</TableHead>
-                <TableHead>Détails</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Chargement...</TableCell></TableRow>
-              ) : logs.length === 0 ? (
-                <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Aucun journal trouvé</TableCell></TableRow>
-              ) : (
-                logs.map((log: any) => (
-                  <TableRow key={log.id}>
-                    <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
-                      {format(new Date(log.created_at), 'dd/MM/yy HH:mm', { locale: fr })}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-6 w-6">
-                          <AvatarImage src={log.user?.avatar_url} />
-                          <AvatarFallback className="text-[10px]">{log.user?.full_name?.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm">{log.user?.full_name || '—'}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="text-[10px]">{ACTION_LABELS[log.action] || log.action}</Badge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{log.entity_type || '—'}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">
-                      {log.metadata ? JSON.stringify(log.metadata).slice(0, 80) : '—'}
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <SortableActivityTable logs={logs} isLoading={isLoading} />
     </div>
+  );
+}
+
+function SortableActivityTable({ logs, isLoading }: { logs: any[]; isLoading: boolean }) {
+  const { sorted, sort, handleSort } = useTableSort(logs);
+
+  return (
+    <Card>
+      <CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <SortableTableHead sortKey="created_at" currentSort={sort} onSort={handleSort}>Date</SortableTableHead>
+              <SortableTableHead sortKey="user.full_name" currentSort={sort} onSort={handleSort}>Utilisateur</SortableTableHead>
+              <SortableTableHead sortKey="action" currentSort={sort} onSort={handleSort}>Action</SortableTableHead>
+              <SortableTableHead sortKey="entity_type" currentSort={sort} onSort={handleSort}>Entité</SortableTableHead>
+              <TableHead>Détails</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Chargement...</TableCell></TableRow>
+            ) : sorted.length === 0 ? (
+              <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Aucun journal trouvé</TableCell></TableRow>
+            ) : (
+              sorted.map((log: any) => (
+                <TableRow key={log.id}>
+                  <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                    {format(new Date(log.created_at), 'dd/MM/yy HH:mm', { locale: fr })}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={log.user?.avatar_url} />
+                        <AvatarFallback className="text-[10px]">{log.user?.full_name?.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm">{log.user?.full_name || '—'}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="text-[10px]">{ACTION_LABELS[log.action] || log.action}</Badge>
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{log.entity_type || '—'}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">
+                    {log.metadata ? JSON.stringify(log.metadata).slice(0, 80) : '—'}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }

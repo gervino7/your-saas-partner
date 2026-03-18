@@ -18,6 +18,8 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import EmptyState from '@/components/common/EmptyState';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
 const DEFAULT_RATES: Record<string, number> = {
   DA: 750000, DM: 500000, CM: 400000, SUP: 300000,
@@ -29,6 +31,7 @@ const EXPENSE_CATEGORIES = ['Transport', 'Hébergement', 'Restauration', 'Fourni
 
 function BudgetTab() {
   const { data: summaries = [], isLoading } = useMissionBudgetSummary();
+  const { sorted: sortedSummaries, sort, handleSort } = useTableSort(summaries);
 
   const getBarColor = (pct: number) => {
     if (pct < 70) return 'bg-green-500';
@@ -67,19 +70,19 @@ function BudgetTab() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Mission</TableHead>
-                <TableHead className="text-right">Budget</TableHead>
-                <TableHead className="text-right">Heures</TableHead>
-                <TableHead className="text-right">Coût réel</TableHead>
+                <SortableTableHead sortKey="name" currentSort={sort} onSort={handleSort}>Mission</SortableTableHead>
+                <SortableTableHead sortKey="budget" currentSort={sort} onSort={handleSort} className="text-right">Budget</SortableTableHead>
+                <SortableTableHead sortKey="total_hours" currentSort={sort} onSort={handleSort} className="text-right">Heures</SortableTableHead>
+                <SortableTableHead sortKey="total_cost" currentSort={sort} onSort={handleSort} className="text-right">Coût réel</SortableTableHead>
                 <TableHead className="text-right">Marge</TableHead>
-                <TableHead className="w-[180px]">Consommé</TableHead>
+                <SortableTableHead sortKey="consumed_pct" currentSort={sort} onSort={handleSort} className="w-[180px]">Consommé</SortableTableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {summaries.length === 0 && (
+              {sortedSummaries.length === 0 && (
                 <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-6">Aucune mission active</TableCell></TableRow>
               )}
-              {summaries.map((m: any) => (
+              {sortedSummaries.map((m: any) => (
                 <TableRow key={m.id}>
                   <TableCell>
                     <div className="font-medium text-sm">{m.name}</div>
@@ -199,6 +202,7 @@ function ExpensesTab() {
   const profile = useAuthStore((s) => s.profile);
   const [statusFilter, setStatusFilter] = useState('all');
   const { data: expenses = [] } = useExpenses({ status: statusFilter });
+  const { sorted: sortedExpenses, sort: expSort, handleSort: handleExpSort } = useTableSort(expenses);
   const approveExpense = useApproveExpense();
   const createExpense = useCreateExpense();
   const { data: missions = [] } = useMissions();
@@ -307,20 +311,20 @@ function ExpensesTab() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Employé</TableHead>
-                <TableHead>Catégorie</TableHead>
-                <TableHead>Mission</TableHead>
-                <TableHead className="text-right">Montant</TableHead>
-                <TableHead>Statut</TableHead>
+                <SortableTableHead sortKey="date" currentSort={expSort} onSort={handleExpSort}>Date</SortableTableHead>
+                <SortableTableHead sortKey="user.full_name" currentSort={expSort} onSort={handleExpSort}>Employé</SortableTableHead>
+                <SortableTableHead sortKey="category" currentSort={expSort} onSort={handleExpSort}>Catégorie</SortableTableHead>
+                <SortableTableHead sortKey="mission.name" currentSort={expSort} onSort={handleExpSort}>Mission</SortableTableHead>
+                <SortableTableHead sortKey="amount" currentSort={expSort} onSort={handleExpSort} className="text-right">Montant</SortableTableHead>
+                <SortableTableHead sortKey="status" currentSort={expSort} onSort={handleExpSort}>Statut</SortableTableHead>
                 {isSuperior && <TableHead className="w-24" />}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {expenses.length === 0 && (
+              {sortedExpenses.length === 0 && (
                 <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-6">Aucune note de frais</TableCell></TableRow>
               )}
-              {expenses.map((exp: any) => (
+              {sortedExpenses.map((exp: any) => (
                 <TableRow key={exp.id}>
                   <TableCell className="text-sm">{format(new Date(exp.date), 'dd/MM/yyyy')}</TableCell>
                   <TableCell className="text-sm">{exp.user?.full_name || '—'}</TableCell>
@@ -355,6 +359,7 @@ function ExpensesTab() {
 function InvoicesTab() {
   const [statusFilter, setStatusFilter] = useState('all');
   const { data: invoices = [] } = useInvoices({ status: statusFilter });
+  const { sorted: sortedInvoices, sort: invSort, handleSort: handleInvSort } = useTableSort(invoices);
   const { data: missions = [] } = useMissions();
   const { data: clients = [] } = useClients();
   const createInvoice = useCreateInvoice();
@@ -490,21 +495,21 @@ function InvoicesTab() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>N° Facture</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead>Mission</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead className="text-right">Montant TTC</TableHead>
-                <TableHead>Échéance</TableHead>
-                <TableHead>Statut</TableHead>
+                <SortableTableHead sortKey="invoice_number" currentSort={invSort} onSort={handleInvSort}>N° Facture</SortableTableHead>
+                <SortableTableHead sortKey="client.name" currentSort={invSort} onSort={handleInvSort}>Client</SortableTableHead>
+                <SortableTableHead sortKey="mission.name" currentSort={invSort} onSort={handleInvSort}>Mission</SortableTableHead>
+                <SortableTableHead sortKey="type" currentSort={invSort} onSort={handleInvSort}>Type</SortableTableHead>
+                <SortableTableHead sortKey="total_amount" currentSort={invSort} onSort={handleInvSort} className="text-right">Montant TTC</SortableTableHead>
+                <SortableTableHead sortKey="due_date" currentSort={invSort} onSort={handleInvSort}>Échéance</SortableTableHead>
+                <SortableTableHead sortKey="status" currentSort={invSort} onSort={handleInvSort}>Statut</SortableTableHead>
                 <TableHead className="w-20" />
               </TableRow>
             </TableHeader>
             <TableBody>
-              {invoices.length === 0 && (
+              {sortedInvoices.length === 0 && (
                 <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-6">Aucune facture</TableCell></TableRow>
               )}
-              {invoices.map((inv: any) => (
+              {sortedInvoices.map((inv: any) => (
                 <TableRow key={inv.id}>
                   <TableCell className="font-mono text-sm">{inv.invoice_number}</TableCell>
                   <TableCell className="text-sm">{inv.client?.name || '—'}</TableCell>
