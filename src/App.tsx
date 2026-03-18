@@ -34,6 +34,8 @@ import ClientPortalPage from '@/pages/ClientPortalPage';
 import CopilPortalPage from '@/pages/CopilPortalPage';
 import SatisfactionSurveyPage from '@/pages/SatisfactionSurveyPage';
 import NotificationsPage from '@/pages/NotificationsPage';
+import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
+import ResetPasswordPage from '@/pages/ResetPasswordPage';
 import NotFound from '@/pages/NotFound';
 
 const queryClient = new QueryClient();
@@ -223,6 +225,8 @@ const App = () => (
               <Route path="/landing" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<LoginPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/portal/:token" element={<ClientPortalPage />} />
               <Route path="/copil-portal/:committeeId" element={<CopilPortalPage />} />
               <Route path="/survey/:token" element={<SatisfactionSurveyPage />} />
