@@ -495,21 +495,21 @@ function InvoicesTab() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>N° Facture</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead>Mission</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead className="text-right">Montant TTC</TableHead>
-                <TableHead>Échéance</TableHead>
-                <TableHead>Statut</TableHead>
+                <SortableTableHead sortKey="invoice_number" currentSort={invSort} onSort={handleInvSort}>N° Facture</SortableTableHead>
+                <SortableTableHead sortKey="client.name" currentSort={invSort} onSort={handleInvSort}>Client</SortableTableHead>
+                <SortableTableHead sortKey="mission.name" currentSort={invSort} onSort={handleInvSort}>Mission</SortableTableHead>
+                <SortableTableHead sortKey="type" currentSort={invSort} onSort={handleInvSort}>Type</SortableTableHead>
+                <SortableTableHead sortKey="total_amount" currentSort={invSort} onSort={handleInvSort} className="text-right">Montant TTC</SortableTableHead>
+                <SortableTableHead sortKey="due_date" currentSort={invSort} onSort={handleInvSort}>Échéance</SortableTableHead>
+                <SortableTableHead sortKey="status" currentSort={invSort} onSort={handleInvSort}>Statut</SortableTableHead>
                 <TableHead className="w-20" />
               </TableRow>
             </TableHeader>
             <TableBody>
-              {invoices.length === 0 && (
+              {sortedInvoices.length === 0 && (
                 <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-6">Aucune facture</TableCell></TableRow>
               )}
-              {invoices.map((inv: any) => (
+              {sortedInvoices.map((inv: any) => (
                 <TableRow key={inv.id}>
                   <TableCell className="font-mono text-sm">{inv.invoice_number}</TableCell>
                   <TableCell className="text-sm">{inv.client?.name || '—'}</TableCell>

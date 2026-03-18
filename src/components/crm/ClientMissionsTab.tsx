@@ -55,6 +55,8 @@ export default function ClientMissionsTab({ clientId }: { clientId: string }) {
     qc.invalidateQueries({ queryKey: ['missions'] });
   };
 
+  const { sorted: sortedMissions, sort, handleSort } = useTableSort(missions ?? []);
+
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between">

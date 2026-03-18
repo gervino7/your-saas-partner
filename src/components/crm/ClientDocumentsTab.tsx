@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Download, Eye } from 'lucide-react';
+import { FileText, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,6 +11,8 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import EmptyState from '@/components/common/EmptyState';
 import Loading from '@/components/common/Loading';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
 function formatSize(bytes: number | null) {
   if (!bytes) return '—';
@@ -38,6 +40,8 @@ export default function ClientDocumentsTab({ clientId }: { clientId: string }) {
     enabled: missionIds.length > 0,
   });
 
+  const { sorted, sort, handleSort } = useTableSort(documents ?? []);
+
   if (isLoading) return <Loading />;
 
   return (
@@ -55,17 +59,17 @@ export default function ClientDocumentsTab({ clientId }: { clientId: string }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nom</TableHead>
-                <TableHead>Mission</TableHead>
-                <TableHead>Taille</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead>Ajouté par</TableHead>
-                <TableHead>Date</TableHead>
+                <SortableTableHead sortKey="name" currentSort={sort} onSort={handleSort}>Nom</SortableTableHead>
+                <SortableTableHead sortKey="mission.name" currentSort={sort} onSort={handleSort}>Mission</SortableTableHead>
+                <SortableTableHead sortKey="file_size" currentSort={sort} onSort={handleSort}>Taille</SortableTableHead>
+                <SortableTableHead sortKey="status" currentSort={sort} onSort={handleSort}>Statut</SortableTableHead>
+                <SortableTableHead sortKey="uploader.full_name" currentSort={sort} onSort={handleSort}>Ajouté par</SortableTableHead>
+                <SortableTableHead sortKey="created_at" currentSort={sort} onSort={handleSort}>Date</SortableTableHead>
                 <TableHead className="w-10"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {documents.map((doc: any) => (
+              {sorted.map((doc: any) => (
                 <TableRow key={doc.id}>
                   <TableCell className="font-medium flex items-center gap-2">
                     <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
