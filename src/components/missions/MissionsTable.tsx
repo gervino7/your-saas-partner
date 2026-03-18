@@ -6,29 +6,33 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import MissionStatusBadge from './MissionStatusBadge';
 import PriorityBadge from './PriorityBadge';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
 function initials(name: string) {
   return name?.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2) ?? '?';
 }
 
 export default function MissionsTable({ missions }: { missions: any[] }) {
+  const { sorted, sort, handleSort } = useTableSort(missions);
+
   return (
     <div className="border rounded-lg overflow-hidden">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Code</TableHead>
-            <TableHead>Nom</TableHead>
-            <TableHead>Client</TableHead>
-            <TableHead>Statut</TableHead>
-            <TableHead>Priorité</TableHead>
+            <SortableTableHead sortKey="code" currentSort={sort} onSort={handleSort}>Code</SortableTableHead>
+            <SortableTableHead sortKey="name" currentSort={sort} onSort={handleSort}>Nom</SortableTableHead>
+            <SortableTableHead sortKey="client.name" currentSort={sort} onSort={handleSort}>Client</SortableTableHead>
+            <SortableTableHead sortKey="status" currentSort={sort} onSort={handleSort}>Statut</SortableTableHead>
+            <SortableTableHead sortKey="priority" currentSort={sort} onSort={handleSort}>Priorité</SortableTableHead>
             <TableHead>Équipe</TableHead>
-            <TableHead>Progression</TableHead>
-            <TableHead>Dates</TableHead>
+            <SortableTableHead sortKey="progress" currentSort={sort} onSort={handleSort}>Progression</SortableTableHead>
+            <SortableTableHead sortKey="start_date" currentSort={sort} onSort={handleSort}>Dates</SortableTableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {missions.map((m) => (
+          {sorted.map((m) => (
             <TableRow key={m.id} className="cursor-pointer hover:bg-muted/50">
               <TableCell>
                 <Link to={`/missions/${m.id}`} className="font-mono text-xs text-muted-foreground hover:text-primary">

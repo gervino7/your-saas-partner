@@ -113,10 +113,10 @@ export default function AdminUsers() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Utilisateur</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Grade</TableHead>
-                <TableHead>Statut</TableHead>
+                <SortableTableHead sortKey="full_name" currentSort={sort} onSort={handleSort}>Utilisateur</SortableTableHead>
+                <SortableTableHead sortKey="email" currentSort={sort} onSort={handleSort}>Email</SortableTableHead>
+                <SortableTableHead sortKey="grade" currentSort={sort} onSort={handleSort}>Grade</SortableTableHead>
+                <SortableTableHead sortKey="is_online" currentSort={sort} onSort={handleSort}>Statut</SortableTableHead>
                 <TableHead className="w-24">Actions</TableHead>
               </TableRow>
             </TableHeader>

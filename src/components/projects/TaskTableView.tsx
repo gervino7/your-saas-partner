@@ -6,6 +6,8 @@ import { TASK_STATUS_LABELS, TASK_PRIORITY_LABELS } from '@/types/database';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import TaskDetailDialog from './TaskDetailDialog';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
 const priorityColors: Record<string, string> = {
   low: 'bg-muted text-muted-foreground',
@@ -29,6 +31,7 @@ function initials(name: string) {
 
 export default function TaskTableView({ tasks, projectLeadId, onEditTask, onDeleteTask }: { tasks: any[]; projectLeadId?: string | null; onEditTask?: (task: any) => void; onDeleteTask?: (task: any) => void }) {
   const [selectedTask, setSelectedTask] = useState<any>(null);
+  const { sorted, sort, handleSort } = useTableSort(tasks);
 
   return (
     <>
@@ -37,24 +40,24 @@ export default function TaskTableView({ tasks, projectLeadId, onEditTask, onDele
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Titre</TableHead>
-            <TableHead>Statut</TableHead>
-            <TableHead>Priorité</TableHead>
+            <SortableTableHead sortKey="title" currentSort={sort} onSort={handleSort}>Titre</SortableTableHead>
+            <SortableTableHead sortKey="status" currentSort={sort} onSort={handleSort}>Statut</SortableTableHead>
+            <SortableTableHead sortKey="priority" currentSort={sort} onSort={handleSort}>Priorité</SortableTableHead>
             <TableHead>Assigné à</TableHead>
-            <TableHead>Date limite</TableHead>
-            <TableHead>Heures est.</TableHead>
-            <TableHead>Compartiment</TableHead>
+            <SortableTableHead sortKey="due_date" currentSort={sort} onSort={handleSort}>Date limite</SortableTableHead>
+            <SortableTableHead sortKey="estimated_hours" currentSort={sort} onSort={handleSort}>Heures est.</SortableTableHead>
+            <SortableTableHead sortKey="compartment" currentSort={sort} onSort={handleSort}>Compartiment</SortableTableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {tasks.length === 0 ? (
+          {sorted.length === 0 ? (
             <TableRow>
               <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                 Aucune tâche
               </TableCell>
             </TableRow>
           ) : (
-            tasks.map((task) => (
+            sorted.map((task) => (
               <TableRow key={task.id} className="cursor-pointer" onClick={() => setSelectedTask(task)}>
                 <TableCell className="font-medium">{task.title}</TableCell>
                 <TableCell>
