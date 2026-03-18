@@ -16,6 +16,8 @@ import { useUpdateUserProfile, useDeleteUser, useInviteUser } from '@/hooks/useA
 import { GRADE_LABELS, GRADE_LEVELS } from '@/types/database';
 import type { Grade } from '@/types/database';
 import { useAuthStore } from '@/stores/authStore';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
 const GRADES = Object.keys(GRADE_LABELS) as Grade[];
 
