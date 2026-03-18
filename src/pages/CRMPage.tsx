@@ -11,6 +11,8 @@ import { useAuthStore } from '@/stores/authStore';
 import EmptyState from '@/components/common/EmptyState';
 import Loading from '@/components/common/Loading';
 import ClientFormDialog from '@/components/crm/ClientFormDialog';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
 const CRMPage = () => {
   const profile = useAuthStore((s) => s.profile);
