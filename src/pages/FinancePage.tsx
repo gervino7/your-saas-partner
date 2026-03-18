@@ -31,6 +31,7 @@ const EXPENSE_CATEGORIES = ['Transport', 'Hébergement', 'Restauration', 'Fourni
 
 function BudgetTab() {
   const { data: summaries = [], isLoading } = useMissionBudgetSummary();
+  const { sorted: sortedSummaries, sort, handleSort } = useTableSort(summaries);
 
   const getBarColor = (pct: number) => {
     if (pct < 70) return 'bg-green-500';
