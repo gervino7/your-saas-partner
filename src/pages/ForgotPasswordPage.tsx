@@ -9,6 +9,21 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Mail, Send } from 'lucide-react';
 import logoImg from '@/assets/logo.png';
 
+const getPasswordResetOrigin = () => {
+  const { origin, protocol, hostname } = window.location;
+
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return origin;
+  }
+
+  if (hostname.endsWith('.lovableproject.com')) {
+    const projectId = hostname.replace('.lovableproject.com', '');
+    return `${protocol}//id-preview--${projectId}.lovable.app`;
+  }
+
+  return origin;
+};
+
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,7 +37,7 @@ const ForgotPasswordPage = () => {
     setLoading(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${getPasswordResetOrigin()}/reset-password`,
       });
       if (error) throw error;
       setSent(true);
