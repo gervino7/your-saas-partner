@@ -42,6 +42,13 @@ const ResetPasswordPage = () => {
       setIsRecovery(true);
     }
 
+    // Also check if we already have a session (redirected from App.tsx after PASSWORD_RECOVERY)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session && window.location.hash.includes('type=recovery')) {
+        setIsRecovery(true);
+      }
+    });
+
     return () => subscription.unsubscribe();
   }, []);
 

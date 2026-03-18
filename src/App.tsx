@@ -148,6 +148,13 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const syncSessionState = async (session: Awaited<ReturnType<typeof supabase.auth.getSession>>['data']['session'], event?: string) => {
       setSession(session);
 
+      // On PASSWORD_RECOVERY, redirect to reset-password and skip normal flow
+      if (event === 'PASSWORD_RECOVERY') {
+        if (isMounted) setLoading(false);
+        window.location.href = '/reset-password#type=recovery';
+        return;
+      }
+
       if (!session?.user) {
         // User signed out — mark offline
         if (currentUserId) {
