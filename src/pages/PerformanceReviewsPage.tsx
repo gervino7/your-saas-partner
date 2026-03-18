@@ -254,7 +254,7 @@ export default function PerformanceReviewsPage() {
                 <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Aucune évaluation disponible</TableCell>
               </TableRow>
             ) : (
-              filteredStats.map((emp) => (
+              sortedStats.map((emp) => (
                 <TableRow key={emp.id}>
                   <TableCell>
                     <div className="flex items-center gap-2">
