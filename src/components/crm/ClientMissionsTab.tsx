@@ -77,17 +77,17 @@ export default function ClientMissionsTab({ clientId }: { clientId: string }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Code</TableHead>
-                <TableHead>Nom</TableHead>
-                <TableHead>Statut</TableHead>
+                <SortableTableHead sortKey="code" currentSort={sort} onSort={handleSort}>Code</SortableTableHead>
+                <SortableTableHead sortKey="name" currentSort={sort} onSort={handleSort}>Nom</SortableTableHead>
+                <SortableTableHead sortKey="status" currentSort={sort} onSort={handleSort}>Statut</SortableTableHead>
                 <TableHead>Chef de mission</TableHead>
-                <TableHead>Dates</TableHead>
-                <TableHead>Progression</TableHead>
+                <SortableTableHead sortKey="start_date" currentSort={sort} onSort={handleSort}>Dates</SortableTableHead>
+                <SortableTableHead sortKey="progress" currentSort={sort} onSort={handleSort}>Progression</SortableTableHead>
                 <TableHead className="w-10"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {missions.map((m: any) => (
+              {sortedMissions.map((m: any) => (
                 <TableRow key={m.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/missions/${m.id}`)}>
                   <TableCell className="font-mono text-xs">{m.code}</TableCell>
                   <TableCell className="font-medium">{m.name}</TableCell>
