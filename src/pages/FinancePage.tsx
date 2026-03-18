@@ -202,6 +202,7 @@ function ExpensesTab() {
   const profile = useAuthStore((s) => s.profile);
   const [statusFilter, setStatusFilter] = useState('all');
   const { data: expenses = [] } = useExpenses({ status: statusFilter });
+  const { sorted: sortedExpenses, sort: expSort, handleSort: handleExpSort } = useTableSort(expenses);
   const approveExpense = useApproveExpense();
   const createExpense = useCreateExpense();
   const { data: missions = [] } = useMissions();
