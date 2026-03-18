@@ -236,11 +236,11 @@ export default function PerformanceReviewsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Collaborateur</TableHead>
-              <TableHead>Grade</TableHead>
-              <TableHead>Missions</TableHead>
-              <TableHead className="text-center">Tâches évaluées</TableHead>
-              <TableHead className="text-center">Score moyen</TableHead>
+              <SortableTableHead sortKey="name" currentSort={sort} onSort={handleSort}>Collaborateur</SortableTableHead>
+              <SortableTableHead sortKey="grade" currentSort={sort} onSort={handleSort}>Grade</SortableTableHead>
+              <SortableTableHead sortKey="missionsStr" currentSort={sort} onSort={handleSort}>Missions</SortableTableHead>
+              <SortableTableHead sortKey="taskCount" currentSort={sort} onSort={handleSort} className="text-center">Tâches évaluées</SortableTableHead>
+              <SortableTableHead sortKey="avgRating" currentSort={sort} onSort={handleSort} className="text-center">Score moyen</SortableTableHead>
               <TableHead>Répartition</TableHead>
             </TableRow>
           </TableHeader>
@@ -249,7 +249,7 @@ export default function PerformanceReviewsPage() {
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Chargement...</TableCell>
               </TableRow>
-            ) : filteredStats.length === 0 ? (
+            ) : sortedStats.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Aucune évaluation disponible</TableCell>
               </TableRow>
