@@ -34,6 +34,8 @@ import ClientPortalPage from '@/pages/ClientPortalPage';
 import CopilPortalPage from '@/pages/CopilPortalPage';
 import SatisfactionSurveyPage from '@/pages/SatisfactionSurveyPage';
 import NotificationsPage from '@/pages/NotificationsPage';
+import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
+import ResetPasswordPage from '@/pages/ResetPasswordPage';
 import NotFound from '@/pages/NotFound';
 
 const queryClient = new QueryClient();
