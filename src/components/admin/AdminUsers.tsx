@@ -52,6 +52,8 @@ export default function AdminUsers() {
     return true;
   });
 
+  const { sorted: sortedUsers, sort, handleSort } = useTableSort(filtered);
+
   const handleOpenEdit = (u: any) => {
     setEditingUser({
       id: u.id,
