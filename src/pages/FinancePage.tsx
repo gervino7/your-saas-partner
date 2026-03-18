@@ -70,19 +70,19 @@ function BudgetTab() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Mission</TableHead>
-                <TableHead className="text-right">Budget</TableHead>
-                <TableHead className="text-right">Heures</TableHead>
-                <TableHead className="text-right">Coût réel</TableHead>
+                <SortableTableHead sortKey="name" currentSort={sort} onSort={handleSort}>Mission</SortableTableHead>
+                <SortableTableHead sortKey="budget" currentSort={sort} onSort={handleSort} className="text-right">Budget</SortableTableHead>
+                <SortableTableHead sortKey="total_hours" currentSort={sort} onSort={handleSort} className="text-right">Heures</SortableTableHead>
+                <SortableTableHead sortKey="total_cost" currentSort={sort} onSort={handleSort} className="text-right">Coût réel</SortableTableHead>
                 <TableHead className="text-right">Marge</TableHead>
-                <TableHead className="w-[180px]">Consommé</TableHead>
+                <SortableTableHead sortKey="consumed_pct" currentSort={sort} onSort={handleSort} className="w-[180px]">Consommé</SortableTableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {summaries.length === 0 && (
+              {sortedSummaries.length === 0 && (
                 <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-6">Aucune mission active</TableCell></TableRow>
               )}
-              {summaries.map((m: any) => (
+              {sortedSummaries.map((m: any) => (
                 <TableRow key={m.id}>
                   <TableCell>
                     <div className="font-medium text-sm">{m.name}</div>
