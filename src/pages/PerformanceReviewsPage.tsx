@@ -121,8 +121,10 @@ export default function PerformanceReviewsPage() {
     if (filterMission !== 'all') {
       result = result.filter((e) => e.missionsStr.includes(filterMission));
     }
-    return result.sort((a, b) => b.avgRating - a.avgRating);
+    return result;
   }, [employeeStats, search, filterMission]);
+
+  const { sorted: sortedStats, sort, handleSort } = useTableSort(filteredStats, { key: 'avgRating', direction: 'desc' });
 
   if (!canAccess) {
     return (
