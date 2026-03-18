@@ -18,6 +18,8 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import EmptyState from '@/components/common/EmptyState';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
 const DEFAULT_RATES: Record<string, number> = {
   DA: 750000, DM: 500000, CM: 400000, SUP: 300000,
