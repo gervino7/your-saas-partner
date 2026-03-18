@@ -403,9 +403,13 @@ const LoginPage = () => {
                     <div className="flex items-center justify-between">
                       <Label htmlFor="password" className="text-sm font-medium">Mot de passe</Label>
                       {!isSignUp && (
-                        <Link to="/forgot-password" className="text-xs text-primary hover:text-primary/80 font-medium transition-colors">
+                        <button
+                          type="button"
+                          onClick={() => navigate('/forgot-password')}
+                          className="text-xs text-primary hover:text-primary/80 font-medium transition-colors"
+                        >
                           Mot de passe oublié ?
-                        </Link>
+                        </button>
                       )}
                     </div>
                     <div className="relative">
