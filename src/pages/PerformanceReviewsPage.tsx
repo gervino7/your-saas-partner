@@ -12,6 +12,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { usePerformanceData } from '@/hooks/useTaskSubmissions';
 import EmptyState from '@/components/common/EmptyState';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { useTableSort } from '@/hooks/useTableSort';
+import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
 const ratingColors: Record<number, string> = {
   1: 'bg-destructive text-destructive-foreground',
