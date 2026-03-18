@@ -9,19 +9,16 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Mail, Send } from 'lucide-react';
 import logoImg from '@/assets/logo.png';
 
+const PRODUCTION_ORIGIN = 'https://mamission.abodje.com';
+
 const getPasswordResetOrigin = () => {
-  const { origin, protocol, hostname } = window.location;
+  const { hostname } = window.location;
 
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return origin;
+    return window.location.origin;
   }
 
-  if (hostname.endsWith('.lovableproject.com')) {
-    const projectId = hostname.replace('.lovableproject.com', '');
-    return `${protocol}//id-preview--${projectId}.lovable.app`;
-  }
-
-  return origin;
+  return PRODUCTION_ORIGIN;
 };
 
 const ForgotPasswordPage = () => {
