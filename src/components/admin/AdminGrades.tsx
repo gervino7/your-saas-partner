@@ -222,43 +222,78 @@ export default function AdminGrades() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>{editingGrade ? 'Modifier le grade' : 'Nouveau grade'}</DialogTitle>
             <DialogDescription>
               {editingGrade ? 'Modifiez les informations du grade.' : 'Ajoutez un nouveau grade à votre organisation.'}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>Code</Label>
-                <Input value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} placeholder="DA" maxLength={10} />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-2">
+            {/* Left: Form */}
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Code</Label>
+                  <Input value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} placeholder="DA" maxLength={10} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Niveau hiérarchique</Label>
+                  <Input type="number" min={1} max={99} value={form.level} onChange={(e) => setForm({ ...form, level: parseInt(e.target.value) || 1 })} />
+                </div>
               </div>
               <div className="space-y-1.5">
-                <Label>Niveau hiérarchique</Label>
-                <Input type="number" min={1} max={99} value={form.level} onChange={(e) => setForm({ ...form, level: parseInt(e.target.value) || 1 })} />
+                <Label>Libellé</Label>
+                <Input value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} placeholder="Directeur Associé" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Taux journalier</Label>
+                  <Input type="number" min={0} value={form.daily_rate} onChange={(e) => setForm({ ...form, daily_rate: parseFloat(e.target.value) || 0 })} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Devise</Label>
+                  <Input value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })} placeholder="XOF" />
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch checked={form.is_active} onCheckedChange={(v) => setForm({ ...form, is_active: v })} />
+                <Label>Grade actif</Label>
               </div>
             </div>
-            <div className="space-y-1.5">
-              <Label>Libellé</Label>
-              <Input value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} placeholder="Directeur Associé" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>Taux journalier</Label>
-                <Input type="number" min={0} value={form.daily_rate} onChange={(e) => setForm({ ...form, daily_rate: parseFloat(e.target.value) || 0 })} />
+
+            {/* Right: Existing grades list */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-muted-foreground">Grades existants</Label>
+              <div className="border rounded-lg max-h-64 overflow-y-auto">
+                {grades.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">Aucun grade configuré</p>
+                ) : (
+                  <div className="divide-y">
+                    {grades.map((g) => (
+                      <div
+                        key={g.id}
+                        className={`flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-muted/50 transition-colors ${editingGrade?.id === g.id ? 'bg-primary/10 border-l-2 border-primary' : ''} ${!g.is_active ? 'opacity-50' : ''}`}
+                        onClick={() => openEdit(g)}
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Badge variant="outline" className="font-mono text-xs shrink-0">{g.level}</Badge>
+                          <span className="font-mono font-semibold shrink-0">{g.code}</span>
+                          <span className="truncate text-muted-foreground">{g.label}</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground shrink-0 ml-2">
+                          {g.daily_rate ? `${g.daily_rate.toLocaleString('fr-FR')} ${g.currency}` : '—'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-              <div className="space-y-1.5">
-                <Label>Devise</Label>
-                <Input value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })} placeholder="XOF" />
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Switch checked={form.is_active} onCheckedChange={(v) => setForm({ ...form, is_active: v })} />
-              <Label>Grade actif</Label>
+              <p className="text-xs text-muted-foreground">Cliquez sur un grade pour le modifier.</p>
             </div>
           </div>
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Annuler</Button>
             <Button onClick={() => saveGrade.mutate()} disabled={!form.code || !form.label || saveGrade.isPending}>
