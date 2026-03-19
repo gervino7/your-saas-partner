@@ -222,7 +222,7 @@ export default function AdminGrades() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl p-0">
           <DialogHeader>
             <DialogTitle>{editingGrade ? 'Modifier le grade' : 'Nouveau grade'}</DialogTitle>
             <DialogDescription>
@@ -230,7 +230,7 @@ export default function AdminGrades() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6 py-5">
             {/* Left: Form */}
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
@@ -266,11 +266,11 @@ export default function AdminGrades() {
             {/* Right: Existing grades list */}
             <div className="space-y-2">
               <Label className="text-sm font-medium text-muted-foreground">Grades existants</Label>
-              <div className="border rounded-lg max-h-64 overflow-y-auto">
+              <div className="border border-border/50 rounded-lg max-h-64 overflow-y-auto">
                 {grades.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-4">Aucun grade configuré</p>
                 ) : (
-                  <div className="divide-y">
+                  <div className="divide-y divide-border/40">
                     {grades.map((g) => (
                       <div
                         key={g.id}
