@@ -320,24 +320,26 @@ export default function AdminGrades() {
                   ) : (
                     <div className="divide-y divide-border/40">
                       {grades.map((g) => (
-                        <div
+                        <button
+                          type="button"
                           key={g.id}
-                          className={`flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-muted/50 transition-colors ${editingGrade?.id === g.id ? 'bg-primary/10 border-l-2 border-primary' : ''} ${!g.is_active ? 'opacity-50' : ''}`}
-                          onClick={(e) => {
+                          className={`w-full flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-muted/50 transition-colors text-left ${editingGrade?.id === g.id ? 'bg-primary/10 border-l-2 border-l-primary font-medium' : ''} ${!g.is_active ? 'opacity-50' : ''}`}
+                          onPointerDown={(e) => {
+                            e.preventDefault();
                             e.stopPropagation();
                             setEditingGrade(g);
                             setForm({ code: g.code, label: g.label, level: g.level, daily_rate: g.daily_rate, currency: g.currency, is_active: g.is_active });
                           }}
                         >
-                          <div className="flex items-center gap-2 min-w-0">
-                            <Badge variant="outline" className="font-mono text-xs shrink-0">{g.level}</Badge>
+                          <div className="flex items-center gap-2 min-w-0 pointer-events-none">
+                            <span className="font-mono text-xs shrink-0 border rounded px-1.5 py-0.5">{g.level}</span>
                             <span className="font-mono font-semibold shrink-0">{g.code}</span>
                             <span className="truncate text-muted-foreground">{g.label}</span>
                           </div>
-                          <span className="text-xs text-muted-foreground shrink-0 ml-2">
+                          <span className="text-xs text-muted-foreground shrink-0 ml-2 pointer-events-none">
                             {g.daily_rate ? `${g.daily_rate.toLocaleString('fr-FR')} ${g.currency}` : '—'}
                           </span>
-                        </div>
+                        </button>
                       ))}
                     </div>
                   )}
