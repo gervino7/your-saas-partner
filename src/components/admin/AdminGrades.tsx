@@ -323,7 +323,11 @@ export default function AdminGrades() {
                         <div
                           key={g.id}
                           className={`flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-muted/50 transition-colors ${editingGrade?.id === g.id ? 'bg-primary/10 border-l-2 border-primary' : ''} ${!g.is_active ? 'opacity-50' : ''}`}
-                          onClick={() => openEdit(g)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingGrade(g);
+                            setForm({ code: g.code, label: g.label, level: g.level, daily_rate: g.daily_rate, currency: g.currency, is_active: g.is_active });
+                          }}
                         >
                           <div className="flex items-center gap-2 min-w-0">
                             <Badge variant="outline" className="font-mono text-xs shrink-0">{g.level}</Badge>
