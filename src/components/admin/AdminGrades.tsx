@@ -221,13 +221,60 @@ export default function AdminGrades() {
       </Card>
 
       {/* Create/Edit Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      {/* Create Dialog - Simple form */}
+      <Dialog open={dialogOpen && !editingGrade} onOpenChange={(v) => { setDialogOpen(v); if (!v) setEditingGrade(null); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Nouveau grade</DialogTitle>
+            <DialogDescription>Ajoutez un nouveau grade à votre organisation.</DialogDescription>
+          </DialogHeader>
+
+          <div className="px-5 py-4 space-y-4 overflow-y-auto max-h-[65vh] dialog-form-bg">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Code</Label>
+                <Input value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} placeholder="DA" maxLength={10} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Niveau hiérarchique</Label>
+                <Input type="number" min={1} max={99} value={form.level} onChange={(e) => setForm({ ...form, level: parseInt(e.target.value) || 1 })} />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Libellé</Label>
+              <Input value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} placeholder="Directeur Associé" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Taux journalier</Label>
+                <Input type="number" min={0} value={form.daily_rate} onChange={(e) => setForm({ ...form, daily_rate: parseFloat(e.target.value) || 0 })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Devise</Label>
+                <Input value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })} placeholder="XOF" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch checked={form.is_active} onCheckedChange={(v) => setForm({ ...form, is_active: v })} />
+              <Label>Grade actif</Label>
+            </div>
+          </div>
+
+          <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex items-center justify-end gap-2">
+            <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => setDialogOpen(false)}>Annuler</Button>
+            <Button size="sm" className="h-9 px-5" onClick={() => saveGrade.mutate()} disabled={!form.code || !form.label || saveGrade.isPending}>
+              Ajouter
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Dialog - Form + grades list */}
+      <Dialog open={dialogOpen && !!editingGrade} onOpenChange={(v) => { setDialogOpen(v); if (!v) setEditingGrade(null); }}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{editingGrade ? 'Modifier le grade' : 'Nouveau grade'}</DialogTitle>
-            <DialogDescription>
-              {editingGrade ? 'Modifiez les informations du grade.' : 'Ajoutez un nouveau grade à votre organisation.'}
-            </DialogDescription>
+            <DialogTitle>Modifier le grade</DialogTitle>
+            <DialogDescription>Modifiez les informations du grade sélectionné.</DialogDescription>
           </DialogHeader>
 
           <div className="px-5 py-4 space-y-5 overflow-y-auto max-h-[65vh] dialog-form-bg">
@@ -297,9 +344,9 @@ export default function AdminGrades() {
           </div>
 
           <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex items-center justify-end gap-2">
-            <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => setDialogOpen(false)}>Annuler</Button>
+            <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => { setDialogOpen(false); setEditingGrade(null); }}>Annuler</Button>
             <Button size="sm" className="h-9 px-5" onClick={() => saveGrade.mutate()} disabled={!form.code || !form.label || saveGrade.isPending}>
-              {editingGrade ? 'Enregistrer' : 'Ajouter'}
+              Enregistrer
             </Button>
           </div>
         </DialogContent>
