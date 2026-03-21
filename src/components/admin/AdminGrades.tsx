@@ -313,38 +313,48 @@ export default function AdminGrades() {
 
               {/* Right: Existing grades list */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-muted-foreground">Grades existants</Label>
-                <div className="border border-border/50 rounded-lg max-h-64 overflow-y-auto">
+                <Label className="text-sm font-semibold text-foreground">Grades existants ({grades.length})</Label>
+                <div className="rounded-lg max-h-64 overflow-y-auto bg-background border border-border">
                   {grades.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-4">Aucun grade configuré</p>
                   ) : (
-                    <div className="divide-y divide-border/40">
-                      {grades.map((g) => (
-                        <button
-                          type="button"
-                          key={g.id}
-                          className={`w-full flex items-center justify-between px-3 py-2 text-sm cursor-pointer hover:bg-muted/50 transition-colors text-left ${editingGrade?.id === g.id ? 'bg-primary/10 border-l-2 border-l-primary font-medium' : ''} ${!g.is_active ? 'opacity-50' : ''}`}
-                          onPointerDown={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setEditingGrade(g);
-                            setForm({ code: g.code, label: g.label, level: g.level, daily_rate: g.daily_rate, currency: g.currency, is_active: g.is_active });
-                          }}
-                        >
-                          <div className="flex items-center gap-2 min-w-0 pointer-events-none">
-                            <span className="font-mono text-xs shrink-0 border rounded px-1.5 py-0.5">{g.level}</span>
-                            <span className="font-mono font-semibold shrink-0">{g.code}</span>
-                            <span className="truncate text-muted-foreground">{g.label}</span>
-                          </div>
-                          <span className="text-xs text-muted-foreground shrink-0 ml-2 pointer-events-none">
-                            {g.daily_rate ? `${g.daily_rate.toLocaleString('fr-FR')} ${g.currency}` : '—'}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
+                    <ul className="divide-y divide-border">
+                      {grades.map((g) => {
+                        const isSelected = editingGrade?.id === g.id;
+                        return (
+                          <li key={g.id}>
+                            <button
+                              type="button"
+                              className={`w-full flex items-center justify-between px-3 py-2.5 text-sm text-left transition-colors
+                                ${isSelected
+                                  ? 'bg-primary/15 border-l-3 border-l-primary text-foreground'
+                                  : 'hover:bg-accent/50 text-foreground border-l-3 border-l-transparent'}
+                                ${!g.is_active ? 'opacity-50' : ''}`}
+                              onPointerDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setEditingGrade(g);
+                                setForm({ code: g.code, label: g.label, level: g.level, daily_rate: g.daily_rate, currency: g.currency, is_active: g.is_active });
+                              }}
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0 pointer-events-none">
+                                <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0">{g.level}</span>
+                                <div className="min-w-0">
+                                  <span className="font-semibold text-foreground">{g.code}</span>
+                                  <span className="ml-1.5 text-muted-foreground truncate">{g.label}</span>
+                                </div>
+                              </div>
+                              <span className="text-xs font-medium text-foreground/70 shrink-0 ml-2 pointer-events-none">
+                                {g.daily_rate ? `${g.daily_rate.toLocaleString('fr-FR')} ${g.currency}` : '—'}
+                              </span>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground">Cliquez sur un grade pour le modifier.</p>
+                <p className="text-xs text-muted-foreground italic">Cliquez sur un grade pour charger ses données dans le formulaire.</p>
               </div>
             </div>
           </div>
