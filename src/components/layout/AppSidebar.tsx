@@ -28,6 +28,7 @@ const AppSidebar = () => {
   const { profile, user } = useAuthStore();
   const gradeLevel = profile?.grade_level ?? 8;
   const showAdmin = gradeLevel <= 2; // DA or DM
+  const isSuperAdmin = !!user?.email && SUPER_ADMIN_EMAILS.includes(user.email);
 
   // Unread message count
   const { data: unreadMessages = 0 } = useQuery({
