@@ -11,6 +11,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import logoImg from '@/assets/logo.png';
+import { SUPER_ADMIN_EMAILS } from '@/lib/plans';
 
 const mainNav = [
   { label: 'Tableau de bord', icon: LayoutDashboard, path: '/' },
