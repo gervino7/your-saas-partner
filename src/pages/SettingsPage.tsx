@@ -26,6 +26,7 @@ const SettingsPage = () => {
         <h1 className="text-2xl font-bold font-display">Paramètres</h1>
         <p className="text-muted-foreground">Configuration de votre organisation.</p>
       </div>
+      <SubscriptionSection />
       <DataSaverSettings />
       <AutomationSettings />
       <AdminSettings />
