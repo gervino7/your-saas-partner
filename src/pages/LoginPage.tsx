@@ -133,6 +133,8 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const showInvitationCard = !!invitationToken;
+
   useEffect(() => {
     if (!invitationToken) {
       setInvitation(null);
