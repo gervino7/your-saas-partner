@@ -226,7 +226,7 @@ const LoginPage = () => {
   const isLocked = lockoutUntil !== null && Date.now() < lockoutUntil;
   const gradeLabel = invitation?.grade ? GRADE_LABELS[invitation.grade as Grade] || invitation.grade : null;
   const showInvitationFields = isSignUp || isForcedSignUp;
-  const signUpBlocked = isSignUp && (!invitationToken || !invitation);
+  const signUpBlocked = isSignUp && invitationToken && !invitation;
 
   return (
     <div className="flex min-h-screen">
