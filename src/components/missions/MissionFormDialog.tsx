@@ -11,6 +11,8 @@ import { useCreateMission, useUpdateMission, useOrganizationUsers, useClients } 
 import { MISSION_TYPE_LABELS, CURRENCY_LABELS } from '@/types/database';
 import type { MissionType, Currency } from '@/types/database';
 import { Info, Users, Wallet, CalendarDays } from 'lucide-react';
+import { useSubscriptionLimits } from '@/hooks/useSubscriptionLimits';
+import { useToast } from '@/hooks/use-toast';
 
 const missionSchema = z.object({
   name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères').max(200),
