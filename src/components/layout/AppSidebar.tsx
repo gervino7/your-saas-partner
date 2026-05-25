@@ -151,6 +151,14 @@ const AppSidebar = () => {
             <LogOut className="h-4 w-4" />
           </button>
         </div>
+        {isSuperAdmin && (
+          <button
+            onClick={() => navigate('/super-admin')}
+            className="mt-2 text-[10px] text-sidebar-foreground/40 hover:text-sidebar-foreground/80 transition-colors text-left"
+          >
+            ⚙ Super Admin
+          </button>
+        )}
       </SidebarFooter>
     </Sidebar>
   );
