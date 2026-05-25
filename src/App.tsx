@@ -257,6 +257,8 @@ const App = () => (
                 <Route path="/workspace/:userId" element={<WorkspacePage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/onboarding" element={<OnboardingPage />} />
+                <Route path="/super-admin" element={<SuperAdminPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
