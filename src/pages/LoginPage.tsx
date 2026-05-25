@@ -183,10 +183,6 @@ const LoginPage = () => {
       toast({ title: 'Trop de tentatives', description: `Veuillez patienter ${remaining} secondes.`, variant: TOAST_ERROR });
       return;
     }
-    if (isSignUp && !invitationToken) {
-      toast({ title: 'Invitation requise', description: 'Utilisez le lien d\'invitation reçu par email.', variant: TOAST_ERROR });
-      return;
-    }
     if (isSignUp && invitationToken && !invitation) {
       toast({ title: 'Invitation invalide', description: 'Ce lien est invalide ou expiré.', variant: TOAST_ERROR });
       return;
