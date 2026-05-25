@@ -183,10 +183,6 @@ const LoginPage = () => {
       toast({ title: 'Trop de tentatives', description: `Veuillez patienter ${remaining} secondes.`, variant: TOAST_ERROR });
       return;
     }
-    if (isSignUp && !invitationToken) {
-      toast({ title: 'Invitation requise', description: 'Utilisez le lien d\'invitation reçu par email.', variant: TOAST_ERROR });
-      return;
-    }
     if (isSignUp && invitationToken && !invitation) {
       toast({ title: 'Invitation invalide', description: 'Ce lien est invalide ou expiré.', variant: TOAST_ERROR });
       return;
@@ -230,7 +226,7 @@ const LoginPage = () => {
   const isLocked = lockoutUntil !== null && Date.now() < lockoutUntil;
   const gradeLabel = invitation?.grade ? GRADE_LABELS[invitation.grade as Grade] || invitation.grade : null;
   const showInvitationFields = isSignUp || isForcedSignUp;
-  const signUpBlocked = isSignUp && (!invitationToken || !invitation);
+  const signUpBlocked = isSignUp && invitationToken && !invitation;
 
   return (
     <div className="flex min-h-screen">

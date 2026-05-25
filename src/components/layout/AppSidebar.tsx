@@ -11,6 +11,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import logoImg from '@/assets/logo.png';
+import { SUPER_ADMIN_EMAILS } from '@/lib/plans';
 
 const mainNav = [
   { label: 'Tableau de bord', icon: LayoutDashboard, path: '/' },
@@ -27,6 +28,7 @@ const AppSidebar = () => {
   const { profile, user } = useAuthStore();
   const gradeLevel = profile?.grade_level ?? 8;
   const showAdmin = gradeLevel <= 2; // DA or DM
+  const isSuperAdmin = !!user?.email && SUPER_ADMIN_EMAILS.includes(user.email);
 
   // Unread message count
   const { data: unreadMessages = 0 } = useQuery({
@@ -149,6 +151,14 @@ const AppSidebar = () => {
             <LogOut className="h-4 w-4" />
           </button>
         </div>
+        {isSuperAdmin && (
+          <button
+            onClick={() => navigate('/super-admin')}
+            className="mt-2 text-[10px] text-sidebar-foreground/40 hover:text-sidebar-foreground/80 transition-colors text-left"
+          >
+            ⚙ Super Admin
+          </button>
+        )}
       </SidebarFooter>
     </Sidebar>
   );

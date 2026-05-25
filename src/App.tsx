@@ -37,6 +37,8 @@ import NotificationsPage from '@/pages/NotificationsPage';
 import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
 import ResetPasswordPage from '@/pages/ResetPasswordPage';
 import NotFound from '@/pages/NotFound';
+import OnboardingPage from '@/pages/OnboardingPage';
+import SuperAdminPage from '@/pages/SuperAdminPage';
 
 const queryClient = new QueryClient();
 
@@ -255,6 +257,8 @@ const App = () => (
                 <Route path="/workspace/:userId" element={<WorkspacePage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/onboarding" element={<OnboardingPage />} />
+                <Route path="/super-admin" element={<SuperAdminPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>

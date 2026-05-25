@@ -1,6 +1,7 @@
 import AdminSettings from '@/components/admin/AdminSettings';
 import DataSaverSettings from '@/components/settings/DataSaverSettings';
 import AutomationSettings from '@/components/settings/AutomationSettings';
+import SubscriptionSection from '@/components/settings/SubscriptionSection';
 import { useAuthStore } from '@/stores/authStore';
 import EmptyState from '@/components/common/EmptyState';
 import { Shield } from 'lucide-react';
@@ -25,6 +26,7 @@ const SettingsPage = () => {
         <h1 className="text-2xl font-bold font-display">Paramètres</h1>
         <p className="text-muted-foreground">Configuration de votre organisation.</p>
       </div>
+      <SubscriptionSection />
       <DataSaverSettings />
       <AutomationSettings />
       <AdminSettings />

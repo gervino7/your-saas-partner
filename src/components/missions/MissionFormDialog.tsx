@@ -11,6 +11,8 @@ import { useCreateMission, useUpdateMission, useOrganizationUsers, useClients } 
 import { MISSION_TYPE_LABELS, CURRENCY_LABELS } from '@/types/database';
 import type { MissionType, Currency } from '@/types/database';
 import { Info, Users, Wallet, CalendarDays } from 'lucide-react';
+import { useSubscriptionLimits } from '@/hooks/useSubscriptionLimits';
+import { useToast } from '@/hooks/use-toast';
 
 const missionSchema = z.object({
   name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères').max(200),
@@ -48,6 +50,8 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
   const updateMission = useUpdateMission();
   const { data: users = [] } = useOrganizationUsers();
   const { data: clients = [] } = useClients();
+  const limits = useSubscriptionLimits();
+  const { toast } = useToast();
 
   const isEdit = !!mission;
 
@@ -69,6 +73,14 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
   });
 
   const onSubmit = async (values: MissionFormValues) => {
+    if (!isEdit && !limits.canCreateMission) {
+      toast({
+        title: 'Limite atteinte',
+        description: `Vous avez atteint la limite de ${limits.plan.maxMissions} missions pour le plan ${limits.plan.name}.${limits.nextPlan ? ` Passez au plan ${limits.nextPlan.name} pour continuer.` : ''}`,
+        variant: 'destructive',
+      });
+      return;
+    }
     const cleaned = Object.fromEntries(
       Object.entries(values).filter(([, v]) => v !== '' && v !== undefined)
     );
