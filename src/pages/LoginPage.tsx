@@ -133,6 +133,8 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const showInvitationCard = !!invitationToken;
+
   useEffect(() => {
     if (!invitationToken) {
       setInvitation(null);
@@ -323,7 +325,7 @@ const LoginPage = () => {
               {invitationToken
                 ? 'Complétez votre inscription pour rejoindre l\'équipe'
                 : isSignUp
-                  ? 'Inscription uniquement via un lien d\'invitation'
+                  ? 'Créez votre compte pour démarrer avec MissionFlow'
                   : 'Connectez-vous à votre espace de travail'}
             </p>
           </div>
@@ -335,12 +337,12 @@ const LoginPage = () => {
                 {invitationToken
                   ? 'Complétez votre inscription'
                   : isSignUp
-                    ? 'Via lien d\'invitation uniquement'
+                    ? 'Nouveau ? Créez votre compte en 2 minutes'
                     : 'Accédez à votre espace'}
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-6 lg:p-8">
-              {showInvitationFields && (
+              {showInvitationCard && (
                 <div className="mb-6 rounded-xl border border-primary/15 bg-primary/[0.04] p-4 space-y-3">
                   <div className="flex items-center gap-2.5">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
