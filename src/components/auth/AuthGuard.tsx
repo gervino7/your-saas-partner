@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { supabase } from '@/integrations/supabase/client';
 import Loading from '@/components/common/Loading';
@@ -9,9 +9,10 @@ interface AuthGuardProps {
 }
 
 const AuthGuard = ({ children }: AuthGuardProps) => {
-  const { session, loading } = useAuthStore();
+  const { session, profile, loading } = useAuthStore();
   const [verified, setVerified] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (loading) return;
@@ -21,7 +22,6 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
       return;
     }
 
-    // Server-side token verification
     supabase.auth.getUser().then(({ data: { user }, error }) => {
       if (error || !user) {
         supabase.auth.signOut();
@@ -31,6 +31,14 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
       }
     });
   }, [session, loading, navigate]);
+
+  // Redirect to onboarding if the profile has no organization yet
+  useEffect(() => {
+    if (!verified || !profile) return;
+    if (!profile.organization_id && location.pathname !== '/onboarding') {
+      navigate('/onboarding', { replace: true });
+    }
+  }, [verified, profile, location.pathname, navigate]);
 
   if (loading || (!verified && session)) {
     return <Loading fullScreen message="Vérification de l'authentification..." />;
