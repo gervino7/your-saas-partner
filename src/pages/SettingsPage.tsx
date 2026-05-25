@@ -1,6 +1,7 @@
 import AdminSettings from '@/components/admin/AdminSettings';
 import DataSaverSettings from '@/components/settings/DataSaverSettings';
 import AutomationSettings from '@/components/settings/AutomationSettings';
+import SubscriptionSection from '@/components/settings/SubscriptionSection';
 import { useAuthStore } from '@/stores/authStore';
 import EmptyState from '@/components/common/EmptyState';
 import { Shield } from 'lucide-react';
