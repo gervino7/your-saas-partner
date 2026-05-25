@@ -73,6 +73,14 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
   });
 
   const onSubmit = async (values: MissionFormValues) => {
+    if (!isEdit && !limits.canCreateMission) {
+      toast({
+        title: 'Limite atteinte',
+        description: `Vous avez atteint la limite de ${limits.plan.maxMissions} missions pour le plan ${limits.plan.name}.${limits.nextPlan ? ` Passez au plan ${limits.nextPlan.name} pour continuer.` : ''}`,
+        variant: 'destructive',
+      });
+      return;
+    }
     const cleaned = Object.fromEntries(
       Object.entries(values).filter(([, v]) => v !== '' && v !== undefined)
     );
