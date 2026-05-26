@@ -403,6 +403,26 @@ const LoginPage = () => {
                 </div>
               )}
 
+              {pendingConfirmEmail && (
+                <div className="mb-6 rounded-xl border border-primary/30 bg-primary/[0.06] p-4 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15">
+                      <Mail className="h-4 w-4 text-primary" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold">Confirmez votre email</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Un lien de confirmation a été envoyé à <span className="font-medium text-foreground">{pendingConfirmEmail}</span>. Cliquez sur ce lien pour activer votre compte, puis revenez vous connecter.
+                      </p>
+                    </div>
+                  </div>
+                  <Button type="button" variant="outline" size="sm" onClick={handleResendConfirmation} disabled={resending} className="w-full">
+                    {resending ? 'Envoi en cours…' : "Renvoyer l'email de confirmation"}
+                  </Button>
+                </div>
+              )}
+
+
               {loadingInvitation ? (
                 <div className="py-12 text-center text-sm text-muted-foreground">Chargement de l'invitation…</div>
               ) : (
