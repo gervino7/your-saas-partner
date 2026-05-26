@@ -240,6 +240,25 @@ const LoginPage = () => {
     }
   };
 
+  const handleResendConfirmation = async () => {
+    if (!pendingConfirmEmail) return;
+    setResending(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: pendingConfirmEmail,
+        options: { emailRedirectTo: `${window.location.origin}/` },
+      });
+      if (error) throw error;
+      toast({ title: 'Email renvoyé', description: `Un nouvel email a été envoyé à ${pendingConfirmEmail}.` });
+    } catch (error) {
+      console.error('[Resend Error]', error);
+      toast({ title: 'Erreur', description: "Impossible de renvoyer l'email. Réessayez dans quelques instants.", variant: TOAST_ERROR });
+    } finally {
+      setResending(false);
+    }
+  };
+
   const isLocked = lockoutUntil !== null && Date.now() < lockoutUntil;
   const gradeLabel = invitation?.grade ? GRADE_LABELS[invitation.grade as Grade] || invitation.grade : null;
   const showInvitationFields = isSignUp || isForcedSignUp;
