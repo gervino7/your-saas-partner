@@ -16,9 +16,16 @@ const MAX_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 60_000;
 const INVITATION_TOKEN_KEYS = ['token', 'invitation_token', 'invite_token', 'invitation'] as const;
 
-const getAuthErrorMessage = (_error: unknown, isSignUp: boolean): string => {
+const getAuthErrorMessage = (error: unknown, isSignUp: boolean): string => {
+  const msg = (error as { message?: string })?.message?.toLowerCase() ?? '';
   if (isSignUp) {
-    return 'Impossible de créer le compte. Si cette adresse est déjà utilisée, connectez-vous directement.';
+    if (msg.includes('already') || msg.includes('registered') || msg.includes('exists')) {
+      return 'Cette adresse email est déjà utilisée. Connectez-vous directement.';
+    }
+    return 'Impossible de créer le compte. Veuillez réessayer.';
+  }
+  if (msg.includes('email not confirmed') || msg.includes('not confirmed')) {
+    return 'Votre email n\'est pas encore confirmé. Vérifiez votre boîte de réception (et vos spams).';
   }
   return 'Identifiants invalides. Veuillez vérifier votre email et mot de passe.';
 };
