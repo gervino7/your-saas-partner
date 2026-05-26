@@ -16,9 +16,16 @@ const MAX_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 60_000;
 const INVITATION_TOKEN_KEYS = ['token', 'invitation_token', 'invite_token', 'invitation'] as const;
 
-const getAuthErrorMessage = (_error: unknown, isSignUp: boolean): string => {
+const getAuthErrorMessage = (error: unknown, isSignUp: boolean): string => {
+  const msg = (error as { message?: string })?.message?.toLowerCase() ?? '';
   if (isSignUp) {
-    return 'Impossible de créer le compte. Si cette adresse est déjà utilisée, connectez-vous directement.';
+    if (msg.includes('already') || msg.includes('registered') || msg.includes('exists')) {
+      return 'Cette adresse email est déjà utilisée. Connectez-vous directement.';
+    }
+    return 'Impossible de créer le compte. Veuillez réessayer.';
+  }
+  if (msg.includes('email not confirmed') || msg.includes('not confirmed')) {
+    return 'Votre email n\'est pas encore confirmé. Vérifiez votre boîte de réception (et vos spams).';
   }
   return 'Identifiants invalides. Veuillez vérifier votre email et mot de passe.';
 };
@@ -130,6 +137,8 @@ const LoginPage = () => {
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [invitation, setInvitation] = useState<InvitationInfo | null>(null);
   const [loadingInvitation, setLoadingInvitation] = useState(false);
+  const [pendingConfirmEmail, setPendingConfirmEmail] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -201,11 +210,17 @@ const LoginPage = () => {
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({
           email, password,
-          options: { data: { full_name: fullName, invitation_token: invitationToken }, emailRedirectTo: window.location.origin },
+          options: { data: { full_name: fullName, invitation_token: invitationToken }, emailRedirectTo: `${window.location.origin}/` },
         });
         if (error) throw error;
         setLoginAttempts(0);
-        toast({ title: 'Inscription réussie', description: 'Vérifiez votre email pour confirmer votre compte.' });
+        setPendingConfirmEmail(email);
+        setIsSignUp(false);
+        setPassword('');
+        toast({
+          title: 'Inscription réussie 🎉',
+          description: `Un email de confirmation a été envoyé à ${email}. Cliquez sur le lien pour activer votre compte.`,
+        });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
@@ -222,6 +237,25 @@ const LoginPage = () => {
       toast({ title: isSignUp ? "Erreur d'inscription" : "Erreur d'authentification", description: getAuthErrorMessage(error, isSignUp), variant: TOAST_ERROR });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!pendingConfirmEmail) return;
+    setResending(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: pendingConfirmEmail,
+        options: { emailRedirectTo: `${window.location.origin}/` },
+      });
+      if (error) throw error;
+      toast({ title: 'Email renvoyé', description: `Un nouvel email a été envoyé à ${pendingConfirmEmail}.` });
+    } catch (error) {
+      console.error('[Resend Error]', error);
+      toast({ title: 'Erreur', description: "Impossible de renvoyer l'email. Réessayez dans quelques instants.", variant: TOAST_ERROR });
+    } finally {
+      setResending(false);
     }
   };
 
@@ -368,6 +402,26 @@ const LoginPage = () => {
                   </div>
                 </div>
               )}
+
+              {pendingConfirmEmail && (
+                <div className="mb-6 rounded-xl border border-primary/30 bg-primary/[0.06] p-4 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15">
+                      <Mail className="h-4 w-4 text-primary" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-semibold">Confirmez votre email</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Un lien de confirmation a été envoyé à <span className="font-medium text-foreground">{pendingConfirmEmail}</span>. Cliquez sur ce lien pour activer votre compte, puis revenez vous connecter.
+                      </p>
+                    </div>
+                  </div>
+                  <Button type="button" variant="outline" size="sm" onClick={handleResendConfirmation} disabled={resending} className="w-full">
+                    {resending ? 'Envoi en cours…' : "Renvoyer l'email de confirmation"}
+                  </Button>
+                </div>
+              )}
+
 
               {loadingInvitation ? (
                 <div className="py-12 text-center text-sm text-muted-foreground">Chargement de l'invitation…</div>
