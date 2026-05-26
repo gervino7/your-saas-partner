@@ -210,11 +210,17 @@ const LoginPage = () => {
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({
           email, password,
-          options: { data: { full_name: fullName, invitation_token: invitationToken }, emailRedirectTo: window.location.origin },
+          options: { data: { full_name: fullName, invitation_token: invitationToken }, emailRedirectTo: `${window.location.origin}/` },
         });
         if (error) throw error;
         setLoginAttempts(0);
-        toast({ title: 'Inscription réussie', description: 'Vérifiez votre email pour confirmer votre compte.' });
+        setPendingConfirmEmail(email);
+        setIsSignUp(false);
+        setPassword('');
+        toast({
+          title: 'Inscription réussie 🎉',
+          description: `Un email de confirmation a été envoyé à ${email}. Cliquez sur le lien pour activer votre compte.`,
+        });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
