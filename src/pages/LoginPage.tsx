@@ -137,6 +137,8 @@ const LoginPage = () => {
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [invitation, setInvitation] = useState<InvitationInfo | null>(null);
   const [loadingInvitation, setLoadingInvitation] = useState(false);
+  const [pendingConfirmEmail, setPendingConfirmEmail] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
