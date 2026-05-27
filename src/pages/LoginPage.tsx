@@ -208,11 +208,16 @@ const LoginPage = () => {
     setLoading(true);
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email, password,
-          options: { data: { full_name: fullName, invitation_token: invitationToken }, emailRedirectTo: `${window.location.origin}/` },
+        const { data, error } = await supabase.functions.invoke('send-signup-confirmation', {
+          body: { email, password, full_name: fullName, invitation_token: invitationToken },
         });
         if (error) throw error;
+        if (data?.error === 'already_registered') {
+          toast({ title: 'Email déjà utilisé', description: 'Cette adresse est déjà enregistrée. Connectez-vous directement.', variant: TOAST_ERROR });
+          setIsSignUp(false);
+          return;
+        }
+        if (data?.error) throw new Error(data.error);
         setLoginAttempts(0);
         setPendingConfirmEmail(email);
         setIsSignUp(false);
@@ -244,10 +249,8 @@ const LoginPage = () => {
     if (!pendingConfirmEmail) return;
     setResending(true);
     try {
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: pendingConfirmEmail,
-        options: { emailRedirectTo: `${window.location.origin}/` },
+      const { error } = await supabase.functions.invoke('send-signup-confirmation', {
+        body: { email: pendingConfirmEmail, password, full_name: fullName, invitation_token: invitationToken },
       });
       if (error) throw error;
       toast({ title: 'Email renvoyé', description: `Un nouvel email a été envoyé à ${pendingConfirmEmail}.` });
