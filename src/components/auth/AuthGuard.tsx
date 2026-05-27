@@ -34,11 +34,11 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
 
   // Redirect to onboarding if the profile has no organization yet
   useEffect(() => {
-    if (!verified || !profile) return;
+    if (loading || !verified || !profile) return;
     if (!profile.organization_id && location.pathname !== '/onboarding') {
       navigate('/onboarding', { replace: true });
     }
-  }, [verified, profile, location.pathname, navigate]);
+  }, [verified, profile, location.pathname, navigate, loading]);
 
   if (loading || (!verified && session)) {
     return <Loading fullScreen message="Vérification de l'authentification..." />;
@@ -46,6 +46,11 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
 
   if (!session) {
     return null;
+  }
+
+  // Block rendering of guarded pages while we wait for the profile or redirect to onboarding
+  if (verified && profile && !profile.organization_id && location.pathname !== '/onboarding') {
+    return <Loading fullScreen message="Configuration de votre espace..." />;
   }
 
   return <>{children}</>;
