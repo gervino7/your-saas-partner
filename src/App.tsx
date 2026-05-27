@@ -39,6 +39,7 @@ import ResetPasswordPage from '@/pages/ResetPasswordPage';
 import NotFound from '@/pages/NotFound';
 import OnboardingPage from '@/pages/OnboardingPage';
 import SuperAdminPage from '@/pages/SuperAdminPage';
+import OrgRedirectPage from '@/pages/OrgRedirectPage';
 
 const queryClient = new QueryClient();
 
@@ -238,6 +239,7 @@ const App = () => (
               <Route path="/portal/:token" element={<ClientPortalPage />} />
               <Route path="/copil-portal/:committeeId" element={<CopilPortalPage />} />
               <Route path="/survey/:token" element={<SatisfactionSurveyPage />} />
+              <Route path="/org/:slug" element={<OrgRedirectPage />} />
               <Route path="/onboarding" element={<AuthGuard><OnboardingPage /></AuthGuard>} />
               <Route element={<AuthGuard><AppLayout /></AuthGuard>}>
                 <Route path="/" element={<DashboardPage />} />
