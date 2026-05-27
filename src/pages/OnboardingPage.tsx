@@ -51,40 +51,20 @@ const OnboardingPage = () => {
     setLoading(true);
     try {
       const plan = PLANS[planId];
-      const { data: org, error: orgErr } = await supabase
-        .from('organizations')
-        .insert({
-          name: orgName,
-          slug: `${slug}-${Date.now().toString(36)}`,
-          subscription_plan: planId,
-          max_users: plan.maxUsers,
-          max_storage_gb: plan.maxStorageGb,
-          settings: { sector, country, city },
-        })
-        .select()
-        .single();
+      const { data: createdOrg, error: orgErr } = await (supabase as any).rpc('create_organization_for_current_user', {
+        _name: orgName.trim(),
+        _slug: slug,
+        _subscription_plan: planId,
+        _max_users: plan.maxUsers,
+        _max_storage_gb: plan.maxStorageGb,
+        _settings: { sector, country, city },
+        _full_name: fullName.trim(),
+        _phone: phone.trim() || null,
+      });
       if (orgErr) throw orgErr;
 
-      const { error: profErr } = await supabase
-        .from('profiles')
-        .update({
-          organization_id: org.id,
-          grade: 'DA',
-          full_name: fullName,
-          phone: phone || null,
-        })
-        .eq('id', user.id);
-      if (profErr) throw profErr;
-
-      await supabase.from('user_roles').upsert(
-        { user_id: user.id, role: 'owner', organization_id: org.id },
-        { onConflict: 'user_id,role' }
-      );
-
-      await supabase.from('personal_workspaces').insert({
-        user_id: user.id,
-        organization_id: org.id,
-      });
+      const org = Array.isArray(createdOrg) ? createdOrg[0] : createdOrg;
+      if (!org?.id) throw new Error('Organisation créée mais réponse invalide');
 
       // Force a fresh fetch from DB so grade_level (generated column) and any trigger-driven fields are accurate
       const { data: freshProfile } = await supabase
