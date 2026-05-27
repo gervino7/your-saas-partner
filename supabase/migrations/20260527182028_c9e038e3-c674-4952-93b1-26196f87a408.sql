@@ -1,0 +1,3 @@
+REVOKE EXECUTE ON FUNCTION public.create_organization_for_current_user(text, text, text, integer, integer, jsonb, text, text) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.create_organization_for_current_user(text, text, text, integer, integer, jsonb, text, text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.create_organization_for_current_user(text, text, text, integer, integer, jsonb, text, text) TO authenticated;

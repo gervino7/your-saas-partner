@@ -3386,6 +3386,36 @@ export type Database = {
       }
     }
     Functions: {
+      create_organization_for_current_user: {
+        Args: {
+          _full_name?: string
+          _max_storage_gb?: number
+          _max_users?: number
+          _name: string
+          _phone?: string
+          _settings?: Json
+          _slug: string
+          _subscription_plan?: string
+        }
+        Returns: {
+          created_at: string | null
+          id: string
+          logo_url: string | null
+          max_storage_gb: number | null
+          max_users: number | null
+          name: string
+          settings: Json | null
+          slug: string
+          subscription_plan: string | null
+          updated_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "organizations"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       get_invitation_by_token: {
         Args: { _token: string }
         Returns: {
