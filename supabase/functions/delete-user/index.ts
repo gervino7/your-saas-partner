@@ -85,6 +85,7 @@ Deno.serve(async (req) => {
       { table: "performance_reviews", column: "user_id" },
       { table: "performance_reviews", column: "reviewer_id" },
       { table: "user_roles", column: "user_id" },
+      { table: "user_sessions", column: "user_id" },
     ];
 
     for (const { table, column } of relatedTables) {
