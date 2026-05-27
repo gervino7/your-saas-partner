@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
-    const { email, password, full_name, invitation_token } = await req.json();
+    const { email, password, full_name, invitation_token, redirect_to } = await req.json();
     if (!email || !password) {
       return new Response(JSON.stringify({ error: 'email and password required' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -24,6 +24,8 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
 
+    const redirectOrigin = getAllowedRedirectOrigin(redirect_to);
+
     const tryGenerateLink = () =>
       admin.auth.admin.generateLink({
         type: 'signup',
@@ -31,7 +33,7 @@ Deno.serve(async (req) => {
         password,
         options: {
           data: { full_name: full_name || '', invitation_token: invitation_token || '' },
-          redirectTo: `${APP_URL}/`,
+          redirectTo: `${redirectOrigin}/`,
         },
       });
 
@@ -137,6 +139,21 @@ Deno.serve(async (req) => {
 
 function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+}
+
+function getAllowedRedirectOrigin(value: unknown): string {
+  if (typeof value !== 'string' || !value.trim()) return APP_URL;
+  try {
+    const url = new URL(value);
+    const host = url.hostname;
+    const isAllowed =
+      host === 'mamission.abodje.com' ||
+      host === 'missionpro.lovable.app' ||
+      host.endsWith('.lovable.app');
+    return isAllowed ? url.origin : APP_URL;
+  } catch {
+    return APP_URL;
+  }
 }
 
 async function ensureProfileExists(
