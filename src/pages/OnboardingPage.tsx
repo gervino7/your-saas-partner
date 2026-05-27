@@ -86,7 +86,18 @@ const OnboardingPage = () => {
         organization_id: org.id,
       });
 
-      setProfile({ ...(profile as any), organization_id: org.id, grade: 'DA', grade_level: 1, full_name: fullName });
+      // Force a fresh fetch from DB so grade_level (generated column) and any trigger-driven fields are accurate
+      const { data: freshProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (freshProfile) {
+        setProfile(freshProfile as any);
+      } else {
+        setProfile({ ...(profile as any), organization_id: org.id, grade: 'DA', grade_level: 1, full_name: fullName });
+      }
 
       toast({ title: 'Organisation créée', description: `Bienvenue chez ${orgName} !` });
       navigate('/', { replace: true });
