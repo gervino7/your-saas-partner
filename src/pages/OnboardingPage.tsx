@@ -67,8 +67,10 @@ const OnboardingPage = () => {
     setLoading(true);
     try {
       const plan = PLANS[planId];
-      const createOrganization = supabase.rpc as unknown as CreateOrganizationRpc;
-      const { data: createdOrg, error: orgErr } = await createOrganization('create_organization_for_current_user', {
+      const { data: createdOrg, error: orgErr } = await (supabase.rpc as unknown as CreateOrganizationRpc).call(
+        supabase,
+        'create_organization_for_current_user',
+        {
         _name: orgName.trim(),
         _slug: slug,
         _subscription_plan: planId,
@@ -77,7 +79,8 @@ const OnboardingPage = () => {
         _settings: { sector, country, city },
         _full_name: fullName.trim(),
         _phone: phone.trim() || null,
-      });
+        }
+      );
       if (orgErr) throw orgErr;
 
       const org = Array.isArray(createdOrg) ? createdOrg[0] : createdOrg;
