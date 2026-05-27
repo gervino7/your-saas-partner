@@ -109,9 +109,38 @@ const OnboardingPage = () => {
         });
       }
 
-      toast({ title: 'Organisation créée', description: `Bienvenue chez ${orgName} !` });
+      // Récupère le slug réel généré côté DB (peut différer si collision)
+      const { data: orgFull } = await supabase
+        .from('organizations')
+        .select('id, name, slug, subscription_plan, max_users, max_storage_gb')
+        .eq('id', org.id)
+        .maybeSingle();
+
+      const finalSlug = orgFull?.slug || slug;
+
+      // Envoie l'email de bienvenue avec l'URL personnalisée (best-effort)
+      try {
+        await supabase.functions.invoke('send-org-welcome', {
+          body: {
+            email: user.email,
+            fullName: fullName.trim(),
+            organizationName: orgFull?.name || orgName,
+            slug: finalSlug,
+            plan: orgFull?.subscription_plan || planId,
+            maxUsers: orgFull?.max_users || plan.maxUsers,
+            maxStorageGb: orgFull?.max_storage_gb || plan.maxStorageGb,
+          },
+        });
+      } catch (mailErr) {
+        console.warn('send-org-welcome failed', mailErr);
+      }
+
+      const orgUrl = `${window.location.origin}/org/${finalSlug}`;
+      toast({
+        title: 'Organisation créée 🎉',
+        description: `Votre URL : ${orgUrl} — un email récapitulatif vous a été envoyé.`,
+      });
       navigate('/', { replace: true });
-    } catch (e: unknown) {
       const message = e instanceof Error ? e.message : 'Impossible de créer l\'organisation';
       toast({ title: 'Erreur', description: message, variant: 'destructive' });
     } finally {
