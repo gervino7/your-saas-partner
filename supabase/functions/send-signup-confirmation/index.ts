@@ -138,3 +138,34 @@ Deno.serve(async (req) => {
 function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }
+
+async function ensureProfileExists(
+  admin: ReturnType<typeof createClient>,
+  user: { id: string; email: string; user_metadata?: Record<string, unknown> },
+  fullName?: string,
+) {
+  const { data: existingProfile } = await admin
+    .from('profiles')
+    .select('id')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (existingProfile) return;
+
+  const metadataName = typeof user.user_metadata?.full_name === 'string' ? user.user_metadata.full_name : '';
+  const displayName = fullName?.trim() || metadataName.trim() || user.email.split('@')[0];
+
+  const { error: profileError } = await admin.from('profiles').insert({
+    id: user.id,
+    email: user.email,
+    full_name: displayName,
+    grade: 'AUD',
+  });
+  if (profileError) console.error('ensureProfileExists profile error:', profileError.message);
+
+  const { error: roleError } = await admin.from('user_roles').upsert({
+    user_id: user.id,
+    role: 'member',
+  }, { onConflict: 'user_id,role' });
+  if (roleError) console.error('ensureProfileExists role error:', roleError.message);
+}
