@@ -45,20 +45,26 @@ Deno.serve(async (req) => {
 
       if (isExists) {
         // Find existing user
-        let existingUser: { id: string; email_confirmed_at: string | null } | null = null;
+        let existingUser: { id: string; email: string; email_confirmed_at: string | null; user_metadata?: Record<string, unknown> } | null = null;
         let page = 1;
         while (page <= 20 && !existingUser) {
           const { data: list, error: listErr } = await admin.auth.admin.listUsers({ page, perPage: 200 });
           if (listErr) break;
           const found = list?.users?.find((u) => u.email?.toLowerCase() === email.toLowerCase());
-          if (found) existingUser = { id: found.id, email_confirmed_at: found.email_confirmed_at ?? null };
+          if (found) existingUser = {
+            id: found.id,
+            email: found.email ?? email,
+            email_confirmed_at: found.email_confirmed_at ?? null,
+            user_metadata: found.user_metadata as Record<string, unknown> | undefined,
+          };
           if (!list || list.users.length < 200) break;
           page++;
         }
 
         if (existingUser?.email_confirmed_at) {
+          await ensureProfileExists(admin, existingUser, full_name);
           return new Response(JSON.stringify({ error: 'already_registered' }), {
-            status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           });
         }
 
