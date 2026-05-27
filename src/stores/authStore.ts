@@ -13,13 +13,22 @@ interface Profile {
   is_online: boolean;
 }
 
+interface Organization {
+  id: string;
+  name: string;
+  slug: string | null;
+  subscription_plan: string | null;
+}
+
 interface AuthState {
   session: Session | null;
   user: User | null;
   profile: Profile | null;
+  organization: Organization | null;
   loading: boolean;
   setSession: (session: Session | null) => void;
   setProfile: (profile: Profile | null) => void;
+  setOrganization: (org: Organization | null) => void;
   setLoading: (loading: boolean) => void;
   clear: () => void;
 }
@@ -28,9 +37,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   session: null,
   user: null,
   profile: null,
+  organization: null,
   loading: true,
   setSession: (session) => set({ session, user: session?.user ?? null }),
   setProfile: (profile) => set({ profile }),
+  setOrganization: (organization) => set({ organization }),
   setLoading: (loading) => set({ loading }),
-  clear: () => set({ session: null, user: null, profile: null }),
+  clear: () => set({ session: null, user: null, profile: null, organization: null }),
 }));

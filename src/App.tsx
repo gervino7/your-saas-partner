@@ -140,7 +140,7 @@ const setUserOffline = async (userId: string) => {
 };
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { setSession, setProfile, setLoading } = useAuthStore();
+  const { setSession, setProfile, setOrganization, setLoading } = useAuthStore();
 
   useEffect(() => {
     let isMounted = true;
@@ -164,13 +164,26 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           currentUserId = null;
         }
         if (heartbeatInterval) { clearInterval(heartbeatInterval); heartbeatInterval = null; }
-        if (isMounted) setProfile(null);
+        if (isMounted) { setProfile(null); setOrganization(null); }
         if (isMounted) setLoading(false);
         return;
       }
 
       const profile = await ensureUserProfile(session.user);
       if (isMounted) setProfile(profile);
+
+      // Load organization details (name + slug) for header / dashboard display
+      if (profile?.organization_id) {
+        const { data: org } = await supabase
+          .from('organizations')
+          .select('id, name, slug, subscription_plan')
+          .eq('id', profile.organization_id)
+          .maybeSingle();
+        if (isMounted) setOrganization(org ?? null);
+      } else if (isMounted) {
+        setOrganization(null);
+      }
+
       if (isMounted) setLoading(false);
 
       // Mark user online on sign-in
@@ -217,7 +230,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (currentUserId) void setUserOffline(currentUserId);
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [setSession, setProfile, setLoading]);
+  }, [setSession, setProfile, setOrganization, setLoading]);
 
   return <>{children}</>;
 };
