@@ -209,7 +209,13 @@ const LoginPage = () => {
     try {
       if (isSignUp) {
         const { data, error } = await supabase.functions.invoke('send-signup-confirmation', {
-          body: { email, password, full_name: fullName, invitation_token: invitationToken },
+          body: {
+            email,
+            password,
+            full_name: fullName,
+            invitation_token: invitationToken,
+            redirect_to: window.location.origin,
+          },
         });
         if (error) throw error;
         if (data?.error === 'already_registered') {
@@ -250,7 +256,13 @@ const LoginPage = () => {
     setResending(true);
     try {
       const { error } = await supabase.functions.invoke('send-signup-confirmation', {
-        body: { email: pendingConfirmEmail, password, full_name: fullName, invitation_token: invitationToken },
+        body: {
+          email: pendingConfirmEmail,
+          password,
+          full_name: fullName,
+          invitation_token: invitationToken,
+          redirect_to: window.location.origin,
+        },
       });
       if (error) throw error;
       toast({ title: 'Email renvoyé', description: `Un nouvel email a été envoyé à ${pendingConfirmEmail}.` });
