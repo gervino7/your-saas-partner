@@ -239,6 +239,7 @@ const App = () => (
               <Route path="/portal/:token" element={<ClientPortalPage />} />
               <Route path="/copil-portal/:committeeId" element={<CopilPortalPage />} />
               <Route path="/survey/:token" element={<SatisfactionSurveyPage />} />
+              <Route path="/onboarding" element={<AuthGuard><OnboardingPage /></AuthGuard>} />
               <Route element={<AuthGuard><AppLayout /></AuthGuard>}>
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/missions" element={<MissionsPage />} />
@@ -257,7 +258,6 @@ const App = () => (
                 <Route path="/workspace/:userId" element={<WorkspacePage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
-                <Route path="/onboarding" element={<OnboardingPage />} />
                 <Route path="/super-admin" element={<SuperAdminPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
