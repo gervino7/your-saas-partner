@@ -141,6 +141,7 @@ const OnboardingPage = () => {
         description: `Votre URL : ${orgUrl} — un email récapitulatif vous a été envoyé.`,
       });
       navigate('/', { replace: true });
+    } catch (e: unknown) {
       const message = e instanceof Error ? e.message : 'Impossible de créer l\'organisation';
       toast({ title: 'Erreur', description: message, variant: 'destructive' });
     } finally {
