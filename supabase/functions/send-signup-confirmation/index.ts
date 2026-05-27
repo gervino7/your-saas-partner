@@ -24,29 +24,65 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
 
-    // Check if user already exists & is confirmed → block re-signup
-    // Otherwise generateLink type=signup will create OR return existing unconfirmed user
-    const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
-      type: 'signup',
-      email,
-      password,
-      options: {
-        data: { full_name: full_name || '', invitation_token: invitation_token || '' },
-        redirectTo: `${APP_URL}/`,
-      },
-    });
+    const tryGenerateLink = () =>
+      admin.auth.admin.generateLink({
+        type: 'signup',
+        email,
+        password,
+        options: {
+          data: { full_name: full_name || '', invitation_token: invitation_token || '' },
+          redirectTo: `${APP_URL}/`,
+        },
+      });
 
+    let { data: linkData, error: linkError } = await tryGenerateLink();
+
+    // If user already exists, check if confirmed. If not, delete & recreate to send fresh link.
     if (linkError) {
-      console.error('generateLink error:', linkError);
+      const code = (linkError as { code?: string }).code || '';
       const msg = linkError.message?.toLowerCase() || '';
-      if (msg.includes('already') || msg.includes('registered') || msg.includes('exists')) {
-        return new Response(JSON.stringify({ error: 'already_registered' }), {
-          status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      const isExists = code === 'email_exists' || msg.includes('already') || msg.includes('registered') || msg.includes('exists');
+
+      if (isExists) {
+        // Find existing user
+        let existingUser: { id: string; email_confirmed_at: string | null } | null = null;
+        let page = 1;
+        while (page <= 20 && !existingUser) {
+          const { data: list, error: listErr } = await admin.auth.admin.listUsers({ page, perPage: 200 });
+          if (listErr) break;
+          const found = list?.users?.find((u) => u.email?.toLowerCase() === email.toLowerCase());
+          if (found) existingUser = { id: found.id, email_confirmed_at: found.email_confirmed_at ?? null };
+          if (!list || list.users.length < 200) break;
+          page++;
+        }
+
+        if (existingUser?.email_confirmed_at) {
+          return new Response(JSON.stringify({ error: 'already_registered' }), {
+            status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        if (existingUser) {
+          // Unconfirmed → delete and retry so a fresh confirmation link is generated
+          const { error: delErr } = await admin.auth.admin.deleteUser(existingUser.id);
+          if (delErr) {
+            console.error('deleteUser error:', delErr);
+            return new Response(JSON.stringify({ error: 'cannot_reset_unconfirmed', details: delErr.message }), {
+              status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            });
+          }
+          const retry = await tryGenerateLink();
+          linkData = retry.data;
+          linkError = retry.error;
+        }
+      }
+
+      if (linkError) {
+        console.error('generateLink error:', linkError);
+        return new Response(JSON.stringify({ error: linkError.message }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      return new Response(JSON.stringify({ error: linkError.message }), {
-        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
     }
 
     const actionLink = linkData?.properties?.action_link;
