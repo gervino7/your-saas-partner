@@ -114,7 +114,6 @@ const ensureUserProfile = async (user: User) => {
       full_name: existingProfile?.full_name || resolveFullName(user),
       organization_id: existingProfile?.organization_id ?? invitationOrgId,
       grade: nextGrade,
-      grade_level: existingProfile?.grade_level ?? GRADE_LEVELS[nextGrade],
     })
     .select('*')
     .single();
