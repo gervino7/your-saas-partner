@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '@/stores/authStore';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Loading from '@/components/common/Loading';
 
@@ -8,52 +7,76 @@ interface AuthGuardProps {
   children: React.ReactNode;
 }
 
-const AuthGuard = ({ children }: AuthGuardProps) => {
-  const { session, profile, loading } = useAuthStore();
-  const [verified, setVerified] = useState(false);
+export default function AuthGuard({ children }: AuthGuardProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
-    if (loading) return;
+    let cancelled = false;
 
-    if (!session) {
-      navigate('/login', { replace: true });
-      return;
-    }
+    async function checkAuth() {
+      setLoading(true);
+      setAuthorized(false);
 
-    supabase.auth.getUser().then(({ data: { user }, error }) => {
-      if (error || !user) {
-        supabase.auth.signOut();
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (cancelled) return;
+
+      if (!session) {
         navigate('/login', { replace: true });
-      } else {
-        setVerified(true);
+        setLoading(false);
+        return;
       }
-    });
-  }, [session, loading, navigate]);
 
-  // Redirect to onboarding if the profile has no organization yet
-  useEffect(() => {
-    if (loading || !verified || !profile) return;
-    if (!profile.organization_id && location.pathname !== '/onboarding') {
-      navigate('/onboarding', { replace: true });
+      // Always fetch fresh profile from DB (no cache) to get up-to-date organization_id
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+      if (cancelled) return;
+
+      console.log('[AuthGuard]', {
+        userId: session.user.id,
+        orgId: profile?.organization_id ?? null,
+        path: location.pathname,
+      });
+
+      // No organization → force onboarding
+      if (!profile?.organization_id && location.pathname !== '/onboarding') {
+        navigate('/onboarding', { replace: true });
+        setLoading(false);
+        return;
+      }
+
+      // Has organization but on onboarding → go to dashboard
+      if (profile?.organization_id && location.pathname === '/onboarding') {
+        navigate('/', { replace: true });
+        setLoading(false);
+        return;
+      }
+
+      setAuthorized(true);
+      setLoading(false);
     }
-  }, [verified, profile, location.pathname, navigate, loading]);
 
-  if (loading || (!verified && session)) {
+    void checkAuth();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [location.pathname, navigate]);
+
+  if (loading) {
     return <Loading fullScreen message="Vérification de l'authentification..." />;
   }
 
-  if (!session) {
+  if (!authorized) {
     return null;
   }
 
-  // Block rendering of guarded pages while we wait for the profile or redirect to onboarding
-  if (verified && profile && !profile.organization_id && location.pathname !== '/onboarding') {
-    return <Loading fullScreen message="Configuration de votre espace..." />;
-  }
-
   return <>{children}</>;
-};
-
-export default AuthGuard;
+}
