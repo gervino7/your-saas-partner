@@ -241,7 +241,18 @@ const LoginPage = () => {
           throw error;
         }
         setLoginAttempts(0);
-        navigate('/', { replace: true });
+
+        const { data: { user } } = await supabase.auth.getUser();
+        const { data: profile } = user
+          ? await supabase
+              .from('profiles')
+              .select('organization_id')
+              .eq('id', user.id)
+              .maybeSingle()
+          : { data: null };
+
+        const hasOrganization = typeof profile?.organization_id === 'string' && profile.organization_id.trim().length > 0;
+        navigate(hasOrganization ? '/' : '/onboarding', { replace: true });
       }
     } catch (error: unknown) {
       console.error('[Auth Error]', error);

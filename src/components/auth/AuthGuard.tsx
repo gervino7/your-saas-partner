@@ -15,16 +15,14 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
   useEffect(() => {
     let cancelled = false;
-    let checkId = 0;
 
     async function checkAuth(reason: string) {
-      const currentCheckId = ++checkId;
       setLoading(true);
       setAuthorized(false);
 
       const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-      if (cancelled || currentCheckId !== checkId) return;
+      if (cancelled) return;
 
       if (userError || !user) {
         navigate('/login', { replace: true });
@@ -39,25 +37,29 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         .eq('id', user.id)
         .maybeSingle();
 
-      if (cancelled || currentCheckId !== checkId) return;
+      if (cancelled) return;
+
+      const hasOrganization = typeof profile?.organization_id === 'string' && profile.organization_id.trim().length > 0;
+      const isOnboardingRoute = location.pathname === '/onboarding';
 
       console.log('[AuthGuard]', {
         reason,
         userId: user.id,
         orgId: profile?.organization_id ?? null,
+        hasOrganization,
         profileError: profileError?.message ?? null,
         path: location.pathname,
       });
 
       // No organization → force onboarding
-      if (!profile?.organization_id && location.pathname !== '/onboarding') {
+      if (!hasOrganization && !isOnboardingRoute) {
         navigate('/onboarding', { replace: true });
         setLoading(false);
         return;
       }
 
       // Has organization but on onboarding → go to dashboard
-      if (profile?.organization_id && location.pathname === '/onboarding') {
+      if (hasOrganization && isOnboardingRoute) {
         navigate('/', { replace: true });
         setLoading(false);
         return;
