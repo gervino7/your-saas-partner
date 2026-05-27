@@ -15,33 +15,37 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
   useEffect(() => {
     let cancelled = false;
+    let checkId = 0;
 
-    async function checkAuth() {
+    async function checkAuth(reason: string) {
+      const currentCheckId = ++checkId;
       setLoading(true);
       setAuthorized(false);
 
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-      if (cancelled) return;
+      if (cancelled || currentCheckId !== checkId) return;
 
-      if (!session) {
+      if (userError || !user) {
         navigate('/login', { replace: true });
         setLoading(false);
         return;
       }
 
       // Always fetch fresh profile from DB (no cache) to get up-to-date organization_id
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('organization_id')
-        .eq('id', session.user.id)
+        .eq('id', user.id)
         .maybeSingle();
 
-      if (cancelled) return;
+      if (cancelled || currentCheckId !== checkId) return;
 
       console.log('[AuthGuard]', {
-        userId: session.user.id,
+        reason,
+        userId: user.id,
         orgId: profile?.organization_id ?? null,
+        profileError: profileError?.message ?? null,
         path: location.pathname,
       });
 
@@ -63,10 +67,20 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       setLoading(false);
     }
 
-    void checkAuth();
+    void checkAuth('route-check');
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED' || event === 'INITIAL_SESSION') {
+        void checkAuth(`auth-${event}`);
+      }
+      if (event === 'SIGNED_OUT') {
+        navigate('/login', { replace: true });
+      }
+    });
 
     return () => {
       cancelled = true;
+      subscription.unsubscribe();
     };
   }, [location.pathname, navigate]);
 
