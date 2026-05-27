@@ -26,6 +26,22 @@ const STEPS = [
   { id: 4, label: 'Confirmation', icon: CheckCircle2 },
 ];
 
+type CreatedOrganization = { id: string };
+
+type CreateOrganizationRpc = (
+  fn: 'create_organization_for_current_user',
+  args: {
+    _name: string;
+    _slug: string;
+    _subscription_plan: PlanId;
+    _max_users: number;
+    _max_storage_gb: number;
+    _settings: { sector: string; country: string; city: string };
+    _full_name: string;
+    _phone: string | null;
+  }
+) => Promise<{ data: CreatedOrganization | CreatedOrganization[] | null; error: { message: string } | null }>;
+
 const OnboardingPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -51,7 +67,8 @@ const OnboardingPage = () => {
     setLoading(true);
     try {
       const plan = PLANS[planId];
-      const { data: createdOrg, error: orgErr } = await (supabase as any).rpc('create_organization_for_current_user', {
+      const createOrganization = supabase.rpc as unknown as CreateOrganizationRpc;
+      const { data: createdOrg, error: orgErr } = await createOrganization('create_organization_for_current_user', {
         _name: orgName.trim(),
         _slug: slug,
         _subscription_plan: planId,
@@ -74,15 +91,26 @@ const OnboardingPage = () => {
         .single();
 
       if (freshProfile) {
-        setProfile(freshProfile as any);
+        setProfile(freshProfile);
       } else {
-        setProfile({ ...(profile as any), organization_id: org.id, grade: 'DA', grade_level: 1, full_name: fullName });
+        setProfile({
+          id: user.id,
+          organization_id: org.id,
+          email: user.email || profile?.email || '',
+          full_name: fullName.trim(),
+          avatar_url: profile?.avatar_url ?? null,
+          phone: phone.trim() || null,
+          grade: 'DA',
+          grade_level: 1,
+          is_online: profile?.is_online ?? true,
+        });
       }
 
       toast({ title: 'Organisation créée', description: `Bienvenue chez ${orgName} !` });
       navigate('/', { replace: true });
-    } catch (e: any) {
-      toast({ title: 'Erreur', description: e.message || 'Impossible de créer l\'organisation', variant: 'destructive' });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Impossible de créer l\'organisation';
+      toast({ title: 'Erreur', description: message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
