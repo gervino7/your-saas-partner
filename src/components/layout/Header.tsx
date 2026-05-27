@@ -4,6 +4,7 @@ import {
   Search, Bell, ChevronRight, LogOut, User, Settings,
   ClipboardList, Clock, AlertTriangle, Send, RotateCcw, CheckCircle,
   Video, FileText, AtSign, MessageSquare, Mail, DollarSign, Star, UserPlus,
+  Building2, Link as LinkIcon, Check,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -48,8 +49,9 @@ const typeIconMap: Record<string, React.ElementType> = {
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { profile } = useAuthStore();
+  const { profile, organization } = useAuthStore();
   const { notifications, unreadCount, markAsRead, markAllAsRead, getNavigationPath } = useNotifications();
+  const [copiedUrl, setCopiedUrl] = useState(false);
 
   const segments = location.pathname.split('/').filter(Boolean);
   const breadcrumbs = segments.length === 0
@@ -59,6 +61,17 @@ const Header = () => {
         path: '/' + segments.slice(0, i + 1).join('/'),
       }));
 
+  const orgUrl = organization?.slug
+    ? `${window.location.origin}/org/${organization.slug}`
+    : null;
+
+  const handleCopyOrgUrl = async () => {
+    if (!orgUrl) return;
+    await navigator.clipboard.writeText(orgUrl);
+    setCopiedUrl(true);
+    setTimeout(() => setCopiedUrl(false), 2000);
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/login');
@@ -66,9 +79,28 @@ const Header = () => {
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-card px-4 gap-4">
-      {/* Left: trigger + breadcrumb */}
+      {/* Left: trigger + org + breadcrumb */}
       <div className="flex items-center gap-2 min-w-0">
         <SidebarTrigger />
+        {organization && (
+          <div className="hidden sm:flex items-center gap-1.5 pl-1 pr-2 border-r border-border mr-1">
+            <Building2 className="h-4 w-4 text-primary shrink-0" />
+            <span className="text-sm font-semibold truncate max-w-[160px]" title={organization.name}>
+              {organization.name}
+            </span>
+            {orgUrl && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={handleCopyOrgUrl}
+                title={`Copier l'URL: ${orgUrl}`}
+              >
+                {copiedUrl ? <Check className="h-3 w-3 text-success" /> : <LinkIcon className="h-3 w-3" />}
+              </Button>
+            )}
+          </div>
+        )}
         <nav className="hidden md:flex items-center gap-1 text-sm text-muted-foreground min-w-0">
           {breadcrumbs.map((bc, i) => (
             <span key={bc.path} className="flex items-center gap-1">
