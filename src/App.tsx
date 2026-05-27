@@ -39,6 +39,7 @@ import ResetPasswordPage from '@/pages/ResetPasswordPage';
 import NotFound from '@/pages/NotFound';
 import OnboardingPage from '@/pages/OnboardingPage';
 import SuperAdminPage from '@/pages/SuperAdminPage';
+import OrgRedirectPage from '@/pages/OrgRedirectPage';
 
 const queryClient = new QueryClient();
 
