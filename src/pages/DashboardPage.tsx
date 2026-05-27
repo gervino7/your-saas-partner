@@ -32,7 +32,7 @@ const statConfig = [
 ];
 
 const DashboardPage = () => {
-  const { profile } = useAuthStore();
+  const { profile, organization } = useAuthStore();
   const {
     activeMissions,
     myTasks,
@@ -46,13 +46,24 @@ const DashboardPage = () => {
 
   const firstName = profile?.full_name?.split(" ")[0] || "Utilisateur";
   const statValues = [activeMissions, myTasks, weeklyDocuments, `${weeklyHours}h`];
+  const orgUrl = organization?.slug ? `${window.location.origin}/org/${organization.slug}` : null;
 
   return (
     <div className="space-y-8">
       {/* Greeting */}
       <div className="space-y-1">
         <h1 className="text-2xl font-bold font-display tracking-tight">Bienvenue, {firstName}</h1>
-        {<p className="text-muted-foreground"></p>}
+        {organization && (
+          <p className="text-muted-foreground text-sm">
+            <span className="font-medium text-foreground">{organization.name}</span>
+            {orgUrl && (
+              <>
+                {" · "}
+                <a href={orgUrl} className="text-primary hover:underline">{orgUrl}</a>
+              </>
+            )}
+          </p>
+        )}
       </div>
 
       {/* KPI Cards */}
