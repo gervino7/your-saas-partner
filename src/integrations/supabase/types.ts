@@ -3386,6 +3386,10 @@ export type Database = {
       }
     }
     Functions: {
+      can_access_mission: {
+        Args: { _mission_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_see_user_info: {
         Args: { target_id: string; viewer_id: string }
         Returns: boolean
@@ -3434,6 +3438,7 @@ export type Database = {
         Args: { _user_id: string }
         Returns: string[]
       }
+      get_user_grade_level: { Args: { _user_id: string }; Returns: number }
       get_user_organization_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
@@ -3448,6 +3453,10 @@ export type Database = {
       }
       is_conversation_member: {
         Args: { _conversation_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_mission_member: {
+        Args: { _mission_id: string; _user_id: string }
         Returns: boolean
       }
       super_admin_get_all_orgs: {

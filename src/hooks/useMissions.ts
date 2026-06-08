@@ -15,9 +15,9 @@ export function useMissions(filters: MissionFilters = {}) {
   const profile = useAuthStore((s) => s.profile);
 
   return useQuery({
-    queryKey: ['missions', filters, profile?.organization_id],
+    queryKey: ['missions', filters, profile?.id],
     queryFn: async () => {
-      if (!profile?.organization_id) return [];
+      if (!profile?.id) return [];
 
       let query = supabase
         .from('missions')
@@ -27,7 +27,6 @@ export function useMissions(filters: MissionFilters = {}) {
           director:profiles!missions_director_id_fkey(id, full_name, avatar_url),
           chief:profiles!missions_chief_id_fkey(id, full_name, avatar_url)
         `)
-        .eq('organization_id', profile.organization_id)
         .order('created_at', { ascending: false });
 
       if (filters.status && filters.status !== 'all') {
@@ -50,7 +49,7 @@ export function useMissions(filters: MissionFilters = {}) {
       if (error) throw error;
       return data ?? [];
     },
-    enabled: !!profile?.organization_id,
+    enabled: !!profile?.id,
   });
 }
 
