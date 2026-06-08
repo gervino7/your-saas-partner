@@ -21,8 +21,16 @@ const roleLabels: Record<string, string> = {
 };
 
 export default function MissionTeamTab({ missionId, canManage }: { missionId: string; canManage: boolean }) {
-  const { data: members = [], isLoading } = useMissionMembers(missionId);
+  const { data: allMembers = [], isLoading } = useMissionMembers(missionId);
   const { data: orgUsers = [] } = useOrganizationUsers();
+  const currentProfile = useAuthStore((s) => s.profile);
+  const viewerLevel = currentProfile?.grade_level ?? 8;
+  const members = viewerLevel <= 2
+    ? allMembers
+    : (allMembers as any[]).filter((m: any) => {
+        const lvl = m.user?.grade ? GRADE_LEVELS[m.user.grade as Grade] ?? 8 : 8;
+        return lvl >= viewerLevel || m.user_id === currentProfile?.id;
+      });
   const addMember = useAddMissionMember();
   const [addOpen, setAddOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState('');
