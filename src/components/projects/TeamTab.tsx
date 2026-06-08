@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, Users } from 'lucide-react';
 import { useProjectMembers, useAddProjectMember } from '@/hooks/useProject';
 import { useMissionMembers } from '@/hooks/useMissions';
-import { GRADE_LABELS } from '@/types/database';
+import { useAuthStore } from '@/stores/authStore';
+import { GRADE_LABELS, GRADE_LEVELS } from '@/types/database';
 import type { Grade } from '@/types/database';
 import EmptyState from '@/components/common/EmptyState';
 
@@ -23,7 +24,15 @@ function initials(name: string) {
 }
 
 export default function TeamTab({ projectId, missionId }: { projectId: string; missionId: string | null }) {
-  const { data: members = [], isLoading } = useProjectMembers(projectId);
+  const { data: allMembers = [], isLoading } = useProjectMembers(projectId);
+  const currentProfile = useAuthStore((s) => s.profile);
+  const viewerLevel = currentProfile?.grade_level ?? 8;
+  const members = viewerLevel <= 2
+    ? allMembers
+    : (allMembers as any[]).filter((m: any) => {
+        const lvl = m.user?.grade ? GRADE_LEVELS[m.user.grade as Grade] ?? 8 : 8;
+        return lvl >= viewerLevel || m.user?.id === currentProfile?.id;
+      });
   const { data: missionMembers = [] } = useMissionMembers(missionId ?? undefined);
   const addMember = useAddProjectMember();
   const [dialogOpen, setDialogOpen] = useState(false);

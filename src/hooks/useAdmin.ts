@@ -170,9 +170,10 @@ export function useActivityLogs(filters: {
 } = {}) {
   const profile = useAuthStore((s) => s.profile);
   return useQuery({
-    queryKey: ['activity-logs', filters, profile?.organization_id],
+    queryKey: ['activity-logs', filters, profile?.organization_id, profile?.grade_level],
     queryFn: async () => {
       if (!profile?.organization_id) return [];
+      const viewerLevel = profile.grade_level ?? 8;
       let query = supabase
         .from('activity_logs')
         .select('*, user:profiles!activity_logs_user_id_fkey(id, full_name, avatar_url, grade)')
@@ -180,7 +181,12 @@ export function useActivityLogs(filters: {
         .order('created_at', { ascending: false })
         .limit(200);
 
-      if (filters.userId) query = query.eq('user_id', filters.userId);
+      // Non DA/DM users can only see their own activity logs
+      if (viewerLevel > 2) {
+        query = query.eq('user_id', profile.id);
+      } else if (filters.userId) {
+        query = query.eq('user_id', filters.userId);
+      }
       if (filters.action) query = query.eq('action', filters.action);
       if (filters.entityType) query = query.eq('entity_type', filters.entityType);
       if (filters.dateFrom) query = query.gte('created_at', filters.dateFrom);

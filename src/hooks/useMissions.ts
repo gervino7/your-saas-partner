@@ -245,7 +245,7 @@ export function useOrganizationUsers() {
   const profile = useAuthStore((s) => s.profile);
 
   return useQuery({
-    queryKey: ['org-users', profile?.organization_id],
+    queryKey: ['org-users', profile?.organization_id, profile?.grade_level],
     queryFn: async () => {
       if (!profile?.organization_id) return [];
       const { data, error } = await supabase
@@ -254,7 +254,12 @@ export function useOrganizationUsers() {
         .eq('organization_id', profile.organization_id)
         .order('grade_level', { ascending: true });
       if (error) throw error;
-      return data ?? [];
+      const viewerLevel = profile.grade_level ?? 8;
+      // DA/DM (level <= 2) see everyone. Others see same grade or lower (level >= viewer).
+      const filtered = viewerLevel <= 2
+        ? (data ?? [])
+        : (data ?? []).filter((u: any) => (u.grade_level ?? 8) >= viewerLevel || u.id === profile.id);
+      return filtered;
     },
     enabled: !!profile?.organization_id,
   });

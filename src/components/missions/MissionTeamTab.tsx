@@ -8,7 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserPlus } from 'lucide-react';
 import { useMissionMembers, useOrganizationUsers, useAddMissionMember } from '@/hooks/useMissions';
-import { GRADE_LABELS } from '@/types/database';
+import { useAuthStore } from '@/stores/authStore';
+import { GRADE_LABELS, GRADE_LEVELS } from '@/types/database';
 import type { Grade } from '@/types/database';
 
 function initials(name: string) {
@@ -20,8 +21,16 @@ const roleLabels: Record<string, string> = {
 };
 
 export default function MissionTeamTab({ missionId, canManage }: { missionId: string; canManage: boolean }) {
-  const { data: members = [], isLoading } = useMissionMembers(missionId);
+  const { data: allMembers = [], isLoading } = useMissionMembers(missionId);
   const { data: orgUsers = [] } = useOrganizationUsers();
+  const currentProfile = useAuthStore((s) => s.profile);
+  const viewerLevel = currentProfile?.grade_level ?? 8;
+  const members = viewerLevel <= 2
+    ? allMembers
+    : (allMembers as any[]).filter((m: any) => {
+        const lvl = m.user?.grade ? GRADE_LEVELS[m.user.grade as Grade] ?? 8 : 8;
+        return lvl >= viewerLevel || m.user_id === currentProfile?.id;
+      });
   const addMember = useAddMissionMember();
   const [addOpen, setAddOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState('');
