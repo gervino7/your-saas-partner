@@ -24,7 +24,15 @@ function initials(name: string) {
 }
 
 export default function TeamTab({ projectId, missionId }: { projectId: string; missionId: string | null }) {
-  const { data: members = [], isLoading } = useProjectMembers(projectId);
+  const { data: allMembers = [], isLoading } = useProjectMembers(projectId);
+  const currentProfile = useAuthStore((s) => s.profile);
+  const viewerLevel = currentProfile?.grade_level ?? 8;
+  const members = viewerLevel <= 2
+    ? allMembers
+    : (allMembers as any[]).filter((m: any) => {
+        const lvl = m.user?.grade ? GRADE_LEVELS[m.user.grade as Grade] ?? 8 : 8;
+        return lvl >= viewerLevel || m.user?.id === currentProfile?.id;
+      });
   const { data: missionMembers = [] } = useMissionMembers(missionId ?? undefined);
   const addMember = useAddProjectMember();
   const [dialogOpen, setDialogOpen] = useState(false);
