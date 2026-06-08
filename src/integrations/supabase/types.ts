@@ -3386,6 +3386,10 @@ export type Database = {
       }
     }
     Functions: {
+      can_access_document: {
+        Args: { _doc_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_access_mission: {
         Args: { _mission_id: string; _user_id: string }
         Returns: boolean
