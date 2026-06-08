@@ -3386,6 +3386,10 @@ export type Database = {
       }
     }
     Functions: {
+      can_see_user_info: {
+        Args: { target_id: string; viewer_id: string }
+        Returns: boolean
+      }
       create_organization_for_current_user: {
         Args: {
           _full_name?: string
