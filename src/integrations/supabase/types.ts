@@ -3402,6 +3402,10 @@ export type Database = {
         Args: { _task_id: string; _user_id: string }
         Returns: boolean
       }
+      can_create_mission: {
+        Args: { _organization_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_see_user_info: {
         Args: { target_id: string; viewer_id: string }
         Returns: boolean
