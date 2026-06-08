@@ -8,7 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserPlus } from 'lucide-react';
 import { useMissionMembers, useOrganizationUsers, useAddMissionMember } from '@/hooks/useMissions';
-import { GRADE_LABELS } from '@/types/database';
+import { useAuthStore } from '@/stores/authStore';
+import { GRADE_LABELS, GRADE_LEVELS } from '@/types/database';
 import type { Grade } from '@/types/database';
 
 function initials(name: string) {
