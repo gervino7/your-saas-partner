@@ -3410,6 +3410,49 @@ export type Database = {
         Args: { target_id: string; viewer_id: string }
         Returns: boolean
       }
+      create_mission_with_members: {
+        Args: {
+          _budget_amount?: number
+          _budget_currency?: string
+          _chief_id?: string
+          _client_id?: string
+          _description?: string
+          _director_id?: string
+          _end_date?: string
+          _name: string
+          _priority?: string
+          _start_date?: string
+          _type?: string
+        }
+        Returns: {
+          actual_end_date: string | null
+          budget_amount: number | null
+          budget_currency: string | null
+          chief_id: string | null
+          client_id: string | null
+          code: string | null
+          created_at: string | null
+          description: string | null
+          director_id: string | null
+          end_date: string | null
+          id: string
+          name: string
+          organization_id: string | null
+          priority: string | null
+          progress: number | null
+          settings: Json | null
+          start_date: string | null
+          status: string | null
+          type: string | null
+          updated_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "missions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       create_organization_for_current_user: {
         Args: {
           _full_name?: string
