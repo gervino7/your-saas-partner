@@ -132,39 +132,25 @@ export function useCreateMission() {
       end_date?: string;
       priority?: string;
     }) => {
-      // Generate mission code
-      const year = new Date().getFullYear();
-      const { count } = await supabase
-        .from('missions')
-        .select('*', { count: 'exact', head: true })
-        .eq('organization_id', profile!.organization_id!);
-      const code = `MIS-${year}-${String((count ?? 0) + 1).padStart(3, '0')}`;
+      if (!profile?.id) {
+        throw new Error('Utilisateur non authentifié');
+      }
 
-      const { data, error } = await supabase
-        .from('missions')
-        .insert({
-          ...values,
-          code,
-          organization_id: profile!.organization_id!,
-          status: 'draft',
-        })
-        .select()
-        .single();
+      const { data, error } = await (supabase as any).rpc('create_mission_with_members', {
+        _name: values.name,
+        _description: values.description ?? null,
+        _type: values.type ?? null,
+        _client_id: values.client_id ?? null,
+        _director_id: values.director_id ?? null,
+        _chief_id: values.chief_id ?? null,
+        _budget_amount: values.budget_amount ?? null,
+        _budget_currency: values.budget_currency ?? 'XOF',
+        _start_date: values.start_date ?? null,
+        _end_date: values.end_date ?? null,
+        _priority: values.priority ?? 'medium',
+      });
 
       if (error) throw error;
-
-      // Add director and chief as mission members
-      const members: { mission_id: string; user_id: string; role: string }[] = [];
-      if (values.director_id) {
-        members.push({ mission_id: data.id, user_id: values.director_id, role: 'director' });
-      }
-      if (values.chief_id && values.chief_id !== values.director_id) {
-        members.push({ mission_id: data.id, user_id: values.chief_id, role: 'chief' });
-      }
-      if (members.length > 0) {
-        await supabase.from('mission_members').insert(members);
-      }
-
       return data;
     },
     onSuccess: () => {
