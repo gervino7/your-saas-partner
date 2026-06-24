@@ -267,16 +267,25 @@ export function useCreateProject() {
       if (!profile?.id) {
         throw new Error('Utilisateur non authentifié');
       }
+      if (!profile.organization_id) {
+        throw new Error('Votre profil n\'est rattaché à aucune organisation');
+      }
 
-      const { data, error } = await (supabase as any).rpc('create_project_with_members', {
-        _mission_id: values.mission_id,
-        _name: values.name,
-        _description: values.description ?? null,
-        _lead_id: values.lead_id ?? null,
-        _budget_allocated: values.budget_allocated ?? 0,
-        _start_date: values.start_date ?? null,
-        _end_date: values.end_date ?? null,
-      });
+      const { data, error } = await supabase
+        .from('projects')
+        .insert({
+          mission_id: values.mission_id,
+          organization_id: profile.organization_id,
+          name: values.name,
+          description: values.description ?? null,
+          lead_id: values.lead_id ?? null,
+          budget_allocated: values.budget_allocated ?? 0,
+          start_date: values.start_date ?? null,
+          end_date: values.end_date ?? null,
+          status: 'planning',
+        })
+        .select()
+        .single();
       if (error) throw error;
 
       return data;
