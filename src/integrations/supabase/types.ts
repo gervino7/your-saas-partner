@@ -3406,6 +3406,14 @@ export type Database = {
         Args: { _organization_id: string; _user_id: string }
         Returns: boolean
       }
+      can_insert_project: {
+        Args: {
+          _mission_id: string
+          _organization_id: string
+          _user_id: string
+        }
+        Returns: boolean
+      }
       can_see_user_info: {
         Args: { target_id: string; viewer_id: string }
         Returns: boolean

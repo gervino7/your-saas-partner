@@ -271,7 +271,7 @@ export function useCreateProject() {
         throw new Error('Votre profil n\'est rattaché à aucune organisation');
       }
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('projects')
         .insert({
           mission_id: values.mission_id,
@@ -283,12 +283,10 @@ export function useCreateProject() {
           start_date: values.start_date ?? null,
           end_date: values.end_date ?? null,
           status: 'planning',
-        })
-        .select()
-        .single();
+        });
       if (error) throw error;
 
-      return data;
+      return null;
     },
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ['mission-projects', vars.mission_id] });
