@@ -3483,6 +3483,39 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      create_project_with_members: {
+        Args: {
+          _budget_allocated?: number
+          _description?: string
+          _end_date?: string
+          _lead_id?: string
+          _mission_id: string
+          _name: string
+          _start_date?: string
+        }
+        Returns: {
+          budget_allocated: number | null
+          code: string | null
+          created_at: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          lead_id: string | null
+          mission_id: string | null
+          name: string
+          organization_id: string | null
+          progress: number | null
+          start_date: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "projects"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       get_invitation_by_token: {
         Args: { _token: string }
         Returns: {
