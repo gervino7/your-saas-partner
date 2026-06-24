@@ -264,35 +264,20 @@ export function useCreateProject() {
       start_date?: string;
       end_date?: string;
     }) => {
-      // Generate project code
-      const year = new Date().getFullYear();
-      const { count } = await supabase
-        .from('projects')
-        .select('*', { count: 'exact', head: true })
-        .eq('mission_id', values.mission_id);
-      const code = `PRJ-${year}-${String((count ?? 0) + 1).padStart(3, '0')}`;
-
-      const { data, error } = await supabase
-        .from('projects')
-        .insert({
-          ...values,
-          code,
-          organization_id: profile!.organization_id!,
-          status: 'planning',
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Add lead as project member
-      if (values.lead_id) {
-        await supabase.from('project_members').insert({
-          project_id: data.id,
-          user_id: values.lead_id,
-          role: 'lead',
-        });
+      if (!profile?.id) {
+        throw new Error('Utilisateur non authentifié');
       }
+
+      const { data, error } = await (supabase as any).rpc('create_project_with_members', {
+        _mission_id: values.mission_id,
+        _name: values.name,
+        _description: values.description ?? null,
+        _lead_id: values.lead_id ?? null,
+        _budget_allocated: values.budget_allocated ?? 0,
+        _start_date: values.start_date ?? null,
+        _end_date: values.end_date ?? null,
+      });
+      if (error) throw error;
 
       return data;
     },
