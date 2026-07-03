@@ -189,11 +189,36 @@ export default function TaskDetailDialog({ task, open, onOpenChange, projectLead
             </div>
           </TabsContent>
 
-          <TabsContent value="submissions" className="mt-4">
+          <TabsContent value="submissions" className="mt-4 space-y-4">
+            {isAssignee && ['todo', 'in_progress', 'correction'].includes(status) && (
+              <InlineSubmissionForm
+                taskId={task.id}
+                onSubmitted={() => updateTask.mutate({ id: task.id, status: 'in_review' })}
+              />
+            )}
+            {isLead && (() => {
+              const pending = [...submissions].reverse().find(
+                (s: any) => s.type === 'submission' && s.status === 'pending'
+              );
+              return pending ? (
+                <InlineReviewPanel
+                  taskId={task.id}
+                  submission={pending}
+                  onValidated={() => updateTask.mutate({ id: task.id, status: 'completed', completed_at: new Date().toISOString() })}
+                  onRejected={() => updateTask.mutate({ id: task.id, status: 'correction' })}
+                />
+              ) : null;
+            })()}
             <SubmissionTimeline submissions={submissions} loading={subsLoading} />
           </TabsContent>
 
-          <TabsContent value="files" className="mt-4">
+          <TabsContent value="files" className="mt-4 space-y-4">
+            {(isAssignee || isLead) && (
+              <InlineFileUploader
+                taskId={task.id}
+                onUploaded={() => updateTask.mutate({ id: task.id, status: status === 'todo' ? 'in_progress' : status })}
+              />
+            )}
             <TaskFiles submissions={submissions} />
           </TabsContent>
 
@@ -613,5 +638,232 @@ function RejectDialog({ taskId, open, onClose, onRejected }: {
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+/* ─── Inline Submission Form (Soumissions tab) ─── */
+async function uploadFilesToStorage(taskId: string, files: File[]) {
+  const attachments: any[] = [];
+  for (const file of files) {
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const path = `${taskId}/${Date.now()}_${safeName}`;
+    const { error } = await supabase.storage.from('attachments').upload(path, file);
+    if (error) throw error;
+    const { data: urlData } = supabase.storage.from('attachments').getPublicUrl(path);
+    attachments.push({ name: file.name, url: urlData.publicUrl, path, size: file.size });
+  }
+  return attachments;
+}
+
+function InlineSubmissionForm({ taskId, onSubmitted }: { taskId: string; onSubmitted: () => void }) {
+  const [comment, setComment] = useState('');
+  const [files, setFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const createSubmission = useCreateSubmission();
+
+  const handleSubmit = async () => {
+    if (!comment.trim() && files.length === 0) {
+      toast.error('Ajoutez un commentaire ou un fichier');
+      return;
+    }
+    setUploading(true);
+    try {
+      const attachments = await uploadFilesToStorage(taskId, files);
+      await createSubmission.mutateAsync({
+        task_id: taskId, type: 'submission',
+        comment: comment || undefined, attachments, status: 'pending',
+      });
+      toast.success('Travail soumis au chef de projet');
+      setComment(''); setFiles([]);
+      onSubmitted();
+    } catch (e: any) {
+      toast.error(`Erreur: ${e.message}`);
+    } finally { setUploading(false); }
+  };
+
+  return (
+    <div className="rounded-lg border border-amber-300/50 bg-amber-50/70 dark:bg-amber-950/20 p-4 space-y-3">
+      <div className="flex items-center gap-2">
+        <Send className="h-4 w-4 text-amber-700" />
+        <h3 className="text-sm font-semibold text-amber-900 dark:text-amber-100">Soumettre mon travail</h3>
+      </div>
+      <Textarea
+        placeholder="Décrivez votre travail..."
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        rows={3}
+        className="bg-white"
+      />
+      <div>
+        <Input
+          type="file"
+          multiple
+          onChange={(e) => setFiles([...files, ...Array.from(e.target.files || [])])}
+          className="bg-white"
+        />
+        {files.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {files.map((f, i) => (
+              <span key={i} className="inline-flex items-center gap-1 text-xs bg-white border rounded-full px-2 py-0.5">
+                {f.name}
+                <button type="button" onClick={() => setFiles(files.filter((_, j) => j !== i))} className="hover:text-destructive">×</button>
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="flex justify-end">
+        <Button size="sm" onClick={handleSubmit} disabled={uploading || createSubmission.isPending}>
+          <Send className="h-4 w-4 mr-1" /> {uploading ? 'Envoi...' : 'Soumettre au chef'}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Inline Review Panel (Project lead) ─── */
+function InlineReviewPanel({ taskId, submission, onValidated, onRejected }: {
+  taskId: string; submission: any; onValidated: () => void; onRejected: () => void;
+}) {
+  const [comment, setComment] = useState('');
+  const [rating, setRating] = useState<number>(3);
+  const createSubmission = useCreateSubmission();
+
+  const att = submission.attachments
+    ? (typeof submission.attachments === 'string' ? JSON.parse(submission.attachments) : submission.attachments)
+    : [];
+
+  const handleValidate = async () => {
+    await createSubmission.mutateAsync({
+      task_id: taskId, type: 'validation', comment: comment || undefined, rating, status: 'approved',
+    });
+    toast.success('Tâche validée');
+    onValidated();
+  };
+
+  const handleReject = async () => {
+    if (!comment.trim()) { toast.error('Précisez les corrections demandées'); return; }
+    await createSubmission.mutateAsync({
+      task_id: taskId, type: 'rejection', comment, status: 'rejected',
+    });
+    toast.success('Correction demandée');
+    onRejected();
+  };
+
+  return (
+    <div className="rounded-lg border border-amber-300/50 bg-amber-50/70 dark:bg-amber-950/20 p-4 space-y-3">
+      <div className="flex items-center gap-2">
+        <Check className="h-4 w-4 text-amber-700" />
+        <h3 className="text-sm font-semibold text-amber-900 dark:text-amber-100">Revue de la soumission en attente</h3>
+      </div>
+      <div className="bg-white rounded-md border p-3 space-y-2">
+        {submission.submitter && (
+          <p className="text-xs text-muted-foreground">Soumis par <span className="font-medium text-foreground">{submission.submitter.full_name}</span></p>
+        )}
+        {submission.comment && <p className="text-sm whitespace-pre-wrap">{submission.comment}</p>}
+        {Array.isArray(att) && att.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {att.map((f: any, i: number) => (
+              <a key={i} href={f.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-primary hover:underline bg-muted px-2 py-1 rounded">
+                <Download className="h-3 w-3" /> {f.name}
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+      <div>
+        <Label className="text-xs">Évaluation</Label>
+        <div className="grid grid-cols-4 gap-1.5 mt-1">
+          {ratingConfig.map((r) => (
+            <button
+              key={r.value}
+              type="button"
+              onClick={() => setRating(r.value)}
+              className={`p-2 rounded-md border-2 text-center transition-all bg-white ${
+                rating === r.value ? 'border-primary' : 'border-border hover:border-muted-foreground/30'
+              }`}
+              title={r.desc}
+            >
+              <div className="flex items-center justify-center gap-1">
+                <Star className="h-3 w-3" fill="currentColor" />
+                <span className="text-sm font-bold">{r.value}</span>
+              </div>
+              <p className="text-[10px] mt-0.5">{r.label}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+      <Textarea
+        placeholder="Commentaire de revue..."
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        rows={2}
+        className="bg-white"
+      />
+      <div className="flex justify-end gap-2">
+        <Button size="sm" variant="outline" className="border-orange-400 text-orange-700 hover:bg-orange-50" onClick={handleReject} disabled={createSubmission.isPending}>
+          <RotateCcw className="h-4 w-4 mr-1" /> Demander correction
+        </Button>
+        <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={handleValidate} disabled={createSubmission.isPending}>
+          <Check className="h-4 w-4 mr-1" /> Valider
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Inline File Uploader (Fichiers tab) ─── */
+function InlineFileUploader({ taskId, onUploaded }: { taskId: string; onUploaded: () => void }) {
+  const [files, setFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const createSubmission = useCreateSubmission();
+
+  const handleUpload = async () => {
+    if (files.length === 0) return;
+    setUploading(true);
+    try {
+      const attachments = await uploadFilesToStorage(taskId, files);
+      await createSubmission.mutateAsync({
+        task_id: taskId, type: 'submission',
+        comment: 'Fichiers ajoutés à la tâche', attachments, status: 'pending',
+      });
+      toast.success(`${files.length} fichier(s) ajouté(s)`);
+      setFiles([]);
+      onUploaded();
+    } catch (e: any) {
+      toast.error(`Erreur: ${e.message}`);
+    } finally { setUploading(false); }
+  };
+
+  return (
+    <div className="rounded-lg border border-amber-300/50 bg-amber-50/70 dark:bg-amber-950/20 p-4 space-y-3">
+      <div className="flex items-center gap-2">
+        <Upload className="h-4 w-4 text-amber-700" />
+        <h3 className="text-sm font-semibold text-amber-900 dark:text-amber-100">Ajouter des fichiers</h3>
+      </div>
+      <Input
+        type="file"
+        multiple
+        onChange={(e) => setFiles([...files, ...Array.from(e.target.files || [])])}
+        className="bg-white"
+      />
+      {files.length > 0 && (
+        <>
+          <div className="flex flex-wrap gap-1.5">
+            {files.map((f, i) => (
+              <span key={i} className="inline-flex items-center gap-1 text-xs bg-white border rounded-full px-2 py-0.5">
+                {f.name}
+                <button type="button" onClick={() => setFiles(files.filter((_, j) => j !== i))} className="hover:text-destructive">×</button>
+              </span>
+            ))}
+          </div>
+          <div className="flex justify-end">
+            <Button size="sm" onClick={handleUpload} disabled={uploading}>
+              <Upload className="h-4 w-4 mr-1" /> {uploading ? 'Envoi...' : 'Uploader'}
+            </Button>
+          </div>
+        </>
+      )}
+    </div>
   );
 }
