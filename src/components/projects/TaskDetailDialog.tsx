@@ -189,11 +189,36 @@ export default function TaskDetailDialog({ task, open, onOpenChange, projectLead
             </div>
           </TabsContent>
 
-          <TabsContent value="submissions" className="mt-4">
+          <TabsContent value="submissions" className="mt-4 space-y-4">
+            {isAssignee && ['todo', 'in_progress', 'correction'].includes(status) && (
+              <InlineSubmissionForm
+                taskId={task.id}
+                onSubmitted={() => updateTask.mutate({ id: task.id, status: 'in_review' })}
+              />
+            )}
+            {isLead && (() => {
+              const pending = [...submissions].reverse().find(
+                (s: any) => s.type === 'submission' && s.status === 'pending'
+              );
+              return pending ? (
+                <InlineReviewPanel
+                  taskId={task.id}
+                  submission={pending}
+                  onValidated={() => updateTask.mutate({ id: task.id, status: 'completed', completed_at: new Date().toISOString() })}
+                  onRejected={() => updateTask.mutate({ id: task.id, status: 'correction' })}
+                />
+              ) : null;
+            })()}
             <SubmissionTimeline submissions={submissions} loading={subsLoading} />
           </TabsContent>
 
-          <TabsContent value="files" className="mt-4">
+          <TabsContent value="files" className="mt-4 space-y-4">
+            {(isAssignee || isLead) && (
+              <InlineFileUploader
+                taskId={task.id}
+                onUploaded={() => updateTask.mutate({ id: task.id, status: status === 'todo' ? 'in_progress' : status })}
+              />
+            )}
             <TaskFiles submissions={submissions} />
           </TabsContent>
 
