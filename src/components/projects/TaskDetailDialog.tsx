@@ -386,9 +386,9 @@ function TaskFiles({ submissions }: { submissions: any[] }) {
               </p>
             </div>
           </div>
-          <a href={f.url} target="_blank" rel="noopener noreferrer">
-            <Button variant="ghost" size="sm"><Download className="h-4 w-4" /></Button>
-          </a>
+          <Button variant="ghost" size="sm" onClick={() => openAttachment(f)}>
+            <Download className="h-4 w-4" />
+          </Button>
         </div>
       ))}
     </div>
