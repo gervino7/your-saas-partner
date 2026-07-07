@@ -663,6 +663,7 @@ function InlineSubmissionForm({ taskId, onSubmitted }: { taskId: string; onSubmi
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const createSubmission = useCreateSubmission();
+  const profile = useAuthStore((s) => s.profile);
 
   const handleSubmit = async () => {
     if (!comment.trim() && files.length === 0) {
@@ -671,7 +672,8 @@ function InlineSubmissionForm({ taskId, onSubmitted }: { taskId: string; onSubmi
     }
     setUploading(true);
     try {
-      const attachments = await uploadFilesToStorage(taskId, files);
+      if (!profile?.organization_id) throw new Error('Organisation introuvable');
+      const attachments = await uploadFilesToStorage(profile.organization_id, taskId, files);
       await createSubmission.mutateAsync({
         task_id: taskId, type: 'submission',
         comment: comment || undefined, attachments, status: 'pending',
