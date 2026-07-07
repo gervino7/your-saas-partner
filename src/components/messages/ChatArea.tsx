@@ -50,7 +50,7 @@ export default function ChatArea({
   onMarkAsRead,
   onTyping,
 }: ChatAreaProps) {
-  const { user } = useAuthStore();
+  const { user, profile } = useAuthStore();
   const [input, setInput] = useState('');
   const [replyTo, setReplyTo] = useState<MessageWithSender | null>(null);
   const [editing, setEditing] = useState<MessageWithSender | null>(null);
@@ -148,9 +148,13 @@ export default function ChatArea({
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
+    if (!profile?.organization_id) {
+      toast.error('Organisation introuvable');
+      return;
+    }
 
-    const filePath = `${user.id}/${Date.now()}_${file.name}`;
-    const { error } = await supabase.storage.from('attachments').upload(filePath, file);
+    const filePath = `${profile.organization_id}/messages/${user.id}/${Date.now()}_${file.name}`;
+    const { error } = await supabase.storage.from('attachments').upload(filePath, file, { upsert: true });
     if (error) {
       toast.error("Erreur d'upload");
       return;

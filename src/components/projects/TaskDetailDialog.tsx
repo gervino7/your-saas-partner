@@ -429,11 +429,12 @@ function SubmitWorkDialog({ taskId, open, onClose, onSubmitted }: {
   const handleSubmit = async () => {
     setUploading(true);
     try {
+      if (!profile?.organization_id) throw new Error('Organisation introuvable');
       const attachments: any[] = [];
       for (const file of files) {
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-        const path = `submissions/${taskId}/${Date.now()}_${safeName}`;
-        const { error } = await supabase.storage.from('attachments').upload(path, file);
+        const path = `${profile.organization_id}/submissions/${taskId}/${Date.now()}_${safeName}`;
+        const { error } = await supabase.storage.from('attachments').upload(path, file, { upsert: true });
         if (error) throw error;
         const { data: urlData } = supabase.storage.from('attachments').getPublicUrl(path);
         attachments.push({ name: file.name, url: urlData.publicUrl, path });
@@ -574,15 +575,17 @@ function RejectDialog({ taskId, open, onClose, onRejected }: {
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const createSubmission = useCreateSubmission();
+  const profile = useAuthStore((s) => s.profile);
 
   const handleReject = async () => {
     setUploading(true);
     try {
+      if (!profile?.organization_id) throw new Error('Organisation introuvable');
       const attachments: any[] = [];
       for (const file of files) {
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-        const path = `submissions/${taskId}/${Date.now()}_${safeName}`;
-        const { error } = await supabase.storage.from('attachments').upload(path, file);
+        const path = `${profile.organization_id}/submissions/${taskId}/${Date.now()}_${safeName}`;
+        const { error } = await supabase.storage.from('attachments').upload(path, file, { upsert: true });
         if (error) throw error;
         const { data: urlData } = supabase.storage.from('attachments').getPublicUrl(path);
         attachments.push({ name: file.name, url: urlData.publicUrl, path });
@@ -642,12 +645,12 @@ function RejectDialog({ taskId, open, onClose, onRejected }: {
 }
 
 /* ─── Inline Submission Form (Soumissions tab) ─── */
-async function uploadFilesToStorage(taskId: string, files: File[]) {
+async function uploadFilesToStorage(orgId: string, taskId: string, files: File[]) {
   const attachments: any[] = [];
   for (const file of files) {
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const path = `${taskId}/${Date.now()}_${safeName}`;
-    const { error } = await supabase.storage.from('attachments').upload(path, file);
+    const path = `${orgId}/submissions/${taskId}/${Date.now()}_${safeName}`;
+    const { error } = await supabase.storage.from('attachments').upload(path, file, { upsert: true });
     if (error) throw error;
     const { data: urlData } = supabase.storage.from('attachments').getPublicUrl(path);
     attachments.push({ name: file.name, url: urlData.publicUrl, path, size: file.size });
@@ -660,6 +663,7 @@ function InlineSubmissionForm({ taskId, onSubmitted }: { taskId: string; onSubmi
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const createSubmission = useCreateSubmission();
+  const profile = useAuthStore((s) => s.profile);
 
   const handleSubmit = async () => {
     if (!comment.trim() && files.length === 0) {
@@ -668,7 +672,8 @@ function InlineSubmissionForm({ taskId, onSubmitted }: { taskId: string; onSubmi
     }
     setUploading(true);
     try {
-      const attachments = await uploadFilesToStorage(taskId, files);
+      if (!profile?.organization_id) throw new Error('Organisation introuvable');
+      const attachments = await uploadFilesToStorage(profile.organization_id, taskId, files);
       await createSubmission.mutateAsync({
         task_id: taskId, type: 'submission',
         comment: comment || undefined, attachments, status: 'pending',
@@ -817,12 +822,14 @@ function InlineFileUploader({ taskId, onUploaded }: { taskId: string; onUploaded
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const createSubmission = useCreateSubmission();
+  const profile = useAuthStore((s) => s.profile);
 
   const handleUpload = async () => {
     if (files.length === 0) return;
     setUploading(true);
     try {
-      const attachments = await uploadFilesToStorage(taskId, files);
+      if (!profile?.organization_id) throw new Error('Organisation introuvable');
+      const attachments = await uploadFilesToStorage(profile.organization_id, taskId, files);
       await createSubmission.mutateAsync({
         task_id: taskId, type: 'submission',
         comment: 'Fichiers ajoutés à la tâche', attachments, status: 'pending',
