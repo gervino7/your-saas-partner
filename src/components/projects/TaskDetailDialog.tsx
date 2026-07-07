@@ -21,6 +21,20 @@ import { useTaskSubmissions, useCreateSubmission } from '@/hooks/useTaskSubmissi
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+async function openAttachment(f: { path?: string; url?: string; name?: string }) {
+  try {
+    if (f.path) {
+      const { data, error } = await supabase.storage.from('attachments').createSignedUrl(f.path, 3600);
+      if (error) throw error;
+      window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    if (f.url) window.open(f.url, '_blank', 'noopener,noreferrer');
+  } catch (e: any) {
+    toast.error(`Impossible d'ouvrir le fichier: ${e.message}`);
+  }
+}
+
 const statusColors: Record<string, string> = {
   todo: 'bg-muted text-muted-foreground',
   in_progress: 'bg-info/15 text-info',
@@ -323,15 +337,14 @@ function SubmissionTimeline({ submissions, loading }: { submissions: any[]; load
                 return Array.isArray(att) && att.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {att.map((f: any, i: number) => (
-                      <a
+                      <button
                         key={i}
-                        href={f.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        type="button"
+                        onClick={() => openAttachment(f)}
                         className="flex items-center gap-1 text-xs text-primary hover:underline bg-muted px-2 py-1 rounded"
                       >
                         <Download className="h-3 w-3" /> {f.name ?? `Fichier ${i + 1}`}
-                      </a>
+                      </button>
                     ))}
                   </div>
                 ) : null;
@@ -373,9 +386,9 @@ function TaskFiles({ submissions }: { submissions: any[] }) {
               </p>
             </div>
           </div>
-          <a href={f.url} target="_blank" rel="noopener noreferrer">
-            <Button variant="ghost" size="sm"><Download className="h-4 w-4" /></Button>
-          </a>
+          <Button variant="ghost" size="sm" onClick={() => openAttachment(f)}>
+            <Download className="h-4 w-4" />
+          </Button>
         </div>
       ))}
     </div>
@@ -769,9 +782,9 @@ function InlineReviewPanel({ taskId, submission, onValidated, onRejected }: {
         {Array.isArray(att) && att.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {att.map((f: any, i: number) => (
-              <a key={i} href={f.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-primary hover:underline bg-muted px-2 py-1 rounded">
+              <button key={i} type="button" onClick={() => openAttachment(f)} className="flex items-center gap-1 text-xs text-primary hover:underline bg-muted px-2 py-1 rounded">
                 <Download className="h-3 w-3" /> {f.name}
-              </a>
+              </button>
             ))}
           </div>
         )}
