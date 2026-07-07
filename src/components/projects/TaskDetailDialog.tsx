@@ -669,8 +669,7 @@ async function uploadFilesToStorage(orgId: string, taskId: string, files: File[]
     const path = `${orgId}/submissions/${taskId}/${Date.now()}_${safeName}`;
     const { error } = await supabase.storage.from('attachments').upload(path, file, { upsert: true });
     if (error) throw error;
-    const { data: urlData } = supabase.storage.from('attachments').getPublicUrl(path);
-    attachments.push({ name: file.name, url: urlData.publicUrl, path, size: file.size });
+    attachments.push({ name: file.name, path, size: file.size });
   }
   return attachments;
 }
