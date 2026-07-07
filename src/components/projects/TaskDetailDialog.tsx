@@ -822,12 +822,14 @@ function InlineFileUploader({ taskId, onUploaded }: { taskId: string; onUploaded
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const createSubmission = useCreateSubmission();
+  const profile = useAuthStore((s) => s.profile);
 
   const handleUpload = async () => {
     if (files.length === 0) return;
     setUploading(true);
     try {
-      const attachments = await uploadFilesToStorage(taskId, files);
+      if (!profile?.organization_id) throw new Error('Organisation introuvable');
+      const attachments = await uploadFilesToStorage(profile.organization_id, taskId, files);
       await createSubmission.mutateAsync({
         task_id: taskId, type: 'submission',
         comment: 'Fichiers ajoutés à la tâche', attachments, status: 'pending',
