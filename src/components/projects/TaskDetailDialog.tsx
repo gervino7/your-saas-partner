@@ -575,15 +575,17 @@ function RejectDialog({ taskId, open, onClose, onRejected }: {
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const createSubmission = useCreateSubmission();
+  const profile = useAuthStore((s) => s.profile);
 
   const handleReject = async () => {
     setUploading(true);
     try {
+      if (!profile?.organization_id) throw new Error('Organisation introuvable');
       const attachments: any[] = [];
       for (const file of files) {
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-        const path = `submissions/${taskId}/${Date.now()}_${safeName}`;
-        const { error } = await supabase.storage.from('attachments').upload(path, file);
+        const path = `${profile.organization_id}/submissions/${taskId}/${Date.now()}_${safeName}`;
+        const { error } = await supabase.storage.from('attachments').upload(path, file, { upsert: true });
         if (error) throw error;
         const { data: urlData } = supabase.storage.from('attachments').getPublicUrl(path);
         attachments.push({ name: file.name, url: urlData.publicUrl, path });
