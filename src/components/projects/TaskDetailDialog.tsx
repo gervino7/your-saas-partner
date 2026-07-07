@@ -455,8 +455,7 @@ function SubmitWorkDialog({ taskId, open, onClose, onSubmitted }: {
         const path = `${profile.organization_id}/submissions/${taskId}/${Date.now()}_${safeName}`;
         const { error } = await supabase.storage.from('attachments').upload(path, file, { upsert: true });
         if (error) throw error;
-        const { data: urlData } = supabase.storage.from('attachments').getPublicUrl(path);
-        attachments.push({ name: file.name, url: urlData.publicUrl, path });
+        attachments.push({ name: file.name, path, size: file.size });
       }
 
       await createSubmission.mutateAsync({
