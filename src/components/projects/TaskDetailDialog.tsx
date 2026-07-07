@@ -645,12 +645,12 @@ function RejectDialog({ taskId, open, onClose, onRejected }: {
 }
 
 /* ─── Inline Submission Form (Soumissions tab) ─── */
-async function uploadFilesToStorage(taskId: string, files: File[]) {
+async function uploadFilesToStorage(orgId: string, taskId: string, files: File[]) {
   const attachments: any[] = [];
   for (const file of files) {
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const path = `${taskId}/${Date.now()}_${safeName}`;
-    const { error } = await supabase.storage.from('attachments').upload(path, file);
+    const path = `${orgId}/submissions/${taskId}/${Date.now()}_${safeName}`;
+    const { error } = await supabase.storage.from('attachments').upload(path, file, { upsert: true });
     if (error) throw error;
     const { data: urlData } = supabase.storage.from('attachments').getPublicUrl(path);
     attachments.push({ name: file.name, url: urlData.publicUrl, path, size: file.size });
