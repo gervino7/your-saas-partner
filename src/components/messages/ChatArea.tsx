@@ -50,7 +50,7 @@ export default function ChatArea({
   onMarkAsRead,
   onTyping,
 }: ChatAreaProps) {
-  const { user } = useAuthStore();
+  const { user, profile } = useAuthStore();
   const [input, setInput] = useState('');
   const [replyTo, setReplyTo] = useState<MessageWithSender | null>(null);
   const [editing, setEditing] = useState<MessageWithSender | null>(null);
