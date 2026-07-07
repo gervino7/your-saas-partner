@@ -21,6 +21,20 @@ import { useTaskSubmissions, useCreateSubmission } from '@/hooks/useTaskSubmissi
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+async function openAttachment(f: { path?: string; url?: string; name?: string }) {
+  try {
+    if (f.path) {
+      const { data, error } = await supabase.storage.from('attachments').createSignedUrl(f.path, 3600);
+      if (error) throw error;
+      window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    if (f.url) window.open(f.url, '_blank', 'noopener,noreferrer');
+  } catch (e: any) {
+    toast.error(`Impossible d'ouvrir le fichier: ${e.message}`);
+  }
+}
+
 const statusColors: Record<string, string> = {
   todo: 'bg-muted text-muted-foreground',
   in_progress: 'bg-info/15 text-info',
