@@ -337,15 +337,14 @@ function SubmissionTimeline({ submissions, loading }: { submissions: any[]; load
                 return Array.isArray(att) && att.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {att.map((f: any, i: number) => (
-                      <a
+                      <button
                         key={i}
-                        href={f.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        type="button"
+                        onClick={() => openAttachment(f)}
                         className="flex items-center gap-1 text-xs text-primary hover:underline bg-muted px-2 py-1 rounded"
                       >
                         <Download className="h-3 w-3" /> {f.name ?? `Fichier ${i + 1}`}
-                      </a>
+                      </button>
                     ))}
                   </div>
                 ) : null;
