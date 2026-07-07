@@ -23,15 +23,21 @@ import { toast } from 'sonner';
 
 async function openAttachment(f: { path?: string; url?: string; name?: string }) {
   try {
-    if (f.path) {
-      const { data, error } = await supabase.storage.from('attachments').createSignedUrl(f.path, 3600);
-      if (error) throw error;
-      window.open(data.signedUrl, '_blank', 'noopener,noreferrer');
-      return;
-    }
-    if (f.url) window.open(f.url, '_blank', 'noopener,noreferrer');
+    if (!f.path) throw new Error('Chemin du fichier manquant');
+    const { data, error } = await supabase.storage
+      .from('attachments')
+      .createSignedUrl(f.path, 3600);
+    if (error || !data?.signedUrl) throw error ?? new Error('URL signée indisponible');
+    const link = document.createElement('a');
+    link.href = data.signedUrl;
+    link.download = f.name ?? '';
+    link.rel = 'noopener noreferrer';
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   } catch (e: any) {
-    toast.error(`Impossible d'ouvrir le fichier: ${e.message}`);
+    toast.error(`Impossible de télécharger le fichier: ${e.message}`);
   }
 }
 
