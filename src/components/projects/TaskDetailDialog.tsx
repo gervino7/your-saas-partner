@@ -20,26 +20,9 @@ import { useUpdateTask } from '@/hooks/useProject';
 import { useTaskSubmissions, useCreateSubmission } from '@/hooks/useTaskSubmissions';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { downloadAttachment } from '@/lib/attachments';
 
-async function openAttachment(f: { path?: string; url?: string; name?: string }) {
-  try {
-    if (!f.path) throw new Error('Chemin du fichier manquant');
-    const { data, error } = await supabase.storage
-      .from('attachments')
-      .createSignedUrl(f.path, 3600);
-    if (error || !data?.signedUrl) throw error ?? new Error('URL signée indisponible');
-    const link = document.createElement('a');
-    link.href = data.signedUrl;
-    link.download = f.name ?? '';
-    link.rel = 'noopener noreferrer';
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  } catch (e: any) {
-    toast.error(`Impossible de télécharger le fichier: ${e.message}`);
-  }
-}
+const openAttachment = (f: { path?: string; name?: string }) => downloadAttachment(f);
 
 const statusColors: Record<string, string> = {
   todo: 'bg-muted text-muted-foreground',
