@@ -575,10 +575,10 @@ function MessageContent({ content, attachments }: { content: string; attachments
 
 function AttachmentCard({ attachment }: { attachment: any }) {
   const handleDownload = async () => {
-    const { data } = await supabase.storage
-      .from('attachments')
-      .createSignedUrl(attachment.path, 3600);
-    if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+    const { getAttachmentDownloadUrl } = await import('@/lib/attachments');
+    const url = await getAttachmentDownloadUrl(attachment.path);
+    if (url) window.open(url, '_blank');
+    else toast.error('Impossible de télécharger le fichier');
   };
 
   return (
