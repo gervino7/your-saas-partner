@@ -240,8 +240,9 @@ const App = () => (
   <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
+      <Toaster />
         <Sonner />
+        <ServiceWorkerUpdater />
         <BrowserRouter>
           <AuthProvider>
             <Routes>
