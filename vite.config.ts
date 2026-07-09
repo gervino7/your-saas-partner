@@ -21,6 +21,9 @@ export default defineConfig(({ mode }) => ({
       includeAssets: ["favicon.ico", "icon-192.png", "icon-512.png"],
       manifest: false, // using public/manifest.json
       workbox: {
+        clientsClaim: true,
+        skipWaiting: true,
+        cleanupOutdatedCaches: true,
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         navigateFallbackDenylist: [/^\/~oauth/, /^\/portal\//, /^\/survey\//],
         runtimeCaching: [

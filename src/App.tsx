@@ -40,6 +40,7 @@ import NotFound from '@/pages/NotFound';
 import OnboardingPage from '@/pages/OnboardingPage';
 import SuperAdminPage from '@/pages/SuperAdminPage';
 import OrgRedirectPage from '@/pages/OrgRedirectPage';
+import ServiceWorkerUpdater from '@/components/ServiceWorkerUpdater';
 
 const queryClient = new QueryClient();
 
@@ -239,8 +240,9 @@ const App = () => (
   <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
+      <Toaster />
         <Sonner />
+        <ServiceWorkerUpdater />
         <BrowserRouter>
           <AuthProvider>
             <Routes>
