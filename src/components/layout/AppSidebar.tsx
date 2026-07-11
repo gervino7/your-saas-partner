@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Briefcase, FolderKanban, FileText, MessageSquare,
-  Calendar, Clock, Monitor, Settings, LogOut, ChevronDown,
+  Calendar, Clock, Monitor, Settings, LogOut, ChevronDown, Eye,
 } from 'lucide-react';
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent,
@@ -108,6 +108,18 @@ const AppSidebar = () => {
                   <span>Bureau personnel</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              {showAdmin && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    isActive={isActive('/supervision')}
+                    onClick={() => navigate('/supervision')}
+                    tooltip="Supervision"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span>Supervision</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
               {showAdmin && (
                 <SidebarMenuItem>
                   <SidebarMenuButton

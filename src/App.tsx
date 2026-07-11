@@ -40,6 +40,7 @@ import NotFound from '@/pages/NotFound';
 import OnboardingPage from '@/pages/OnboardingPage';
 import SuperAdminPage from '@/pages/SuperAdminPage';
 import OrgRedirectPage from '@/pages/OrgRedirectPage';
+import SupervisionPage from '@/pages/SupervisionPage';
 import ServiceWorkerUpdater from '@/components/ServiceWorkerUpdater';
 
 const queryClient = new QueryClient();
@@ -275,6 +276,7 @@ const App = () => (
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/super-admin" element={<SuperAdminPage />} />
+                <Route path="/supervision" element={<SupervisionPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>

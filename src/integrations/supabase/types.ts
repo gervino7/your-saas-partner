@@ -177,6 +177,134 @@ export type Database = {
           },
         ]
       }
+      activity_reports: {
+        Row: {
+          active_seconds: number | null
+          category_breakdown: Json | null
+          created_at: string | null
+          files_synced: number | null
+          first_activity: string | null
+          id: string
+          idle_seconds: number | null
+          last_activity: string | null
+          organization_id: string | null
+          professional_seconds: number | null
+          report_date: string
+          top_apps: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          active_seconds?: number | null
+          category_breakdown?: Json | null
+          created_at?: string | null
+          files_synced?: number | null
+          first_activity?: string | null
+          id?: string
+          idle_seconds?: number | null
+          last_activity?: string | null
+          organization_id?: string | null
+          professional_seconds?: number | null
+          report_date: string
+          top_apps?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          active_seconds?: number | null
+          category_breakdown?: Json | null
+          created_at?: string | null
+          files_synced?: number | null
+          first_activity?: string | null
+          id?: string
+          idle_seconds?: number | null
+          last_activity?: string | null
+          organization_id?: string | null
+          professional_seconds?: number | null
+          report_date?: string
+          top_apps?: Json | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_reports_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_reports_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_reports_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      activity_sessions: {
+        Row: {
+          active_seconds: number | null
+          created_at: string | null
+          ended_at: string | null
+          id: string
+          is_paused: boolean | null
+          organization_id: string | null
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          active_seconds?: number | null
+          created_at?: string | null
+          ended_at?: string | null
+          id?: string
+          is_paused?: boolean | null
+          organization_id?: string | null
+          started_at: string
+          user_id: string
+        }
+        Update: {
+          active_seconds?: number | null
+          created_at?: string | null
+          ended_at?: string | null
+          id?: string
+          is_paused?: boolean | null
+          organization_id?: string | null
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_sessions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_contacts: {
         Row: {
           client_id: string
@@ -3325,6 +3453,44 @@ export type Database = {
       }
     }
     Views: {
+      activity_supervision: {
+        Row: {
+          active_seconds: number | null
+          files_synced: number | null
+          full_name: string | null
+          grade: string | null
+          idle_seconds: number | null
+          organization_id: string | null
+          professional_ratio: number | null
+          professional_seconds: number | null
+          report_date: string | null
+          top_apps: Json | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_reports_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_reports_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_reports_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles_safe: {
         Row: {
           avatar_url: string | null
@@ -3524,6 +3690,46 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      get_activity_detail: {
+        Args: { _end_date?: string; _start_date?: string; _target_user: string }
+        Returns: {
+          active_seconds: number
+          category_breakdown: Json
+          files_synced: number
+          first_activity: string
+          idle_seconds: number
+          last_activity: string
+          professional_ratio: number
+          professional_seconds: number
+          report_date: string
+          top_apps: Json
+        }[]
+      }
+      get_activity_kpis: {
+        Args: { _end_date?: string; _start_date?: string }
+        Returns: {
+          active_collaborators: number
+          avg_professional_ratio: number
+          total_active_hours: number
+          total_collaborators: number
+          total_files_synced: number
+        }[]
+      }
+      get_activity_supervision: {
+        Args: { _end_date?: string; _start_date?: string }
+        Returns: {
+          avg_professional_ratio: number
+          days_active: number
+          full_name: string
+          grade: string
+          grade_level: number
+          last_activity: string
+          total_active_seconds: number
+          total_files_synced: number
+          total_professional_seconds: number
+          user_id: string
+        }[]
+      }
       get_invitation_by_token: {
         Args: { _token: string }
         Returns: {
@@ -3559,6 +3765,7 @@ export type Database = {
         Args: { _mission_id: string; _user_id: string }
         Returns: boolean
       }
+      purge_old_activity_data: { Args: never; Returns: undefined }
       super_admin_get_all_orgs: {
         Args: never
         Returns: {
@@ -3572,6 +3779,20 @@ export type Database = {
           subscription_plan: string
           user_count: number
         }[]
+      }
+      upsert_activity_report: {
+        Args: {
+          _active_seconds: number
+          _category_breakdown: Json
+          _files_synced?: number
+          _first_activity: string
+          _idle_seconds: number
+          _last_activity: string
+          _professional_seconds: number
+          _report_date: string
+          _top_apps: Json
+        }
+        Returns: string
       }
     }
     Enums: {
