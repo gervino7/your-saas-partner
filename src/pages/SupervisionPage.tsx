@@ -155,7 +155,9 @@ export default function SupervisionPage() {
                     <TableCell>{formatDuration(r.total_professional_seconds)}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Progress value={Number(r.avg_professional_ratio)} indicatorClassName={ratioColor(Number(r.avg_professional_ratio))} />
+                        <div className="flex-1 h-2 bg-muted rounded overflow-hidden">
+                          <div className={`h-full ${ratioColor(Number(r.avg_professional_ratio))}`} style={{ width: `${Number(r.avg_professional_ratio)}%` }} />
+                        </div>
                         <span className="text-xs w-10 text-right">{r.avg_professional_ratio}%</span>
                       </div>
                     </TableCell>
