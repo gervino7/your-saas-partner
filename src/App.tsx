@@ -276,6 +276,7 @@ const App = () => (
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/super-admin" element={<SuperAdminPage />} />
+                <Route path="/supervision" element={<SupervisionPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
