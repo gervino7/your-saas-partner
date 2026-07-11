@@ -111,6 +111,18 @@ const AppSidebar = () => {
               {showAdmin && (
                 <SidebarMenuItem>
                   <SidebarMenuButton
+                    isActive={isActive('/supervision')}
+                    onClick={() => navigate('/supervision')}
+                    tooltip="Supervision"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span>Supervision</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+              {showAdmin && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
                     isActive={isActive('/admin')}
                     onClick={() => navigate('/admin')}
                     tooltip="Administration"
