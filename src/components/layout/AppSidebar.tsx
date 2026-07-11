@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Briefcase, FolderKanban, FileText, MessageSquare,
-  Calendar, Clock, Monitor, Settings, LogOut, ChevronDown,
+  Calendar, Clock, Monitor, Settings, LogOut, ChevronDown, Eye,
 } from 'lucide-react';
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent,
