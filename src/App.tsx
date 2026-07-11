@@ -40,6 +40,7 @@ import NotFound from '@/pages/NotFound';
 import OnboardingPage from '@/pages/OnboardingPage';
 import SuperAdminPage from '@/pages/SuperAdminPage';
 import OrgRedirectPage from '@/pages/OrgRedirectPage';
+import SupervisionPage from '@/pages/SupervisionPage';
 import ServiceWorkerUpdater from '@/components/ServiceWorkerUpdater';
 
 const queryClient = new QueryClient();
