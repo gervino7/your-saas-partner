@@ -1,5 +1,6 @@
 import { Target, CheckSquare, FileText, Clock, AlertTriangle, CalendarClock, Activity } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import PointageCard from "@/components/attendance/PointageCard";
 import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/stores/authStore";
 import { useDashboardData } from "@/hooks/useDashboardData";
