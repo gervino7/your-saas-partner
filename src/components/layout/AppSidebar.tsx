@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Briefcase, FolderKanban, FileText, MessageSquare,
   Calendar, Clock, Monitor, Settings, LogOut, ChevronDown, Eye,
+  ClipboardCheck, CalendarRange, LineChart,
 } from 'lucide-react';
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent,
@@ -19,6 +20,11 @@ const mainNav = [
   { label: 'Documents', icon: FileText, path: '/documents' },
   { label: 'Messagerie', icon: MessageSquare, path: '/messages' },
   { label: 'Calendrier', icon: Calendar, path: '/calendar' },
+];
+
+const timeNav = [
+  { label: 'Pointage', icon: ClipboardCheck, path: '/pointage' },
+  { label: 'Planning', icon: CalendarRange, path: '/planning' },
   { label: 'Feuilles de temps', icon: Clock, path: '/timesheets' },
 ];
 
@@ -93,6 +99,39 @@ const AppSidebar = () => {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Temps & Planning</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {timeNav.map((item) => (
+                <SidebarMenuItem key={item.path}>
+                  <SidebarMenuButton
+                    isActive={isActive(item.path)}
+                    onClick={() => navigate(item.path)}
+                    tooltip={item.label}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span className="flex-1">{item.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+              {gradeLevel <= 3 && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    isActive={isActive('/suivi-execution')}
+                    onClick={() => navigate('/suivi-execution')}
+                    tooltip="Suivi d'exécution"
+                  >
+                    <LineChart className="h-4 w-4" />
+                    <span className="flex-1">Suivi d'exécution</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
 
         <SidebarGroup>
           <SidebarGroupLabel>Espace de travail</SidebarGroupLabel>

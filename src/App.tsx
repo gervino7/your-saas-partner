@@ -41,6 +41,9 @@ import OnboardingPage from '@/pages/OnboardingPage';
 import SuperAdminPage from '@/pages/SuperAdminPage';
 import OrgRedirectPage from '@/pages/OrgRedirectPage';
 import SupervisionPage from '@/pages/SupervisionPage';
+import PointagePage from '@/pages/PointagePage';
+import PlanningPage from '@/pages/PlanningPage';
+import SuiviExecutionPage from '@/pages/SuiviExecutionPage';
 import ServiceWorkerUpdater from '@/components/ServiceWorkerUpdater';
 
 const queryClient = new QueryClient();
@@ -277,6 +280,9 @@ const App = () => (
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/super-admin" element={<SuperAdminPage />} />
                 <Route path="/supervision" element={<SupervisionPage />} />
+                <Route path="/pointage" element={<PointagePage />} />
+                <Route path="/planning" element={<PlanningPage />} />
+                <Route path="/suivi-execution" element={<SuiviExecutionPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>

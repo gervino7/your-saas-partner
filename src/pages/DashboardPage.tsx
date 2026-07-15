@@ -1,5 +1,6 @@
 import { Target, CheckSquare, FileText, Clock, AlertTriangle, CalendarClock, Activity } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import PointageCard from "@/components/attendance/PointageCard";
 import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/stores/authStore";
 import { useDashboardData } from "@/hooks/useDashboardData";
@@ -65,6 +66,9 @@ const DashboardPage = () => {
           </p>
         )}
       </div>
+
+      {/* Pointage compact */}
+      <PointageCard compact />
 
       {/* KPI Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
