@@ -280,6 +280,9 @@ const App = () => (
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/super-admin" element={<SuperAdminPage />} />
                 <Route path="/supervision" element={<SupervisionPage />} />
+                <Route path="/pointage" element={<PointagePage />} />
+                <Route path="/planning" element={<PlanningPage />} />
+                <Route path="/suivi-execution" element={<SuiviExecutionPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
