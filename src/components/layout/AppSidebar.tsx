@@ -101,6 +101,39 @@ const AppSidebar = () => {
         </SidebarGroup>
 
         <SidebarGroup>
+          <SidebarGroupLabel>Temps & Planning</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {timeNav.map((item) => (
+                <SidebarMenuItem key={item.path}>
+                  <SidebarMenuButton
+                    isActive={isActive(item.path)}
+                    onClick={() => navigate(item.path)}
+                    tooltip={item.label}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span className="flex-1">{item.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+              {gradeLevel <= 3 && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    isActive={isActive('/suivi-execution')}
+                    onClick={() => navigate('/suivi-execution')}
+                    tooltip="Suivi d'exécution"
+                  >
+                    <LineChart className="h-4 w-4" />
+                    <span className="flex-1">Suivi d'exécution</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+
+        <SidebarGroup>
           <SidebarGroupLabel>Espace de travail</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
