@@ -67,6 +67,9 @@ const DashboardPage = () => {
         )}
       </div>
 
+      {/* Pointage compact */}
+      <PointageCard compact />
+
       {/* KPI Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {statConfig.map((stat, i) => (
