@@ -305,6 +305,94 @@ export type Database = {
           },
         ]
       }
+      attendance_events: {
+        Row: {
+          authorized_by: string | null
+          created_at: string | null
+          destination: string | null
+          event_at: string
+          event_date: string
+          event_type: string
+          id: string
+          mission_id: string | null
+          note: string | null
+          organization_id: string | null
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          authorized_by?: string | null
+          created_at?: string | null
+          destination?: string | null
+          event_at?: string
+          event_date?: string
+          event_type: string
+          id?: string
+          mission_id?: string | null
+          note?: string | null
+          organization_id?: string | null
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          authorized_by?: string | null
+          created_at?: string | null
+          destination?: string | null
+          event_at?: string
+          event_date?: string
+          event_type?: string
+          id?: string
+          mission_id?: string | null
+          note?: string | null
+          organization_id?: string | null
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_events_authorized_by_fkey"
+            columns: ["authorized_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_events_authorized_by_fkey"
+            columns: ["authorized_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_events_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_contacts: {
         Row: {
           client_id: string
@@ -2525,6 +2613,142 @@ export type Database = {
           },
         ]
       }
+      plan_entries: {
+        Row: {
+          created_at: string | null
+          end_time: string | null
+          entry_type: string
+          id: string
+          location: string | null
+          meeting_id: string | null
+          mission_id: string | null
+          organization_id: string | null
+          plan_date: string
+          planned_hours: number
+          project_id: string | null
+          review_comment: string | null
+          reviewed_at: string | null
+          reviewer_id: string | null
+          start_time: string | null
+          status: string
+          task_id: string | null
+          title: string | null
+          updated_at: string | null
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string | null
+          end_time?: string | null
+          entry_type?: string
+          id?: string
+          location?: string | null
+          meeting_id?: string | null
+          mission_id?: string | null
+          organization_id?: string | null
+          plan_date: string
+          planned_hours?: number
+          project_id?: string | null
+          review_comment?: string | null
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          start_time?: string | null
+          status?: string
+          task_id?: string | null
+          title?: string | null
+          updated_at?: string | null
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          created_at?: string | null
+          end_time?: string | null
+          entry_type?: string
+          id?: string
+          location?: string | null
+          meeting_id?: string | null
+          mission_id?: string | null
+          organization_id?: string | null
+          plan_date?: string
+          planned_hours?: number
+          project_id?: string | null
+          review_comment?: string | null
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          start_time?: string | null
+          status?: string
+          task_id?: string | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_entries_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_entries_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_entries_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_entries_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_entries_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_entries_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_entries_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_entries_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_entries_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -2783,6 +3007,107 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staffing_assignments: {
+        Row: {
+          assigned_by: string | null
+          collaborator_note: string | null
+          created_at: string | null
+          end_date: string | null
+          id: string
+          mission_id: string
+          organization_id: string | null
+          project_id: string | null
+          role: string
+          start_date: string
+          status: string
+          updated_at: string | null
+          user_id: string
+          weekly_hours: number | null
+        }
+        Insert: {
+          assigned_by?: string | null
+          collaborator_note?: string | null
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          mission_id: string
+          organization_id?: string | null
+          project_id?: string | null
+          role?: string
+          start_date: string
+          status?: string
+          updated_at?: string | null
+          user_id: string
+          weekly_hours?: number | null
+        }
+        Update: {
+          assigned_by?: string | null
+          collaborator_note?: string | null
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          mission_id?: string
+          organization_id?: string | null
+          project_id?: string | null
+          role?: string
+          start_date?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+          weekly_hours?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staffing_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staffing_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staffing_assignments_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staffing_assignments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staffing_assignments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staffing_assignments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staffing_assignments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
             referencedColumns: ["id"]
           },
         ]
@@ -3235,6 +3560,7 @@ export type Database = {
           date: string
           id: string
           note: string | null
+          organization_id: string | null
           status: string | null
           user_id: string | null
         }
@@ -3244,6 +3570,7 @@ export type Database = {
           date: string
           id?: string
           note?: string | null
+          organization_id?: string | null
           status?: string | null
           user_id?: string | null
         }
@@ -3253,10 +3580,18 @@ export type Database = {
           date?: string
           id?: string
           note?: string | null
+          organization_id?: string | null
           status?: string | null
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "user_availability_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "user_availability_user_id_fkey"
             columns: ["user_id"]
@@ -3484,6 +3819,40 @@ export type Database = {
           },
           {
             foreignKeyName: "activity_reports_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attendance_daily: {
+        Row: {
+          amplitude_hours: number | null
+          event_date: string | null
+          first_check_in: string | null
+          last_check_out: string | null
+          nb_sorties: number | null
+          organization_id: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_events_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles_safe"
@@ -3740,12 +4109,37 @@ export type Database = {
           status: string
         }[]
       }
+      get_plan_execution: {
+        Args: { _end_date?: string; _start_date?: string; _user_id?: string }
+        Returns: {
+          actual_hours: number
+          execution_rate: number
+          full_name: string
+          gap_hours: number
+          mission_id: string
+          mission_name: string
+          planned_hours: number
+          user_id: string
+        }[]
+      }
       get_user_conversation_ids: {
         Args: { _user_id: string }
         Returns: string[]
       }
       get_user_grade_level: { Args: { _user_id: string }; Returns: number }
       get_user_organization_id: { Args: { _user_id: string }; Returns: string }
+      get_workload: {
+        Args: { _week_start?: string }
+        Returns: {
+          capacity_hours: number
+          full_name: string
+          grade: string
+          is_overloaded: boolean
+          load_rate: number
+          planned_hours: number
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -3766,6 +4160,7 @@ export type Database = {
         Returns: boolean
       }
       purge_old_activity_data: { Args: never; Returns: undefined }
+      purge_old_attendance: { Args: never; Returns: undefined }
       super_admin_get_all_orgs: {
         Args: never
         Returns: {
