@@ -61,9 +61,11 @@ export function useUpsertPlanEntry() {
   return useMutation({
     mutationFn: async (payload: Partial<PlanEntry> & { plan_date: string; entry_type: PlanEntryType; planned_hours: number }) => {
       if (!profile?.id) throw new Error('Non authentifié');
+      const weekStart = format(getWeekStart(new Date(payload.plan_date)), 'yyyy-MM-dd');
       const row = {
         user_id: profile.id,
         plan_date: payload.plan_date,
+        week_start: weekStart,
         entry_type: payload.entry_type,
         planned_hours: payload.planned_hours,
         start_time: payload.start_time ?? null,
