@@ -41,6 +41,9 @@ import OnboardingPage from '@/pages/OnboardingPage';
 import SuperAdminPage from '@/pages/SuperAdminPage';
 import OrgRedirectPage from '@/pages/OrgRedirectPage';
 import SupervisionPage from '@/pages/SupervisionPage';
+import PointagePage from '@/pages/PointagePage';
+import PlanningPage from '@/pages/PlanningPage';
+import SuiviExecutionPage from '@/pages/SuiviExecutionPage';
 import ServiceWorkerUpdater from '@/components/ServiceWorkerUpdater';
 
 const queryClient = new QueryClient();
