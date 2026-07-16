@@ -285,6 +285,8 @@ const App = () => (
                 <Route path="/pointage" element={<PointagePage />} />
                 <Route path="/planning" element={<PlanningPage />} />
                 <Route path="/suivi-execution" element={<SuiviExecutionPage />} />
+                <Route path="/echeancier" element={<EcheancierPage />} />
+                <Route path="/dossiers" element={<DossiersPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
