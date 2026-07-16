@@ -72,14 +72,17 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
     }
   }, [open, entry, defaultDate]);
 
-  // My unique missions from staffing
-  const myMissions = useMemo(() => {
-    const map = new Map<string, { id: string; name: string }>();
-    for (const s of staffing as any[]) {
-      if (s.mission) map.set(s.mission.id, { id: s.mission.id, name: s.mission.name });
-    }
-    return Array.from(map.values());
-  }, [staffing]);
+  // Missions available for planning (RLS-scoped)
+  const myMissions = useMemo(
+    () => (plannableMissions as any[]).map((m) => ({ id: m.id, name: m.name })),
+    [plannableMissions]
+  );
+
+  // Informational staffing lookup for the selected mission
+  const staffingForMission = useMemo(() => {
+    if (!missionId) return null;
+    return (staffing as any[]).find((s) => s.mission?.id === missionId) ?? null;
+  }, [staffing, missionId]);
 
   // Projects for selected mission
   const { data: projects = [] } = useQuery({
