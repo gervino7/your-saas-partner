@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Briefcase, FolderKanban, FileText, MessageSquare,
   Calendar, Clock, Monitor, Settings, LogOut, ChevronDown, Eye,
-  ClipboardCheck, CalendarRange, LineChart, CalendarClock, FolderOpen, Building2,
+  ClipboardCheck, CalendarRange, LineChart, CalendarClock, FolderOpen, Building2, UsersRound,
 } from 'lucide-react';
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent,
@@ -25,6 +25,7 @@ const mainNav = [
 const timeNav = [
   { label: 'Pointage', icon: ClipboardCheck, path: '/pointage' },
   { label: 'Planning', icon: CalendarRange, path: '/planning' },
+  { label: 'Staffing', icon: UsersRound, path: '/staffing' },
   { label: 'Feuilles de temps', icon: Clock, path: '/timesheets' },
 ];
 
