@@ -136,7 +136,7 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
 
   const requiresMission = type === 'mission';
   const requiresTimes = type === 'rendez_vous';
-  const noStaffing = requiresMission && myMissions.length === 0;
+  const noStaffing = requiresMission && !missionsLoading && myMissions.length === 0;
 
   const canSave = useMemo(() => {
     if (!date) return false;
