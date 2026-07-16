@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Briefcase, FolderKanban, FileText, MessageSquare,
   Calendar, Clock, Monitor, Settings, LogOut, ChevronDown, Eye,
-  ClipboardCheck, CalendarRange, LineChart, CalendarClock, FolderOpen, Building2,
+  ClipboardCheck, CalendarRange, LineChart, CalendarClock, FolderOpen, Building2, UsersRound,
 } from 'lucide-react';
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent,
@@ -25,6 +25,7 @@ const mainNav = [
 const timeNav = [
   { label: 'Pointage', icon: ClipboardCheck, path: '/pointage' },
   { label: 'Planning', icon: CalendarRange, path: '/planning' },
+  { label: 'Staffing', icon: UsersRound, path: '/staffing' },
   { label: 'Feuilles de temps', icon: Clock, path: '/timesheets' },
 ];
 
@@ -62,6 +63,29 @@ const AppSidebar = () => {
     },
     enabled: !!user,
     refetchInterval: 60000,
+  });
+
+  // Staffing badge: proposed assignments for the user, or adjustment_requested if manager
+  const gradeLevelForBadge = profile?.grade_level ?? 8;
+  const { data: staffingBadge = 0 } = useQuery({
+    queryKey: ['staffing-badge', user?.id, gradeLevelForBadge],
+    enabled: !!user,
+    refetchInterval: 60000,
+    queryFn: async () => {
+      if (gradeLevelForBadge <= 3) {
+        const { count } = await supabase
+          .from('staffing_assignments')
+          .select('id', { count: 'exact', head: true })
+          .eq('status', 'adjustment_requested');
+        return count ?? 0;
+      }
+      const { count } = await supabase
+        .from('staffing_assignments')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user!.id)
+        .eq('status', 'proposed');
+      return count ?? 0;
+    },
   });
 
   const handleLogout = async () => {
@@ -124,6 +148,11 @@ const AppSidebar = () => {
                   >
                     <item.icon className="h-4 w-4" />
                     <span className="flex-1">{item.label}</span>
+                    {item.path === '/staffing' && staffingBadge > 0 && (
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-white">
+                        {staffingBadge > 99 ? '99+' : staffingBadge}
+                      </span>
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
