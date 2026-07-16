@@ -187,17 +187,22 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
             <>
               {noStaffing ? (
                 <div className="rounded-md border border-warning/30 bg-warning/10 p-3 text-sm text-warning-foreground">
-                  Aucune mission ne vous est affectée. Contactez votre responsable.
+                  Aucune mission disponible. Créez une mission ou demandez à être ajouté à une équipe.
                 </div>
               ) : (
                 <div className="space-y-1.5">
                   <Label>Mission {type === 'mission' && <span className="text-destructive">*</span>}</Label>
-                  <Select value={missionId ?? ''} onValueChange={handleMissionChange}>
-                    <SelectTrigger><SelectValue placeholder="Sélectionner une mission" /></SelectTrigger>
+                  <Select value={missionId ?? ''} onValueChange={handleMissionChange} disabled={missionsLoading}>
+                    <SelectTrigger><SelectValue placeholder={missionsLoading ? 'Chargement…' : 'Sélectionner une mission'} /></SelectTrigger>
                     <SelectContent>
                       {myMissions.map((m) => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
+                  {staffingForMission && (
+                    <p className="text-xs text-muted-foreground">
+                      Affecté : {staffingForMission.allocated_hours_per_week ?? staffingForMission.hours_per_week ?? '—'}h/semaine sur cette mission
+                    </p>
+                  )}
                 </div>
               )}
 
