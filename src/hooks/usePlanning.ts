@@ -151,6 +151,23 @@ export function useMyStaffing() {
   });
 }
 
+export function usePlannableMissions() {
+  const profile = useAuthStore((s) => s.profile);
+  return useQuery({
+    queryKey: ['plannable-missions', profile?.organization_id],
+    enabled: !!profile?.organization_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('missions')
+        .select('id, name, code, status')
+        .in('status', ['planning', 'in_progress', 'active'])
+        .order('name');
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
 export function useTeamPlans(weekStart: Date) {
   const profile = useAuthStore((s) => s.profile);
   const ws = format(getWeekStart(weekStart), 'yyyy-MM-dd');

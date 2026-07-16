@@ -13,7 +13,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
-import { useMyStaffing, useUpsertPlanEntry, type PlanEntry, type PlanEntryType } from '@/hooks/usePlanning';
+import { useMyStaffing, usePlannableMissions, useUpsertPlanEntry, type PlanEntry, type PlanEntryType } from '@/hooks/usePlanning';
 
 const TYPES: { value: PlanEntryType; label: string }[] = [
   { value: 'mission', label: 'Mission' },
@@ -34,6 +34,7 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
   const profile = useAuthStore((s) => s.profile);
   const gradeLevel = profile?.grade_level ?? 8;
   const { data: staffing = [] } = useMyStaffing();
+  const { data: plannableMissions = [], isLoading: missionsLoading } = usePlannableMissions();
   const upsert = useUpsertPlanEntry();
 
   const [type, setType] = useState<PlanEntryType>('mission');
@@ -71,14 +72,17 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
     }
   }, [open, entry, defaultDate]);
 
-  // My unique missions from staffing
-  const myMissions = useMemo(() => {
-    const map = new Map<string, { id: string; name: string }>();
-    for (const s of staffing as any[]) {
-      if (s.mission) map.set(s.mission.id, { id: s.mission.id, name: s.mission.name });
-    }
-    return Array.from(map.values());
-  }, [staffing]);
+  // Missions available for planning (RLS-scoped)
+  const myMissions = useMemo(
+    () => (plannableMissions as any[]).map((m) => ({ id: m.id, name: m.name })),
+    [plannableMissions]
+  );
+
+  // Informational staffing lookup for the selected mission
+  const staffingForMission = useMemo(() => {
+    if (!missionId) return null;
+    return (staffing as any[]).find((s) => s.mission?.id === missionId) ?? null;
+  }, [staffing, missionId]);
 
   // Projects for selected mission
   const { data: projects = [] } = useQuery({
@@ -132,7 +136,7 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
 
   const requiresMission = type === 'mission';
   const requiresTimes = type === 'rendez_vous';
-  const noStaffing = requiresMission && myMissions.length === 0;
+  const noStaffing = requiresMission && !missionsLoading && myMissions.length === 0;
 
   const canSave = useMemo(() => {
     if (!date) return false;
@@ -183,17 +187,22 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
             <>
               {noStaffing ? (
                 <div className="rounded-md border border-warning/30 bg-warning/10 p-3 text-sm text-warning-foreground">
-                  Aucune mission ne vous est affectée. Contactez votre responsable.
+                  Aucune mission disponible. Créez une mission ou demandez à être ajouté à une équipe.
                 </div>
               ) : (
                 <div className="space-y-1.5">
                   <Label>Mission {type === 'mission' && <span className="text-destructive">*</span>}</Label>
-                  <Select value={missionId ?? ''} onValueChange={handleMissionChange}>
-                    <SelectTrigger><SelectValue placeholder="Sélectionner une mission" /></SelectTrigger>
+                  <Select value={missionId ?? ''} onValueChange={handleMissionChange} disabled={missionsLoading}>
+                    <SelectTrigger><SelectValue placeholder={missionsLoading ? 'Chargement…' : 'Sélectionner une mission'} /></SelectTrigger>
                     <SelectContent>
                       {myMissions.map((m) => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
+                  {staffingForMission && (
+                    <p className="text-xs text-muted-foreground">
+                      Affecté : {staffingForMission.allocated_hours_per_week ?? staffingForMission.hours_per_week ?? '—'}h/semaine sur cette mission
+                    </p>
+                  )}
                 </div>
               )}
 
