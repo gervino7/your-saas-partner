@@ -13,7 +13,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
-import { useMyStaffing, useUpsertPlanEntry, type PlanEntry, type PlanEntryType } from '@/hooks/usePlanning';
+import { useMyStaffing, usePlannableMissions, useUpsertPlanEntry, type PlanEntry, type PlanEntryType } from '@/hooks/usePlanning';
 
 const TYPES: { value: PlanEntryType; label: string }[] = [
   { value: 'mission', label: 'Mission' },
