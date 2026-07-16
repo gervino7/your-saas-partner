@@ -34,6 +34,7 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
   const profile = useAuthStore((s) => s.profile);
   const gradeLevel = profile?.grade_level ?? 8;
   const { data: staffing = [] } = useMyStaffing();
+  const { data: plannableMissions = [], isLoading: missionsLoading } = usePlannableMissions();
   const upsert = useUpsertPlanEntry();
 
   const [type, setType] = useState<PlanEntryType>('mission');
