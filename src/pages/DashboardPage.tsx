@@ -97,6 +97,11 @@ const DashboardPage = () => {
         ))}
       </div>
 
+      {/* Mes échéances comptables */}
+      <EcheancesWidget />
+
+
+
       {/* Main grid */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Urgent Tasks */}
