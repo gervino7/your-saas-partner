@@ -437,6 +437,104 @@ export type Database = {
           },
         ]
       }
+      client_fiscal_profile: {
+        Row: {
+          assujetti_tva: boolean | null
+          centre_impots: string | null
+          client_id: string
+          collaborateur_id: string | null
+          created_at: string | null
+          date_cloture: string | null
+          date_entree_portefeuille: string | null
+          exercice_end_month: number | null
+          exercice_start_month: number | null
+          forme_juridique: string | null
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          numero_contribuable: string | null
+          organization_id: string | null
+          regime_fiscal: string | null
+          registre_commerce: string | null
+          taxpayer_category: string | null
+          tva_periodicite: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assujetti_tva?: boolean | null
+          centre_impots?: string | null
+          client_id: string
+          collaborateur_id?: string | null
+          created_at?: string | null
+          date_cloture?: string | null
+          date_entree_portefeuille?: string | null
+          exercice_end_month?: number | null
+          exercice_start_month?: number | null
+          forme_juridique?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          numero_contribuable?: string | null
+          organization_id?: string | null
+          regime_fiscal?: string | null
+          registre_commerce?: string | null
+          taxpayer_category?: string | null
+          tva_periodicite?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assujetti_tva?: boolean | null
+          centre_impots?: string | null
+          client_id?: string
+          collaborateur_id?: string | null
+          created_at?: string | null
+          date_cloture?: string | null
+          date_entree_portefeuille?: string | null
+          exercice_end_month?: number | null
+          exercice_start_month?: number | null
+          forme_juridique?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          numero_contribuable?: string | null
+          organization_id?: string | null
+          regime_fiscal?: string | null
+          registre_commerce?: string | null
+          taxpayer_category?: string | null
+          tva_periodicite?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_fiscal_profile_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_fiscal_profile_collaborateur_id_fkey"
+            columns: ["collaborateur_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_fiscal_profile_collaborateur_id_fkey"
+            columns: ["collaborateur_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_fiscal_profile_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_interactions: {
         Row: {
           client_id: string
@@ -447,6 +545,7 @@ export type Database = {
           interaction_date: string | null
           metadata: Json | null
           mission_id: string | null
+          obligation_period_id: string | null
           title: string
           type: string
         }
@@ -459,6 +558,7 @@ export type Database = {
           interaction_date?: string | null
           metadata?: Json | null
           mission_id?: string | null
+          obligation_period_id?: string | null
           title: string
           type?: string
         }
@@ -471,6 +571,7 @@ export type Database = {
           interaction_date?: string | null
           metadata?: Json | null
           mission_id?: string | null
+          obligation_period_id?: string | null
           title?: string
           type?: string
         }
@@ -501,6 +602,91 @@ export type Database = {
             columns: ["mission_id"]
             isOneToOne: false
             referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_interactions_obligation_period_id_fkey"
+            columns: ["obligation_period_id"]
+            isOneToOne: false
+            referencedRelation: "obligation_periods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_obligations: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          custom_deadline_day: number | null
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          obligation_type_id: string
+          organization_id: string | null
+          responsible_id: string | null
+          start_date: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          custom_deadline_day?: number | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          obligation_type_id: string
+          organization_id?: string | null
+          responsible_id?: string | null
+          start_date?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          custom_deadline_day?: number | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          obligation_type_id?: string
+          organization_id?: string | null
+          responsible_id?: string | null
+          start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_obligations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_obligations_obligation_type_id_fkey"
+            columns: ["obligation_type_id"]
+            isOneToOne: false
+            referencedRelation: "obligation_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_obligations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_obligations_responsible_id_fkey"
+            columns: ["responsible_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_obligations_responsible_id_fkey"
+            columns: ["responsible_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
             referencedColumns: ["id"]
           },
         ]
@@ -2385,6 +2571,192 @@ export type Database = {
           },
         ]
       }
+      obligation_periods: {
+        Row: {
+          assigned_to: string | null
+          client_id: string
+          client_obligation_id: string | null
+          created_at: string | null
+          deposed_at: string | null
+          deposed_by: string | null
+          due_date: string
+          id: string
+          mission_id: string | null
+          montant: number | null
+          notes: string | null
+          obligation_type_id: string
+          organization_id: string | null
+          period_end: string
+          period_label: string
+          period_start: string
+          reference_depot: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          client_id: string
+          client_obligation_id?: string | null
+          created_at?: string | null
+          deposed_at?: string | null
+          deposed_by?: string | null
+          due_date: string
+          id?: string
+          mission_id?: string | null
+          montant?: number | null
+          notes?: string | null
+          obligation_type_id: string
+          organization_id?: string | null
+          period_end: string
+          period_label: string
+          period_start: string
+          reference_depot?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          client_id?: string
+          client_obligation_id?: string | null
+          created_at?: string | null
+          deposed_at?: string | null
+          deposed_by?: string | null
+          due_date?: string
+          id?: string
+          mission_id?: string | null
+          montant?: number | null
+          notes?: string | null
+          obligation_type_id?: string
+          organization_id?: string | null
+          period_end?: string
+          period_label?: string
+          period_start?: string
+          reference_depot?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "obligation_periods_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "obligation_periods_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "obligation_periods_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "obligation_periods_client_obligation_id_fkey"
+            columns: ["client_obligation_id"]
+            isOneToOne: false
+            referencedRelation: "client_obligations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "obligation_periods_deposed_by_fkey"
+            columns: ["deposed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "obligation_periods_deposed_by_fkey"
+            columns: ["deposed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "obligation_periods_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "obligation_periods_obligation_type_id_fkey"
+            columns: ["obligation_type_id"]
+            isOneToOne: false
+            referencedRelation: "obligation_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "obligation_periods_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      obligation_types: {
+        Row: {
+          applies_to_regimes: string[] | null
+          category: string
+          code: string
+          created_at: string | null
+          deadline_day: number | null
+          deadline_month: number | null
+          deadline_offset_months: number | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          organization_id: string | null
+          periodicite: string
+        }
+        Insert: {
+          applies_to_regimes?: string[] | null
+          category?: string
+          code: string
+          created_at?: string | null
+          deadline_day?: number | null
+          deadline_month?: number | null
+          deadline_offset_months?: number | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          organization_id?: string | null
+          periodicite: string
+        }
+        Update: {
+          applies_to_regimes?: string[] | null
+          category?: string
+          code?: string
+          created_at?: string | null
+          deadline_day?: number | null
+          deadline_month?: number | null
+          deadline_offset_months?: number | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          organization_id?: string | null
+          periodicite?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "obligation_types_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_grades: {
         Row: {
           code: string
@@ -4059,6 +4431,12 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      generate_obligation_periods: {
+        Args: { _month?: number; _year: number }
+        Returns: {
+          created_count: number
+        }[]
+      }
       get_activity_detail: {
         Args: { _end_date?: string; _start_date?: string; _target_user: string }
         Returns: {
@@ -4099,6 +4477,20 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_client_dossiers: {
+        Args: never
+        Returns: {
+          client_id: string
+          client_name: string
+          collaborateur_name: string
+          nb_a_faire: number
+          nb_en_retard: number
+          nb_obligations: number
+          prochaine_echeance: string
+          regime_fiscal: string
+          sante: string
+        }[]
+      }
       get_invitation_by_token: {
         Args: { _token: string }
         Returns: {
@@ -4107,6 +4499,40 @@ export type Database = {
           organization_id: string
           organization_name: string
           status: string
+        }[]
+      }
+      get_obligations_echeancier: {
+        Args: {
+          _client_id?: string
+          _from?: string
+          _status?: string
+          _to?: string
+        }
+        Returns: {
+          assigned_name: string
+          assigned_to: string
+          category: string
+          client_id: string
+          client_name: string
+          days_left: number
+          due_date: string
+          id: string
+          is_late: boolean
+          last_reminder_at: string
+          obligation_code: string
+          obligation_label: string
+          period_label: string
+          status: string
+        }[]
+      }
+      get_obligations_kpis: {
+        Args: never
+        Returns: {
+          deposees_ce_mois: number
+          echeance_7j: number
+          en_retard: number
+          pieces_attendues: number
+          total_en_cours: number
         }[]
       }
       get_plan_execution: {
@@ -4161,6 +4587,7 @@ export type Database = {
       }
       purge_old_activity_data: { Args: never; Returns: undefined }
       purge_old_attendance: { Args: never; Returns: undefined }
+      seed_obligation_types: { Args: { _org_id: string }; Returns: undefined }
       super_admin_get_all_orgs: {
         Args: never
         Returns: {

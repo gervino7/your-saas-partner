@@ -1,6 +1,7 @@
 import { Target, CheckSquare, FileText, Clock, AlertTriangle, CalendarClock, Activity } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PointageCard from "@/components/attendance/PointageCard";
+import EcheancesWidget from "@/components/dashboard/EcheancesWidget";
 import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/stores/authStore";
 import { useDashboardData } from "@/hooks/useDashboardData";
@@ -95,6 +96,11 @@ const DashboardPage = () => {
           </Card>
         ))}
       </div>
+
+      {/* Mes échéances comptables */}
+      <EcheancesWidget />
+
+
 
       {/* Main grid */}
       <div className="grid gap-6 lg:grid-cols-2">

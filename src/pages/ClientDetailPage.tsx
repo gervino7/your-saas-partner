@@ -12,6 +12,7 @@ import ClientDocumentsTab from '@/components/crm/ClientDocumentsTab';
 import ClientSatisfactionTab from '@/components/crm/ClientSatisfactionTab';
 import ClientHistoryTab from '@/components/crm/ClientHistoryTab';
 import ClientPortalTab from '@/components/crm/ClientPortalTab';
+import ClientFiscalTab from '@/components/crm/ClientFiscalTab';
 
 const ClientDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -33,11 +34,12 @@ const ClientDetailPage = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="info">
+      <Tabs defaultValue={new URLSearchParams(window.location.search).get('tab') ?? 'info'}>
         <TabsList>
           <TabsTrigger value="info">Informations</TabsTrigger>
           <TabsTrigger value="contacts">Contacts</TabsTrigger>
           <TabsTrigger value="missions">Missions</TabsTrigger>
+          <TabsTrigger value="fiscal">Dossier comptable</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="portal">Portail</TabsTrigger>
           <TabsTrigger value="satisfaction">Satisfaction</TabsTrigger>
@@ -46,6 +48,7 @@ const ClientDetailPage = () => {
         <TabsContent value="info" className="mt-4"><ClientInfoTab client={client} /></TabsContent>
         <TabsContent value="contacts" className="mt-4"><ClientContactsTab clientId={client.id} /></TabsContent>
         <TabsContent value="missions" className="mt-4"><ClientMissionsTab clientId={client.id} /></TabsContent>
+        <TabsContent value="fiscal" className="mt-4"><ClientFiscalTab clientId={client.id} /></TabsContent>
         <TabsContent value="documents" className="mt-4"><ClientDocumentsTab clientId={client.id} /></TabsContent>
         <TabsContent value="portal" className="mt-4"><ClientPortalTab clientId={client.id} /></TabsContent>
         <TabsContent value="satisfaction" className="mt-4"><ClientSatisfactionTab clientId={client.id} /></TabsContent>

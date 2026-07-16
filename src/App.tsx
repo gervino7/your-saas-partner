@@ -44,6 +44,8 @@ import SupervisionPage from '@/pages/SupervisionPage';
 import PointagePage from '@/pages/PointagePage';
 import PlanningPage from '@/pages/PlanningPage';
 import SuiviExecutionPage from '@/pages/SuiviExecutionPage';
+import EcheancierPage from '@/pages/EcheancierPage';
+import DossiersPage from '@/pages/DossiersPage';
 import ServiceWorkerUpdater from '@/components/ServiceWorkerUpdater';
 
 const queryClient = new QueryClient();
@@ -283,6 +285,8 @@ const App = () => (
                 <Route path="/pointage" element={<PointagePage />} />
                 <Route path="/planning" element={<PlanningPage />} />
                 <Route path="/suivi-execution" element={<SuiviExecutionPage />} />
+                <Route path="/echeancier" element={<EcheancierPage />} />
+                <Route path="/dossiers" element={<DossiersPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>

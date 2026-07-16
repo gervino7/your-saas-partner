@@ -2,9 +2,11 @@ import AdminSettings from '@/components/admin/AdminSettings';
 import DataSaverSettings from '@/components/settings/DataSaverSettings';
 import AutomationSettings from '@/components/settings/AutomationSettings';
 import SubscriptionSection from '@/components/settings/SubscriptionSection';
+import ObligationTypesSettings from '@/components/obligations/ObligationTypesSettings';
 import { useAuthStore } from '@/stores/authStore';
 import EmptyState from '@/components/common/EmptyState';
 import { Shield } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const SettingsPage = () => {
   const profile = useAuthStore((s) => s.profile);
@@ -26,10 +28,21 @@ const SettingsPage = () => {
         <h1 className="text-2xl font-bold font-display">Paramètres</h1>
         <p className="text-muted-foreground">Configuration de votre organisation.</p>
       </div>
-      <SubscriptionSection />
-      <DataSaverSettings />
-      <AutomationSettings />
-      <AdminSettings />
+      <Tabs defaultValue="general">
+        <TabsList>
+          <TabsTrigger value="general">Général</TabsTrigger>
+          <TabsTrigger value="obligations">Obligations</TabsTrigger>
+        </TabsList>
+        <TabsContent value="general" className="space-y-6 mt-4">
+          <SubscriptionSection />
+          <DataSaverSettings />
+          <AutomationSettings />
+          <AdminSettings />
+        </TabsContent>
+        <TabsContent value="obligations" className="mt-4">
+          <ObligationTypesSettings />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

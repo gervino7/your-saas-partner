@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Briefcase, FolderKanban, FileText, MessageSquare,
   Calendar, Clock, Monitor, Settings, LogOut, ChevronDown, Eye,
-  ClipboardCheck, CalendarRange, LineChart,
+  ClipboardCheck, CalendarRange, LineChart, CalendarClock, FolderOpen, Building2,
 } from 'lucide-react';
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent,
@@ -51,6 +51,17 @@ const AppSidebar = () => {
     },
     enabled: !!user,
     refetchInterval: 30000,
+  });
+
+  // Late obligations count for badge
+  const { data: enRetardCount = 0 } = useQuery({
+    queryKey: ['obligations-kpis-badge', user?.id],
+    queryFn: async () => {
+      const { data } = await supabase.rpc('get_obligations_kpis');
+      return Number(data?.[0]?.en_retard ?? 0);
+    },
+    enabled: !!user,
+    refetchInterval: 60000,
   });
 
   const handleLogout = async () => {
@@ -131,6 +142,55 @@ const AppSidebar = () => {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Dossiers clients</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive('/echeancier')}
+                  onClick={() => navigate('/echeancier')}
+                  tooltip="Échéancier"
+                >
+                  <CalendarClock className="h-4 w-4" />
+                  <span className="flex-1">Échéancier</span>
+                  {enRetardCount > 0 && (
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground">
+                      {enRetardCount > 99 ? '99+' : enRetardCount}
+                    </span>
+                  )}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              {gradeLevel <= 3 && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    isActive={isActive('/dossiers')}
+                    onClick={() => navigate('/dossiers')}
+                    tooltip="Dossiers"
+                  >
+                    <FolderOpen className="h-4 w-4" />
+                    <span>Dossiers</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+              {showAdmin && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    isActive={isActive('/admin/clients')}
+                    onClick={() => navigate('/admin/clients')}
+                    tooltip="Clients (CRM)"
+                  >
+                    <Building2 className="h-4 w-4" />
+                    <span>Clients (CRM)</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+
 
 
         <SidebarGroup>
