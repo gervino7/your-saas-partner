@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Briefcase, FolderKanban, FileText, MessageSquare,
   Calendar, Clock, Monitor, Settings, LogOut, ChevronDown, Eye,
-  ClipboardCheck, CalendarRange, LineChart,
+  ClipboardCheck, CalendarRange, LineChart, CalendarClock, FolderOpen, Building2,
 } from 'lucide-react';
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent,
