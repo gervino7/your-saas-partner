@@ -224,7 +224,7 @@ export function useUpsertObligationType() {
   const profile = useAuthStore((s) => s.profile);
   return useMutation({
     mutationFn: async (values: Record<string, unknown> & { id?: string }) => {
-      const payload = { ...values, organization_id: profile!.organization_id };
+      const payload = { ...values, organization_id: profile!.organization_id } as never;
       const { data, error } = await supabase
         .from('obligation_types')
         .upsert(payload)
