@@ -53,6 +53,17 @@ const AppSidebar = () => {
     refetchInterval: 30000,
   });
 
+  // Late obligations count for badge
+  const { data: enRetardCount = 0 } = useQuery({
+    queryKey: ['obligations-kpis-badge', user?.id],
+    queryFn: async () => {
+      const { data } = await supabase.rpc('get_obligations_kpis');
+      return Number(data?.[0]?.en_retard ?? 0);
+    },
+    enabled: !!user,
+    refetchInterval: 60000,
+  });
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
