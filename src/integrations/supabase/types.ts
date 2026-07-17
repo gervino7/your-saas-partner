@@ -3385,7 +3385,9 @@ export type Database = {
       }
       staffing_assignments: {
         Row: {
+          adjustment_requested_at: string | null
           assigned_by: string | null
+          chef_response: string | null
           collaborator_note: string | null
           created_at: string | null
           end_date: string | null
@@ -3393,6 +3395,9 @@ export type Database = {
           mission_id: string
           organization_id: string | null
           project_id: string | null
+          responded_at: string | null
+          responded_by: string | null
+          revision_count: number | null
           role: string
           start_date: string
           status: string
@@ -3401,7 +3406,9 @@ export type Database = {
           weekly_hours: number | null
         }
         Insert: {
+          adjustment_requested_at?: string | null
           assigned_by?: string | null
+          chef_response?: string | null
           collaborator_note?: string | null
           created_at?: string | null
           end_date?: string | null
@@ -3409,6 +3416,9 @@ export type Database = {
           mission_id: string
           organization_id?: string | null
           project_id?: string | null
+          responded_at?: string | null
+          responded_by?: string | null
+          revision_count?: number | null
           role?: string
           start_date: string
           status?: string
@@ -3417,7 +3427,9 @@ export type Database = {
           weekly_hours?: number | null
         }
         Update: {
+          adjustment_requested_at?: string | null
           assigned_by?: string | null
+          chef_response?: string | null
           collaborator_note?: string | null
           created_at?: string | null
           end_date?: string | null
@@ -3425,6 +3437,9 @@ export type Database = {
           mission_id?: string
           organization_id?: string | null
           project_id?: string | null
+          responded_at?: string | null
+          responded_by?: string | null
+          revision_count?: number | null
           role?: string
           start_date?: string
           status?: string
@@ -3466,6 +3481,20 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staffing_assignments_responded_by_fkey"
+            columns: ["responded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staffing_assignments_responded_by_fkey"
+            columns: ["responded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
             referencedColumns: ["id"]
           },
           {
@@ -4533,6 +4562,26 @@ export type Database = {
           en_retard: number
           pieces_attendues: number
           total_en_cours: number
+        }[]
+      }
+      get_pending_adjustments: {
+        Args: never
+        Returns: {
+          adjustment_requested_at: string
+          collaborator_grade: string
+          collaborator_name: string
+          collaborator_note: string
+          current_total_hours: number
+          end_date: string
+          id: string
+          mission_id: string
+          mission_name: string
+          project_name: string
+          revision_count: number
+          role: string
+          start_date: string
+          user_id: string
+          weekly_hours: number
         }[]
       }
       get_plan_execution: {
