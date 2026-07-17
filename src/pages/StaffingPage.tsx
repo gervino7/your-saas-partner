@@ -1,15 +1,14 @@
-import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { format, addWeeks, startOfWeek } from 'date-fns';
+import { useMemo, useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { format, addWeeks, startOfWeek, formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Plus, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, AlertCircle, CheckCircle2, Clock, MessageSquareQuote, RefreshCw } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Progress } from '@/components/ui/progress';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -23,8 +22,10 @@ import {
   useCancelAssignment,
   useRespondToAssignment,
   useWorkload,
+  usePendingAdjustments,
   type StaffingAssignment,
   type StaffingPeriod,
+  type PendingAdjustment,
 } from '@/hooks/useStaffing';
 import { usePlannableMissions } from '@/hooks/usePlanning';
 import { supabase } from '@/integrations/supabase/client';
@@ -35,12 +36,14 @@ import {
 } from '@/lib/staffing';
 import AssignmentDialog from '@/components/staffing/AssignmentDialog';
 import AdjustmentDialog from '@/components/staffing/AdjustmentDialog';
+import ArbitrationDialog, { type ArbitrationMode } from '@/components/staffing/ArbitrationDialog';
 
 const fmtDate = (d: string | null) => (d ? format(new Date(d), 'dd/MM/yy') : '∞');
 const fmtPeriod = (a: { start_date: string; end_date: string | null }) => {
   if (!a.end_date) return `${fmtDate(a.start_date)} → Jusqu'à nouvel ordre`;
   return `${fmtDate(a.start_date)} → ${fmtDate(a.end_date)}`;
 };
+const loadColor = (h: number) => (h > 45 ? 'text-red-600' : h >= 35 ? 'text-amber-600' : 'text-green-600');
 
 function MyAssignmentsTab() {
   const { data: assignments = [], isLoading } = useMyAssignments();
@@ -58,8 +61,22 @@ function MyAssignmentsTab() {
         {assignments.map((a) => {
           const proposed = a.status === 'proposed';
           const adjusting = a.status === 'adjustment_requested';
+          const hasResponse = proposed && a.chef_response;
+          const cancelledWithResponse = a.status === 'cancelled' && a.chef_response;
+          const revision = a.revision_count ?? 0;
+
+          const borderClass = cancelledWithResponse
+            ? 'border-muted'
+            : hasResponse
+            ? 'border-[#E67433] border-2'
+            : adjusting
+            ? 'border-amber-400 border-2'
+            : proposed
+            ? 'border-[#16519C]/40 border-2'
+            : '';
+
           return (
-            <Card key={a.id} className={cn(proposed && 'border-amber-400 border-2')}>
+            <Card key={a.id} className={cn(borderClass, cancelledWithResponse && 'opacity-80')}>
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-2">
                   <div>
@@ -81,14 +98,61 @@ function MyAssignmentsTab() {
                   <span className="text-muted-foreground">{a.weekly_hours}h/semaine</span>
                 </div>
                 <div className="text-muted-foreground">{fmtPeriod(a)}</div>
+
                 {adjusting && a.collaborator_note && (
-                  <div className="rounded-md bg-orange-50 border border-orange-200 p-2 text-xs">
-                    <p className="font-medium text-orange-900">Votre demande :</p>
-                    <p className="text-orange-800">{a.collaborator_note}</p>
-                    <p className="mt-1 text-orange-700 italic">En attente de retour de votre responsable</p>
+                  <div className="rounded-md bg-amber-50 border border-amber-200 p-2 text-xs space-y-1">
+                    <p className="font-medium text-amber-900">Votre demande :</p>
+                    <p className="text-amber-800 whitespace-pre-wrap">{a.collaborator_note}</p>
+                    <p className="flex items-center gap-1 text-amber-700 italic pt-1">
+                      <Clock className="h-3 w-3" />
+                      En attente de la réponse de votre responsable
+                      {a.adjustment_requested_at && (
+                        <> · {formatDistanceToNow(new Date(a.adjustment_requested_at), { locale: fr, addSuffix: true })}</>
+                      )}
+                    </p>
                   </div>
                 )}
-                {proposed && (
+
+                {hasResponse && (
+                  <div className="rounded-md border border-[#E67433]/40 bg-[#E67433]/5 p-3 text-xs space-y-2">
+                    <div className="flex items-center gap-2 font-medium text-[#E67433]">
+                      <MessageSquareQuote className="h-4 w-4" />
+                      Réponse de votre responsable
+                      {a.responder?.full_name && <span className="text-muted-foreground font-normal">· {a.responder.full_name}</span>}
+                      {a.responded_at && (
+                        <span className="text-muted-foreground font-normal ml-auto">
+                          {formatDistanceToNow(new Date(a.responded_at), { locale: fr, addSuffix: true })}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-foreground whitespace-pre-wrap border-l-2 border-[#E67433]/50 pl-2">{a.chef_response}</p>
+                    <div className="pt-1 flex flex-wrap gap-2">
+                      <Badge variant="outline" className="text-[10px]">Volume révisé : {a.weekly_hours}h/sem</Badge>
+                      <Badge variant="outline" className="text-[10px]">{fmtPeriod(a)}</Badge>
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        size="sm"
+                        className="flex-1 bg-[#16519C] hover:bg-[#16519C]/90"
+                        onClick={() => respond.mutate({ id: a.id, status: 'accepted' })}
+                        disabled={respond.isPending}
+                      >
+                        Accepter
+                      </Button>
+                      {revision >= 2 ? (
+                        <p className="flex-1 text-[11px] text-muted-foreground italic self-center">
+                          Plusieurs échanges ont eu lieu — contactez directement votre responsable si un désaccord persiste.
+                        </p>
+                      ) : (
+                        <Button size="sm" variant="outline" className="flex-1" onClick={() => setAdjustFor(a.id)}>
+                          Demander un nouvel ajustement
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {proposed && !hasResponse && (
                   <div className="flex gap-2 pt-2">
                     <Button
                       size="sm"
@@ -103,6 +167,14 @@ function MyAssignmentsTab() {
                     </Button>
                   </div>
                 )}
+
+                {cancelledWithResponse && (
+                  <div className="rounded-md bg-muted border p-2 text-xs">
+                    <p className="font-medium mb-1">Motif de l'annulation :</p>
+                    <p className="text-muted-foreground whitespace-pre-wrap">{a.chef_response}</p>
+                  </div>
+                )}
+
                 {a.status === 'accepted' && (
                   <Link to={`/missions/${a.mission_id}`} className="inline-block text-sm text-[#16519C] hover:underline pt-1">
                     Ouvrir la mission →
@@ -114,6 +186,119 @@ function MyAssignmentsTab() {
         })}
       </div>
       <AdjustmentDialog open={!!adjustFor} onOpenChange={(v) => !v && setAdjustFor(null)} assignmentId={adjustFor} />
+    </>
+  );
+}
+
+function PendingAdjustmentsTab() {
+  const { data: pending = [], isLoading } = usePendingAdjustments();
+  const [selected, setSelected] = useState<PendingAdjustment | null>(null);
+  const [mode, setMode] = useState<ArbitrationMode>('revise');
+  const [open, setOpen] = useState(false);
+
+  const openWith = (req: PendingAdjustment, m: ArbitrationMode) => {
+    setSelected(req);
+    setMode(m);
+    setOpen(true);
+  };
+
+  if (isLoading) return <p className="text-sm text-muted-foreground">Chargement…</p>;
+
+  if (pending.length === 0) {
+    return (
+      <Card>
+        <CardContent className="py-10 text-center text-muted-foreground flex flex-col items-center gap-2">
+          <CheckCircle2 className="h-8 w-8 text-green-600" />
+          <p>Aucune demande d'ajustement en attente.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <>
+      <div className="space-y-3">
+        {pending.map((r) => {
+          const total = Number(r.current_total_hours);
+          const revision = Number(r.revision_count ?? 0);
+          return (
+            <Card key={r.id} className="border-amber-300 border-2">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center text-sm font-semibold">
+                    {r.collaborator_name?.[0]?.toUpperCase() ?? '?'}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="text-base">{r.collaborator_name}</CardTitle>
+                      <Badge variant="outline" className="text-[10px] py-0">{r.collaborator_grade}</Badge>
+                      <span className="text-sm text-muted-foreground">demande un ajustement</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDistanceToNow(new Date(r.adjustment_requested_at), { locale: fr, addSuffix: true })}
+                    </p>
+                  </div>
+                </div>
+                {revision >= 2 && (
+                  <div className="mt-2 rounded-md border border-amber-300 bg-amber-50 p-2 text-xs text-amber-900 flex items-start gap-2">
+                    <RefreshCw className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                    <span>{revision} allers-retours sur cette affectation. Un échange direct sera peut-être plus efficace.</span>
+                  </div>
+                )}
+              </CardHeader>
+
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  {/* Left: current proposed assignment */}
+                  <div className="rounded-md border bg-muted/30 p-3 text-sm space-y-2">
+                    <p className="font-semibold text-xs uppercase tracking-wide text-muted-foreground">Affectation proposée</p>
+                    <div>
+                      <div className="font-medium">{r.mission_name}</div>
+                      {r.project_name && <div className="text-xs text-muted-foreground">{r.project_name}</div>}
+                    </div>
+                    <div>
+                      <Badge className={cn('border', ROLE_BADGE_CLASSES[r.role])} variant="outline">
+                        {STAFFING_ROLES[r.role].label}
+                      </Badge>
+                    </div>
+                    <div className="text-muted-foreground text-xs">
+                      Période : {fmtPeriod({ start_date: r.start_date, end_date: r.end_date })}
+                    </div>
+                    <div className="text-xs">
+                      Volume : <span className="font-medium">{r.weekly_hours}h/semaine</span>
+                    </div>
+                    <div className="text-xs">
+                      Charge totale actuelle : <span className={cn('font-semibold', loadColor(total))}>{total}h/sem</span>
+                    </div>
+                  </div>
+
+                  {/* Right: collaborator note */}
+                  <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm">
+                    <p className="font-semibold text-xs uppercase tracking-wide text-amber-900 mb-2 flex items-center gap-1">
+                      <MessageSquareQuote className="h-3.5 w-3.5" /> Demande du collaborateur
+                    </p>
+                    <p className="text-amber-900 whitespace-pre-wrap">{r.collaborator_note}</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 pt-2 border-t">
+                  <Button className="bg-[#16519C] hover:bg-[#16519C]/90" onClick={() => openWith(r, 'revise')}>
+                    Réviser l'affectation
+                  </Button>
+                  <Button variant="outline" onClick={() => openWith(r, 'maintain')}>
+                    Maintenir
+                  </Button>
+                  <Button variant="ghost" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => openWith(r, 'cancel')}>
+                    Annuler l'affectation
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      <ArbitrationDialog open={open} onOpenChange={setOpen} request={selected} mode={mode} />
     </>
   );
 }
@@ -314,7 +499,6 @@ function TeamWorkloadTab() {
   const { data: assignments = [] } = useStaffingAssignments({ period: 'all' });
 
   const rows = useMemo(() => {
-    // Alloué per user across active non-cancelled assignments overlapping the week
     const alloc = new Map<string, number>();
     for (const a of assignments) {
       if (a.status === 'cancelled') continue;
@@ -408,6 +592,31 @@ export default function StaffingPage() {
   const profile = useAuthStore((s) => s.profile);
   const gradeLevel = profile?.grade_level ?? 8;
   const isManager = gradeLevel <= 3;
+  const { data: pending = [] } = usePendingAdjustments();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab');
+  const [tab, setTab] = useState<string>(() => {
+    if (initialTab === 'pending' && isManager) return 'pending';
+    if (initialTab === 'mine') return 'mine';
+    if (initialTab === 'team' && isManager) return 'team';
+    if (initialTab === 'workload' && isManager) return 'workload';
+    return isManager && pending.length > 0 ? 'pending' : 'mine';
+  });
+
+  useEffect(() => {
+    const q = searchParams.get('tab');
+    if (q && q !== tab) setTab(q);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  const onTabChange = (v: string) => {
+    setTab(v);
+    setSearchParams((sp) => {
+      const next = new URLSearchParams(sp);
+      next.set('tab', v);
+      return next;
+    }, { replace: true });
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -416,12 +625,23 @@ export default function StaffingPage() {
         <p className="text-sm text-muted-foreground">Affectation des collaborateurs aux missions et pilotage de la charge.</p>
       </div>
 
-      <Tabs defaultValue="mine">
+      <Tabs value={tab} onValueChange={onTabChange}>
         <TabsList>
+          {isManager && (
+            <TabsTrigger value="pending" className="relative">
+              Demandes d'ajustement
+              {pending.length > 0 && (
+                <span className="ml-2 inline-flex items-center justify-center rounded-full bg-red-600 text-white text-[10px] h-5 min-w-[20px] px-1.5">
+                  {pending.length}
+                </span>
+              )}
+            </TabsTrigger>
+          )}
           <TabsTrigger value="mine">Mes affectations</TabsTrigger>
           {isManager && <TabsTrigger value="team">Affectations équipe</TabsTrigger>}
           {isManager && <TabsTrigger value="workload">Charge d'équipe</TabsTrigger>}
         </TabsList>
+        {isManager && <TabsContent value="pending" className="mt-4"><PendingAdjustmentsTab /></TabsContent>}
         <TabsContent value="mine" className="mt-4"><MyAssignmentsTab /></TabsContent>
         {isManager && <TabsContent value="team" className="mt-4"><TeamAssignmentsTab /></TabsContent>}
         {isManager && <TabsContent value="workload" className="mt-4"><TeamWorkloadTab /></TabsContent>}
