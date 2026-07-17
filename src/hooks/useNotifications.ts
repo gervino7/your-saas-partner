@@ -20,6 +20,9 @@ export const notificationIcons: Record<string, string> = {
   new_evaluation: 'Star',
   timesheet_reminder: 'Clock',
   invitation_received: 'UserPlus',
+  staffing_assigned: 'UserPlus',
+  staffing_adjustment_requested: 'RefreshCw',
+  staffing_response: 'MessageCircle',
 };
 
 export const notificationLabels: Record<string, string> = {
@@ -39,6 +42,9 @@ export const notificationLabels: Record<string, string> = {
   new_evaluation: 'Évaluation',
   timesheet_reminder: 'Rappel timesheet',
   invitation_received: 'Invitation',
+  staffing_assigned: 'Nouvelle affectation',
+  staffing_adjustment_requested: 'Demande d\'ajustement',
+  staffing_response: 'Réponse d\'affectation',
 };
 
 export function useNotifications(limit = 20) {
@@ -114,6 +120,8 @@ export function useNotifications(limit = 20) {
 
   const getNavigationPath = useCallback((notification: typeof notifications[0]) => {
     const { type, entity_type, entity_id } = notification;
+    if (type === 'staffing_adjustment_requested') return '/staffing?tab=pending';
+    if (type === 'staffing_response' || type === 'staffing_assigned') return '/staffing?tab=mine';
     if (!entity_id) return null;
     switch (entity_type) {
       case 'task': return `/projects/${entity_id}`;
