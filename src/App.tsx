@@ -38,7 +38,16 @@ import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
 import ResetPasswordPage from '@/pages/ResetPasswordPage';
 import NotFound from '@/pages/NotFound';
 import OnboardingPage from '@/pages/OnboardingPage';
-import SuperAdminPage from '@/pages/SuperAdminPage';
+import SuperAdminGuard from '@/components/superadmin/SuperAdminGuard';
+import SuperAdminLayout from '@/components/superadmin/SuperAdminLayout';
+import SuperAdminDashboard from '@/pages/superadmin/SuperAdminDashboard';
+import OrganisationsListPage from '@/pages/superadmin/OrganisationsListPage';
+import OrganisationDetailPage from '@/pages/superadmin/OrganisationDetailPage';
+import AbonnementsPage from '@/pages/superadmin/AbonnementsPage';
+import UtilisateursPage from '@/pages/superadmin/UtilisateursPage';
+import SantePage from '@/pages/superadmin/SantePage';
+import JournalPage from '@/pages/superadmin/JournalPage';
+import AdministrateursPage from '@/pages/superadmin/AdministrateursPage';
 import OrgRedirectPage from '@/pages/OrgRedirectPage';
 import SupervisionPage from '@/pages/SupervisionPage';
 import PointagePage from '@/pages/PointagePage';
@@ -281,7 +290,6 @@ const App = () => (
                 <Route path="/workspace/:userId" element={<WorkspacePage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
-                <Route path="/super-admin" element={<SuperAdminPage />} />
                 <Route path="/supervision" element={<SupervisionPage />} />
                 <Route path="/pointage" element={<PointagePage />} />
                 <Route path="/planning" element={<PlanningPage />} />
@@ -289,6 +297,19 @@ const App = () => (
                 <Route path="/staffing" element={<StaffingPage />} />
                 <Route path="/echeancier" element={<EcheancierPage />} />
                 <Route path="/dossiers" element={<DossiersPage />} />
+              </Route>
+              <Route
+                path="/super-admin"
+                element={<SuperAdminGuard><SuperAdminLayout /></SuperAdminGuard>}
+              >
+                <Route index element={<SuperAdminDashboard />} />
+                <Route path="organisations" element={<OrganisationsListPage />} />
+                <Route path="organisations/:id" element={<OrganisationDetailPage />} />
+                <Route path="abonnements" element={<AbonnementsPage />} />
+                <Route path="utilisateurs" element={<UtilisateursPage />} />
+                <Route path="sante" element={<SantePage />} />
+                <Route path="journal" element={<JournalPage />} />
+                <Route path="administrateurs" element={<AdministrateursPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
