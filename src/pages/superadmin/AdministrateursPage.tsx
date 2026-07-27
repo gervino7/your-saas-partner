@@ -11,7 +11,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { usePlatformAdmins, useGrantAdmin, useRevokeAdmin, useIsPlatformAdmin } from '@/hooks/useSuperAdmin';
+import { usePlatformAdmins, useGrantAdmin, useRevokeAdmin, useIsPlatformAdmin, type PlatformRole } from '@/hooks/useSuperAdmin';
 import { format } from 'date-fns';
 
 const ROLE_LABEL: Record<string, string> = {
@@ -27,7 +27,7 @@ export default function AdministrateursPage() {
   const revoke = useRevokeAdmin();
 
   const [email, setEmail] = useState('');
-  const [newRole, setNewRole] = useState('support');
+  const [newRole, setNewRole] = useState<PlatformRole>('support');
   const [toRevoke, setToRevoke] = useState<any>(null);
 
   const isOwner = role === 'owner';
@@ -53,7 +53,7 @@ export default function AdministrateursPage() {
             </div>
             <div className="space-y-1.5">
               <Label>Rôle</Label>
-              <Select value={newRole} onValueChange={setNewRole}>
+              <Select value={newRole} onValueChange={(v) => setNewRole(v as PlatformRole)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="support">Support</SelectItem>
