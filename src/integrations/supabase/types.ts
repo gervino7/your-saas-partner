@@ -2806,39 +2806,72 @@ export type Database = {
       }
       organizations: {
         Row: {
+          billing_contact: string | null
+          billing_email: string | null
+          city: string | null
+          country: string | null
           created_at: string | null
           id: string
+          internal_notes: string | null
+          is_active: boolean
           logo_url: string | null
           max_storage_gb: number | null
           max_users: number | null
           name: string
+          phone: string | null
           settings: Json | null
           slug: string
           subscription_plan: string | null
+          support_access_enabled: boolean
+          suspended_at: string | null
+          suspension_reason: string | null
+          trial_ends_at: string | null
           updated_at: string | null
         }
         Insert: {
+          billing_contact?: string | null
+          billing_email?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string | null
           id?: string
+          internal_notes?: string | null
+          is_active?: boolean
           logo_url?: string | null
           max_storage_gb?: number | null
           max_users?: number | null
           name: string
+          phone?: string | null
           settings?: Json | null
           slug: string
           subscription_plan?: string | null
+          support_access_enabled?: boolean
+          suspended_at?: string | null
+          suspension_reason?: string | null
+          trial_ends_at?: string | null
           updated_at?: string | null
         }
         Update: {
+          billing_contact?: string | null
+          billing_email?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string | null
           id?: string
+          internal_notes?: string | null
+          is_active?: boolean
           logo_url?: string | null
           max_storage_gb?: number | null
           max_users?: number | null
           name?: string
+          phone?: string | null
           settings?: Json | null
           slug?: string
           subscription_plan?: string | null
+          support_access_enabled?: boolean
+          suspended_at?: string | null
+          suspension_reason?: string | null
+          trial_ends_at?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -2985,6 +3018,70 @@ export type Database = {
           },
         ]
       }
+      plan_changes_log: {
+        Row: {
+          changed_by: string | null
+          changed_by_email: string | null
+          created_at: string | null
+          effective_date: string | null
+          id: string
+          new_plan: string
+          new_price: number | null
+          old_plan: string | null
+          old_price: number | null
+          organization_id: string
+          reason: string | null
+        }
+        Insert: {
+          changed_by?: string | null
+          changed_by_email?: string | null
+          created_at?: string | null
+          effective_date?: string | null
+          id?: string
+          new_plan: string
+          new_price?: number | null
+          old_plan?: string | null
+          old_price?: number | null
+          organization_id: string
+          reason?: string | null
+        }
+        Update: {
+          changed_by?: string | null
+          changed_by_email?: string | null
+          created_at?: string | null
+          effective_date?: string | null
+          id?: string
+          new_plan?: string
+          new_price?: number | null
+          old_plan?: string | null
+          old_price?: number | null
+          organization_id?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_changes_log_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_changes_log_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_changes_log_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plan_entries: {
         Row: {
           created_at: string | null
@@ -3116,6 +3213,71 @@ export type Database = {
             foreignKeyName: "plan_entries_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_admins: {
+        Row: {
+          email: string
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          revoked_at: string | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          email: string
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          revoked_at?: string | null
+          role?: string
+          user_id: string
+        }
+        Update: {
+          email?: string
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          revoked_at?: string | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_admins_granted_by_fkey"
+            columns: ["granted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "platform_admins_granted_by_fkey"
+            columns: ["granted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "platform_admins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "platform_admins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "profiles_safe"
             referencedColumns: ["id"]
           },
@@ -3507,6 +3669,57 @@ export type Database = {
           {
             foreignKeyName: "staffing_assignments_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      super_admin_audit_log: {
+        Row: {
+          action: string
+          admin_email: string | null
+          admin_id: string | null
+          created_at: string | null
+          details: Json | null
+          id: string
+          target_id: string | null
+          target_label: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          admin_email?: string | null
+          admin_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_label?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          admin_email?: string | null
+          admin_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_label?: string | null
+          target_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "super_admin_audit_log_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "super_admin_audit_log_admin_id_fkey"
+            columns: ["admin_id"]
             isOneToOne: false
             referencedRelation: "profiles_safe"
             referencedColumns: ["id"]
@@ -4409,15 +4622,26 @@ export type Database = {
           _subscription_plan?: string
         }
         Returns: {
+          billing_contact: string | null
+          billing_email: string | null
+          city: string | null
+          country: string | null
           created_at: string | null
           id: string
+          internal_notes: string | null
+          is_active: boolean
           logo_url: string | null
           max_storage_gb: number | null
           max_users: number | null
           name: string
+          phone: string | null
           settings: Json | null
           slug: string
           subscription_plan: string | null
+          support_access_enabled: boolean
+          suspended_at: string | null
+          suspension_reason: string | null
+          trial_ends_at: string | null
           updated_at: string | null
         }
         SetofOptions: {
@@ -4634,22 +4858,127 @@ export type Database = {
         Args: { _mission_id: string; _user_id: string }
         Returns: boolean
       }
+      is_org_active: { Args: { _org_id: string }; Returns: boolean }
+      is_platform_admin: { Args: { _min_role?: string }; Returns: boolean }
+      log_super_admin_action: {
+        Args: {
+          _action: string
+          _details?: Json
+          _target_id: string
+          _target_label?: string
+          _target_type: string
+        }
+        Returns: undefined
+      }
       purge_old_activity_data: { Args: never; Returns: undefined }
       purge_old_attendance: { Args: never; Returns: undefined }
       seed_obligation_types: { Args: { _org_id: string }; Returns: undefined }
+      seed_platform_owner: { Args: { _email: string }; Returns: string }
+      super_admin_change_plan: {
+        Args: {
+          _max_storage_gb: number
+          _max_users: number
+          _new_plan: string
+          _new_price?: number
+          _org_id: string
+          _reason?: string
+        }
+        Returns: Json
+      }
       super_admin_get_all_orgs: {
         Args: never
         Returns: {
+          billing_email: string
+          city: string
+          client_count: number
+          country: string
           created_at: string
           id: string
+          is_active: boolean
+          last_activity: string
           max_storage_gb: number
           max_users: number
           mission_count: number
           name: string
           slug: string
+          storage_used_mb: number
           subscription_plan: string
+          suspended_at: string
+          trial_ends_at: string
           user_count: number
         }[]
+      }
+      super_admin_growth: {
+        Args: { _months?: number }
+        Returns: {
+          cumulative_orgs: number
+          new_orgs: number
+          new_users: number
+          period: string
+        }[]
+      }
+      super_admin_health: {
+        Args: never
+        Returns: {
+          alert_level: string
+          org_id: string
+          org_name: string
+          storage_max_gb: number
+          storage_pct: number
+          storage_used_gb: number
+          subscription_plan: string
+          users_max: number
+          users_pct: number
+          users_used: number
+        }[]
+      }
+      super_admin_kpis: {
+        Args: never
+        Returns: {
+          active_orgs: number
+          active_users_30d: number
+          new_orgs_30d: number
+          storage_total_gb: number
+          suspended_orgs: number
+          total_clients: number
+          total_missions: number
+          total_orgs: number
+          total_users: number
+          trial_orgs: number
+        }[]
+      }
+      super_admin_org_detail: { Args: { _org_id: string }; Returns: Json }
+      super_admin_search_users: {
+        Args: { _query: string }
+        Returns: {
+          created_at: string
+          email: string
+          full_name: string
+          grade: string
+          grade_level: number
+          id: string
+          is_online: boolean
+          last_seen_at: string
+          organization_id: string
+          organization_name: string
+        }[]
+      }
+      super_admin_toggle_org: {
+        Args: { _activate: boolean; _org_id: string; _reason?: string }
+        Returns: Json
+      }
+      super_admin_update_org: {
+        Args: {
+          _billing_contact?: string
+          _billing_email?: string
+          _city?: string
+          _country?: string
+          _internal_notes?: string
+          _org_id: string
+          _phone?: string
+          _trial_ends_at?: string
+        }
+        Returns: Json
       }
       upsert_activity_report: {
         Args: {
