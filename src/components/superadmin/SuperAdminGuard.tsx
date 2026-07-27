@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useIsPlatformAdmin } from '@/hooks/useSuperAdmin';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,7 +7,15 @@ import { ShieldAlert } from 'lucide-react';
 
 export default function SuperAdminGuard({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
-  const { isAdmin, isLoading } = useIsPlatformAdmin();
+  const { isAdmin, role, isLoading } = useIsPlatformAdmin();
+  const loggedGuardState = useRef(false);
+
+  useEffect(() => {
+    if (!isLoading && !loggedGuardState.current) {
+      console.log('[SuperAdmin] guard:', { isAdmin, role, isLoading });
+      loggedGuardState.current = true;
+    }
+  }, [isAdmin, role, isLoading]);
 
   useEffect(() => {
     if (!isLoading && !isAdmin) {
