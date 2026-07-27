@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuditLog } from '@/hooks/useSuperAdmin';
+import { auditLabel } from '@/lib/superAdmin';
 import { exportToCSV } from '@/lib/exportUtils';
 import { Download } from 'lucide-react';
 import { format } from 'date-fns';
@@ -14,27 +15,25 @@ import { format } from 'date-fns';
 const PAGE_SIZE = 50;
 
 export default function JournalPage() {
-  const { data: logs = [], isLoading } = useAuditLog(500);
+  const [page, setPage] = useState(0);
+  const { data, isLoading } = useAuditLog(page, PAGE_SIZE);
   const [search, setSearch] = useState('');
   const [action, setAction] = useState('all');
-  const [page, setPage] = useState(0);
 
-  const actions = useMemo(
-    () => Array.from(new Set((logs as any[]).map((l) => l.action))).sort(),
-    [logs],
-  );
+  const rows = (data?.rows ?? []) as any[];
+  const total = data?.total ?? 0;
+  const maxPage = Math.max(Math.ceil(total / PAGE_SIZE) - 1, 0);
+
+  const actions = useMemo(() => Array.from(new Set(rows.map((l) => l.action))).sort(), [rows]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return (logs as any[]).filter((l) => {
+    return rows.filter((l) => {
       if (action !== 'all' && l.action !== action) return false;
       if (q && ![l.admin_email, l.target_label, l.target_type].some((v) => (v ?? '').toLowerCase().includes(q))) return false;
       return true;
     });
-  }, [logs, search, action]);
-
-  const pageRows = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-  const maxPage = Math.max(Math.ceil(filtered.length / PAGE_SIZE) - 1, 0);
+  }, [rows, search, action]);
 
   if (isLoading) return <Skeleton className="h-96 w-full" />;
 
@@ -43,7 +42,7 @@ export default function JournalPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-bold">Journal d'audit</h1>
-          <p className="text-sm text-muted-foreground">{filtered.length} action(s) enregistrée(s)</p>
+          <p className="text-sm text-muted-foreground">{total} action(s) enregistrée(s)</p>
         </div>
         <Button
           variant="outline"
@@ -51,8 +50,10 @@ export default function JournalPage() {
             exportToCSV(
               filtered.map((l) => ({
                 date: l.created_at ? format(new Date(l.created_at), 'dd/MM/yyyy HH:mm') : '',
-                admin: l.admin_email ?? '', action: l.action,
-                cible: l.target_label ?? '', type: l.target_type ?? '',
+                admin: l.admin_email ?? '',
+                action: auditLabel(l.action),
+                cible: l.target_label ?? '',
+                type: l.target_type ?? '',
               })),
               'journal-audit',
             )
@@ -64,16 +65,12 @@ export default function JournalPage() {
 
       <Card>
         <CardContent className="grid gap-3 p-4 md:grid-cols-3">
-          <Input
-            placeholder="Admin, cible…"
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-          />
-          <Select value={action} onValueChange={(v) => { setAction(v); setPage(0); }}>
+          <Input placeholder="Admin, cible…" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Select value={action} onValueChange={setAction}>
             <SelectTrigger><SelectValue placeholder="Action" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Toutes les actions</SelectItem>
-              {actions.map((a) => <SelectItem key={a} value={a}>{a}</SelectItem>)}
+              {actions.map((a) => <SelectItem key={a} value={a}>{auditLabel(a)}</SelectItem>)}
             </SelectContent>
           </Select>
         </CardContent>
@@ -92,13 +89,13 @@ export default function JournalPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {pageRows.map((l: any) => (
+              {filtered.map((l) => (
                 <TableRow key={l.id}>
                   <TableCell className="whitespace-nowrap text-sm">
                     {l.created_at ? format(new Date(l.created_at), 'dd/MM/yyyy HH:mm') : '—'}
                   </TableCell>
                   <TableCell className="text-sm">{l.admin_email ?? '—'}</TableCell>
-                  <TableCell><Badge variant="outline">{l.action}</Badge></TableCell>
+                  <TableCell><Badge variant="outline">{auditLabel(l.action)}</Badge></TableCell>
                   <TableCell className="text-sm">
                     {l.target_label ?? '—'}
                     {l.target_type && <span className="ml-1 text-xs text-muted-foreground">({l.target_type})</span>}

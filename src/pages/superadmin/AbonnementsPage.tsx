@@ -15,6 +15,12 @@ export default function AbonnementsPage() {
 
   const mrr = useMemo(() => computeMrr(orgs as any), [orgs]);
   const breakdown = useMemo(() => planBreakdown(orgs as any), [orgs]);
+  const orgName = useMemo(() => {
+    const map: Record<string, string> = {};
+    (orgs as any[]).forEach((o) => { map[o.id] = o.name; });
+    return map;
+  }, [orgs]);
+
   const trials = useMemo(
     () => (orgs as any[]).filter((o) => o.trial_ends_at && (daysUntil(o.trial_ends_at) ?? 99) <= 14),
     [orgs],
@@ -110,7 +116,7 @@ export default function AbonnementsPage() {
                   <TableCell className="text-sm">{c.created_at ? format(new Date(c.created_at), 'dd/MM/yyyy HH:mm') : '—'}</TableCell>
                   <TableCell className="text-sm">
                     <Link className="hover:underline" to={`/super-admin/organisations/${c.organization_id}`}>
-                      {c.organizations?.name ?? c.organization_id}
+                      {orgName[c.organization_id] ?? c.organization_id}
                     </Link>
                   </TableCell>
                   <TableCell className="text-sm">{c.old_plan ?? '—'} → <strong>{c.new_plan}</strong></TableCell>
