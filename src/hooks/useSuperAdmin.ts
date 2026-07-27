@@ -5,31 +5,46 @@ import type { PlanId } from '@/lib/plans';
 
 export type PlatformRole = 'owner' | 'admin' | 'support';
 
+type PlatformAdminState = {
+  isAdmin: boolean;
+  role: PlatformRole | null;
+  canManage: boolean;
+  isOwner: boolean;
+};
+
 export function useIsPlatformAdmin() {
   const query = useQuery({
     queryKey: ['is-platform-admin'],
-    queryFn: async (): Promise<{ isAdmin: boolean; role: PlatformRole | null }> => {
-      const { data, error } = await supabase.rpc('is_platform_admin', { _min_role: 'support' });
-      if (error || !data) return { isAdmin: false, role: null };
-      const { data: auth } = await supabase.auth.getUser();
-      const { data: row } = await supabase
-        .from('platform_admins')
-        .select('role, is_active')
-        .eq('user_id', auth.user?.id ?? '')
-        .eq('is_active', true)
-        .maybeSingle();
-      return { isAdmin: true, role: (row?.role as PlatformRole) ?? 'support' };
+    queryFn: async (): Promise<PlatformAdminState> => {
+      const [support, admin, owner] = await Promise.all([
+        supabase.rpc('is_platform_admin', { _min_role: 'support' }),
+        supabase.rpc('is_platform_admin', { _min_role: 'admin' }),
+        supabase.rpc('is_platform_admin', { _min_role: 'owner' }),
+      ]);
+
+      if (support.error) {
+        console.error('[SuperAdmin] RPC error:', support.error);
+        return { isAdmin: false, role: null, canManage: false, isOwner: false };
+      }
+
+      const role: PlatformRole | null = owner.data ? 'owner' : admin.data ? 'admin' : support.data ? 'support' : null;
+      return {
+        isAdmin: !!support.data,
+        role,
+        canManage: !!admin.data,
+        isOwner: !!owner.data,
+      };
     },
     staleTime: 5 * 60 * 1000,
+    retry: false,
   });
 
-  const role = query.data?.role ?? null;
   return {
     ...query,
     isAdmin: query.data?.isAdmin ?? false,
-    role,
-    canManage: role === 'owner' || role === 'admin',
-    isOwner: role === 'owner',
+    role: query.data?.role ?? null,
+    canManage: query.data?.canManage ?? false,
+    isOwner: query.data?.isOwner ?? false,
   };
 }
 
