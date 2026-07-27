@@ -58,10 +58,3 @@ export const getNextPlan = (current: PlanId): Plan | null => {
 };
 
 export const formatFcfa = (n: number) => (n === 0 ? "Gratuit" : `${n.toLocaleString("fr-FR")} FCFA/mois`);
-
-export const SUPER_ADMIN_EMAILS = [
-  "gervais@abodje.com",
-  "admin@d-gconseil.com",
-  "info@abodje.com",
-  "gkonan7@yahoo.com",
-];

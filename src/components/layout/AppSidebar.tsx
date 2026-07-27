@@ -12,7 +12,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import logoImg from '@/assets/logo.png';
-import { SUPER_ADMIN_EMAILS } from '@/lib/plans';
+import { useIsPlatformAdmin } from '@/hooks/useSuperAdmin';
 
 const mainNav = [
   { label: 'Tableau de bord', icon: LayoutDashboard, path: '/' },
@@ -35,7 +35,7 @@ const AppSidebar = () => {
   const { profile, user } = useAuthStore();
   const gradeLevel = profile?.grade_level ?? 8;
   const showAdmin = gradeLevel <= 2; // DA or DM
-  const isSuperAdmin = !!user?.email && SUPER_ADMIN_EMAILS.includes(user.email);
+  const { isAdmin: isSuperAdmin } = useIsPlatformAdmin();
 
   // Unread message count
   const { data: unreadMessages = 0 } = useQuery({
