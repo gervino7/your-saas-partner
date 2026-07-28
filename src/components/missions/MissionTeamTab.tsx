@@ -1,16 +1,20 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { UserPlus } from 'lucide-react';
-import { useMissionMembers, useOrganizationUsers, useAddMissionMember } from '@/hooks/useMissions';
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { UserPlus, MoreVertical, UserMinus } from 'lucide-react';
+import { useMissionMembers, useOrganizationUsers, useAddMissionMember, useMission } from '@/hooks/useMissions';
 import { useAuthStore } from '@/stores/authStore';
 import { GRADE_LABELS, GRADE_LEVELS } from '@/types/database';
 import type { Grade } from '@/types/database';
+import RemoveMemberDialog from './RemoveMemberDialog';
 
 function initials(name: string) {
   return name?.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2) ?? '?';
@@ -23,6 +27,7 @@ const roleLabels: Record<string, string> = {
 export default function MissionTeamTab({ missionId, canManage }: { missionId: string; canManage: boolean }) {
   const { data: allMembers = [], isLoading } = useMissionMembers(missionId);
   const { data: orgUsers = [] } = useOrganizationUsers();
+  const { data: mission } = useMission(missionId);
   const currentProfile = useAuthStore((s) => s.profile);
   const viewerLevel = currentProfile?.grade_level ?? 8;
   const members = viewerLevel <= 2
@@ -35,6 +40,14 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
   const [addOpen, setAddOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState('');
   const [selectedRole, setSelectedRole] = useState('member');
+  const [removeTarget, setRemoveTarget] = useState<{ user_id: string; name: string } | null>(null);
+
+  const canRemove = (m: any) =>
+    canManage &&
+    viewerLevel <= 3 &&
+    m.user_id !== currentProfile?.id &&
+    m.user_id !== (mission as any)?.director_id &&
+    m.user_id !== (mission as any)?.chief_id;
 
   const memberIds = new Set(members.map((m: any) => m.user_id));
   const availableUsers = orgUsers.filter((u: any) => !memberIds.has(u.id));
@@ -44,6 +57,7 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
     await addMember.mutateAsync({ missionId, userId: selectedUser, role: selectedRole });
     setAddOpen(false); setSelectedUser(''); setSelectedRole('member');
   };
+
 
   return (
     <div className="space-y-4">
