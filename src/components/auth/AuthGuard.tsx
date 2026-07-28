@@ -41,6 +41,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
       const hasOrganization = typeof profile?.organization_id === 'string' && profile.organization_id.trim().length > 0;
       const isOnboardingRoute = location.pathname === '/onboarding';
+      const isSuspendedRoute = location.pathname === '/compte-suspendu';
 
       console.log('[AuthGuard]', {
         reason,
@@ -58,12 +59,39 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         return;
       }
 
+      // Organisation suspendue → écran dédié (sauf administrateurs plateforme)
+      if (hasOrganization) {
+        const { data: org } = await supabase
+          .from('organizations')
+          .select('is_active')
+          .eq('id', profile!.organization_id!)
+          .maybeSingle();
+
+        if (cancelled) return;
+
+        if (org && org.is_active === false) {
+          const { data: isPlatformAdmin } = await supabase.rpc('is_platform_admin', { _min_role: 'support' } as any);
+          if (cancelled) return;
+
+          if (!isPlatformAdmin && !isSuspendedRoute) {
+            navigate('/compte-suspendu', { replace: true });
+            setLoading(false);
+            return;
+          }
+        } else if (isSuspendedRoute) {
+          navigate('/', { replace: true });
+          setLoading(false);
+          return;
+        }
+      }
+
       // Has organization but on onboarding → go to dashboard
       if (hasOrganization && isOnboardingRoute) {
         navigate('/', { replace: true });
         setLoading(false);
         return;
       }
+
 
       setAuthorized(true);
       setLoading(false);
