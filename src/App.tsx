@@ -272,6 +272,8 @@ const App = () => (
               <Route path="/survey/:token" element={<SatisfactionSurveyPage />} />
               <Route path="/org/:slug" element={<OrgRedirectPage />} />
               <Route path="/onboarding" element={<AuthGuard><OnboardingPage /></AuthGuard>} />
+              <Route path="/compte-suspendu" element={<AuthGuard><CompteSuspenduPage /></AuthGuard>} />
+
               <Route element={<AuthGuard><AppLayout /></AuthGuard>}>
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/missions" element={<MissionsPage />} />
