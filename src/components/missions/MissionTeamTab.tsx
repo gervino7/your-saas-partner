@@ -83,11 +83,34 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
                   <Badge variant="outline" className="text-xs">{roleLabels[m.role] ?? m.role}</Badge>
                   {m.user?.grade && (<span className="text-xs text-muted-foreground">{GRADE_LABELS[m.user.grade as Grade] ?? m.user.grade}</span>)}
                 </div>
+                {canRemove(m) && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8"><MoreVertical className="h-4 w-4" /></Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        className="text-destructive focus:text-destructive"
+                        onClick={() => setRemoveTarget({ user_id: m.user_id, name: m.user?.full_name ?? 'ce collaborateur' })}
+                      >
+                        <UserMinus className="mr-2 h-4 w-4" /> Retirer de la mission
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </CardContent>
             </Card>
           ))}
         </div>
       )}
+
+      <RemoveMemberDialog
+        open={!!removeTarget}
+        onOpenChange={(v) => { if (!v) setRemoveTarget(null); }}
+        missionId={missionId}
+        member={removeTarget}
+      />
+
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className="max-w-md">
