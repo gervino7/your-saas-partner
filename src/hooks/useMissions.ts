@@ -226,6 +226,28 @@ export function useAddMissionMember() {
   });
 }
 
+export function useRemoveMissionMember() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ missionId, userId, reason }: { missionId: string; userId: string; reason: string }) => {
+      const { error } = await supabase.rpc('remove_mission_member' as any, {
+        _mission_id: missionId,
+        _user_id: userId,
+        _reason: reason,
+      });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['mission-members', vars.missionId] });
+      queryClient.invalidateQueries({ queryKey: ['staffing-assignments'] });
+      toast.success('Collaborateur retiré de la mission');
+    },
+  });
+}
+
+
+
 export function useOrganizationUsers() {
   const profile = useAuthStore((s) => s.profile);
 

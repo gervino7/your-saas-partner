@@ -3299,6 +3299,7 @@ export type Database = {
           phone: string | null
           skills: Json | null
           updated_at: string | null
+          weekly_capacity_hours: number | null
         }
         Insert: {
           avatar_url?: string | null
@@ -3315,6 +3316,7 @@ export type Database = {
           phone?: string | null
           skills?: Json | null
           updated_at?: string | null
+          weekly_capacity_hours?: number | null
         }
         Update: {
           avatar_url?: string | null
@@ -3331,6 +3333,7 @@ export type Database = {
           phone?: string | null
           skills?: Json | null
           updated_at?: string | null
+          weekly_capacity_hours?: number | null
         }
         Relationships: [
           {
@@ -4754,6 +4757,10 @@ export type Database = {
           status: string
         }[]
       }
+      get_member_removal_impact: {
+        Args: { _mission_id: string; _user_id: string }
+        Returns: Json
+      }
       get_obligations_echeancier: {
         Args: {
           _client_id?: string
@@ -4830,9 +4837,11 @@ export type Database = {
       get_workload: {
         Args: { _week_start?: string }
         Returns: {
+          allocated_hours: number
           capacity_hours: number
           full_name: string
           grade: string
+          has_leave: boolean
           is_overloaded: boolean
           load_rate: number
           planned_hours: number
@@ -4872,6 +4881,10 @@ export type Database = {
       }
       purge_old_activity_data: { Args: never; Returns: undefined }
       purge_old_attendance: { Args: never; Returns: undefined }
+      remove_mission_member: {
+        Args: { _mission_id: string; _reason: string; _user_id: string }
+        Returns: Json
+      }
       seed_obligation_types: { Args: { _org_id: string }; Returns: undefined }
       seed_platform_owner: { Args: { _email: string }; Returns: string }
       super_admin_change_plan: {

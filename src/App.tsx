@@ -12,6 +12,7 @@ import { GRADE_LEVELS } from '@/types/database';
 import type { Grade } from '@/types/database';
 
 import AuthGuard from '@/components/auth/AuthGuard';
+import CompteSuspenduPage from '@/pages/CompteSuspenduPage';
 import AppLayout from '@/components/layout/AppLayout';
 import LoginPage from '@/pages/LoginPage';
 import LandingPage from '@/pages/LandingPage';
@@ -272,6 +273,8 @@ const App = () => (
               <Route path="/survey/:token" element={<SatisfactionSurveyPage />} />
               <Route path="/org/:slug" element={<OrgRedirectPage />} />
               <Route path="/onboarding" element={<AuthGuard><OnboardingPage /></AuthGuard>} />
+              <Route path="/compte-suspendu" element={<AuthGuard><CompteSuspenduPage /></AuthGuard>} />
+
               <Route element={<AuthGuard><AppLayout /></AuthGuard>}>
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/missions" element={<MissionsPage />} />
