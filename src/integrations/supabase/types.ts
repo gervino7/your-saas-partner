@@ -3299,6 +3299,7 @@ export type Database = {
           phone: string | null
           skills: Json | null
           updated_at: string | null
+          weekly_capacity_hours: number | null
         }
         Insert: {
           avatar_url?: string | null
@@ -3315,6 +3316,7 @@ export type Database = {
           phone?: string | null
           skills?: Json | null
           updated_at?: string | null
+          weekly_capacity_hours?: number | null
         }
         Update: {
           avatar_url?: string | null
@@ -3331,6 +3333,7 @@ export type Database = {
           phone?: string | null
           skills?: Json | null
           updated_at?: string | null
+          weekly_capacity_hours?: number | null
         }
         Relationships: [
           {
@@ -4830,9 +4833,11 @@ export type Database = {
       get_workload: {
         Args: { _week_start?: string }
         Returns: {
+          allocated_hours: number
           capacity_hours: number
           full_name: string
           grade: string
+          has_leave: boolean
           is_overloaded: boolean
           load_rate: number
           planned_hours: number
