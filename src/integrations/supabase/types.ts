@@ -4757,6 +4757,10 @@ export type Database = {
           status: string
         }[]
       }
+      get_member_removal_impact: {
+        Args: { _mission_id: string; _user_id: string }
+        Returns: Json
+      }
       get_obligations_echeancier: {
         Args: {
           _client_id?: string
@@ -4877,6 +4881,10 @@ export type Database = {
       }
       purge_old_activity_data: { Args: never; Returns: undefined }
       purge_old_attendance: { Args: never; Returns: undefined }
+      remove_mission_member: {
+        Args: { _mission_id: string; _reason: string; _user_id: string }
+        Returns: Json
+      }
       seed_obligation_types: { Args: { _org_id: string }; Returns: undefined }
       seed_platform_owner: { Args: { _email: string }; Returns: string }
       super_admin_change_plan: {
