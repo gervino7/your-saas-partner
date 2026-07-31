@@ -182,9 +182,11 @@ export function useUpsertFiscalProfile() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (values: Record<string, unknown> & { client_id: string }) => {
+      // organization_id is filled by a database trigger — never send it.
+      const { organization_id, created_at, updated_at, ...payload } = values as Record<string, unknown>;
       const { data, error } = await supabase
         .from('client_fiscal_profile')
-        .upsert(values, { onConflict: 'client_id' })
+        .upsert(payload as never, { onConflict: 'client_id' })
         .select()
         .single();
       if (error) throw error;
@@ -288,10 +290,8 @@ export function useToggleClientObligation() {
       responsible_id?: string | null;
       custom_deadline_day?: number | null;
     }) => {
-      const payload = {
-        ...values,
-        organization_id: profile!.organization_id,
-      };
+      // organization_id is filled by a database trigger — never send it.
+      const payload = { ...values };
       const { data, error } = await supabase
         .from('client_obligations')
         .upsert(payload, { onConflict: 'client_id,obligation_type_id' })

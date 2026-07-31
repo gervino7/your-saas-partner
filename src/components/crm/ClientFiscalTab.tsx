@@ -15,13 +15,13 @@ import {
   useOrgCollaborators,
 } from '@/hooks/useObligations';
 import { useEcheancier } from '@/hooks/useObligations';
-import { REGIMES, PERIODICITE_LABELS } from '@/lib/obligations';
+import { REGIMES, PERIODICITE_LABELS, TAXPAYER_CATEGORIES } from '@/lib/obligations';
 import { useAuthStore } from '@/stores/authStore';
 import { format, addDays } from 'date-fns';
 import EcheancierTable from './EcheancierTable';
 
 const FORME_JURIDIQUE = ['SA', 'SARL', 'SAS', 'SASU', 'EI', 'SCI', 'Association', 'Autre'];
-const CATEGORIE = ['DGE', 'CME', 'CDI', 'Autre'];
+
 const TVA_PERIOD = [
   { value: 'mensuelle', label: 'Mensuelle' },
   { value: 'trimestrielle', label: 'Trimestrielle' },
@@ -54,10 +54,23 @@ const ClientFiscalTab = ({ clientId }: Props) => {
 
   const submit = form.handleSubmit((v) => {
     upsertFp.mutate({
-      ...v,
+      id: fp?.id,
       client_id: clientId,
-      exercice_debut: v.exercice_debut ? Number(v.exercice_debut) : 1,
-      exercice_fin: v.exercice_fin ? Number(v.exercice_fin) : 12,
+      numero_contribuable: v.numero_contribuable || null,
+      registre_commerce: v.registre_commerce || null,
+      forme_juridique: v.forme_juridique || null,
+      regime_fiscal: v.regime_fiscal || null,
+      centre_impots: v.centre_impots || null,
+      taxpayer_category: v.taxpayer_category || null,
+      assujetti_tva: !!v.assujetti_tva,
+      tva_periodicite: v.assujetti_tva ? (v.tva_periodicite || null) : 'aucune',
+      exercice_start_month: v.exercice_start_month ? Number(v.exercice_start_month) : 1,
+      exercice_end_month: v.exercice_end_month ? Number(v.exercice_end_month) : 12,
+      date_cloture: v.date_cloture || null,
+      collaborateur_id: v.collaborateur_id || null,
+      date_entree_portefeuille: v.date_entree_portefeuille || null,
+      is_active: v.is_active !== false,
+      notes: v.notes || null,
     });
   });
 
@@ -72,11 +85,11 @@ const ClientFiscalTab = ({ clientId }: Props) => {
           <form onSubmit={submit} className="grid gap-4 md:grid-cols-2">
             <div>
               <Label>Numéro contribuable (NCC)</Label>
-              <Input {...form.register('ncc')} disabled={!isResponsable} />
+              <Input {...form.register('numero_contribuable')} disabled={!isResponsable} />
             </div>
             <div>
               <Label>Registre de commerce (RCCM)</Label>
-              <Input {...form.register('rccm')} disabled={!isResponsable} />
+              <Input {...form.register('registre_commerce')} disabled={!isResponsable} />
             </div>
             <div>
               <Label>Forme juridique</Label>
@@ -103,10 +116,10 @@ const ClientFiscalTab = ({ clientId }: Props) => {
             </div>
             <div>
               <Label>Catégorie contribuable</Label>
-              <Select value={values.categorie_contribuable ?? ''} onValueChange={(v) => form.setValue('categorie_contribuable', v)} disabled={!isResponsable}>
+              <Select value={values.taxpayer_category ?? ''} onValueChange={(v) => form.setValue('taxpayer_category', v)} disabled={!isResponsable}>
                 <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
                 <SelectContent>
-                  {CATEGORIE.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  {TAXPAYER_CATEGORIES.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -131,7 +144,7 @@ const ClientFiscalTab = ({ clientId }: Props) => {
             )}
             <div>
               <Label>Exercice — début (mois)</Label>
-              <Select value={String(values.exercice_debut ?? 1)} onValueChange={(v) => form.setValue('exercice_debut', Number(v))} disabled={!isResponsable}>
+              <Select value={String(values.exercice_start_month ?? 1)} onValueChange={(v) => form.setValue('exercice_start_month', Number(v))} disabled={!isResponsable}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => <SelectItem key={m} value={String(m)}>{m}</SelectItem>)}
@@ -140,7 +153,7 @@ const ClientFiscalTab = ({ clientId }: Props) => {
             </div>
             <div>
               <Label>Exercice — fin (mois)</Label>
-              <Select value={String(values.exercice_fin ?? 12)} onValueChange={(v) => form.setValue('exercice_fin', Number(v))} disabled={!isResponsable}>
+              <Select value={String(values.exercice_end_month ?? 12)} onValueChange={(v) => form.setValue('exercice_end_month', Number(v))} disabled={!isResponsable}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => <SelectItem key={m} value={String(m)}>{m}</SelectItem>)}
@@ -166,8 +179,8 @@ const ClientFiscalTab = ({ clientId }: Props) => {
             </div>
             <div className="flex items-center gap-3 pt-6">
               <Switch
-                checked={values.actif !== false}
-                onCheckedChange={(v) => form.setValue('actif', v)}
+                checked={values.is_active !== false}
+                onCheckedChange={(v) => form.setValue('is_active', v)}
                 disabled={!isResponsable}
               />
               <Label>Dossier actif</Label>

@@ -44,21 +44,30 @@ export function nextStatus(current: string): ObligationStatus | null {
 export const PERIODICITE_LABELS: Record<string, string> = {
   mensuelle: 'Mensuelle',
   trimestrielle: 'Trimestrielle',
+  semestrielle: 'Semestrielle',
   annuelle: 'Annuelle',
+  ponctuelle: 'Ponctuelle',
 };
 
 export const CATEGORY_LABELS: Record<string, string> = {
   fiscal: 'Fiscal',
   social: 'Social',
   comptable: 'Comptable',
-  autre: 'Autre',
+  juridique: 'Juridique',
 };
 
 export const REGIMES = [
   { value: 'reel_normal', label: 'Réel normal' },
   { value: 'reel_simplifie', label: 'Réel simplifié' },
-  { value: 'micro', label: 'Micro-entreprise' },
+  { value: 'micro_entreprise', label: 'Micro-entreprise' },
   { value: 'exonere', label: 'Exonéré' },
+  { value: 'autre', label: 'Autre' },
+];
+
+export const TAXPAYER_CATEGORIES = [
+  { value: 'DGE', label: 'DGE' },
+  { value: 'CME', label: 'CME' },
+  { value: 'CDI', label: 'CDI' },
   { value: 'autre', label: 'Autre' },
 ];
 
