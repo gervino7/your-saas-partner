@@ -108,6 +108,10 @@ const EcheancierPage = () => {
     direction: sortDir,
   });
 
+  const { data: docCounts } = usePeriodDocCounts(sorted.map((r) => r.id));
+
+
+
   // keep sort state mirrored into the URL
   useEffect(() => {
     if (sort.key === sortKey && sort.direction === sortDir) return;
