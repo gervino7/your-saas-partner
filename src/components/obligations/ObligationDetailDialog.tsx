@@ -14,6 +14,9 @@ import { OBLIGATION_STATUS, STATUS_FLOW, statusBadgeClasses, statusLabel } from 
 import { useAuthStore } from '@/stores/authStore';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import DocumentChecklist from '@/components/obligations/DocumentChecklist';
+import { usePeriodDocuments } from '@/hooks/useObligationDocs';
 import { cn } from '@/lib/utils';
 
 interface Props {
