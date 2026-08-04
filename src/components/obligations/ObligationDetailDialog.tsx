@@ -14,6 +14,9 @@ import { OBLIGATION_STATUS, STATUS_FLOW, statusBadgeClasses, statusLabel } from 
 import { useAuthStore } from '@/stores/authStore';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import DocumentChecklist from '@/components/obligations/DocumentChecklist';
+import { usePeriodDocuments } from '@/hooks/useObligationDocs';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -29,6 +32,10 @@ const ObligationDetailDialog = ({ row, open, onOpenChange, onRelance }: Props) =
   const update = useUpdateObligation();
   const { data: collabs = [] } = useOrgCollaborators();
   const { data: interactions = [] } = useObligationInteractions(row.id);
+  const { data: docsData } = usePeriodDocuments(row.id);
+  const docProgress = docsData?.progress;
+  const piecesComplete = !docProgress || docProgress.total_required === 0
+    || docProgress.received_required >= docProgress.total_required;
 
   const { data: fullRow } = useQuery({
     queryKey: ['obligation-period', row.id],
@@ -93,20 +100,34 @@ const ObligationDetailDialog = ({ row, open, onOpenChange, onRelance }: Props) =
           <div>
             <Label className="text-xs uppercase tracking-wide text-muted-foreground">Avancement</Label>
             <div className="flex flex-wrap gap-1.5 mt-2">
-              {STATUS_FLOW.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setStatus(s)}
-                  className={cn(
-                    'px-3 py-1.5 rounded-md text-xs border transition',
-                    status === s
-                      ? statusBadgeClasses(s) + ' ring-2 ring-primary/40'
-                      : 'bg-background border-border hover:bg-muted'
-                  )}
-                >
-                  {OBLIGATION_STATUS[s].label}
-                </button>
-              ))}
+              {STATUS_FLOW.map((s) => {
+                const blocked = s === 'pieces_recues' && !piecesComplete;
+                const btn = (
+                  <button
+                    key={s}
+                    disabled={blocked}
+                    onClick={() => setStatus(s)}
+                    className={cn(
+                      'px-3 py-1.5 rounded-md text-xs border transition',
+                      blocked && 'opacity-40 cursor-not-allowed',
+                      status === s
+                        ? statusBadgeClasses(s) + ' ring-2 ring-primary/40'
+                        : 'bg-background border-border hover:bg-muted'
+                    )}
+                  >
+                    {OBLIGATION_STATUS[s].label}
+                  </button>
+                );
+                if (!blocked) return btn;
+                return (
+                  <TooltipProvider key={s}>
+                    <Tooltip>
+                      <TooltipTrigger asChild><span>{btn}</span></TooltipTrigger>
+                      <TooltipContent>Toutes les pièces requises doivent être reçues.</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                );
+              })}
               <button
                 onClick={() => setStatus('na')}
                 className={cn(
@@ -118,6 +139,10 @@ const ObligationDetailDialog = ({ row, open, onOpenChange, onRelance }: Props) =
               </button>
             </div>
           </div>
+
+          {/* Checklist des pièces */}
+          <DocumentChecklist periodId={row.id} />
+
 
           {/* Assignation */}
           <div>

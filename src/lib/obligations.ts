@@ -15,6 +15,23 @@ export const STATUS_FLOW: ObligationStatus[] = [
   'a_faire', 'pieces_attendues', 'pieces_recues', 'saisie', 'revision', 'pret', 'depose',
 ];
 
+export const DOC_STATUS = {
+  attendue:        { label: 'Attendue',            color: 'slate'  },
+  deposee:         { label: 'Déposée — à valider', color: 'amber'  },
+  recue:           { label: 'Reçue',               color: 'green'  },
+  non_applicable:  { label: 'Non applicable',      color: 'gray'   },
+  rejetee:         { label: 'Rejetée',             color: 'red'    },
+} as const;
+
+export type DocStatus = keyof typeof DOC_STATUS;
+
+export const DOC_SOURCE_LABELS: Record<string, string> = {
+  portail: 'Portail',
+  email: 'Email',
+  physique: 'Physique',
+  autre: 'Autre',
+};
+
 const CLASS_MAP: Record<string, string> = {
   slate: 'bg-slate-100 text-slate-700 border-slate-200',
   amber: 'bg-amber-100 text-amber-800 border-amber-200',
@@ -24,6 +41,7 @@ const CLASS_MAP: Record<string, string> = {
   emerald: 'bg-emerald-100 text-emerald-800 border-emerald-200',
   green: 'bg-green-100 text-green-800 border-green-200',
   gray: 'bg-gray-100 text-gray-700 border-gray-200',
+  red: 'bg-red-100 text-red-800 border-red-200',
 };
 
 export function statusBadgeClasses(status: string): string {
@@ -33,6 +51,15 @@ export function statusBadgeClasses(status: string): string {
 
 export function statusLabel(status: string): string {
   return OBLIGATION_STATUS[status as ObligationStatus]?.label ?? status;
+}
+
+export function docStatusBadgeClasses(status: string): string {
+  const s = DOC_STATUS[status as DocStatus];
+  return CLASS_MAP[s?.color ?? 'gray'] ?? CLASS_MAP.gray;
+}
+
+export function docStatusLabel(status: string): string {
+  return DOC_STATUS[status as DocStatus]?.label ?? status;
 }
 
 export function nextStatus(current: string): ObligationStatus | null {

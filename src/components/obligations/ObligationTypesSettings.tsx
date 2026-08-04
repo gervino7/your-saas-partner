@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useObligationTypes, useUpsertObligationType, useSeedObligationTypes, useGeneratePeriods } from '@/hooks/useObligations';
+import DocumentTypesSection from '@/components/obligations/DocumentTypesSection';
 import { PERIODICITE_LABELS, CATEGORY_LABELS, REGIMES, formatDeadline } from '@/lib/obligations';
 
 const emptyType = {
@@ -224,6 +225,7 @@ const ObligationTypesSettings = () => {
                 <Label>Description</Label>
                 <Textarea rows={2} value={editing.description ?? ''} onChange={(e) => setEditing({ ...editing, description: e.target.value })} />
               </div>
+              {editing.id && <DocumentTypesSection obligationTypeId={editing.id} />}
               <div className="flex items-center gap-3">
                 <Switch checked={editing.is_active !== false} onCheckedChange={(v) => setEditing({ ...editing, is_active: v })} />
                 <Label>Actif</Label>

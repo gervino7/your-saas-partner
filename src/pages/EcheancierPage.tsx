@@ -22,6 +22,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { OBLIGATION_STATUS, statusBadgeClasses, statusLabel, nextStatus } from '@/lib/obligations';
 import { useUpdateObligation } from '@/hooks/useObligations';
 import { useTableSort } from '@/hooks/useTableSort';
+import { usePeriodDocCounts } from '@/hooks/useObligationDocs';
 import ObligationDetailDialog from '@/components/obligations/ObligationDetailDialog';
 import RelanceDialog from '@/components/obligations/RelanceDialog';
 import EmptyState from '@/components/common/EmptyState';
@@ -106,6 +107,10 @@ const EcheancierPage = () => {
     key: sortKey,
     direction: sortDir,
   });
+
+  const { data: docCounts } = usePeriodDocCounts(sorted.map((r) => r.id));
+
+
 
   // keep sort state mirrored into the URL
   useEffect(() => {
@@ -378,6 +383,7 @@ const EcheancierPage = () => {
                   <SortHead label="Échéance" sortKey="due_date" />
                   <SortHead label="J‑X" sortKey="days_left" />
                   <SortHead label="Statut" sortKey="status" />
+                  <TableHead>Pièces</TableHead>
                   <TableHead>Assigné</TableHead>
                   <SortHead label="Dernière relance" sortKey="last_reminder_at" />
                   <TableHead className="text-right">Actions</TableHead>
@@ -419,6 +425,30 @@ const EcheancierPage = () => {
                       <TableCell>{jxBadge}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className={statusBadgeClasses(r.status)}>{statusLabel(r.status)}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        {(() => {
+                          const c = docCounts?.[r.id];
+                          if (!c || c.total === 0) return <span className="text-xs text-muted-foreground">—</span>;
+                          const done = c.received >= c.total;
+                          return (
+                            <div className="flex items-center gap-1.5">
+                              <span className={cn(
+                                'px-2 py-0.5 rounded-full text-[11px] border',
+                                done
+                                  ? 'bg-green-100 text-green-800 border-green-200'
+                                  : c.received === 0
+                                    ? 'bg-red-100 text-red-800 border-red-200'
+                                    : 'bg-amber-100 text-amber-800 border-amber-200',
+                              )}>
+                                {c.received}/{c.total} pièces
+                              </span>
+                              {c.pending_validation > 0 && (
+                                <span className="h-2 w-2 rounded-full bg-amber-500" title="Dépôts à valider" />
+                              )}
+                            </div>
+                          );
+                        })()}
                       </TableCell>
                       <TableCell className="text-sm">{r.assigned_name ?? '—'}</TableCell>
                       <TableCell className="text-sm">

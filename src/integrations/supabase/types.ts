@@ -2571,6 +2571,163 @@ export type Database = {
           },
         ]
       }
+      obligation_document_types: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_required: boolean | null
+          label: string
+          obligation_type_id: string
+          organization_id: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_required?: boolean | null
+          label: string
+          obligation_type_id: string
+          organization_id?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_required?: boolean | null
+          label?: string
+          obligation_type_id?: string
+          organization_id?: string | null
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "obligation_document_types_obligation_type_id_fkey"
+            columns: ["obligation_type_id"]
+            isOneToOne: false
+            referencedRelation: "obligation_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "obligation_document_types_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      obligation_documents: {
+        Row: {
+          created_at: string | null
+          deposited_at: string | null
+          deposited_by_contact: string | null
+          document_id: string | null
+          document_type_id: string | null
+          file_name: string | null
+          file_path: string | null
+          id: string
+          is_required: boolean | null
+          label: string
+          notes: string | null
+          obligation_period_id: string
+          organization_id: string | null
+          reject_reason: string | null
+          source: string | null
+          status: string
+          updated_at: string | null
+          validated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          deposited_at?: string | null
+          deposited_by_contact?: string | null
+          document_id?: string | null
+          document_type_id?: string | null
+          file_name?: string | null
+          file_path?: string | null
+          id?: string
+          is_required?: boolean | null
+          label: string
+          notes?: string | null
+          obligation_period_id: string
+          organization_id?: string | null
+          reject_reason?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string | null
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          deposited_at?: string | null
+          deposited_by_contact?: string | null
+          document_id?: string | null
+          document_type_id?: string | null
+          file_name?: string | null
+          file_path?: string | null
+          id?: string
+          is_required?: boolean | null
+          label?: string
+          notes?: string | null
+          obligation_period_id?: string
+          organization_id?: string | null
+          reject_reason?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string | null
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "obligation_documents_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "obligation_documents_document_type_id_fkey"
+            columns: ["document_type_id"]
+            isOneToOne: false
+            referencedRelation: "obligation_document_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "obligation_documents_obligation_period_id_fkey"
+            columns: ["obligation_period_id"]
+            isOneToOne: false
+            referencedRelation: "obligation_periods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "obligation_documents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "obligation_documents_validated_by_fkey"
+            columns: ["validated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "obligation_documents_validated_by_fkey"
+            columns: ["validated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       obligation_periods: {
         Row: {
           assigned_to: string | null
@@ -4693,6 +4850,10 @@ export type Database = {
           created_count: number
         }[]
       }
+      generate_period_documents: {
+        Args: { _period_id: string }
+        Returns: number
+      }
       get_activity_detail: {
         Args: { _end_date?: string; _start_date?: string; _target_user: string }
         Returns: {
@@ -4815,6 +4976,7 @@ export type Database = {
           weekly_hours: number
         }[]
       }
+      get_period_documents: { Args: { _period_id: string }; Returns: Json }
       get_plan_execution: {
         Args: { _end_date?: string; _start_date?: string; _user_id?: string }
         Returns: {
@@ -4884,6 +5046,10 @@ export type Database = {
       remove_mission_member: {
         Args: { _mission_id: string; _reason: string; _user_id: string }
         Returns: Json
+      }
+      seed_obligation_documents: {
+        Args: { _org_id: string }
+        Returns: undefined
       }
       seed_obligation_types: { Args: { _org_id: string }; Returns: undefined }
       seed_platform_owner: { Args: { _email: string }; Returns: string }
