@@ -32,6 +32,10 @@ const ObligationDetailDialog = ({ row, open, onOpenChange, onRelance }: Props) =
   const update = useUpdateObligation();
   const { data: collabs = [] } = useOrgCollaborators();
   const { data: interactions = [] } = useObligationInteractions(row.id);
+  const { data: docsData } = usePeriodDocuments(row.id);
+  const docProgress = docsData?.progress;
+  const piecesComplete = !docProgress || docProgress.total_required === 0
+    || docProgress.received_required >= docProgress.total_required;
 
   const { data: fullRow } = useQuery({
     queryKey: ['obligation-period', row.id],
