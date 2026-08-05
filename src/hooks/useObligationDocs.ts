@@ -29,9 +29,11 @@ export function usePeriodDocuments(periodId: string | undefined) {
     queryKey: ['period-documents', periodId],
     enabled: !!periodId,
     queryFn: async () => {
+      console.log('[Pieces] RPC get_period_documents ->', periodId);
       const { data, error } = await supabase.rpc('get_period_documents', {
         _period_id: periodId!,
       });
+      console.log('[Pieces] RPC raw response:', { data, error });
       if (error) throw error;
       const payload = (data ?? {}) as {
         documents?: PeriodDocument[];
