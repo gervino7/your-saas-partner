@@ -163,7 +163,7 @@ interface Props { periodId: string }
 
 const DocumentChecklist = ({ periodId }: Props) => {
   const profile = useAuthStore((s) => s.profile);
-  const { data, isLoading } = usePeriodDocuments(periodId);
+  const { data, isLoading, refetch } = usePeriodDocuments(periodId);
   const generate = useGenerateChecklist();
   const update = useUpdateDocument();
   const addManual = useAddManualDocument();
