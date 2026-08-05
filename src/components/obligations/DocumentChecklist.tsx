@@ -183,18 +183,28 @@ const DocumentChecklist = ({ periodId }: Props) => {
   }, [periodId, docs.length, isLoading]);
 
   useEffect(() => {
-    if (!isLoading && data && docs.length === 0 && generatedFor.current !== periodId && !generate.isPending) {
-      generatedFor.current = periodId;
-      console.log('[Pieces] generating checklist for period', periodId);
-      generate.mutate(periodId, {
-        onSuccess: async (count) => {
-          console.log('[Pieces] generate_period_documents created', count, 'rows');
-          const res = await refetch();
-          console.log('[Pieces] after refetch docs:', res.data?.documents.length ?? 0);
-        },
-      });
-    }
-  }, [isLoading, data, docs.length, periodId, generate, refetch]);
+    if (isLoading || !data) return;
+    if (generatedFor.current === periodId) return;
+    generatedFor.current = periodId;
+
+    const documents = docs;
+    console.log('[Pieces] periodId:', periodId, 'existing docs:', documents.length, '→ generating:', documents.length === 0);
+    if (documents.length > 0) return;
+
+    generate.mutate(periodId, {
+      onSuccess: async (count) => {
+        console.log('[Pieces] generate_period_documents created', count, 'rows');
+        const res = await refetch();
+        console.log('[Pieces] after refetch docs:', res.data?.documents.length ?? 0);
+      },
+      onError: (e) => {
+        console.error('[Pieces] generate_period_documents failed:', e);
+        generatedFor.current = null;
+      },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, data, periodId]);
+
 
   const pct = progress.total_required > 0
     ? Math.round((progress.received_required / progress.total_required) * 100)
