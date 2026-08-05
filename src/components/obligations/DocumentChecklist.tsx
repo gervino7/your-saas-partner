@@ -179,11 +179,22 @@ const DocumentChecklist = ({ periodId }: Props) => {
   const progress = data?.progress ?? { total_required: 0, received_required: 0, pending_validation: 0 };
 
   useEffect(() => {
+    console.log('[Pieces] period:', periodId, 'docs:', docs.length, 'loading:', isLoading);
+  }, [periodId, docs.length, isLoading]);
+
+  useEffect(() => {
     if (!isLoading && data && docs.length === 0 && generatedFor.current !== periodId && !generate.isPending) {
       generatedFor.current = periodId;
-      generate.mutate(periodId);
+      console.log('[Pieces] generating checklist for period', periodId);
+      generate.mutate(periodId, {
+        onSuccess: async (count) => {
+          console.log('[Pieces] generate_period_documents created', count, 'rows');
+          const res = await refetch();
+          console.log('[Pieces] after refetch docs:', res.data?.documents.length ?? 0);
+        },
+      });
     }
-  }, [isLoading, data, docs.length, periodId, generate]);
+  }, [isLoading, data, docs.length, periodId, generate, refetch]);
 
   const pct = progress.total_required > 0
     ? Math.round((progress.received_required / progress.total_required) * 100)
