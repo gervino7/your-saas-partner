@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.3';
-import { buildEmailHtml, sendResend } from '../_shared/email-template.ts';
+import { buildEmailHtml, EMAIL_FROM } from '../_shared/email-template.ts';
 
 const APP_URL = Deno.env.get('APP_URL') || 'https://mamission.abodje.com';
 
@@ -50,6 +50,8 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'client_id et email sont requis' }), { status: 400, headers });
     }
 
+    console.log('[invite] creating invitation for', email, 'client', client_id);
+
     const { data, error } = await supabase.rpc('create_portal_invitation', {
       _client_id: client_id,
       _email: String(email).trim().toLowerCase(),
@@ -82,15 +84,38 @@ Deno.serve(async (req) => {
       footerNote: "Ce lien expire dans 7 jours. Si vous n'attendiez pas cet email, vous pouvez l'ignorer.",
     });
 
-    const result = await sendResend({
-      to: invitation.email,
-      subject: `Accès à votre espace client — ${invitation.client_name}`,
-      html,
+    const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
+    if (!RESEND_API_KEY) {
+      console.error('[invite] RESEND_API_KEY manquante — email non envoyé');
+      return new Response(
+        JSON.stringify({ error: "Le service d'envoi d'emails n'est pas configuré (RESEND_API_KEY manquante)." }),
+        { status: 500, headers },
+      );
+    }
+
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${RESEND_API_KEY}` },
+      body: JSON.stringify({
+        from: EMAIL_FROM,
+        to: [invitation.email],
+        subject: `Accès à votre espace client — ${invitation.client_name}`,
+        html,
+      }),
     });
 
-    if (!result.ok) {
-      console.error('resend error:', result.error);
-      return new Response(JSON.stringify({ error: "L'invitation a été créée mais l'email n'a pas pu être envoyé." }), { status: 500, headers });
+    const resendBody = await res.text();
+    console.log('[invite] resend status', res.status, resendBody);
+
+    if (!res.ok) {
+      return new Response(
+        JSON.stringify({
+          error: "L'invitation a été créée mais l'email n'a pas pu être envoyé.",
+          status: res.status,
+          details: resendBody,
+        }),
+        { status: 502, headers },
+      );
     }
 
     return new Response(JSON.stringify({ success: true }), { headers });
