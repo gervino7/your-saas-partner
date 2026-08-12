@@ -20,6 +20,8 @@ const ClientDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: client, isLoading } = useClient(id);
+  const gradeLevel = useAuthStore((s) => s.profile?.grade_level) ?? 8;
+  const canManagePortalAccess = gradeLevel <= 3;
 
   if (isLoading) return <Loading />;
   if (!client) return <EmptyState icon={Building2} title="Client introuvable" description="Ce client n'existe pas." />;
