@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.3';
-import { buildEmailHtml, sendResend } from '../_shared/email-template.ts';
+import { buildEmailHtml, EMAIL_FROM } from '../_shared/email-template.ts';
 
 const APP_URL = Deno.env.get('APP_URL') || 'https://mamission.abodje.com';
 
