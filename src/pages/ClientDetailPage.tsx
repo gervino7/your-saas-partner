@@ -46,6 +46,7 @@ const ClientDetailPage = () => {
           <TabsTrigger value="fiscal">Dossier comptable</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="portal">Portail</TabsTrigger>
+          {canManagePortalAccess && <TabsTrigger value="portal-access">Accès espace client</TabsTrigger>}
           <TabsTrigger value="satisfaction">Satisfaction</TabsTrigger>
           <TabsTrigger value="history">Historique</TabsTrigger>
         </TabsList>
@@ -55,6 +56,12 @@ const ClientDetailPage = () => {
         <TabsContent value="fiscal" className="mt-4"><ClientFiscalTab clientId={client.id} /></TabsContent>
         <TabsContent value="documents" className="mt-4"><ClientDocumentsTab clientId={client.id} /></TabsContent>
         <TabsContent value="portal" className="mt-4"><ClientPortalTab clientId={client.id} /></TabsContent>
+        {canManagePortalAccess && (
+          <TabsContent value="portal-access" className="mt-4">
+            <ClientPortalAccessTab clientId={client.id} defaultEmail={client.contact_email} />
+          </TabsContent>
+        )}
+
         <TabsContent value="satisfaction" className="mt-4"><ClientSatisfactionTab clientId={client.id} /></TabsContent>
         <TabsContent value="history" className="mt-4"><ClientHistoryTab clientId={client.id} /></TabsContent>
       </Tabs>
