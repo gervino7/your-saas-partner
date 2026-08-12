@@ -50,6 +50,8 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'client_id et email sont requis' }), { status: 400, headers });
     }
 
+    console.log('[invite] creating invitation for', email, 'client', client_id);
+
     const { data, error } = await supabase.rpc('create_portal_invitation', {
       _client_id: client_id,
       _email: String(email).trim().toLowerCase(),
