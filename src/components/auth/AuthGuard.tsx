@@ -30,6 +30,18 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         return;
       }
 
+      // Un compte "espace client" ne doit jamais atteindre une route cabinet
+      const { data: isPortal } = await supabase.rpc('is_portal_user');
+      if (cancelled) return;
+      if (isPortal) {
+        const { data: clientId } = await supabase.rpc('current_portal_client');
+        if (cancelled) return;
+        console.log('[AccountType]', { type: 'portal_client', clientId, path: location.pathname });
+        navigate('/espace-client', { replace: true });
+        setLoading(false);
+        return;
+      }
+
       // Always fetch fresh profile from DB (no cache) to get up-to-date organization_id
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
