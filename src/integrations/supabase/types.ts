@@ -3440,6 +3440,228 @@ export type Database = {
           },
         ]
       }
+      portal_access_log: {
+        Row: {
+          action: string
+          client_id: string | null
+          created_at: string | null
+          details: Json | null
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          organization_id: string | null
+          portal_user_id: string | null
+        }
+        Insert: {
+          action: string
+          client_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          organization_id?: string | null
+          portal_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          client_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          organization_id?: string | null
+          portal_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portal_access_log_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_access_log_portal_user_id_fkey"
+            columns: ["portal_user_id"]
+            isOneToOne: false
+            referencedRelation: "portal_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portal_invitations: {
+        Row: {
+          accepted_at: string | null
+          client_id: string
+          created_at: string | null
+          email: string
+          expires_at: string | null
+          full_name: string | null
+          id: string
+          invited_at: string | null
+          invited_by: string | null
+          organization_id: string
+          revoked_at: string | null
+          revoked_by: string | null
+          status: string
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          client_id: string
+          created_at?: string | null
+          email: string
+          expires_at?: string | null
+          full_name?: string | null
+          id?: string
+          invited_at?: string | null
+          invited_by?: string | null
+          organization_id: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          status?: string
+          token?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          client_id?: string
+          created_at?: string | null
+          email?: string
+          expires_at?: string | null
+          full_name?: string | null
+          id?: string
+          invited_at?: string | null
+          invited_by?: string | null
+          organization_id?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          status?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portal_invitations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_invitations_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_invitations_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_invitations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_invitations_revoked_by_fkey"
+            columns: ["revoked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_invitations_revoked_by_fkey"
+            columns: ["revoked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portal_users: {
+        Row: {
+          activated_at: string | null
+          client_id: string
+          created_at: string | null
+          email: string
+          full_name: string | null
+          id: string
+          invited_at: string | null
+          invited_by: string | null
+          is_active: boolean
+          last_seen_at: string | null
+          organization_id: string
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          activated_at?: string | null
+          client_id: string
+          created_at?: string | null
+          email: string
+          full_name?: string | null
+          id: string
+          invited_at?: string | null
+          invited_by?: string | null
+          is_active?: boolean
+          last_seen_at?: string | null
+          organization_id: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          activated_at?: string | null
+          client_id?: string
+          created_at?: string | null
+          email?: string
+          full_name?: string | null
+          id?: string
+          invited_at?: string | null
+          invited_by?: string | null
+          is_active?: boolean
+          last_seen_at?: string | null
+          organization_id?: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portal_users_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_users_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_users_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_users_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -4811,6 +5033,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      create_portal_invitation: {
+        Args: { _client_id: string; _email: string; _full_name?: string }
+        Returns: Json
+      }
       create_project_with_members: {
         Args: {
           _budget_allocated?: number
@@ -4844,6 +5070,8 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      current_portal_client: { Args: never; Returns: string }
+      expire_portal_invitations: { Args: never; Returns: number }
       generate_obligation_periods: {
         Args: { _month?: number; _year: number }
         Returns: {
@@ -4908,6 +5136,7 @@ export type Database = {
           sante: string
         }[]
       }
+      get_client_portal_access: { Args: { _client_id: string }; Returns: Json }
       get_invitation_by_token: {
         Args: { _token: string }
         Returns: {
@@ -5031,6 +5260,7 @@ export type Database = {
       }
       is_org_active: { Args: { _org_id: string }; Returns: boolean }
       is_platform_admin: { Args: { _min_role?: string }; Returns: boolean }
+      is_portal_user: { Args: never; Returns: boolean }
       log_super_admin_action: {
         Args: {
           _action: string
@@ -5041,6 +5271,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      portal_accept_invitation: {
+        Args: { _auth_user_id: string; _token: string }
+        Returns: Json
+      }
+      portal_toggle_access: {
+        Args: { _activate: boolean; _portal_user_id: string; _reason?: string }
+        Returns: Json
+      }
+      portal_validate_invitation: { Args: { _token: string }; Returns: Json }
       purge_old_activity_data: { Args: never; Returns: undefined }
       purge_old_attendance: { Args: never; Returns: undefined }
       remove_mission_member: {
