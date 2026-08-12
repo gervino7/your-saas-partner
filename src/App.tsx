@@ -58,6 +58,9 @@ import StaffingPage from '@/pages/StaffingPage';
 import EcheancierPage from '@/pages/EcheancierPage';
 import DossiersPage from '@/pages/DossiersPage';
 import ServiceWorkerUpdater from '@/components/ServiceWorkerUpdater';
+import PortalGuard from '@/components/portal/PortalGuard';
+import PortalActivationPage from '@/pages/PortalActivationPage';
+import PortalHomePage from '@/pages/PortalHomePage';
 
 const queryClient = new QueryClient();
 
@@ -272,6 +275,8 @@ const App = () => (
               <Route path="/copil-portal/:committeeId" element={<CopilPortalPage />} />
               <Route path="/survey/:token" element={<SatisfactionSurveyPage />} />
               <Route path="/org/:slug" element={<OrgRedirectPage />} />
+              <Route path="/espace-client/activation" element={<PortalActivationPage />} />
+              <Route path="/espace-client" element={<PortalGuard><PortalHomePage /></PortalGuard>} />
               <Route path="/onboarding" element={<AuthGuard><OnboardingPage /></AuthGuard>} />
               <Route path="/compte-suspendu" element={<AuthGuard><CompteSuspenduPage /></AuthGuard>} />
 

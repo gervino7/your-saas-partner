@@ -242,6 +242,13 @@ const LoginPage = () => {
         }
         setLoginAttempts(0);
 
+        const { data: isPortal } = await supabase.rpc('is_portal_user');
+        if (isPortal) {
+          console.log('[AccountType]', { type: 'portal_client', path: '/espace-client' });
+          navigate('/espace-client', { replace: true });
+          return;
+        }
+
         const { data: { user } } = await supabase.auth.getUser();
         const { data: profile } = user
           ? await supabase
