@@ -3491,6 +3491,148 @@ export type Database = {
           },
         ]
       }
+      portal_documents: {
+        Row: {
+          category: string | null
+          client_id: string
+          created_at: string | null
+          description: string | null
+          direction: string
+          download_count: number | null
+          file_name: string
+          file_path: string
+          file_size: number | null
+          first_downloaded_at: string | null
+          id: string
+          is_available: boolean
+          mime_type: string | null
+          obligation_document_id: string | null
+          obligation_period_id: string | null
+          organization_id: string
+          title: string
+          updated_at: string | null
+          uploaded_at: string | null
+          uploaded_by_client: string | null
+          uploaded_by_staff: string | null
+          withdrawn_at: string | null
+          withdrawn_by: string | null
+        }
+        Insert: {
+          category?: string | null
+          client_id: string
+          created_at?: string | null
+          description?: string | null
+          direction: string
+          download_count?: number | null
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          first_downloaded_at?: string | null
+          id?: string
+          is_available?: boolean
+          mime_type?: string | null
+          obligation_document_id?: string | null
+          obligation_period_id?: string | null
+          organization_id: string
+          title: string
+          updated_at?: string | null
+          uploaded_at?: string | null
+          uploaded_by_client?: string | null
+          uploaded_by_staff?: string | null
+          withdrawn_at?: string | null
+          withdrawn_by?: string | null
+        }
+        Update: {
+          category?: string | null
+          client_id?: string
+          created_at?: string | null
+          description?: string | null
+          direction?: string
+          download_count?: number | null
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          first_downloaded_at?: string | null
+          id?: string
+          is_available?: boolean
+          mime_type?: string | null
+          obligation_document_id?: string | null
+          obligation_period_id?: string | null
+          organization_id?: string
+          title?: string
+          updated_at?: string | null
+          uploaded_at?: string | null
+          uploaded_by_client?: string | null
+          uploaded_by_staff?: string | null
+          withdrawn_at?: string | null
+          withdrawn_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portal_documents_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_documents_obligation_document_id_fkey"
+            columns: ["obligation_document_id"]
+            isOneToOne: false
+            referencedRelation: "obligation_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_documents_obligation_period_id_fkey"
+            columns: ["obligation_period_id"]
+            isOneToOne: false
+            referencedRelation: "obligation_periods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_documents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_documents_uploaded_by_client_fkey"
+            columns: ["uploaded_by_client"]
+            isOneToOne: false
+            referencedRelation: "portal_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_documents_uploaded_by_staff_fkey"
+            columns: ["uploaded_by_staff"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_documents_uploaded_by_staff_fkey"
+            columns: ["uploaded_by_staff"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_documents_withdrawn_by_fkey"
+            columns: ["withdrawn_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_documents_withdrawn_by_fkey"
+            columns: ["withdrawn_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       portal_invitations: {
         Row: {
           accepted_at: string | null
@@ -5137,6 +5279,10 @@ export type Database = {
         }[]
       }
       get_client_portal_access: { Args: { _client_id: string }; Returns: Json }
+      get_client_shared_documents: {
+        Args: { _client_id: string }
+        Returns: Json
+      }
       get_invitation_by_token: {
         Args: { _token: string }
         Returns: {
@@ -5275,11 +5421,17 @@ export type Database = {
         Args: { _auth_user_id: string; _token: string }
         Returns: Json
       }
+      portal_mark_downloaded: { Args: { _document_id: string }; Returns: Json }
+      portal_my_documents: { Args: never; Returns: Json }
       portal_toggle_access: {
         Args: { _activate: boolean; _portal_user_id: string; _reason?: string }
         Returns: Json
       }
       portal_validate_invitation: { Args: { _token: string }; Returns: Json }
+      portal_withdraw_document: {
+        Args: { _document_id: string; _restore?: boolean }
+        Returns: Json
+      }
       purge_old_activity_data: { Args: never; Returns: undefined }
       purge_old_attendance: { Args: never; Returns: undefined }
       remove_mission_member: {
