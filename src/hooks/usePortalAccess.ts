@@ -50,8 +50,22 @@ export function useInvitePortalContact(clientId: string) {
       const { data, error } = await supabase.functions.invoke('send-portal-invitation', {
         body: { client_id: clientId, email, full_name: fullName || null },
       });
+      if (error) {
+        let details = error.message;
+        const ctx = (error as { context?: Response }).context;
+        if (ctx && typeof ctx.text === 'function') {
+          const raw = await ctx.text();
+          try {
+            details = (JSON.parse(raw) as { error?: string }).error ?? raw;
+          } catch {
+            details = raw || details;
+          }
+        }
+        console.error('send-portal-invitation failed:', details);
+        throw new Error(details || "L'invitation n'a pas pu être envoyée.");
+      }
       const payload = data as { success?: boolean; error?: string } | null;
-      if (error || !payload?.success) {
+      if (!payload?.success) {
         throw new Error(payload?.error ?? "L'invitation n'a pas pu être envoyée.");
       }
       return payload;
