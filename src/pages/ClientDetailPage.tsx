@@ -13,6 +13,7 @@ import ClientSatisfactionTab from '@/components/crm/ClientSatisfactionTab';
 import ClientHistoryTab from '@/components/crm/ClientHistoryTab';
 import ClientPortalTab from '@/components/crm/ClientPortalTab';
 import ClientPortalAccessTab from '@/components/crm/ClientPortalAccessTab';
+import ClientSharedDocsTab from '@/components/crm/ClientSharedDocsTab';
 import ClientFiscalTab from '@/components/crm/ClientFiscalTab';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -46,6 +47,7 @@ const ClientDetailPage = () => {
           <TabsTrigger value="fiscal">Dossier comptable</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="portal">Portail</TabsTrigger>
+          <TabsTrigger value="shared-docs">Documents partagés</TabsTrigger>
           {canManagePortalAccess && <TabsTrigger value="portal-access">Accès espace client</TabsTrigger>}
           <TabsTrigger value="satisfaction">Satisfaction</TabsTrigger>
           <TabsTrigger value="history">Historique</TabsTrigger>
@@ -56,6 +58,7 @@ const ClientDetailPage = () => {
         <TabsContent value="fiscal" className="mt-4"><ClientFiscalTab clientId={client.id} /></TabsContent>
         <TabsContent value="documents" className="mt-4"><ClientDocumentsTab clientId={client.id} /></TabsContent>
         <TabsContent value="portal" className="mt-4"><ClientPortalTab clientId={client.id} /></TabsContent>
+        <TabsContent value="shared-docs" className="mt-4"><ClientSharedDocsTab clientId={client.id} /></TabsContent>
         {canManagePortalAccess && (
           <TabsContent value="portal-access" className="mt-4">
             <ClientPortalAccessTab clientId={client.id} defaultEmail={client.contact_email} />

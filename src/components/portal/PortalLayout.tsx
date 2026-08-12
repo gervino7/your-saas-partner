@@ -29,12 +29,20 @@ export default function PortalLayout({ clientName, children }: PortalLayoutProps
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {clientName && <span className="hidden text-sm font-medium sm:inline">{clientName}</span>}
+            <nav className="hidden items-center gap-1 sm:flex">
+              <Button variant="ghost" size="sm" onClick={() => navigate('/espace-client')}>Accueil</Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/espace-client/documents')}>Mes documents</Button>
+            </nav>
+            {clientName && <span className="hidden text-sm font-medium md:inline">{clientName}</span>}
             <Button variant="outline" size="sm" onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" /> Se déconnecter
             </Button>
           </div>
         </div>
+        <nav className="mx-auto flex max-w-5xl gap-1 px-2 pb-2 sm:hidden">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/espace-client')}>Accueil</Button>
+          <Button variant="ghost" size="sm" onClick={() => navigate('/espace-client/documents')}>Mes documents</Button>
+        </nav>
       </header>
       <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
     </div>

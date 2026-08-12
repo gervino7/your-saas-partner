@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Info, Mail, Plus, RotateCcw, ShieldOff, Send, X, Users } from 'lucide-react';
+import { ChevronDown, ChevronUp, History, Info, Mail, Plus, RotateCcw, ShieldOff, Send, X, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +19,8 @@ import {
   useCancelPortalInvitation,
   type PortalAccount,
 } from '@/hooks/usePortalAccess';
+import { usePortalAccessLog } from '@/hooks/useClientDocuments';
+import { PORTAL_LOG_ACTIONS } from '@/lib/portalDocs';
 
 const fmt = (value: string | null) => (value ? format(new Date(value), 'dd MMM yyyy', { locale: fr }) : '—');
 
@@ -39,6 +41,8 @@ export default function ClientPortalAccessTab({ clientId, defaultEmail }: Props)
 
   const [revokeTarget, setRevokeTarget] = useState<PortalAccount | null>(null);
   const [reason, setReason] = useState('');
+  const [logOpen, setLogOpen] = useState(false);
+  const { data: logs, isLoading: logLoading } = usePortalAccessLog(logOpen ? clientId : undefined);
 
   const handleInvite = async () => {
     await invite.mutateAsync({ email: email.trim(), fullName: fullName.trim() });
@@ -193,6 +197,53 @@ export default function ClientPortalAccessTab({ clientId, defaultEmail }: Props)
             </Table>
           )}
         </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex-row items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <History className="h-5 w-5" /> Journal d'activité
+          </CardTitle>
+          <Button variant="ghost" size="sm" onClick={() => setLogOpen((o) => !o)}>
+            {logOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
+        </CardHeader>
+        {logOpen && (
+          <CardContent>
+            {logLoading ? (
+              <Loading />
+            ) : (logs?.length ?? 0) === 0 ? (
+              <p className="text-sm text-muted-foreground">Aucune activité enregistrée.</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Contact</TableHead>
+                    <TableHead>Action</TableHead>
+                    <TableHead>Détail</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {logs!.map((l) => {
+                    const details = (l.details ?? {}) as Record<string, unknown>;
+                    const detail = (details.title ?? details.reason ?? details.file_name ?? '') as string;
+                    return (
+                      <TableRow key={l.id}>
+                        <TableCell className="whitespace-nowrap">
+                          {format(new Date(l.created_at), 'dd MMM yyyy HH:mm', { locale: fr })}
+                        </TableCell>
+                        <TableCell>{l.portal_users?.full_name || l.portal_users?.email || '—'}</TableCell>
+                        <TableCell>{PORTAL_LOG_ACTIONS[l.action] ?? l.action}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{detail || '—'}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        )}
       </Card>
 
       <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>

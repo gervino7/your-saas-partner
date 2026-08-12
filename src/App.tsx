@@ -61,6 +61,7 @@ import ServiceWorkerUpdater from '@/components/ServiceWorkerUpdater';
 import PortalGuard from '@/components/portal/PortalGuard';
 import PortalActivationPage from '@/pages/PortalActivationPage';
 import PortalHomePage from '@/pages/PortalHomePage';
+import PortalDocumentsPage from '@/pages/PortalDocumentsPage';
 
 const queryClient = new QueryClient();
 
@@ -277,6 +278,7 @@ const App = () => (
               <Route path="/org/:slug" element={<OrgRedirectPage />} />
               <Route path="/espace-client/activation" element={<PortalActivationPage />} />
               <Route path="/espace-client" element={<PortalGuard><PortalHomePage /></PortalGuard>} />
+              <Route path="/espace-client/documents" element={<PortalGuard><PortalDocumentsPage /></PortalGuard>} />
               <Route path="/onboarding" element={<AuthGuard><OnboardingPage /></AuthGuard>} />
               <Route path="/compte-suspendu" element={<AuthGuard><CompteSuspenduPage /></AuthGuard>} />
 
