@@ -66,25 +66,67 @@ Deno.serve(async (req) => {
       }), { headers });
     }
 
+    console.log('[activate] password provided:', !!password);
+
     const pwdError = validatePassword(password);
     if (pwdError) {
       return new Response(JSON.stringify({ error: pwdError }), { status: 400, headers });
     }
 
+    const metadata = { account_type: 'portal_client', full_name: full_name || invitation.full_name || '' };
+
+    let userId: string | null = null;
+    let createdNow = false;
+
     const { data: created, error: createError } = await admin.auth.admin.createUser({
       email: invitation.email,
       password,
       email_confirm: true,
-      user_metadata: { account_type: 'portal_client', full_name: full_name || invitation.full_name || '' },
+      user_metadata: metadata,
     });
 
-    if (createError || !created?.user) {
-      console.error('createUser error:', createError?.message);
+    if (created?.user && !createError) {
+      userId = created.user.id;
+      createdNow = true;
+      console.log('[activate] auth user created', userId);
+    } else {
       const msg = (createError?.message ?? '').toLowerCase();
-      const french = msg.includes('already') || msg.includes('exists')
-        ? 'Un compte existe déjà pour cette adresse email.'
-        : "Impossible de créer le compte. Veuillez réessayer.";
-      return new Response(JSON.stringify({ error: french }), { status: 400, headers });
+      const alreadyExists = msg.includes('already') || msg.includes('exists') || msg.includes('registered');
+      console.error('[activate] createUser error:', createError?.message);
+
+      if (!alreadyExists) {
+        return new Response(JSON.stringify({ error: "Impossible de créer le compte. Veuillez réessayer." }), { status: 400, headers });
+      }
+
+      // A previous activation attempt left an auth user behind (or the invitation was retried).
+      // The invitation token is still valid, so it is safe to (re)set the password on that account.
+      const { data: existing, error: lookupError } = await admin.auth.admin.listUsers({ page: 1, perPage: 200 });
+      const match = existing?.users?.find(
+        (u) => (u.email ?? '').toLowerCase() === invitation.email.toLowerCase(),
+      );
+
+      if (lookupError || !match) {
+        console.error('[activate] existing user lookup failed:', lookupError?.message);
+        return new Response(JSON.stringify({ error: 'Un compte existe déjà pour cette adresse email.' }), { status: 400, headers });
+      }
+
+      const { error: updateError } = await admin.auth.admin.updateUserById(match.id, {
+        password,
+        email_confirm: true,
+        user_metadata: { ...(match.user_metadata ?? {}), ...metadata },
+      });
+
+      if (updateError) {
+        console.error('[activate] updateUserById error:', updateError.message);
+        return new Response(JSON.stringify({ error: "Impossible de définir votre mot de passe. Contactez votre cabinet." }), { status: 400, headers });
+      }
+
+      userId = match.id;
+      console.log('[activate] existing auth user password reset', userId);
+    }
+
+    if (!userId) {
+      return new Response(JSON.stringify({ error: "Impossible de créer le compte. Veuillez réessayer." }), { status: 400, headers });
     }
 
     const { data: accepted, error: acceptError } = await admin.rpc('portal_accept_invitation', {
