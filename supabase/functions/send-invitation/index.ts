@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.3';
+import { sendResend } from '../_shared/email-template.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,7 +19,6 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
 
     // Verify caller
     const userClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!, {
@@ -45,15 +45,6 @@ Deno.serve(async (req) => {
     const gradeLabel = gradeLabels[grade] || grade || 'Membre';
     const orgName = organizationName || 'Mission-DGC';
 
-    if (!resendApiKey) {
-      console.log(`[SIMULATED] Invitation email to ${email} with link ${inviteLink}`);
-      return new Response(JSON.stringify({
-        success: true,
-        message: 'Email simulated (no RESEND_API_KEY configured)',
-        inviteLink,
-      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background: #1a1a2e; color: white; padding: 24px; border-radius: 8px 8px 0 0; text-align: center;">
@@ -77,29 +68,19 @@ Deno.serve(async (req) => {
       </div>
     `;
 
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${resendApiKey}` },
-      body: JSON.stringify({
-        from: 'MissionFlow <noreply@mamission.abodje.com>',
-        to: [email],
-        subject: `Invitation à rejoindre ${orgName} sur Mission-DGC`,
-        html,
-      }),
+    const result = await sendResend({
+      to: email,
+      subject: `Invitation à rejoindre ${orgName} sur Mission-DGC`,
+      html,
     });
 
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error('Resend error:', errText);
-      return new Response(JSON.stringify({ error: 'Failed to send email', details: errText }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    if (!result.ok) {
+      return new Response(JSON.stringify({ error: "L'email d'invitation n'a pas pu être envoyé.", details: result.error }), { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
-
-    const data = await res.json();
-    console.log('Invitation email sent:', data.id);
 
     return new Response(JSON.stringify({
       success: true,
-      resend_id: data.id,
+      resend_id: result.id,
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
   } catch (error) {

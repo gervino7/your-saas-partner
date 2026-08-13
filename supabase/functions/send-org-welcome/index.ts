@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.3';
+import { sendResend } from '../_shared/email-template.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,7 +23,6 @@ Deno.serve(async (req) => {
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
 
     const userClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!, {
       global: { headers: { Authorization: authHeader } },
@@ -40,11 +40,6 @@ Deno.serve(async (req) => {
     const appUrl = Deno.env.get('APP_URL') || 'https://mamission.abodje.com';
     const orgUrl = `${appUrl}/org/${slug}`;
     const planLabel = PLAN_LABELS[plan] || plan || 'Gratuit';
-
-    if (!resendApiKey) {
-      console.log(`[SIMULATED] Org welcome email to ${email}: ${orgUrl}`);
-      return new Response(JSON.stringify({ success: true, simulated: true, orgUrl }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
 
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -89,21 +84,14 @@ Deno.serve(async (req) => {
       </div>
     `;
 
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        from: 'Mission-DGC <noreply@abodje.com>',
-        to: [email],
-        subject: `Bienvenue ! Votre espace ${organizationName} est prêt`,
-        html,
-      }),
+    const result = await sendResend({
+      to: email,
+      subject: `Bienvenue ! Votre espace ${organizationName} est prêt`,
+      html,
     });
 
-    if (!res.ok) {
-      const txt = await res.text();
-      console.error('Resend error', txt);
-      return new Response(JSON.stringify({ error: 'Email send failed', detail: txt }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    if (!result.ok) {
+      return new Response(JSON.stringify({ error: 'Email send failed', detail: result.error }), { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
     return new Response(JSON.stringify({ success: true, orgUrl }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
