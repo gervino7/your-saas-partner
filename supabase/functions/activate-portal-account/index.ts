@@ -131,14 +131,15 @@ Deno.serve(async (req) => {
 
     const { data: accepted, error: acceptError } = await admin.rpc('portal_accept_invitation', {
       _token: token,
-      _auth_user_id: created.user.id,
+      _auth_user_id: userId,
     });
 
     const acceptFailed = acceptError || (accepted && (accepted as { success?: boolean }).success === false);
 
     if (acceptFailed) {
       console.error('portal_accept_invitation error:', acceptError?.message ?? JSON.stringify(accepted));
-      await admin.auth.admin.deleteUser(created.user.id);
+      // Only clean up an account we created in this request — never delete a pre-existing one.
+      if (createdNow) await admin.auth.admin.deleteUser(userId);
       const reason = acceptError?.message ?? (accepted as { reason?: string })?.reason ?? "L'activation a échoué. Veuillez réessayer.";
       return new Response(JSON.stringify({ error: reason }), { status: 400, headers });
     }
