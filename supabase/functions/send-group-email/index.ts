@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.3';
+import { sendResend } from '../_shared/email-template.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,7 +19,6 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
 
     // Verify caller
     const userClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!, {
@@ -87,23 +87,6 @@ Deno.serve(async (req) => {
 
     const deliveryReport: Record<string, any> = {};
 
-    if (!resendApiKey) {
-      // No Resend key configured - simulate sending
-      for (const r of allRecipients) {
-        deliveryReport[r.email] = { status: 'simulated', name: r.name, timestamp: new Date().toISOString() };
-      }
-      await admin.from('group_emails').update({
-        status: 'sent',
-        delivery_report: deliveryReport,
-      }).eq('id', emailId);
-
-      return new Response(JSON.stringify({
-        success: true,
-        message: 'Emails simulated (no RESEND_API_KEY configured)',
-        recipients: allRecipients.length,
-      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
-
     // Build attachments array for Resend
     const emailAttachments: { filename: string; path: string }[] = [];
     const attachmentsData = email.attachments ?? [];
@@ -133,11 +116,7 @@ Deno.serve(async (req) => {
       }
 
       try {
-        const emailPayload: Record<string, any> = {
-          from: 'MissionFlow <noreply@mamission.abodje.com>',
-          to: [recipient.email],
-          subject: email.subject,
-          html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        const html = `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <div style="background: #1a1a2e; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
                 <h2 style="margin: 0;">Mission-DGC</h2>
               </div>
@@ -147,26 +126,20 @@ Deno.serve(async (req) => {
               <p style="color: #6b7280; font-size: 12px; text-align: center; margin-top: 16px;">
                 Envoyé via Mission-DGC
               </p>
-            </div>`,
-        };
+            </div>`;
 
-        if (emailAttachments.length > 0) {
-          emailPayload.attachments = emailAttachments;
-        }
-
-        const res = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${resendApiKey}` },
-          body: JSON.stringify(emailPayload),
+        const result = await sendResend({
+          to: recipient.email,
+          subject: email.subject,
+          html,
+          attachments: emailAttachments.length > 0 ? emailAttachments : undefined,
         });
 
-        if (res.ok) {
-          const data = await res.json();
-          deliveryReport[recipient.email] = { status: 'sent', resend_id: data.id, name: recipient.name, timestamp: new Date().toISOString() };
+        if (result.ok) {
+          deliveryReport[recipient.email] = { status: 'sent', resend_id: result.id, name: recipient.name, timestamp: new Date().toISOString() };
         } else {
-          const errText = await res.text();
-          console.error(`Failed to send to ${recipient.email}:`, errText);
-          deliveryReport[recipient.email] = { status: 'error', error: errText, name: recipient.name };
+          console.error(`Failed to send to ${recipient.email}:`, result.error);
+          deliveryReport[recipient.email] = { status: 'error', error: result.error, name: recipient.name };
         }
       } catch (e) {
         console.error(`Exception sending to ${recipient.email}:`, e);
@@ -183,13 +156,16 @@ Deno.serve(async (req) => {
     console.log('Final update result:', JSON.stringify(updateResult));
     console.log('Delivery report:', JSON.stringify(deliveryReport));
 
+    const sentCount = Object.values(deliveryReport).filter((r: any) => r.status === 'sent').length;
+    const errorCount = Object.values(deliveryReport).filter((r: any) => r.status === 'error').length;
+
     return new Response(JSON.stringify({
-      success: true,
+      success: errorCount === 0,
       recipients: allRecipients.length,
-      sent: Object.values(deliveryReport).filter((r: any) => r.status === 'sent').length,
-      errors: Object.values(deliveryReport).filter((r: any) => r.status === 'error').length,
+      sent: sentCount,
+      errors: errorCount,
       deliveryReport,
-    }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }), { status: errorCount > 0 && sentCount === 0 ? 502 : 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
   } catch (error) {
     console.error('send-group-email error:', error);

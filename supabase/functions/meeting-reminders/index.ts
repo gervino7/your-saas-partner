@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { sendResend } from "../_shared/email-template.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -93,10 +94,10 @@ Deno.serve(async (req) => {
     }
 
     // Send email reminders for meetings in 1 day
-    const resendKey = Deno.env.get("RESEND_API_KEY");
     let emailsSent = 0;
+    let emailsFailed = 0;
 
-    if (resendKey && meetingsIn1Day && meetingsIn1Day.length > 0) {
+    if (meetingsIn1Day && meetingsIn1Day.length > 0) {
       for (const meeting of meetingsIn1Day) {
         for (const p of meeting.meeting_participants || []) {
           // Get user email
@@ -109,17 +110,10 @@ Deno.serve(async (req) => {
           if (profile?.email) {
             const meetingDate = new Date(meeting.scheduled_at);
             try {
-              await fetch("https://api.resend.com/emails", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${resendKey}`,
-                },
-                body: JSON.stringify({
-                  from: "MissionFlow <noreply@mamission.abodje.com>",
-                  to: [profile.email],
-                  subject: `Rappel : ${meeting.title} — demain`,
-                  html: `
+              const result = await sendResend({
+                to: profile.email,
+                subject: `Rappel : ${meeting.title} — demain`,
+                html: `
                     <h2>Rappel de réunion</h2>
                     <p>Bonjour ${profile.full_name},</p>
                     <p>Vous avez une réunion prévue demain :</p>
@@ -131,9 +125,13 @@ Deno.serve(async (req) => {
                     </ul>
                     <p>— MissionFlow</p>
                   `,
-                }),
               });
-              emailsSent++;
+              if (!result.ok) {
+                emailsFailed++;
+                console.error("Meeting reminder email failed:", profile.email, result.error);
+              } else {
+                emailsSent++;
+              }
               // Delay between emails
               await new Promise((r) => setTimeout(r, 600));
             } catch (e) {
@@ -149,6 +147,7 @@ Deno.serve(async (req) => {
         success: true,
         notifications_created: notifications.length,
         emails_sent: emailsSent,
+        emails_failed: emailsFailed,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
