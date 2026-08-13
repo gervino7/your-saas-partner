@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.3';
+import { sendResend } from '../_shared/email-template.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,7 +14,6 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
 
     const { missionId, clientId, contactEmail, contactName } = await req.json();
 
@@ -45,17 +45,13 @@ Deno.serve(async (req) => {
     }
 
     // Send email if Resend configured and contactEmail provided
-    if (resendApiKey && contactEmail) {
+    if (contactEmail) {
       const surveyUrl = `${req.headers.get('origin') || supabaseUrl.replace('.supabase.co', '.lovable.app')}/survey/${token}`;
       
-      const emailRes = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${resendApiKey}` },
-        body: JSON.stringify({
-          from: 'MissionFlow <noreply@mamission.abodje.com>',
-          to: [contactEmail],
-          subject: `Enquête de satisfaction — ${mission?.name || 'Mission'}`,
-          html: `
+      const result = await sendResend({
+        to: contactEmail,
+        subject: `Enquête de satisfaction — ${mission?.name || 'Mission'}`,
+        html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <div style="background: #1a1a2e; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
                 <h2 style="margin: 0;">Mission-DGC</h2>
@@ -76,11 +72,13 @@ Deno.serve(async (req) => {
               </p>
             </div>
           `,
-        }),
       });
 
-      const emailResult = await emailRes.text();
-      console.log('Survey email result:', emailResult);
+      if (!result.ok) {
+        return new Response(JSON.stringify({ error: "L'enquête a été créée mais l'email n'a pas pu être envoyé.", details: result.error, surveyId: survey.id, token }), {
+          status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
     }
 
     return new Response(JSON.stringify({ success: true, surveyId: survey.id, token }), {

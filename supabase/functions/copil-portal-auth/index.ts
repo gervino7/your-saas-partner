@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { sendResend } from "../_shared/email-template.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -31,7 +32,6 @@ Deno.serve(async (req) => {
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const resendApiKey = Deno.env.get("RESEND_API_KEY");
   const admin = createClient(supabaseUrl, serviceKey);
 
   try {
@@ -97,22 +97,15 @@ Deno.serve(async (req) => {
       });
 
       // Send OTP via email
-      if (resendApiKey) {
+      {
         const memberName = member.external_name || email;
         const committeeName = (committee as any).name || "COPIL";
         const missionName = mission?.name || "Mission";
 
-        await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${resendApiKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            from: "MissionFlow <noreply@mamission.abodje.com>",
-            to: [email],
-            subject: `Code d'accès portail ${committeeName} — ${missionName}`,
-            html: `
+        const result = await sendResend({
+          to: email,
+          subject: `Code d'accès portail ${committeeName} — ${missionName}`,
+          html: `
               <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
                 <h2 style="color: #1a1a1a; margin-bottom: 8px;">Portail Documents ${committeeName}</h2>
                 <p style="color: #555;">Bonjour ${memberName},</p>
@@ -126,8 +119,13 @@ Deno.serve(async (req) => {
                 <p style="color: #aaa; font-size: 12px;">MissionFlow — Plateforme de gestion de missions</p>
               </div>
             `,
-          }),
         });
+
+        if (!result.ok) {
+          return new Response(JSON.stringify({ error: "Le code n'a pas pu être envoyé par email.", details: result.error }), {
+            status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
       }
 
       return new Response(JSON.stringify({ success: true, message: "Code envoyé" }), {
