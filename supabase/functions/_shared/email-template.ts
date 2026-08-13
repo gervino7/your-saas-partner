@@ -93,27 +93,39 @@ export async function sendResend(params: {
   to: string;
   subject: string;
   html: string;
-}): Promise<{ ok: boolean; id?: string; error?: string }> {
+  attachments?: Array<Record<string, unknown>>;
+  from?: string;
+}): Promise<{ ok: boolean; id?: string; status?: number; error?: string }> {
   const apiKey = Deno.env.get('RESEND_API_KEY');
   if (!apiKey) {
-    console.log('[SIMULATED EMAIL]', params.to, params.subject);
-    return { ok: true, id: 'simulated' };
+    console.error('[email] RESEND_API_KEY is not configured — email NOT sent to', params.to);
+    return { ok: false, error: 'RESEND_API_KEY non configurée' };
   }
+
+  const payload: Record<string, unknown> = {
+    from: params.from || EMAIL_FROM,
+    to: [params.to],
+    subject: params.subject,
+    html: params.html,
+  };
+  if (params.attachments?.length) payload.attachments = params.attachments;
+
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      from: EMAIL_FROM,
-      to: [params.to],
-      subject: params.subject,
-      html: params.html,
-    }),
+    body: JSON.stringify(payload),
   });
+
+  console.log('[email] resend status', res.status, 'to', params.to);
+
+  const text = await res.text();
   if (!res.ok) {
-    const err = await res.text();
-    console.error('Resend error:', err);
-    return { ok: false, error: err };
+    console.error('[email] resend error body:', text);
+    return { ok: false, status: res.status, error: text };
   }
-  const data = await res.json();
-  return { ok: true, id: data.id };
+
+  let id: string | undefined;
+  try { id = JSON.parse(text)?.id; } catch { /* ignore */ }
+  return { ok: true, id, status: res.status };
 }
+

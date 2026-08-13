@@ -60,6 +60,9 @@ Deno.serve(async (req) => {
 
     if (!result.ok) {
       console.error('Resend failed:', result.error);
+      return new Response(JSON.stringify({ error: 'send_failed', details: result.error }), {
+        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     return new Response(JSON.stringify({ success: true }), {
@@ -67,8 +70,8 @@ Deno.serve(async (req) => {
     });
   } catch (err) {
     console.error('send-password-reset error:', err);
-    return new Response(JSON.stringify({ success: true }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    return new Response(JSON.stringify({ error: String(err) }), {
+      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 });

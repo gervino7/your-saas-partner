@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.3';
-import { buildEmailHtml, EMAIL_FROM } from '../_shared/email-template.ts';
+import { buildEmailHtml, sendResend } from '../_shared/email-template.ts';
 
 const APP_URL = Deno.env.get('APP_URL') || 'https://mamission.abodje.com';
 
@@ -84,41 +84,26 @@ Deno.serve(async (req) => {
       footerNote: "Ce lien expire dans 7 jours. Si vous n'attendiez pas cet email, vous pouvez l'ignorer.",
     });
 
-    const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
-    if (!RESEND_API_KEY) {
-      console.error('[invite] RESEND_API_KEY manquante — email non envoyé');
-      return new Response(
-        JSON.stringify({ error: "Le service d'envoi d'emails n'est pas configuré (RESEND_API_KEY manquante)." }),
-        { status: 500, headers },
-      );
-    }
-
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${RESEND_API_KEY}` },
-      body: JSON.stringify({
-        from: EMAIL_FROM,
-        to: [invitation.email],
-        subject: `Accès à votre espace client — ${invitation.client_name}`,
-        html,
-      }),
+    const result = await sendResend({
+      to: invitation.email,
+      subject: `Accès à votre espace client — ${invitation.client_name}`,
+      html,
     });
 
-    const resendBody = await res.text();
-    console.log('[invite] resend status', res.status, resendBody);
-
-    if (!res.ok) {
+    if (!result.ok) {
+      console.error('[invite] email send failed:', result.error);
       return new Response(
         JSON.stringify({
           error: "L'invitation a été créée mais l'email n'a pas pu être envoyé.",
-          status: res.status,
-          details: resendBody,
+          status: result.status,
+          details: result.error,
         }),
         { status: 502, headers },
       );
     }
 
-    return new Response(JSON.stringify({ success: true }), { headers });
+    return new Response(JSON.stringify({ success: true, resend_id: result.id }), { headers });
+
   } catch (err) {
     console.error('send-portal-invitation error:', err);
     return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers });
