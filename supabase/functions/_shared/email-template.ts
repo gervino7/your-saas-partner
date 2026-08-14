@@ -9,8 +9,8 @@ export interface EmailTemplateOptions {
   greeting: string;
   title: string;
   body: string; // raw HTML
-  ctaLabel: string;
-  ctaUrl: string;
+  ctaLabel?: string;
+  ctaUrl?: string;
   footerNote?: string;
 }
 
@@ -24,6 +24,21 @@ export function buildEmailHtml(opts: EmailTemplateOptions): string {
     ctaUrl,
     footerNote = "Si vous n'avez pas effectué cette demande, ignorez simplement cet email.",
   } = opts;
+
+  const ctaBlock = ctaLabel && ctaUrl
+    ? `<table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:32px auto 8px auto;">
+                <tr>
+                  <td align="center" style="background:#d4782f;border-radius:10px;">
+                    <a href="${ctaUrl}" style="display:inline-block;padding:14px 32px;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:10px;">${ctaLabel}</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin:24px 0 0 0;color:#6b7280;font-size:12px;line-height:1.6;">
+                Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br />
+                <a href="${ctaUrl}" style="color:#1a5091;word-break:break-all;">${ctaUrl}</a>
+              </p>`
+    : '';
+
 
   return `<!DOCTYPE html>
 <html lang="fr">
