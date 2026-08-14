@@ -24,11 +24,12 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function substitute(tpl: string, r: EcheancierRow) {
   return tpl
-    .replaceAll('{client}', r.client_name)
-    .replaceAll('{obligation}', r.obligation_label)
-    .replaceAll('{periode}', r.period_label)
-    .replaceAll('{echeance}', format(new Date(r.due_date), 'dd/MM/yyyy'));
+    .replace(/\{client\}/g, r.client_name)
+    .replace(/\{obligation\}/g, r.obligation_label)
+    .replace(/\{periode\}/g, r.period_label)
+    .replace(/\{echeance\}/g, format(new Date(r.due_date), 'dd/MM/yyyy'));
 }
+
 
 const BulkRelanceDialog = ({ rows, open, onOpenChange }: Props) => {
   const profile = useAuthStore((s) => s.profile);
