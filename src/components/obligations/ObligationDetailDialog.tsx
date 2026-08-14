@@ -55,6 +55,8 @@ const ObligationDetailDialog = ({ row, open, onOpenChange, onRelance }: Props) =
   const [notes, setNotes] = useState<string>('');
   const [reference, setReference] = useState<string>('');
   const [montant, setMontant] = useState<string>('');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
 
   useEffect(() => {
     if (fullRow) {
