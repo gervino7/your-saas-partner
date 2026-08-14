@@ -76,17 +76,8 @@ export function buildEmailHtml(opts: EmailTemplateOptions): string {
               <p style="margin:0 0 20px 0;color:#374151;font-size:15px;line-height:1.6;">${greeting}</p>
               <div style="color:#4b5563;font-size:14px;line-height:1.65;">${body}</div>
               <!-- CTA -->
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:32px auto 8px auto;">
-                <tr>
-                  <td align="center" style="background:#d4782f;border-radius:10px;">
-                    <a href="${ctaUrl}" style="display:inline-block;padding:14px 32px;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:10px;">${ctaLabel}</a>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin:24px 0 0 0;color:#6b7280;font-size:12px;line-height:1.6;">
-                Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br />
-                <a href="${ctaUrl}" style="color:#1a5091;word-break:break-all;">${ctaUrl}</a>
-              </p>
+              ${ctaBlock}
+
               <p style="margin:20px 0 0 0;color:#9ca3af;font-size:12px;line-height:1.6;font-style:italic;">${footerNote}</p>
             </td>
           </tr>
