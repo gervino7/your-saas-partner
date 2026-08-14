@@ -40,7 +40,7 @@ export function buildEmailHtml(opts: EmailTemplateOptions): string {
               <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                 <tr>
                   <td style="vertical-align:middle;">
-                    <span style="display:inline-block;width:36px;height:36px;line-height:36px;text-align:center;background:#d4782f;color:#ffffff;border-radius:10px;font-weight:700;font-size:16px;">M</span>
+                    <img src="${EMAIL_LOGO_URL}" alt="Mission-DGC" width="36" height="36" style="display:block;border:0;border-radius:8px;" />
                   </td>
                   <td style="padding-left:12px;vertical-align:middle;">
                     <div style="color:#ffffff;font-size:18px;font-weight:700;line-height:1;">Mission-DGC</div>
