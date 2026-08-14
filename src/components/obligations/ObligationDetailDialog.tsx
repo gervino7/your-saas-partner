@@ -199,22 +199,50 @@ const ObligationDetailDialog = ({ row, open, onOpenChange, onRelance }: Props) =
           {/* Historique relances */}
           <div>
             <Label className="text-xs uppercase tracking-wide text-muted-foreground">Historique des relances</Label>
-            <div className="mt-2 space-y-2 max-h-48 overflow-y-auto">
+            <div className="mt-2 space-y-2 max-h-64 overflow-y-auto">
               {interactions.length === 0 ? (
                 <p className="text-sm text-muted-foreground italic">Aucune relance enregistrée.</p>
-              ) : interactions.map((i) => (
-                <div key={i.id} className="text-sm p-2 rounded border bg-background">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">{i.title}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {format(new Date(i.interaction_date), 'dd/MM/yyyy HH:mm', { locale: fr })}
-                    </span>
+              ) : interactions.map((i) => {
+                const meta = (i.metadata ?? {}) as { canal?: string; to_email?: string; sent?: boolean };
+                const sent = meta.sent === true;
+                const expanded = expandedId === i.id;
+                return (
+                  <div key={i.id} className="text-sm p-2 rounded border bg-background">
+                    <button
+                      type="button"
+                      className="w-full text-left"
+                      onClick={() => setExpandedId(expanded ? null : i.id)}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-medium truncate">{i.title}</span>
+                        <span className="text-xs text-muted-foreground shrink-0">
+                          {format(new Date(i.interaction_date), 'dd/MM/yyyy HH:mm', { locale: fr })}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                        {meta.canal && <Badge variant="outline" className="text-[10px]">{meta.canal}</Badge>}
+                        <Badge
+                          variant="outline"
+                          className={cn('text-[10px]', sent
+                            ? 'bg-green-100 text-green-800 border-green-200'
+                            : 'bg-gray-100 text-gray-700 border-gray-200')}
+                        >
+                          {sent ? 'Envoyé' : 'Consigné'}
+                        </Badge>
+                        {meta.to_email && <span className="text-[11px] text-muted-foreground">{meta.to_email}</span>}
+                      </div>
+                    </button>
+                    {expanded && i.description && (
+                      <pre className="mt-2 whitespace-pre-wrap font-sans text-xs text-muted-foreground border-t pt-2">
+                        {i.description}
+                      </pre>
+                    )}
                   </div>
-                  {i.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{i.description}</p>}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
+
         </div>
 
         <DialogFooter>
