@@ -25,6 +25,7 @@ import { useTableSort } from '@/hooks/useTableSort';
 import { usePeriodDocCounts } from '@/hooks/useObligationDocs';
 import ObligationDetailDialog from '@/components/obligations/ObligationDetailDialog';
 import RelanceDialog from '@/components/obligations/RelanceDialog';
+import BulkRelanceDialog from '@/components/obligations/BulkRelanceDialog';
 import EmptyState from '@/components/common/EmptyState';
 import { cn } from '@/lib/utils';
 
@@ -70,6 +71,7 @@ const EcheancierPage = () => {
   const [selected, setSelected] = useState<string[]>([]);
   const [detailRow, setDetailRow] = useState<EcheancierRow | null>(null);
   const [relanceRow, setRelanceRow] = useState<EcheancierRow | null>(null);
+  const [bulkRelanceOpen, setBulkRelanceOpen] = useState(false);
 
   const { data: kpis } = useObligationsKpis();
   const { data: rows = [], isLoading } = useEcheancier({
@@ -151,6 +153,8 @@ const EcheancierPage = () => {
     const next = checked ? [...statuses, key] : statuses.filter((s) => s !== key);
     setParams({ status: next.join(',') || null });
   };
+
+  const selectedRows = useMemo(() => sorted.filter((r) => selected.includes(r.id)), [sorted, selected]);
 
   const toggleAll = (checked: boolean) => setSelected(checked ? sorted.map((r) => r.id) : []);
   const toggleOne = (id: string, checked: boolean) => setSelected((prev) =>
@@ -352,6 +356,11 @@ const EcheancierPage = () => {
                   ))}
                 </SelectContent>
               </Select>
+              {selectedRows.length > 0 && selectedRows.every((r) => r.status === 'pieces_attendues') && (
+                <Button size="sm" onClick={() => setBulkRelanceOpen(true)}>
+                  <Send className="h-3.5 w-3.5 mr-1" /> Relancer la sélection
+                </Button>
+              )}
               <Button size="sm" variant="ghost" onClick={() => setSelected([])}>Annuler</Button>
             </div>
           )}
@@ -488,6 +497,13 @@ const EcheancierPage = () => {
           open={!!detailRow}
           onOpenChange={(o) => !o && setDetailRow(null)}
           onRelance={(r) => setRelanceRow(r)}
+        />
+      )}
+      {bulkRelanceOpen && (
+        <BulkRelanceDialog
+          rows={selectedRows}
+          open={bulkRelanceOpen}
+          onOpenChange={(o) => { setBulkRelanceOpen(o); if (!o) setSelected([]); }}
         />
       )}
       {relanceRow && (
