@@ -1,20 +1,24 @@
-// Shared email template builder — Navy & Cuivre design
+// Mirror of supabase/functions/_shared/email-template.ts — used to preview
+// the exact email HTML before sending a client reminder.
 
 export const EMAIL_LOGO_URL =
   'https://zewszfgmysyocroavlja.supabase.co/storage/v1/object/public/org-assets/branding/logo-email.png';
 
+export function escapeHtml(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+}
 
-export interface EmailTemplateOptions {
+export interface EmailPreviewOptions {
   preheader?: string;
   greeting: string;
   title: string;
-  body: string; // raw HTML
+  body: string;
   ctaLabel?: string;
   ctaUrl?: string;
   footerNote?: string;
 }
 
-export function buildEmailHtml(opts: EmailTemplateOptions): string {
+export function buildEmailPreviewHtml(opts: EmailPreviewOptions): string {
   const {
     preheader = '',
     greeting,
@@ -22,38 +26,32 @@ export function buildEmailHtml(opts: EmailTemplateOptions): string {
     body,
     ctaLabel,
     ctaUrl,
-    footerNote = "Si vous n'avez pas effectué cette demande, ignorez simplement cet email.",
+    footerNote = '',
   } = opts;
 
   const ctaBlock = ctaLabel && ctaUrl
     ? `<table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:32px auto 8px auto;">
-                <tr>
-                  <td align="center" style="background:#d4782f;border-radius:10px;">
-                    <a href="${ctaUrl}" style="display:inline-block;padding:14px 32px;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:10px;">${ctaLabel}</a>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin:24px 0 0 0;color:#6b7280;font-size:12px;line-height:1.6;">
-                Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br />
-                <a href="${ctaUrl}" style="color:#1a5091;word-break:break-all;">${ctaUrl}</a>
-              </p>`
+        <tr>
+          <td align="center" style="background:#d4782f;border-radius:10px;">
+            <a href="${ctaUrl}" style="display:inline-block;padding:14px 32px;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:10px;">${ctaLabel}</a>
+          </td>
+        </tr>
+      </table>
+      <p style="margin:24px 0 0 0;color:#6b7280;font-size:12px;line-height:1.6;">
+        Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br />
+        <a href="${ctaUrl}" style="color:#1a5091;word-break:break-all;">${ctaUrl}</a>
+      </p>`
     : '';
-
 
   return `<!DOCTYPE html>
 <html lang="fr">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Mission-DGC</title>
-</head>
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Mission-DGC</title></head>
 <body style="margin:0;padding:0;background-color:#f5f6fa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#1f2937;">
   <span style="display:none;visibility:hidden;opacity:0;color:transparent;height:0;width:0;overflow:hidden;">${preheader}</span>
   <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#f5f6fa;">
     <tr>
       <td align="center" style="padding:32px 16px;">
         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width:560px;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(15,32,60,0.08);">
-          <!-- Header -->
           <tr>
             <td style="background:#1a5091;padding:28px 32px;text-align:left;">
               <table role="presentation" cellspacing="0" cellpadding="0" border="0">
@@ -69,19 +67,15 @@ export function buildEmailHtml(opts: EmailTemplateOptions): string {
               </table>
             </td>
           </tr>
-          <!-- Body -->
           <tr>
             <td style="padding:36px 32px 24px 32px;">
               <h1 style="margin:0 0 8px 0;color:#1a5091;font-size:22px;font-weight:700;line-height:1.3;">${title}</h1>
               <p style="margin:0 0 20px 0;color:#374151;font-size:15px;line-height:1.6;">${greeting}</p>
               <div style="color:#4b5563;font-size:14px;line-height:1.65;">${body}</div>
-              <!-- CTA -->
               ${ctaBlock}
-
               <p style="margin:20px 0 0 0;color:#9ca3af;font-size:12px;line-height:1.6;font-style:italic;">${footerNote}</p>
             </td>
           </tr>
-          <!-- Footer -->
           <tr>
             <td style="padding:20px 32px 28px 32px;border-top:1px solid #e5e7eb;text-align:center;">
               <p style="margin:0;color:#9ca3af;font-size:12px;line-height:1.5;">
@@ -97,50 +91,17 @@ export function buildEmailHtml(opts: EmailTemplateOptions): string {
 </html>`;
 }
 
-export const EMAIL_FROM = 'Mission-DGC <noreply@mamission.abodje.com>';
+export const REMINDER_FOOTER_NOTE =
+  'Cet email vous est adressé par votre cabinet comptable dans le cadre du suivi de vos obligations.';
 
-export async function sendResend(params: {
-  to: string;
-  subject: string;
-  html: string;
-  attachments?: Array<Record<string, unknown>>;
-  from?: string;
-  reply_to?: string;
-  cc?: string[];
-}): Promise<{ ok: boolean; id?: string; status?: number; error?: string }> {
-  const apiKey = Deno.env.get('RESEND_API_KEY');
-  if (!apiKey) {
-    console.error('[email] RESEND_API_KEY is not configured — email NOT sent to', params.to);
-    return { ok: false, error: 'RESEND_API_KEY non configurée' };
-  }
-
-  const payload: Record<string, unknown> = {
-    from: params.from || EMAIL_FROM,
-    to: [params.to],
-    subject: params.subject,
-    html: params.html,
-  };
-  if (params.attachments?.length) payload.attachments = params.attachments;
-  if (params.reply_to) payload.reply_to = params.reply_to;
-  if (params.cc?.length) payload.cc = params.cc;
-
-
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify(payload),
+export function buildReminderPreview(subject: string, message: string, withPortalCta: boolean) {
+  return buildEmailPreviewHtml({
+    preheader: subject,
+    greeting: 'Bonjour,',
+    title: subject || '(objet)',
+    body: `<div>${escapeHtml(message).replace(/\n/g, '<br />')}</div>`,
+    ctaLabel: withPortalCta ? 'Déposer mes documents' : undefined,
+    ctaUrl: withPortalCta ? 'https://mamission.abodje.com/espace-client/documents' : undefined,
+    footerNote: REMINDER_FOOTER_NOTE,
   });
-
-  console.log('[email] resend status', res.status, 'to', params.to);
-
-  const text = await res.text();
-  if (!res.ok) {
-    console.error('[email] resend error body:', text);
-    return { ok: false, status: res.status, error: text };
-  }
-
-  let id: string | undefined;
-  try { id = JSON.parse(text)?.id; } catch { /* ignore */ }
-  return { ok: true, id, status: res.status };
 }
-
