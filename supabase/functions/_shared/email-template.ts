@@ -105,6 +105,8 @@ export async function sendResend(params: {
   html: string;
   attachments?: Array<Record<string, unknown>>;
   from?: string;
+  reply_to?: string;
+  cc?: string[];
 }): Promise<{ ok: boolean; id?: string; status?: number; error?: string }> {
   const apiKey = Deno.env.get('RESEND_API_KEY');
   if (!apiKey) {
@@ -119,6 +121,9 @@ export async function sendResend(params: {
     html: params.html,
   };
   if (params.attachments?.length) payload.attachments = params.attachments;
+  if (params.reply_to) payload.reply_to = params.reply_to;
+  if (params.cc?.length) payload.cc = params.cc;
+
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
