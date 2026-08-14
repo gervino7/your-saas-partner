@@ -358,6 +358,59 @@ export function useLogRelance() {
   });
 }
 
+/** Real email reminder — goes through the send-client-reminder edge function. */
+export function useSendClientReminder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (values: {
+      obligation_period_id: string;
+      to_email: string;
+      cc_emails?: string[];
+      subject: string;
+      message: string;
+      canal: string;
+    }) => {
+      const { data, error } = await supabase.functions.invoke('send-client-reminder', { body: values });
+      if (error) {
+        let details = error.message;
+        const ctx = (error as { context?: { text?: () => Promise<string> } }).context;
+        if (ctx?.text) {
+          try {
+            const raw = await ctx.text();
+            const parsed = JSON.parse(raw);
+            details = parsed.details || parsed.error || raw;
+          } catch { /* keep default */ }
+        }
+        throw new Error(details);
+      }
+      return data as { success: boolean; resend_id?: string };
+    },
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({ queryKey: ['echeancier'] });
+      qc.invalidateQueries({ queryKey: ['obligation-interactions', vars.obligation_period_id] });
+    },
+  });
+}
+
+/** Does this client have an active portal account? (drives the email CTA) */
+export function useClientHasPortal(clientId: string | undefined) {
+  return useQuery({
+    queryKey: ['client-has-portal', clientId],
+    enabled: !!clientId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('portal_users')
+        .select('id')
+        .eq('client_id', clientId!)
+        .eq('is_active', true)
+        .limit(1);
+      if (error) return false;
+      return (data ?? []).length > 0;
+    },
+  });
+}
+
+
 // ── Org collaborators (for assign selects) ──
 export function useOrgCollaborators() {
   const profile = useAuthStore((s) => s.profile);
