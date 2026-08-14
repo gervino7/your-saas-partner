@@ -1,5 +1,9 @@
 // Shared email template builder — Navy & Cuivre design
 
+export const EMAIL_LOGO_URL =
+  'https://zewszfgmysyocroavlja.supabase.co/storage/v1/object/public/org-assets/branding/logo-email.png';
+
+
 export interface EmailTemplateOptions {
   preheader?: string;
   greeting: string;
