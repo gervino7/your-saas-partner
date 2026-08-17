@@ -51,6 +51,22 @@ export default function MissionCalendarTab({ missionId }: MissionCalendarTabProp
     }
   };
 
+  const handleUpdateClientSharing = async (
+    meetingId: string,
+    values: { shared_with_client?: boolean; client_summary?: string },
+  ) => {
+    try {
+      await updateMeeting.mutateAsync({ id: meetingId, ...values });
+      toast.success(
+        values.shared_with_client === false
+          ? 'Réunion retirée de l\'espace client'
+          : 'Partage client mis à jour',
+      );
+    } catch {
+      toast.error('Erreur lors de la mise à jour du partage');
+    }
+  };
+
   const handleDelete = async (meetingId: string) => {
     try {
       await deleteMeeting.mutateAsync(meetingId);
@@ -87,6 +103,7 @@ export default function MissionCalendarTab({ missionId }: MissionCalendarTabProp
         event={selectedEvent}
         onRespond={handleRespond}
         onSaveSummary={handleSaveSummary}
+        onUpdateClientSharing={handleUpdateClientSharing}
         onDelete={handleDelete}
         members={orgMembers}
       />
