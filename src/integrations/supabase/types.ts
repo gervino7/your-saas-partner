@@ -2134,6 +2134,7 @@ export type Database = {
       meetings: {
         Row: {
           agenda: string | null
+          client_summary: string | null
           created_at: string | null
           description: string | null
           duration_minutes: number | null
@@ -2147,6 +2148,7 @@ export type Database = {
           recurrence: string | null
           reminders: Json | null
           scheduled_at: string
+          shared_with_client: boolean
           status: string | null
           summary: string | null
           title: string
@@ -2154,6 +2156,7 @@ export type Database = {
         }
         Insert: {
           agenda?: string | null
+          client_summary?: string | null
           created_at?: string | null
           description?: string | null
           duration_minutes?: number | null
@@ -2167,6 +2170,7 @@ export type Database = {
           recurrence?: string | null
           reminders?: Json | null
           scheduled_at: string
+          shared_with_client?: boolean
           status?: string | null
           summary?: string | null
           title: string
@@ -2174,6 +2178,7 @@ export type Database = {
         }
         Update: {
           agenda?: string | null
+          client_summary?: string | null
           created_at?: string | null
           description?: string | null
           duration_minutes?: number | null
@@ -2187,6 +2192,7 @@ export type Database = {
           recurrence?: string | null
           reminders?: Json | null
           scheduled_at?: string
+          shared_with_client?: boolean
           status?: string | null
           summary?: string | null
           title?: string
@@ -5421,8 +5427,24 @@ export type Database = {
         Args: { _auth_user_id: string; _token: string }
         Returns: Json
       }
+      portal_dashboard: { Args: never; Returns: Json }
+      portal_deposit_document: {
+        Args: {
+          _file_name: string
+          _file_path: string
+          _obligation_document_id: string
+        }
+        Returns: Json
+      }
       portal_mark_downloaded: { Args: { _document_id: string }; Returns: Json }
       portal_my_documents: { Args: never; Returns: Json }
+      portal_my_invoices: { Args: never; Returns: Json }
+      portal_my_meetings: { Args: never; Returns: Json }
+      portal_my_obligations: { Args: never; Returns: Json }
+      portal_obligation_documents: {
+        Args: { _period_id: string }
+        Returns: Json
+      }
       portal_toggle_access: {
         Args: { _activate: boolean; _portal_user_id: string; _reason?: string }
         Returns: Json
