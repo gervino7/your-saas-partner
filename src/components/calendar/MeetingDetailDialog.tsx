@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { Video, MapPin, Phone, Clock, CalendarDays, Users, Check, X, ExternalLink, Shield, Flag, Star } from 'lucide-react';
 import { format, differenceInMinutes } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -17,6 +18,7 @@ interface MeetingDetailDialogProps {
   event: CalendarEvent | null;
   onRespond?: (meetingId: string, status: string) => void;
   onSaveSummary?: (meetingId: string, summary: string) => void;
+  onUpdateClientSharing?: (meetingId: string, values: { shared_with_client?: boolean; client_summary?: string }) => void;
   onDelete?: (meetingId: string) => void;
   members?: { id: string; full_name: string }[];
 }
@@ -35,10 +37,11 @@ const eventTypeIcons: Record<string, any> = {
   milestone: Star,
 };
 
-export default function MeetingDetailDialog({ open, onOpenChange, event, onRespond, onSaveSummary, onDelete, members = [] }: MeetingDetailDialogProps) {
+export default function MeetingDetailDialog({ open, onOpenChange, event, onRespond, onSaveSummary, onUpdateClientSharing, onDelete, members = [] }: MeetingDetailDialogProps) {
   const { user } = useAuthStore();
   const [summary, setSummary] = useState('');
   const [showSummary, setShowSummary] = useState(false);
+  const [clientSummary, setClientSummary] = useState<string | null>(null);
 
   if (!event) return null;
 
@@ -151,6 +154,55 @@ export default function MeetingDetailDialog({ open, onOpenChange, event, onRespo
                 </>
               )}
 
+              {isOrganizer && onUpdateClientSharing && (
+                <>
+                  <Separator />
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="space-y-0.5">
+                        <Label className="flex items-center gap-2">
+                          Partager avec le client
+                          <Badge variant="outline" className="text-[10px]">Visible client</Badge>
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Le compte rendu interne reste privé.
+                        </p>
+                      </div>
+                      <Switch
+                        checked={!!meta.shared_with_client}
+                        onCheckedChange={(v) => onUpdateClientSharing(meta.id, { shared_with_client: v })}
+                      />
+                    </div>
+
+                    {meta.shared_with_client && (
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-2">
+                          Compte rendu client
+                          <Badge variant="outline" className="text-[10px]">Visible client</Badge>
+                        </Label>
+                        <Textarea
+                          rows={4}
+                          value={clientSummary ?? meta.client_summary ?? ''}
+                          onChange={(e) => setClientSummary(e.target.value)}
+                          placeholder="Ce que le client doit retenir de cette réunion..."
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Ce compte rendu sera visible dans l'espace client. Le compte rendu interne reste privé.
+                        </p>
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            onUpdateClientSharing(meta.id, { client_summary: clientSummary ?? meta.client_summary ?? '' })
+                          }
+                        >
+                          Enregistrer le compte rendu client
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+
               {isPast && isOrganizer && (
                 <>
                   <Separator />
@@ -160,7 +212,10 @@ export default function MeetingDetailDialog({ open, onOpenChange, event, onRespo
                     </Button>
                   ) : (
                     <div className="space-y-2">
-                      <Label>Résumé / Décisions</Label>
+                      <Label className="flex items-center gap-2">
+                        Résumé / Décisions
+                        <Badge variant="secondary" className="text-[10px]">Interne</Badge>
+                      </Label>
                       <Textarea value={summary} onChange={(e) => setSummary(e.target.value)} rows={4} />
                       <div className="flex gap-2">
                         <Button size="sm" onClick={() => { onSaveSummary?.(meta.id, summary); setShowSummary(false); }}>

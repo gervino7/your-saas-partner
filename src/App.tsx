@@ -62,6 +62,9 @@ import PortalGuard from '@/components/portal/PortalGuard';
 import PortalActivationPage from '@/pages/PortalActivationPage';
 import PortalHomePage from '@/pages/PortalHomePage';
 import PortalDocumentsPage from '@/pages/PortalDocumentsPage';
+import PortalObligationsPage from '@/pages/PortalObligationsPage';
+import PortalInvoicesPage from '@/pages/PortalInvoicesPage';
+import PortalMeetingsPage from '@/pages/PortalMeetingsPage';
 
 const queryClient = new QueryClient();
 
@@ -279,6 +282,9 @@ const App = () => (
               <Route path="/espace-client/activation" element={<PortalActivationPage />} />
               <Route path="/espace-client" element={<PortalGuard><PortalHomePage /></PortalGuard>} />
               <Route path="/espace-client/documents" element={<PortalGuard><PortalDocumentsPage /></PortalGuard>} />
+             <Route path="/espace-client/obligations" element={<PortalGuard><PortalObligationsPage /></PortalGuard>} />
+             <Route path="/espace-client/factures" element={<PortalGuard><PortalInvoicesPage /></PortalGuard>} />
+             <Route path="/espace-client/reunions" element={<PortalGuard><PortalMeetingsPage /></PortalGuard>} />
               <Route path="/onboarding" element={<AuthGuard><OnboardingPage /></AuthGuard>} />
               <Route path="/compte-suspendu" element={<AuthGuard><CompteSuspenduPage /></AuthGuard>} />
 
