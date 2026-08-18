@@ -53,7 +53,7 @@ const RelanceDialog = ({ row, open, onOpenChange }: Props) => {
   const [cc, setCc] = useState('');
   const [includeMissing, setIncludeMissing] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [objet, setObjet] = useState(`Pièces comptables — ${row.obligation_label} ${row.period_label}`);
+  const [objet, setObjet] = useState(`Pièces comptables - ${row.obligation_label} ${row.period_label}`);
   const [message, setMessage] = useState(
 `Bonjour,
 
@@ -62,7 +62,7 @@ Dans le cadre de l'établissement de votre ${row.obligation_label} pour la péri
 L'échéance de dépôt est fixée au ${dueDateFr}. Afin de respecter ce délai, nous vous remercions de bien vouloir nous transmettre les documents manquants dans les meilleurs délais.
 
 Cordialement,
-${profile?.full_name ?? ''} — ${cabinet}`
+${profile?.full_name ?? ''} - ${cabinet}`
   );
 
   const recipient = emailTouched ? toEmail : (toEmail || client?.contact_email || '');
@@ -119,7 +119,7 @@ ${profile?.full_name ?? ''} — ${cabinet}`
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Relancer {row.client_name} — {row.obligation_label} {row.period_label}</DialogTitle>
+          <DialogTitle>Relancer {row.client_name} - {row.obligation_label} {row.period_label}</DialogTitle>
         </DialogHeader>
 
         {step === 'edit' ? (

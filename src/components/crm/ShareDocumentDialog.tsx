@@ -68,7 +68,7 @@ export default function ShareDocumentDialog({ clientId, open, onOpenChange }: Pr
             ) : (
               <>
                 <p>Glissez un fichier ici ou cliquez pour parcourir</p>
-                <p className="text-xs text-muted-foreground">PDF, images, Excel, Word, CSV, ZIP — 25 Mo max</p>
+                <p className="text-xs text-muted-foreground">PDF, images, Excel, Word, CSV, ZIP - 25 Mo max</p>
               </>
             )}
             <input

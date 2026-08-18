@@ -35,7 +35,7 @@ export default function PointageCard({ compact = false }: { compact?: boolean })
     const amplitude = arrivalTime && departTime
       ? `${formatTime(arrivalTime)} → ${formatTime(departTime)}`
       : '';
-    bannerText = `Journée terminée — ${amplitude}`;
+    bannerText = `Journée terminée - ${amplitude}`;
   }
 
   return (

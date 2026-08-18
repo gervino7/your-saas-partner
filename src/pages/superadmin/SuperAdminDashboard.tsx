@@ -59,7 +59,7 @@ export default function SuperAdminDashboard() {
         <CardHeader>
           <CardTitle>MRR estimé</CardTitle>
           <p className="text-xs text-muted-foreground">
-            Basé sur les plans attribués — ne reflète pas les paiements encaissés.
+            Basé sur les plans attribués - ne reflète pas les paiements encaissés.
           </p>
         </CardHeader>
         <CardContent className="space-y-3">

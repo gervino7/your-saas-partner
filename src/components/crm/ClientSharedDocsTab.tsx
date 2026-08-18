@@ -19,7 +19,7 @@ import {
 } from '@/hooks/useClientDocuments';
 import ShareDocumentDialog from './ShareDocumentDialog';
 
-const fmt = (v: string | null) => (v ? format(new Date(v), 'dd MMM yyyy', { locale: fr }) : '—');
+const fmt = (v: string | null) => (v ? format(new Date(v), 'dd MMM yyyy', { locale: fr }) : '-');
 
 export default function ClientSharedDocsTab({ clientId }: { clientId: string }) {
   const { data, isLoading } = useClientSharedDocs(clientId);
@@ -75,7 +75,7 @@ export default function ClientSharedDocsTab({ clientId }: { clientId: string }) 
                       {d.file_name} <span className="whitespace-nowrap">({formatFileSize(d.file_size)})</span>
                     </TableCell>
                     <TableCell>{fmt(d.uploaded_at)}</TableCell>
-                    <TableCell>{d.uploaded_by || '—'}</TableCell>
+                    <TableCell>{d.uploaded_by || '-'}</TableCell>
                     <TableCell>
                       {d.first_downloaded_at ? (
                         <span className="text-sm font-medium text-success">
@@ -149,7 +149,7 @@ export default function ClientSharedDocsTab({ clientId }: { clientId: string }) 
                     <TableCell>{fmt(d.uploaded_at)}</TableCell>
                     <TableCell>
                       <div className="text-sm">
-                        <p>{d.uploaded_by || '—'}</p>
+                        <p>{d.uploaded_by || '-'}</p>
                         {d.uploaded_by_email && <p className="text-xs text-muted-foreground">{d.uploaded_by_email}</p>}
                       </div>
                     </TableCell>

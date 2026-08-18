@@ -4,7 +4,7 @@ import { CURRENCY_LABELS } from '@/types/database';
 import { DollarSign, TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
 
 function formatAmount(amount: number | null) {
-  if (amount == null) return '—';
+  if (amount == null) return '-';
   return new Intl.NumberFormat('fr-FR').format(amount) + ' FCFA';
 }
 

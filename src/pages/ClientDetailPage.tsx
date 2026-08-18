@@ -35,7 +35,7 @@ const ClientDetailPage = () => {
         </Button>
         <div>
           <h1 className="text-2xl font-bold font-display">{client.name}</h1>
-          <p className="text-muted-foreground">{client.industry ? `${client.industry} — ` : ''}{client.city || ''} {client.country || ''}</p>
+          <p className="text-muted-foreground">{client.industry ? `${client.industry} - ` : ''}{client.city || ''} {client.country || ''}</p>
         </div>
       </div>
 

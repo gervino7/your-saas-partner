@@ -17,7 +17,7 @@ import {
   type PortalObligation,
 } from '@/hooks/usePortalSpace';
 
-const fmtDate = (v?: string | null) => (v ? format(new Date(v), 'dd MMMM yyyy', { locale: fr }) : '—');
+const fmtDate = (v?: string | null) => (v ? format(new Date(v), 'dd MMMM yyyy', { locale: fr }) : '-');
 
 function Chip({ status }: { status: string }) {
   const info = docStatusInfo(status);
@@ -50,7 +50,7 @@ function DocRow({ doc, periodId }: { doc: any; periodId: string }) {
 
       {doc.client_status === 'en_verification' && (
         <p className="text-xs text-muted-foreground">
-          {doc.file_name} — En cours de vérification par votre comptable
+          {doc.file_name} - En cours de vérification par votre comptable
         </p>
       )}
 
@@ -98,7 +98,7 @@ function ObligationCard({ item }: { item: PortalObligation }) {
           <div className="space-y-1">
             <p className="font-semibold">{item.obligation}</p>
             <p className="text-sm text-muted-foreground">
-              {item.period_label} — échéance {fmtDate(item.due_date)}
+              {item.period_label} - échéance {fmtDate(item.due_date)}
             </p>
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <span className={cn('inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium', statusChipClass(info.color))}>

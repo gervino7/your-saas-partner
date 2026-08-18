@@ -423,7 +423,7 @@ const ClientPortalPage = () => {
           <div className="flex items-center gap-3">
             <img src={logoImg} alt="Logo" className="h-7 w-auto opacity-60" />
             <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} Mission-DGC — Portail client sécurisé
+              © {new Date().getFullYear()} Mission-DGC - Portail client sécurisé
             </p>
           </div>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">

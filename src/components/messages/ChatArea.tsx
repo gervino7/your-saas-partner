@@ -303,7 +303,7 @@ export default function ChatArea({
                     {msg.reply_message && (
                       <div className="mb-1 ml-1 rounded-xl border-l-[3px] border-primary/30 bg-primary/[0.04] px-3 py-1.5 text-xs text-muted-foreground">
                         <span className="font-semibold text-primary/70">{msg.reply_message.sender_name}</span>
-                        <p className="mt-0.5 opacity-70">{msg.reply_message.content.slice(0, 60)}</p>
+                        <p className="mt-0.5 text-muted-foreground">{msg.reply_message.content.slice(0, 60)}</p>
                       </div>
                     )}
 

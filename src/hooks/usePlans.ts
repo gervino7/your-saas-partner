@@ -19,7 +19,7 @@ const mapPlan = (row: any): Plan => ({
   sort_order: row.sort_order ?? null,
 });
 
-/** Plans actifs — source unique pour tout affichage de plan. */
+/** Plans actifs - source unique pour tout affichage de plan. */
 export function usePlans() {
   return useQuery({
     queryKey: ['plans', 'active'],
@@ -36,7 +36,7 @@ export function usePlans() {
   });
 }
 
-/** Plans actifs et publics — page tarifs, onboarding. */
+/** Plans actifs et publics - page tarifs, onboarding. */
 export function usePublicPlans() {
   return useQuery({
     queryKey: ['plans', 'public'],
@@ -55,7 +55,7 @@ export function usePublicPlans() {
 }
 
 
-/** Tous les plans, y compris inactifs — console super admin. */
+/** Tous les plans, y compris inactifs - console super admin. */
 export function useAllPlans() {
   return useQuery({
     queryKey: ['plans', 'all'],

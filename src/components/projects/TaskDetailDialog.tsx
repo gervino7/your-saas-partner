@@ -185,10 +185,10 @@ export default function TaskDetailDialog({ task, open, onOpenChange, projectLead
               <p className="text-sm text-muted-foreground italic">Aucune description</p>
             )}
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <div><span className="text-muted-foreground">Heures estimées :</span> {task.estimated_hours ?? '—'}</div>
-              <div><span className="text-muted-foreground">Heures réelles :</span> {task.actual_hours ?? '—'}</div>
-              <div><span className="text-muted-foreground">Compartiment :</span> {task.compartment ?? '—'}</div>
-              <div><span className="text-muted-foreground">Créé le :</span> {task.created_at ? format(new Date(task.created_at), 'd MMM yyyy', { locale: fr }) : '—'}</div>
+              <div><span className="text-muted-foreground">Heures estimées :</span> {task.estimated_hours ?? '-'}</div>
+              <div><span className="text-muted-foreground">Heures réelles :</span> {task.actual_hours ?? '-'}</div>
+              <div><span className="text-muted-foreground">Compartiment :</span> {task.compartment ?? '-'}</div>
+              <div><span className="text-muted-foreground">Créé le :</span> {task.created_at ? format(new Date(task.created_at), 'd MMM yyyy', { locale: fr }) : '-'}</div>
             </div>
           </TabsContent>
 
@@ -303,7 +303,7 @@ function SubmissionTimeline({ submissions, loading }: { submissions: any[]; load
                   </Badge>
                   {ratingInfo && (
                     <Badge className={`text-[10px] ${ratingInfo.color}`}>
-                      <Star className="h-3 w-3 mr-0.5" /> {ratingInfo.value}/4 — {ratingInfo.label}
+                      <Star className="h-3 w-3 mr-0.5" /> {ratingInfo.value}/4 - {ratingInfo.label}
                     </Badge>
                   )}
                 </div>

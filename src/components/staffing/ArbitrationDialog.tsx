@@ -52,9 +52,9 @@ export default function ArbitrationDialog({ open, onOpenChange, request, mode }:
   if (!request) return null;
 
   const titles: Record<ArbitrationMode, string> = {
-    revise: `Réviser l'affectation — ${request.collaborator_name}`,
-    maintain: `Maintenir l'affectation — ${request.collaborator_name}`,
-    cancel: `Annuler l'affectation — ${request.collaborator_name}`,
+    revise: `Réviser l'affectation - ${request.collaborator_name}`,
+    maintain: `Maintenir l'affectation - ${request.collaborator_name}`,
+    cancel: `Annuler l'affectation - ${request.collaborator_name}`,
   };
 
   const submit = async () => {
@@ -74,7 +74,7 @@ export default function ArbitrationDialog({ open, onOpenChange, request, mode }:
           end_date: endDate ? format(endDate, 'yyyy-MM-dd') : null,
           role,
         });
-        toast.success('Affectation révisée — le collaborateur a été notifié.');
+        toast.success('Affectation révisée - le collaborateur a été notifié.');
       } else if (mode === 'maintain') {
         await arbitrate.mutateAsync({ id: request.id, chef_response: response, status: 'proposed' });
         toast.success('Réponse envoyée au collaborateur.');
@@ -137,7 +137,7 @@ export default function ArbitrationDialog({ open, onOpenChange, request, mode }:
                     <PopoverTrigger asChild>
                       <Button variant="outline" className={cn('w-full justify-start text-left font-normal', !startDate && 'text-muted-foreground')}>
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {startDate ? format(startDate, 'dd/MM/yyyy', { locale: fr }) : '—'}
+                        {startDate ? format(startDate, 'dd/MM/yyyy', { locale: fr }) : '-'}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">

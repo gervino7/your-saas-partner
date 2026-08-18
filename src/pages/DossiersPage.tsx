@@ -46,13 +46,13 @@ const DossiersPage = () => {
     return <EmptyState icon={Folder} title="Accès réservé aux responsables" description="Cette vue est réservée aux directeurs et chefs de mission." />;
   }
 
-  const regimeLabel = (v: string | null) => REGIMES.find((r) => r.value === v)?.label ?? '—';
+  const regimeLabel = (v: string | null) => REGIMES.find((r) => r.value === v)?.label ?? '-';
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold font-display">Dossiers comptables</h1>
-        <p className="text-muted-foreground text-sm">Vue portefeuille — santé et prochaines échéances par client.</p>
+        <p className="text-muted-foreground text-sm">Vue portefeuille - santé et prochaines échéances par client.</p>
       </div>
 
       <Card>
@@ -97,7 +97,7 @@ const DossiersPage = () => {
                     <TableRow key={r.client_id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/admin/clients/${r.client_id}?tab=fiscal`)}>
                       <TableCell className="font-medium">{r.client_name}</TableCell>
                       <TableCell className="text-sm">{regimeLabel(r.regime_fiscal)}</TableCell>
-                      <TableCell className="text-sm">{r.collaborateur_name ?? '—'}</TableCell>
+                      <TableCell className="text-sm">{r.collaborateur_name ?? '-'}</TableCell>
                       <TableCell className="text-center text-sm">{r.nb_obligations}</TableCell>
                       <TableCell className="text-center">
                         {r.nb_en_retard > 0
@@ -106,7 +106,7 @@ const DossiersPage = () => {
                       </TableCell>
                       <TableCell className="text-center text-sm">{r.nb_a_faire}</TableCell>
                       <TableCell className="text-sm">
-                        {r.prochaine_echeance ? format(new Date(r.prochaine_echeance), 'dd/MM/yyyy', { locale: fr }) : '—'}
+                        {r.prochaine_echeance ? format(new Date(r.prochaine_echeance), 'dd/MM/yyyy', { locale: fr }) : '-'}
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className={s.className}>{s.label}</Badge>

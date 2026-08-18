@@ -93,7 +93,7 @@ export default function AdminUsers() {
           <SelectTrigger className="w-[160px]"><SelectValue placeholder="Grade" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tous les grades</SelectItem>
-            {GRADES.map((g) => <SelectItem key={g} value={g}>{g} — {GRADE_LABELS[g]}</SelectItem>)}
+            {GRADES.map((g) => <SelectItem key={g} value={g}>{g} - {GRADE_LABELS[g]}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={filterStatus} onValueChange={setFilterStatus}>
@@ -138,7 +138,7 @@ export default function AdminUsers() {
                       </div>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">{u.email}</TableCell>
-                    <TableCell><Badge variant="outline" className="text-xs">{u.grade || '—'}</Badge></TableCell>
+                    <TableCell><Badge variant="outline" className="text-xs">{u.grade || '-'}</Badge></TableCell>
                     <TableCell><Badge variant={u.is_online ? 'default' : 'secondary'} className="text-[10px]">{u.is_online ? 'En ligne' : 'Hors ligne'}</Badge></TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
@@ -177,7 +177,7 @@ export default function AdminUsers() {
               <Label>Grade</Label>
               <Select value={editingUser?.grade || 'AUD'} onValueChange={(v) => setEditingUser((prev) => prev ? { ...prev, grade: v as Grade } : null)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{GRADES.map((g) => <SelectItem key={g} value={g}>{g} — {GRADE_LABELS[g]}</SelectItem>)}</SelectContent>
+                <SelectContent>{GRADES.map((g) => <SelectItem key={g} value={g}>{g} - {GRADE_LABELS[g]}</SelectItem>)}</SelectContent>
               </Select>
             </div>
           </div>
@@ -217,7 +217,7 @@ export default function AdminUsers() {
             <div><Label>Grade</Label>
               <Select value={inviteGrade} onValueChange={(v) => setInviteGrade(v as Grade)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{GRADES.map((g) => (<SelectItem key={g} value={g}>{g} — {GRADE_LABELS[g]}</SelectItem>))}</SelectContent>
+                <SelectContent>{GRADES.map((g) => (<SelectItem key={g} value={g}>{g} - {GRADE_LABELS[g]}</SelectItem>))}</SelectContent>
               </Select>
             </div>
           </div>

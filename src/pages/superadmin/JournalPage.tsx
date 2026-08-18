@@ -92,16 +92,16 @@ export default function JournalPage() {
               {filtered.map((l) => (
                 <TableRow key={l.id}>
                   <TableCell className="whitespace-nowrap text-sm">
-                    {l.created_at ? format(new Date(l.created_at), 'dd/MM/yyyy HH:mm') : '—'}
+                    {l.created_at ? format(new Date(l.created_at), 'dd/MM/yyyy HH:mm') : '-'}
                   </TableCell>
-                  <TableCell className="text-sm">{l.admin_email ?? '—'}</TableCell>
+                  <TableCell className="text-sm">{l.admin_email ?? '-'}</TableCell>
                   <TableCell><Badge variant="outline">{auditLabel(l.action)}</Badge></TableCell>
                   <TableCell className="text-sm">
-                    {l.target_label ?? '—'}
+                    {l.target_label ?? '-'}
                     {l.target_type && <span className="ml-1 text-xs text-muted-foreground">({l.target_type})</span>}
                   </TableCell>
                   <TableCell className="max-w-[280px] truncate text-xs text-muted-foreground">
-                    {l.details ? JSON.stringify(l.details) : '—'}
+                    {l.details ? JSON.stringify(l.details) : '-'}
                   </TableCell>
                 </TableRow>
               ))}

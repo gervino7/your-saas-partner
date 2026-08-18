@@ -80,7 +80,7 @@ export default function MeetingDetailDialog({ open, onOpenChange, event, onRespo
           </div>
           <div className="flex items-center gap-2 text-sm">
             <Clock className="h-4 w-4 text-muted-foreground" />
-            <span>{format(event.start, 'HH:mm')} — {format(event.end, 'HH:mm')}</span>
+            <span>{format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}</span>
           </div>
 
           {meta.description && (

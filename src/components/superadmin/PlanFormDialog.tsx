@@ -82,7 +82,7 @@ export default function PlanFormDialog({ open, onOpenChange, plan, orgsUsingPlan
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEdit ? `Modifier le plan — ${plan?.name}` : 'Créer un plan'}</DialogTitle>
+          <DialogTitle>{isEdit ? `Modifier le plan - ${plan?.name}` : 'Créer un plan'}</DialogTitle>
           <DialogDescription>
             Les plans sont lus en base : aucune mise en production n'est nécessaire pour changer un tarif.
           </DialogDescription>

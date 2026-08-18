@@ -56,8 +56,8 @@ export default function AdminDashboard() {
         <KPICard icon={Users} label="Utilisateurs actifs" value={`${kpis?.activeToday ?? 0} / ${kpis?.totalUsers ?? 0}`} sub="aujourd'hui" />
         <KPICard icon={Clock} label="Taux d'utilisation" value={`${kpis?.utilization ?? 0}%`} sub={`${kpis?.billableHours?.toFixed(0) ?? 0}h fact.`} />
         <KPICard icon={DollarSign} label="Revenu mensuel" value={`${(kpis?.monthlyRevenue ?? 0).toLocaleString('fr-FR')} FCFA`} />
-        <KPICard icon={Star} label="Score qualité" value={kpis?.avgQuality ? `${kpis.avgQuality.toFixed(1)}/4` : '—'} />
-        <KPICard icon={Heart} label="Satisfaction client" value={kpis?.avgSatisfaction ? `${kpis.avgSatisfaction.toFixed(1)}/5` : '—'} />
+        <KPICard icon={Star} label="Score qualité" value={kpis?.avgQuality ? `${kpis.avgQuality.toFixed(1)}/4` : '-'} />
+        <KPICard icon={Heart} label="Satisfaction client" value={kpis?.avgSatisfaction ? `${kpis.avgSatisfaction.toFixed(1)}/5` : '-'} />
       </div>
 
       {/* Charts row 1 */}

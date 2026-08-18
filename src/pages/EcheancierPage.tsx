@@ -191,7 +191,7 @@ const EcheancierPage = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold font-display">Échéancier</h1>
-        <p className="text-muted-foreground text-sm">Ne rien rater — pilotage quotidien des dossiers.</p>
+        <p className="text-muted-foreground text-sm">Ne rien rater - pilotage quotidien des dossiers.</p>
       </div>
 
       {/* KPIs */}
@@ -295,7 +295,7 @@ const EcheancierPage = () => {
                 <SelectContent>
                   <SelectItem value="all">Toutes</SelectItem>
                   {obligationOptions.map(([code, label]) => (
-                    <SelectItem key={code} value={code}>{code} — {label}</SelectItem>
+                    <SelectItem key={code} value={code}>{code} - {label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -438,7 +438,7 @@ const EcheancierPage = () => {
                       <TableCell>
                         {(() => {
                           const c = docCounts?.[r.id];
-                          if (!c || c.total === 0) return <span className="text-xs text-muted-foreground">—</span>;
+                          if (!c || c.total === 0) return <span className="text-xs text-muted-foreground">-</span>;
                           const done = c.received >= c.total;
                           return (
                             <div className="flex items-center gap-1.5">
@@ -459,12 +459,12 @@ const EcheancierPage = () => {
                           );
                         })()}
                       </TableCell>
-                      <TableCell className="text-sm">{r.assigned_name ?? '—'}</TableCell>
+                      <TableCell className="text-sm">{r.assigned_name ?? '-'}</TableCell>
                       <TableCell className="text-sm">
                         <div className="flex items-center gap-1.5">
                           {r.last_reminder_at
                             ? formatDistanceToNow(new Date(r.last_reminder_at), { addSuffix: true, locale: fr })
-                            : '—'}
+                            : '-'}
                           {staleRelance && <span className="h-2 w-2 rounded-full bg-amber-500" title="Relance à effectuer" />}
                         </div>
                       </TableCell>

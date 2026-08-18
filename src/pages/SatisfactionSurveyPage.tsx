@@ -115,7 +115,7 @@ const SatisfactionSurveyPage = () => {
         <div className="text-center">
           <h1 className="text-2xl font-bold font-display">Enquête de satisfaction</h1>
           <p className="text-muted-foreground mt-2">
-            Mission : <strong>{(survey.mission as any)?.name}</strong> — {(survey.client as any)?.name}
+            Mission : <strong>{(survey.mission as any)?.name}</strong> - {(survey.client as any)?.name}
           </p>
         </div>
 

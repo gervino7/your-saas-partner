@@ -51,7 +51,7 @@ const BulkRelanceDialog = ({ rows, open, onOpenChange }: Props) => {
   });
 
   const [step, setStep] = useState<'edit' | 'preview'>('edit');
-  const [objet, setObjet] = useState('Pièces comptables — {obligation} {periode}');
+  const [objet, setObjet] = useState('Pièces comptables - {obligation} {periode}');
   const [message, setMessage] = useState(
 `Bonjour,
 
@@ -60,7 +60,7 @@ Dans le cadre de l'établissement de votre {obligation} pour la période {period
 L'échéance de dépôt est fixée au {echeance}. Afin de respecter ce délai, nous vous remercions de bien vouloir nous transmettre les documents manquants dans les meilleurs délais.
 
 Cordialement,
-${profile?.full_name ?? ''} — ${cabinet}`
+${profile?.full_name ?? ''} - ${cabinet}`
   );
   const [progress, setProgress] = useState<number | null>(null);
 
@@ -95,7 +95,7 @@ ${profile?.full_name ?? ''} — ${cabinet}`
       setProgress(Math.round(((i + 1) / sendable.length) * 100));
     }
     setProgress(null);
-    const skippedNote = skipped.length ? ` — ${skipped.length} ignorée(s) (sans email)` : '';
+    const skippedNote = skipped.length ? ` - ${skipped.length} ignorée(s) (sans email)` : '';
     toast[fail ? 'warning' : 'success'](`${ok} relance(s) envoyée(s), ${fail} échec(s)${skippedNote}`);
     onOpenChange(false);
   };
@@ -150,7 +150,7 @@ ${profile?.full_name ?? ''} — ${cabinet}`
         ) : (
           <div className="space-y-4">
             <p className="text-xs text-muted-foreground">
-              Aperçu du premier message — les autres suivront le même modèle.
+              Aperçu du premier message - les autres suivront le même modèle.
               {skipped.length > 0 && ` ${skipped.length} destinataire(s) sans email seront ignorés.`}
             </p>
             <iframe title="Aperçu" srcDoc={previewHtml} className="w-full h-[400px] rounded-lg border bg-white" />

@@ -203,7 +203,7 @@ export function useSuperAdminTickets(status?: string | null) {
   });
 }
 
-/** Nombre de demandes ouvertes (hors résolu / fermé) — badge de navigation. */
+/** Nombre de demandes ouvertes (hors résolu / fermé) - badge de navigation. */
 export function useOpenTicketsCount() {
   const { data = [] } = useSuperAdminTickets(null);
   return data.filter((t) => t.status !== 'resolu' && t.status !== 'ferme').length;

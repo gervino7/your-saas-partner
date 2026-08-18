@@ -182,7 +182,7 @@ export function useUpsertFiscalProfile() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (values: Record<string, unknown> & { client_id: string }) => {
-      // organization_id is filled by a database trigger — never send it.
+      // organization_id is filled by a database trigger - never send it.
       const { organization_id, created_at, updated_at, ...payload } = values as Record<string, unknown>;
       const { data, error } = await supabase
         .from('client_fiscal_profile')
@@ -290,7 +290,7 @@ export function useToggleClientObligation() {
       responsible_id?: string | null;
       custom_deadline_day?: number | null;
     }) => {
-      // organization_id is filled by a database trigger — never send it.
+      // organization_id is filled by a database trigger - never send it.
       const payload = { ...values };
       const { data, error } = await supabase
         .from('client_obligations')
@@ -358,7 +358,7 @@ export function useLogRelance() {
   });
 }
 
-/** Real email reminder — goes through the send-client-reminder edge function. */
+/** Real email reminder - goes through the send-client-reminder edge function. */
 export function useSendClientReminder() {
   const qc = useQueryClient();
   return useMutation({

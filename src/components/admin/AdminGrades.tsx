@@ -121,7 +121,7 @@ export default function AdminGrades() {
   };
 
   const formatRate = (rate: number, currency: string) => {
-    if (!rate) return '—';
+    if (!rate) return '-';
     return `${rate.toLocaleString('fr-FR')} ${currency}`;
   };
 
@@ -345,7 +345,7 @@ export default function AdminGrades() {
                                 </div>
                               </div>
                               <span className="text-xs font-medium text-foreground/70 shrink-0 ml-2 pointer-events-none">
-                                {g.daily_rate ? `${g.daily_rate.toLocaleString('fr-FR')} ${g.currency}` : '—'}
+                                {g.daily_rate ? `${g.daily_rate.toLocaleString('fr-FR')} ${g.currency}` : '-'}
                               </span>
                             </button>
                           </li>

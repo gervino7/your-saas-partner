@@ -35,7 +35,7 @@ const AttachToObligationDialog = ({ open, onOpenChange, upload }: Props) => {
         <DialogHeader>
           <DialogTitle>Rattacher à une déclaration</DialogTitle>
           <DialogDescription>
-            {upload ? `${upload.title || upload.file_name} — ${upload.client_name}` : ''}
+            {upload ? `${upload.title || upload.file_name} - ${upload.client_name}` : ''}
           </DialogDescription>
         </DialogHeader>
 
@@ -58,8 +58,8 @@ const AttachToObligationDialog = ({ open, onOpenChange, upload }: Props) => {
                   <span className="flex-1">
                     <span className="block">{d.label}</span>
                     <span className="block text-[13px] text-muted-foreground">
-                      {d.obligation_label} — {d.period_label}
-                      {d.due_date ? ` — échéance ${format(new Date(d.due_date), 'dd/MM/yyyy')}` : ''}
+                      {d.obligation_label} - {d.period_label}
+                      {d.due_date ? ` - échéance ${format(new Date(d.due_date), 'dd/MM/yyyy')}` : ''}
                     </span>
                   </span>
                   <Badge variant="outline" className="font-mono text-[11px]">{d.obligation_code}</Badge>

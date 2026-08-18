@@ -78,7 +78,7 @@ const LandingPage = () => {
               La plateforme de gestion de missions pour les cabinets d'excellence
             </h1>
             <p className="mt-6 text-lg md:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
-              Planifiez vos missions, pilotez vos équipes, gérez vos COPIL et suivez la rentabilité — le tout dans une seule plateforme.
+              Planifiez vos missions, pilotez vos équipes, gérez vos COPIL et suivez la rentabilité - le tout dans une seule plateforme.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button size="lg" onClick={() => navigate('/login')} className="text-base px-8 h-12 bg-white text-foreground hover:bg-white/90 font-semibold shadow-elevated">
@@ -264,7 +264,7 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="mt-10 pt-8 border-t border-border/50 text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Mission-DGC — D&G CONSEIL. Tous droits réservés.
+            © {new Date().getFullYear()} Mission-DGC - D&G CONSEIL. Tous droits réservés.
           </div>
         </div>
       </footer>

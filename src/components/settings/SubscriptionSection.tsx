@@ -48,7 +48,7 @@ const SubscriptionSection = () => {
         <div>
           <CardTitle>Mon abonnement</CardTitle>
           <CardDescription>
-            Plan actuel : <Badge variant="outline" className="ml-1">{plan.name}</Badge> — {formatFcfa(plan.price_monthly)}
+            Plan actuel : <Badge variant="outline" className="ml-1">{plan.name}</Badge> - {formatFcfa(plan.price_monthly)}
           </CardDescription>
         </div>
         <Button onClick={() => setOpen(true)}>Changer de plan</Button>

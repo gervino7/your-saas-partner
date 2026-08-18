@@ -111,7 +111,7 @@ export default function PortalLayout({ clientName, children }: PortalLayoutProps
       <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
 
       <footer className="mx-auto max-w-5xl px-4 pb-8 text-center text-xs text-muted-foreground">
-        Espace client sécurisé — {dash?.organization_name ?? 'votre cabinet'}
+        Espace client sécurisé - {dash?.organization_name ?? 'votre cabinet'}
       </footer>
 
       <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t bg-background md:hidden">

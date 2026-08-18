@@ -15,7 +15,7 @@ import { useTableSort } from '@/hooks/useTableSort';
 import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
 function formatSize(bytes: number | null) {
-  if (!bytes) return '—';
+  if (!bytes) return '-';
   if (bytes < 1024) return `${bytes} o`;
   if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} Ko`;
   return `${(bytes / 1048576).toFixed(1)} Mo`;
@@ -76,15 +76,15 @@ export default function ClientDocumentsTab({ clientId }: { clientId: string }) {
                     {doc.name}
                   </TableCell>
                   <TableCell className="text-xs text-muted-foreground">
-                    {doc.mission?.code || doc.mission?.name || '—'}
+                    {doc.mission?.code || doc.mission?.name || '-'}
                   </TableCell>
                   <TableCell className="text-xs">{formatSize(doc.file_size)}</TableCell>
                   <TableCell>
                     <Badge variant="secondary" className="text-xs">{doc.status || 'brouillon'}</Badge>
                   </TableCell>
-                  <TableCell className="text-xs">{doc.uploader?.full_name || '—'}</TableCell>
+                  <TableCell className="text-xs">{doc.uploader?.full_name || '-'}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">
-                    {doc.created_at ? format(new Date(doc.created_at), 'dd MMM yyyy', { locale: fr }) : '—'}
+                    {doc.created_at ? format(new Date(doc.created_at), 'dd MMM yyyy', { locale: fr }) : '-'}
                   </TableCell>
                   <TableCell>
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => downloadDocument(doc.file_path, doc.name)}>

@@ -7,14 +7,14 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 function formatAmplitude(seconds: number | null | undefined): string {
-  if (!seconds) return '—';
+  if (!seconds) return '-';
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   return `${h}h ${m.toString().padStart(2, '0')}`;
 }
 
 function formatT(iso: string | null | undefined) {
-  if (!iso) return '—';
+  if (!iso) return '-';
   const d = new Date(iso);
   return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
 }

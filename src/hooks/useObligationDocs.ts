@@ -41,7 +41,7 @@ export function usePeriodDocuments(periodId: string | undefined) {
       };
       const documents = payload.documents ?? [];
 
-      // The RPC does not expose file_path / validator name — fetch them in one go.
+      // The RPC does not expose file_path / validator name - fetch them in one go.
       let extras: Record<string, { file_path: string | null; validator: string | null }> = {};
       if (documents.length) {
         const { data: rows } = await supabase
@@ -104,7 +104,7 @@ export function useUpdateDocument() {
       validated_at?: string | null;
       validated_by?: string | null;
     }) => {
-      // organization_id is filled by a database trigger — never send it.
+      // organization_id is filled by a database trigger - never send it.
       const payload = { ...values } as Record<string, unknown>;
       delete payload.organization_id;
       const { error } = await supabase
@@ -246,7 +246,7 @@ export function useSeedDocTypes() {
   });
 }
 
-/** Private 'documents' bucket — always sign, never getPublicUrl. */
+/** Private 'documents' bucket - always sign, never getPublicUrl. */
 export async function getObligationDocUrl(path: string): Promise<string | null> {
   const { data, error } = await supabase.storage.from('documents').createSignedUrl(path, 3600);
   if (error || !data?.signedUrl) {

@@ -105,7 +105,7 @@ export default function SortieDialog({ open, onOpenChange }: Props) {
             <Select value={missionId} onValueChange={setMissionId}>
               <SelectTrigger><SelectValue placeholder="Aucune" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value={NONE}>— Aucune —</SelectItem>
+                <SelectItem value={NONE}>- Aucune -</SelectItem>
                 {missions.map((m: any) => (
                   <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
                 ))}
@@ -118,7 +118,7 @@ export default function SortieDialog({ open, onOpenChange }: Props) {
             <Select value={authorizedBy} onValueChange={setAuthorizedBy}>
               <SelectTrigger><SelectValue placeholder="Aucun" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value={NONE}>— Aucun —</SelectItem>
+                <SelectItem value={NONE}>- Aucun -</SelectItem>
                 {leads.map((u: any) => (
                   <SelectItem key={u.id} value={u.id}>{u.full_name} ({u.grade})</SelectItem>
                 ))}

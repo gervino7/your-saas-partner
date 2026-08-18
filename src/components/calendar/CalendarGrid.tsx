@@ -50,7 +50,7 @@ export default function CalendarGrid({ events, onDateClick, onEventClick, onCrea
     if (view === 'week') {
       const s = startOfISOWeek(currentDate);
       const e = endOfISOWeek(currentDate);
-      return `${format(s, 'd', { locale: fr })} — ${format(e, 'd MMM yyyy', { locale: fr })}`;
+      return `${format(s, 'd', { locale: fr })} - ${format(e, 'd MMM yyyy', { locale: fr })}`;
     }
     return format(currentDate, "EEEE d MMMM yyyy", { locale: fr });
   }, [currentDate, view]);
@@ -303,7 +303,7 @@ export default function CalendarGrid({ events, onDateClick, onEventClick, onCrea
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-sm text-foreground">{evt.title}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        {format(evt.start, 'HH:mm')} — {format(evt.end, 'HH:mm')}
+                        {format(evt.start, 'HH:mm')} - {format(evt.end, 'HH:mm')}
                       </p>
                     </div>
                   </button>
@@ -363,7 +363,7 @@ export default function CalendarGrid({ events, onDateClick, onEventClick, onCrea
                             </p>
                           </div>
                           <span className="text-xs text-muted-foreground whitespace-nowrap font-medium">
-                            {format(evt.start, 'HH:mm')} — {format(evt.end, 'HH:mm')}
+                            {format(evt.start, 'HH:mm')} - {format(evt.end, 'HH:mm')}
                           </span>
                         </button>
                       );

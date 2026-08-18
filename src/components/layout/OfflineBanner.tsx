@@ -28,7 +28,7 @@ const OfflineBanner = () => {
       {!isOnline && (
         <>
           <WifiOff className="h-3.5 w-3.5" />
-          <span>Vous êtes hors ligne — les modifications seront synchronisées à la reconnexion</span>
+          <span>Vous êtes hors ligne - les modifications seront synchronisées à la reconnexion</span>
         </>
       )}
       {isOnline && pendingCount > 0 && (

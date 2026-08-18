@@ -15,9 +15,9 @@ import { usePlatformAdmins, useGrantAdmin, useRevokeAdmin, useIsPlatformAdmin, t
 import { format } from 'date-fns';
 
 const ROLE_LABEL: Record<string, string> = {
-  owner: 'Propriétaire — contrôle total',
-  admin: 'Administrateur — gestion des organisations',
-  support: 'Support — lecture seule',
+  owner: 'Propriétaire - contrôle total',
+  admin: 'Administrateur - gestion des organisations',
+  support: 'Support - lecture seule',
 };
 
 export default function AdministrateursPage() {
@@ -39,7 +39,7 @@ export default function AdministrateursPage() {
       <div>
         <h1 className="font-display text-2xl font-bold">Administrateurs plateforme</h1>
         <p className="text-sm text-muted-foreground">
-          {isOwner ? 'Gérez les accès à cette console.' : 'Consultation seule — réservé au propriétaire.'}
+          {isOwner ? 'Gérez les accès à cette console.' : 'Consultation seule - réservé au propriétaire.'}
         </p>
       </div>
 
@@ -96,7 +96,7 @@ export default function AdministrateursPage() {
                       : <Badge variant="destructive">Révoqué</Badge>}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {a.granted_at ? format(new Date(a.granted_at), 'dd/MM/yyyy') : '—'}
+                    {a.granted_at ? format(new Date(a.granted_at), 'dd/MM/yyyy') : '-'}
                   </TableCell>
                   {isOwner && (
                     <TableCell>

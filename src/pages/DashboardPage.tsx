@@ -203,7 +203,7 @@ const DashboardPage = () => {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm">
                         <span className="font-medium">{actionLabels[log.action] ?? log.action}</span>
-                        {log.entity_type && <span className="text-muted-foreground"> — {log.entity_type}</span>}
+                        {log.entity_type && <span className="text-muted-foreground"> - {log.entity_type}</span>}
                       </p>
                     </div>
                     <span className="text-xs text-muted-foreground shrink-0">

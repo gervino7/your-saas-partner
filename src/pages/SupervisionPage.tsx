@@ -165,7 +165,7 @@ export default function SupervisionPage() {
                     <TableCell className="text-sm text-muted-foreground">
                       {r.last_activity
                         ? formatDistanceToNow(new Date(r.last_activity), { addSuffix: true, locale: fr })
-                        : '—'}
+                        : '-'}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -316,7 +316,7 @@ function DetailDialog({
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-base">
-                      Répartition par catégorie — {format(new Date(latest.report_date), 'dd MMM', { locale: fr })}
+                      Répartition par catégorie - {format(new Date(latest.report_date), 'dd MMM', { locale: fr })}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">

@@ -122,7 +122,7 @@ export default function SuperAdminSupportTicketPage() {
                     <span className="font-medium text-foreground">{m.author_name}</span>
                     <span>{m.created_at ? format(new Date(m.created_at), 'dd/MM/yyyy HH:mm') : ''}</span>
                     {m.is_internal_note && (
-                      <span className="font-medium text-amber-700">Note interne — non visible par le cabinet</span>
+                      <span className="font-medium text-amber-700">Note interne - non visible par le cabinet</span>
                     )}
                   </div>
                   <p className="whitespace-pre-wrap text-sm">{m.message}</p>

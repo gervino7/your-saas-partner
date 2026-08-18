@@ -44,7 +44,7 @@ export default function MissionsTable({ missions }: { missions: any[] }) {
                   {m.name}
                 </Link>
               </TableCell>
-              <TableCell className="text-sm text-muted-foreground">{m.client?.name ?? '—'}</TableCell>
+              <TableCell className="text-sm text-muted-foreground">{m.client?.name ?? '-'}</TableCell>
               <TableCell><MissionStatusBadge status={m.status ?? 'draft'} /></TableCell>
               <TableCell><PriorityBadge priority={m.priority} /></TableCell>
               <TableCell>
@@ -70,9 +70,9 @@ export default function MissionsTable({ missions }: { missions: any[] }) {
                 </div>
               </TableCell>
               <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
-                {m.start_date ? format(new Date(m.start_date), 'dd/MM/yy', { locale: fr }) : '—'}
-                {' — '}
-                {m.end_date ? format(new Date(m.end_date), 'dd/MM/yy', { locale: fr }) : '—'}
+                {m.start_date ? format(new Date(m.start_date), 'dd/MM/yy', { locale: fr }) : '-'}
+                {' - '}
+                {m.end_date ? format(new Date(m.end_date), 'dd/MM/yy', { locale: fr }) : '-'}
               </TableCell>
             </TableRow>
           ))}

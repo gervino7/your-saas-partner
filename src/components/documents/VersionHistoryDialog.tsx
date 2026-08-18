@@ -27,7 +27,7 @@ export default function VersionHistoryDialog({ doc, open, onClose }: Props) {
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle className="font-display">Historique des versions — {doc.name}</DialogTitle>
+          <DialogTitle className="font-display">Historique des versions - {doc.name}</DialogTitle>
         </DialogHeader>
         <div className="px-5 py-4 space-y-2 max-h-[65vh] overflow-y-auto dialog-form-bg">
           {versions.map((v) => (
@@ -35,7 +35,7 @@ export default function VersionHistoryDialog({ doc, open, onClose }: Props) {
               <div>
                 <p className="text-sm font-medium">v{v.version}</p>
                 <p className="text-xs text-muted-foreground">
-                  {(v.uploader as any)?.full_name || '—'} · {v.created_at ? format(new Date(v.created_at), 'dd MMM yyyy HH:mm', { locale: fr }) : ''}
+                  {(v.uploader as any)?.full_name || '-'} · {v.created_at ? format(new Date(v.created_at), 'dd MMM yyyy HH:mm', { locale: fr }) : ''}
                 </p>
                 <p className="text-xs text-muted-foreground">{formatFileSize(v.file_size)}</p>
               </div>

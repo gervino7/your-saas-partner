@@ -141,7 +141,7 @@ function MyAssignmentsTab() {
                       </Button>
                       {revision >= 2 ? (
                         <p className="flex-1 text-[11px] text-muted-foreground italic self-center">
-                          Plusieurs échanges ont eu lieu — contactez directement votre responsable si un désaccord persiste.
+                          Plusieurs échanges ont eu lieu - contactez directement votre responsable si un désaccord persiste.
                         </p>
                       ) : (
                         <Button size="sm" variant="outline" className="flex-1" onClick={() => setAdjustFor(a.id)}>
@@ -428,7 +428,7 @@ function TeamAssignmentsTab() {
                       </div>
                     </TableCell>
                     <TableCell className="text-sm">{a.mission?.name}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{a.project?.name ?? '—'}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{a.project?.name ?? '-'}</TableCell>
                     <TableCell>
                       <Badge className={cn('border', ROLE_BADGE_CLASSES[a.role])} variant="outline">
                         {STAFFING_ROLES[a.role].label}
@@ -564,7 +564,7 @@ function TeamWorkloadTab() {
                     ) : rate < 50 && r.allocated > 0 ? (
                       <Badge className="bg-amber-100 text-amber-800 border-amber-300" variant="outline">Sous-charge</Badge>
                     ) : (
-                      <span className="text-xs text-muted-foreground">—</span>
+                      <span className="text-xs text-muted-foreground">-</span>
                     )}
                   </TableCell>
                 </TableRow>

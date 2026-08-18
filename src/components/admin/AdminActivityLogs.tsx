@@ -128,15 +128,15 @@ function SortableActivityTable({ logs, isLoading }: { logs: any[]; isLoading: bo
                         <AvatarImage src={log.user?.avatar_url} />
                         <AvatarFallback className="text-[10px]">{log.user?.full_name?.charAt(0)}</AvatarFallback>
                       </Avatar>
-                      <span className="text-sm">{log.user?.full_name || '—'}</span>
+                      <span className="text-sm">{log.user?.full_name || '-'}</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="text-[10px]">{ACTION_LABELS[log.action] || log.action}</Badge>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{log.entity_type || '—'}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{log.entity_type || '-'}</TableCell>
                   <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">
-                    {log.metadata ? JSON.stringify(log.metadata).slice(0, 80) : '—'}
+                    {log.metadata ? JSON.stringify(log.metadata).slice(0, 80) : '-'}
                   </TableCell>
                 </TableRow>
               ))

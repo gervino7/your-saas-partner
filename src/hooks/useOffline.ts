@@ -34,7 +34,7 @@ export function useOffline() {
   useEffect(() => {
     const handleOnline = async () => {
       setOnline(true);
-      toast.success('Connexion rétablie — synchronisation en cours…');
+      toast.success('Connexion rétablie - synchronisation en cours…');
       await syncNow();
     };
 

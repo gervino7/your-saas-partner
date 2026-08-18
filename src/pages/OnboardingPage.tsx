@@ -141,7 +141,7 @@ const OnboardingPage = () => {
       const orgUrl = `${window.location.origin}/org/${finalSlug}`;
       toast({
         title: 'Organisation créée 🎉',
-        description: `Votre URL : ${orgUrl} — un email récapitulatif vous a été envoyé.`,
+        description: `Votre URL : ${orgUrl} - un email récapitulatif vous a été envoyé.`,
       });
       navigate('/', { replace: true });
     } catch (e: unknown) {
@@ -232,7 +232,7 @@ const OnboardingPage = () => {
                 <div><Label>Poste</Label><Input value={position} onChange={(e) => setPosition(e.target.value)} /></div>
                 <div className="flex items-center gap-2 pt-2">
                   <Label>Grade :</Label>
-                  <Badge>DA — Directeur Associé</Badge>
+                  <Badge>DA - Directeur Associé</Badge>
                 </div>
               </CardContent>
             </>
@@ -285,12 +285,12 @@ const OnboardingPage = () => {
               <CardContent className="space-y-3 text-sm">
                 <div className="grid grid-cols-2 gap-2"><span className="text-muted-foreground">Organisation</span><span className="font-medium">{orgName}</span></div>
                 <div className="grid grid-cols-2 gap-2"><span className="text-muted-foreground">Secteur</span><span>{sector}</span></div>
-                <div className="grid grid-cols-2 gap-2"><span className="text-muted-foreground">Pays / Ville</span><span>{country} / {city || '—'}</span></div>
+                <div className="grid grid-cols-2 gap-2"><span className="text-muted-foreground">Pays / Ville</span><span>{country} / {city || '-'}</span></div>
                 <div className="grid grid-cols-2 gap-2"><span className="text-muted-foreground">Nom complet</span><span>{fullName}</span></div>
-                <div className="grid grid-cols-2 gap-2"><span className="text-muted-foreground">Téléphone</span><span>{phone || '—'}</span></div>
+                <div className="grid grid-cols-2 gap-2"><span className="text-muted-foreground">Téléphone</span><span>{phone || '-'}</span></div>
                 <div className="grid grid-cols-2 gap-2"><span className="text-muted-foreground">Poste</span><span>{position}</span></div>
-                <div className="grid grid-cols-2 gap-2"><span className="text-muted-foreground">Grade</span><span>DA — Directeur Associé</span></div>
-                <div className="grid grid-cols-2 gap-2"><span className="text-muted-foreground">Plan</span><span className="font-medium">{selectedPlan?.name ?? planId} — {formatFcfa(selectedPlan?.price_monthly ?? 0)}</span></div>
+                <div className="grid grid-cols-2 gap-2"><span className="text-muted-foreground">Grade</span><span>DA - Directeur Associé</span></div>
+                <div className="grid grid-cols-2 gap-2"><span className="text-muted-foreground">Plan</span><span className="font-medium">{selectedPlan?.name ?? planId} - {formatFcfa(selectedPlan?.price_monthly ?? 0)}</span></div>
               </CardContent>
             </>
           )}

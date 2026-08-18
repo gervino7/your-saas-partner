@@ -22,7 +22,7 @@ import {
 import { usePortalAccessLog } from '@/hooks/useClientDocuments';
 import { PORTAL_LOG_ACTIONS } from '@/lib/portalDocs';
 
-const fmt = (value: string | null) => (value ? format(new Date(value), 'dd MMM yyyy', { locale: fr }) : '—');
+const fmt = (value: string | null) => (value ? format(new Date(value), 'dd MMM yyyy', { locale: fr }) : '-');
 
 interface Props {
   clientId: string;
@@ -101,8 +101,8 @@ export default function ClientPortalAccessTab({ clientId, defaultEmail }: Props)
                 {accounts.map((a) => (
                   <TableRow key={a.id}>
                     <TableCell className="font-medium">{a.email}</TableCell>
-                    <TableCell>{a.full_name || '—'}</TableCell>
-                    <TableCell>{a.phone || '—'}</TableCell>
+                    <TableCell>{a.full_name || '-'}</TableCell>
+                    <TableCell>{a.phone || '-'}</TableCell>
                     <TableCell>{fmt(a.activated_at)}</TableCell>
                     <TableCell>
                       {a.last_seen_at ? fmt(a.last_seen_at) : <span className="text-muted-foreground">Jamais connecté</span>}
@@ -233,9 +233,9 @@ export default function ClientPortalAccessTab({ clientId, defaultEmail }: Props)
                         <TableCell className="whitespace-nowrap">
                           {format(new Date(l.created_at), 'dd MMM yyyy HH:mm', { locale: fr })}
                         </TableCell>
-                        <TableCell>{l.portal_users?.full_name || l.portal_users?.email || '—'}</TableCell>
+                        <TableCell>{l.portal_users?.full_name || l.portal_users?.email || '-'}</TableCell>
                         <TableCell>{PORTAL_LOG_ACTIONS[l.action] ?? l.action}</TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{detail || '—'}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{detail || '-'}</TableCell>
                       </TableRow>
                     );
                   })}

@@ -114,15 +114,15 @@ export default function AbonnementsPage() {
             <TableBody>
               {(changes as any[]).map((c) => (
                 <TableRow key={c.id}>
-                  <TableCell className="text-sm">{c.created_at ? format(new Date(c.created_at), 'dd/MM/yyyy HH:mm') : '—'}</TableCell>
+                  <TableCell className="text-sm">{c.created_at ? format(new Date(c.created_at), 'dd/MM/yyyy HH:mm') : '-'}</TableCell>
                   <TableCell className="text-sm">
                     <Link className="hover:underline" to={`/super-admin/organisations/${c.organization_id}`}>
                       {orgName[c.organization_id] ?? c.organization_id}
                     </Link>
                   </TableCell>
-                  <TableCell className="text-sm">{c.old_plan ?? '—'} → <strong>{c.new_plan}</strong></TableCell>
-                  <TableCell className="text-sm">{c.changed_by_email ?? '—'}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{c.reason ?? '—'}</TableCell>
+                  <TableCell className="text-sm">{c.old_plan ?? '-'} → <strong>{c.new_plan}</strong></TableCell>
+                  <TableCell className="text-sm">{c.changed_by_email ?? '-'}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{c.reason ?? '-'}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

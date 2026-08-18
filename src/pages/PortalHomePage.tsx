@@ -9,9 +9,9 @@ import Loading from '@/components/common/Loading';
 import { usePortalDashboard } from '@/hooks/usePortalSpace';
 import { cn } from '@/lib/utils';
 
-const fmtDate = (v?: string | null) => (v ? format(new Date(v), 'dd MMMM yyyy', { locale: fr }) : '—');
+const fmtDate = (v?: string | null) => (v ? format(new Date(v), 'dd MMMM yyyy', { locale: fr }) : '-');
 const fmtDateTime = (v?: string | null) =>
-  v ? format(new Date(v), "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr }) : '—';
+  v ? format(new Date(v), "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr }) : '-';
 
 export default function PortalHomePage() {
   const navigate = useNavigate();
@@ -91,7 +91,7 @@ export default function PortalHomePage() {
             <CardContent className="space-y-1 text-sm">
               <p className="font-semibold text-foreground">{deadline.obligation}</p>
               <p className="text-muted-foreground">
-                {deadline.period_label} — {fmtDate(deadline.due_date)}
+                {deadline.period_label} - {fmtDate(deadline.due_date)}
               </p>
               <p className={cn('font-medium', Number(deadline.days_left) < 0 ? 'text-destructive' : 'text-foreground')}>
                 {Number(deadline.days_left) < 0

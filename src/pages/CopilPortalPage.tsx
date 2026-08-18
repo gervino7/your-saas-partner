@@ -227,7 +227,7 @@ const CopilPortalPage = () => {
               </div>
               <div>
                 <h1 className="text-3xl font-extrabold font-display text-white tracking-tight drop-shadow-sm">{committee?.name || 'COPIL'}</h1>
-                <p className="text-sm" style={{ color: 'hsla(0,0%,100%,0.65)' }}>{mission?.name} — {mission?.code}</p>
+                <p className="text-sm" style={{ color: 'hsla(0,0%,100%,0.65)' }}>{mission?.name} - {mission?.code}</p>
               </div>
             </div>
           </div>
@@ -387,7 +387,7 @@ const CopilPortalPage = () => {
           <div className="flex items-center gap-3">
             <img src={logoImg} alt="Logo" className="h-7 w-auto opacity-60" />
             <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} Mission-DGC — Portail COPIL sécurisé
+              © {new Date().getFullYear()} Mission-DGC - Portail COPIL sécurisé
             </p>
           </div>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">

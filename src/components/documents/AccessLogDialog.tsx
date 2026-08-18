@@ -42,7 +42,7 @@ export default function AccessLogDialog({ doc, open, onClose }: Props) {
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="font-display">Historique d'accès — {doc.name}</DialogTitle>
+          <DialogTitle className="font-display">Historique d'accès - {doc.name}</DialogTitle>
         </DialogHeader>
         <div className="px-5 py-4 max-h-[65vh] overflow-y-auto dialog-form-bg">
           <Table>
@@ -56,7 +56,7 @@ export default function AccessLogDialog({ doc, open, onClose }: Props) {
             <TableBody>
               {logs.map((log: any) => (
                 <TableRow key={log.id}>
-                  <TableCell className="text-sm">{log.user?.full_name || '—'}</TableCell>
+                  <TableCell className="text-sm">{log.user?.full_name || '-'}</TableCell>
                   <TableCell className="text-sm">{actionLabels[log.action] || log.action}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {log.created_at ? format(new Date(log.created_at), 'dd/MM/yy HH:mm', { locale: fr }) : ''}

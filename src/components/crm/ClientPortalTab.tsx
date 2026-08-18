@@ -171,7 +171,7 @@ export default function ClientPortalTab({ clientId }: { clientId: string }) {
                 <SelectContent>
                   {(missions ?? []).map((m: any) => (
                     <SelectItem key={m.id} value={m.id}>
-                      {m.code ? `${m.code} — ` : ''}{m.name}
+                      {m.code ? `${m.code} - ` : ''}{m.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

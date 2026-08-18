@@ -281,14 +281,14 @@ const DocumentChecklist = ({ periodId }: Props) => {
                   )}
                 </TableCell>
                 <TableCell className="text-xs">
-                  {d.source ? <Badge variant="secondary">{DOC_SOURCE_LABELS[d.source] ?? d.source}</Badge> : '—'}
+                  {d.source ? <Badge variant="secondary">{DOC_SOURCE_LABELS[d.source] ?? d.source}</Badge> : '-'}
                 </TableCell>
                 <TableCell>
                   {(d.file_path || d.document_id) ? (
                     <Button size="sm" variant="link" className="px-0" onClick={() => openFile(d)}>
                       <Eye className="h-3.5 w-3.5 mr-1" /> Voir
                     </Button>
-                  ) : '—'}
+                  ) : '-'}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-1 flex-wrap">

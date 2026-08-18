@@ -23,7 +23,7 @@ import {
   useUploadPortalDoc,
 } from '@/hooks/usePortalDocuments';
 
-const fmt = (v: string | null) => (v ? format(new Date(v), 'dd MMM yyyy', { locale: fr }) : '—');
+const fmt = (v: string | null) => (v ? format(new Date(v), 'dd MMM yyyy', { locale: fr }) : '-');
 
 export default function PortalDocumentsPage() {
   const { data: identity } = usePortalIdentity();
@@ -105,7 +105,7 @@ export default function PortalDocumentsPage() {
                     </CardHeader>
                     <CardContent className="space-y-1 text-sm text-muted-foreground">
                       {d.description && <p>{d.description}</p>}
-                      <p>{d.file_name} — {formatFileSize(d.file_size)}</p>
+                      <p>{d.file_name} - {formatFileSize(d.file_size)}</p>
                       <p>Reçu le {fmt(d.uploaded_at)}</p>
                     </CardContent>
                   </Card>
@@ -173,7 +173,7 @@ export default function PortalDocumentsPage() {
               ) : (
                 <>
                   <p>Glissez un fichier ici ou cliquez pour parcourir</p>
-                  <p className="text-xs text-muted-foreground">PDF, images, Excel, Word, CSV, ZIP — 25 Mo max</p>
+                  <p className="text-xs text-muted-foreground">PDF, images, Excel, Word, CSV, ZIP - 25 Mo max</p>
                 </>
               )}
               <input ref={inputRef} type="file" className="hidden" accept={ACCEPT_ATTR} onChange={(e) => pick(e.target.files?.[0])} />

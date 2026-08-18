@@ -94,7 +94,7 @@ const ClientFiscalTab = ({ clientId }: Props) => {
             <div>
               <Label>Forme juridique</Label>
               <Select value={values.forme_juridique ?? ''} onValueChange={(v) => form.setValue('forme_juridique', v)} disabled={!isResponsable}>
-                <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="-" /></SelectTrigger>
                 <SelectContent>
                   {FORME_JURIDIQUE.map((f) => <SelectItem key={f} value={f}>{f}</SelectItem>)}
                 </SelectContent>
@@ -103,7 +103,7 @@ const ClientFiscalTab = ({ clientId }: Props) => {
             <div>
               <Label>Régime fiscal</Label>
               <Select value={values.regime_fiscal ?? ''} onValueChange={(v) => form.setValue('regime_fiscal', v)} disabled={!isResponsable}>
-                <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="-" /></SelectTrigger>
                 <SelectContent>
                   {REGIMES.map((r) => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}
                 </SelectContent>
@@ -117,7 +117,7 @@ const ClientFiscalTab = ({ clientId }: Props) => {
             <div>
               <Label>Catégorie contribuable</Label>
               <Select value={values.taxpayer_category ?? ''} onValueChange={(v) => form.setValue('taxpayer_category', v)} disabled={!isResponsable}>
-                <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="-" /></SelectTrigger>
                 <SelectContent>
                   {TAXPAYER_CATEGORIES.map((c) => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
                 </SelectContent>
@@ -133,9 +133,9 @@ const ClientFiscalTab = ({ clientId }: Props) => {
             </div>
             {assujettiTva && (
               <div>
-                <Label>TVA — Périodicité</Label>
+                <Label>TVA - Périodicité</Label>
                 <Select value={values.tva_periodicite ?? ''} onValueChange={(v) => form.setValue('tva_periodicite', v)} disabled={!isResponsable}>
-                  <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="-" /></SelectTrigger>
                   <SelectContent>
                     {TVA_PERIOD.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
                   </SelectContent>
@@ -143,7 +143,7 @@ const ClientFiscalTab = ({ clientId }: Props) => {
               </div>
             )}
             <div>
-              <Label>Exercice — début (mois)</Label>
+              <Label>Exercice - début (mois)</Label>
               <Select value={String(values.exercice_start_month ?? 1)} onValueChange={(v) => form.setValue('exercice_start_month', Number(v))} disabled={!isResponsable}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -152,7 +152,7 @@ const ClientFiscalTab = ({ clientId }: Props) => {
               </Select>
             </div>
             <div>
-              <Label>Exercice — fin (mois)</Label>
+              <Label>Exercice - fin (mois)</Label>
               <Select value={String(values.exercice_end_month ?? 12)} onValueChange={(v) => form.setValue('exercice_end_month', Number(v))} disabled={!isResponsable}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -167,7 +167,7 @@ const ClientFiscalTab = ({ clientId }: Props) => {
             <div>
               <Label>Collaborateur responsable</Label>
               <Select value={values.collaborateur_id ?? ''} onValueChange={(v) => form.setValue('collaborateur_id', v)} disabled={!isResponsable}>
-                <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="-" /></SelectTrigger>
                 <SelectContent>
                   {collabs.map((c) => <SelectItem key={c.id} value={c.id}>{c.full_name}</SelectItem>)}
                 </SelectContent>

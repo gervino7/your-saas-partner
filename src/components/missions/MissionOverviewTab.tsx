@@ -13,7 +13,7 @@ function initials(name: string) {
 }
 
 function formatCurrency(amount: number | null, currency: string | null) {
-  if (amount == null) return '—';
+  if (amount == null) return '-';
   return new Intl.NumberFormat('fr-FR').format(amount) + ' ' + (currency ?? 'XOF');
 }
 
@@ -42,9 +42,9 @@ export default function MissionOverviewTab({ mission }: { mission: any }) {
                 <div>
                   <p className="text-xs text-muted-foreground">Période</p>
                   <p className="text-sm font-medium">
-                    {mission.start_date ? format(new Date(mission.start_date), 'dd MMM yyyy', { locale: fr }) : '—'}
-                    {' — '}
-                    {mission.end_date ? format(new Date(mission.end_date), 'dd MMM yyyy', { locale: fr }) : '—'}
+                    {mission.start_date ? format(new Date(mission.start_date), 'dd MMM yyyy', { locale: fr }) : '-'}
+                    {' - '}
+                    {mission.end_date ? format(new Date(mission.end_date), 'dd MMM yyyy', { locale: fr }) : '-'}
                   </p>
                 </div>
               </div>
@@ -95,7 +95,7 @@ export default function MissionOverviewTab({ mission }: { mission: any }) {
             </div>
             <div>
               <p className="text-xs text-muted-foreground mb-1">Type</p>
-              <p className="text-sm">{mission.type ? MISSION_TYPE_LABELS[mission.type as keyof typeof MISSION_TYPE_LABELS] ?? mission.type : '—'}</p>
+              <p className="text-sm">{mission.type ? MISSION_TYPE_LABELS[mission.type as keyof typeof MISSION_TYPE_LABELS] ?? mission.type : '-'}</p>
             </div>
             {mission.client && (
               <div>
@@ -108,7 +108,7 @@ export default function MissionOverviewTab({ mission }: { mission: any }) {
             )}
             <div>
               <p className="text-xs text-muted-foreground mb-1">Code</p>
-              <p className="text-sm font-mono">{mission.code ?? '—'}</p>
+              <p className="text-sm font-mono">{mission.code ?? '-'}</p>
             </div>
           </CardContent>
         </Card>

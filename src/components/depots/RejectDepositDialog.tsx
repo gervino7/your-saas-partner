@@ -95,7 +95,7 @@ const RejectDepositDialog = ({ open, onOpenChange, documentIds, singleLabel, onD
                 variant="outline"
                 size="sm"
                 className="h-7 text-xs"
-                onClick={() => setReason((prev) => (prev.trim() ? `${prev.trim()} — ${r}` : r))}
+                onClick={() => setReason((prev) => (prev.trim() ? `${prev.trim()} - ${r}` : r))}
               >
                 {r}
               </Button>

@@ -29,7 +29,7 @@ function Stars({ value }: { value: number | null }) {
 }
 
 function NpsBadge({ score }: { score: number | null }) {
-  if (score == null) return <span className="text-muted-foreground text-xs">—</span>;
+  if (score == null) return <span className="text-muted-foreground text-xs">-</span>;
   const variant = score >= 9 ? 'default' : score >= 7 ? 'secondary' : 'destructive';
   return <Badge variant={variant as any}>{score}/10</Badge>;
 }
@@ -133,10 +133,10 @@ export default function ClientSatisfactionTab({ clientId }: { clientId: string }
                     <TableBody>
                       {pendingSurveys.map((s: any) => (
                         <TableRow key={s.id}>
-                          <TableCell className="font-medium">{(s.mission as any)?.name || '—'}</TableCell>
-                          <TableCell className="text-sm">{s.respondent_email || '—'}</TableCell>
+                          <TableCell className="font-medium">{(s.mission as any)?.name || '-'}</TableCell>
+                          <TableCell className="text-sm">{s.respondent_email || '-'}</TableCell>
                           <TableCell className="text-sm text-muted-foreground">
-                            {s.submitted_at ? format(new Date(s.submitted_at), 'dd MMM yyyy', { locale: fr }) : '—'}
+                            {s.submitted_at ? format(new Date(s.submitted_at), 'dd MMM yyyy', { locale: fr }) : '-'}
                           </TableCell>
                           <TableCell><Badge variant="outline">En attente</Badge></TableCell>
                           <TableCell>
@@ -181,17 +181,17 @@ export default function ClientSatisfactionTab({ clientId }: { clientId: string }
                     <TableBody>
                       {answeredSurveys.map((s: any) => (
                         <TableRow key={s.id}>
-                          <TableCell className="font-medium">{(s.mission as any)?.name || '—'}</TableCell>
-                          <TableCell className="text-sm">{s.respondent_name || '—'}</TableCell>
+                          <TableCell className="font-medium">{(s.mission as any)?.name || '-'}</TableCell>
+                          <TableCell className="text-sm">{s.respondent_name || '-'}</TableCell>
                           <TableCell className="text-sm text-muted-foreground">
-                            {s.submitted_at ? format(new Date(s.submitted_at), 'dd MMM yyyy', { locale: fr }) : '—'}
+                            {s.submitted_at ? format(new Date(s.submitted_at), 'dd MMM yyyy', { locale: fr }) : '-'}
                           </TableCell>
                           <TableCell><Stars value={s.overall_rating} /></TableCell>
                           <TableCell><Stars value={s.quality_rating} /></TableCell>
                           <TableCell><Stars value={s.timeliness_rating} /></TableCell>
                           <TableCell><Stars value={s.communication_rating} /></TableCell>
                           <TableCell><NpsBadge score={s.nps_score} /></TableCell>
-                          <TableCell className="max-w-[200px] truncate text-sm">{s.comments || '—'}</TableCell>
+                          <TableCell className="max-w-[200px] truncate text-sm">{s.comments || '-'}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -224,7 +224,7 @@ export default function ClientSatisfactionTab({ clientId }: { clientId: string }
                   ) : (
                     (missions ?? []).map((m: any) => (
                       <SelectItem key={m.id} value={m.id}>
-                        {m.code ? `${m.code} — ` : ''}{m.name}
+                        {m.code ? `${m.code} - ` : ''}{m.name}
                       </SelectItem>
                     ))
                   )}

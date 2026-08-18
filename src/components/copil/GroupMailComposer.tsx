@@ -111,7 +111,7 @@ function EmailViewDialog({ email, open, onOpenChange }: { email: any; open: bool
         </DialogHeader>
         <div className="px-5 py-4 space-y-4 overflow-y-auto max-h-[65vh] dialog-form-bg">
         <p className="text-xs text-muted-foreground">
-          Envoyé le {email?.sent_at ? format(new Date(email.sent_at), 'dd/MM/yyyy à HH:mm', { locale: fr }) : email?.created_at ? format(new Date(email.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr }) : '—'}
+          Envoyé le {email?.sent_at ? format(new Date(email.sent_at), 'dd/MM/yyyy à HH:mm', { locale: fr }) : email?.created_at ? format(new Date(email.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr }) : '-'}
           {' • '}{email?.profiles?.full_name ?? 'Inconnu'}
         </p>
         <Separator />
@@ -316,7 +316,7 @@ const GroupMailComposer = ({ committeeId, committeeName, missionName, canManage 
                       <TableRow key={e.id}>
                         <TableCell className="text-sm">{format(new Date(e.created_at), 'dd/MM/yyyy HH:mm', { locale: fr })}</TableCell>
                         <TableCell className="font-medium">{e.subject}</TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{e.profiles?.full_name ?? '—'}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{e.profiles?.full_name ?? '-'}</TableCell>
                         <TableCell>
                           <Badge variant="outline" className="flex items-center gap-1 w-fit">
                             <Icon className="h-3 w-3" />{STATUS_LABELS[e.status ?? 'draft']}

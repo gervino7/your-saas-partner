@@ -89,7 +89,7 @@ export function useCalendar() {
     })),
     ...committeeMeetings.map((cm: any) => ({
       id: `copil-${cm.id}`,
-      title: `${cm.committees?.type === 'copil' ? 'COPIL' : 'CODIR'} — ${cm.title}`,
+      title: `${cm.committees?.type === 'copil' ? 'COPIL' : 'CODIR'} - ${cm.title}`,
       start: new Date(cm.scheduled_at),
       end: new Date(new Date(cm.scheduled_at).getTime() + (cm.duration_minutes || 60) * 60000),
       type: 'copil' as const,

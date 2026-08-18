@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { formatFcfa, statusChipClass } from '@/lib/portalStatus';
 import { usePortalInvoices, type PortalInvoice } from '@/hooks/usePortalSpace';
 
-const fmtDate = (v?: string | null) => (v ? format(new Date(v), 'dd/MM/yyyy', { locale: fr }) : '—');
+const fmtDate = (v?: string | null) => (v ? format(new Date(v), 'dd/MM/yyyy', { locale: fr }) : '-');
 
 const INVOICE_TYPES: Record<string, string> = {
   fixed: 'Forfait',
@@ -106,7 +106,7 @@ export default function PortalInvoicesPage() {
                                   {inv.invoice_number}
                                 </span>
                               </TableCell>
-                              <TableCell>{INVOICE_TYPES[inv.type ?? ''] ?? inv.type ?? '—'}</TableCell>
+                              <TableCell>{INVOICE_TYPES[inv.type ?? ''] ?? inv.type ?? '-'}</TableCell>
                               <TableCell>{fmtDate(inv.created_at)}</TableCell>
                               <TableCell>{fmtDate(inv.due_date)}</TableCell>
                               <TableCell className="text-right">{formatFcfa(inv.total_amount)}</TableCell>
@@ -130,13 +130,13 @@ export default function PortalInvoicesPage() {
                                       <TableBody>
                                         {lines.map((l, i) => (
                                           <TableRow key={i}>
-                                            <TableCell>{l.designation ?? l.description ?? '—'}</TableCell>
-                                            <TableCell className="text-right">{l.quantity ?? '—'}</TableCell>
+                                            <TableCell>{l.designation ?? l.description ?? '-'}</TableCell>
+                                            <TableCell className="text-right">{l.quantity ?? '-'}</TableCell>
                                             <TableCell className="text-right">
-                                              {l.unit_price != null ? formatFcfa(l.unit_price) : '—'}
+                                              {l.unit_price != null ? formatFcfa(l.unit_price) : '-'}
                                             </TableCell>
                                             <TableCell className="text-right">
-                                              {l.total != null ? formatFcfa(l.total) : '—'}
+                                              {l.total != null ? formatFcfa(l.total) : '-'}
                                             </TableCell>
                                           </TableRow>
                                         ))}

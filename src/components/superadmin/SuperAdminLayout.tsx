@@ -33,7 +33,7 @@ export default function SuperAdminLayout() {
         <div className="flex flex-wrap items-center gap-3 px-4 py-3 sm:px-6">
           <ShieldCheck className="h-5 w-5 text-[#E67433]" />
           <span className="font-display text-sm font-semibold sm:text-base">
-            Super Administration — Mission-DGC
+            Super Administration - Mission-DGC
           </span>
           {role && (
             <Badge variant="outline" className="border-white/40 text-white">

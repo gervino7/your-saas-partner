@@ -76,7 +76,7 @@ export default function PlanChangeDialog({ open, onOpenChange, org, defaultPlan 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Changer le plan — {org?.name}</DialogTitle>
+          <DialogTitle>Changer le plan - {org?.name}</DialogTitle>
           <DialogDescription>
             Plan actuel : {planNameOf(plans, current)}. Les quotas sont pré-remplis mais restent modifiables.
           </DialogDescription>

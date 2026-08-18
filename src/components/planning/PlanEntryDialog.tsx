@@ -200,7 +200,7 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
                   </Select>
                   {staffingForMission && (
                     <p className="text-xs text-muted-foreground">
-                      Affecté : {staffingForMission.allocated_hours_per_week ?? staffingForMission.hours_per_week ?? '—'}h/semaine sur cette mission
+                      Affecté : {staffingForMission.allocated_hours_per_week ?? staffingForMission.hours_per_week ?? '-'}h/semaine sur cette mission
                     </p>
                   )}
                 </div>
