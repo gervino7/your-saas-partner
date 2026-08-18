@@ -2,8 +2,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Briefcase, FolderKanban, FileText, MessageSquare,
   Calendar, Clock, Monitor, Settings, LogOut, ChevronDown, Eye,
-  ClipboardCheck, CalendarRange, LineChart, CalendarClock, FolderOpen, Building2, UsersRound,
+  ClipboardCheck, CalendarRange, LineChart, CalendarClock, FolderOpen, Building2, UsersRound, Upload,
 } from 'lucide-react';
+
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
@@ -13,6 +14,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import logoImg from '@/assets/logo.png';
 import { useIsPlatformAdmin } from '@/hooks/useSuperAdmin';
+import { usePendingDepositsCount } from '@/hooks/useDepositsInbox';
+
 
 const mainNav = [
   { label: 'Tableau de bord', icon: LayoutDashboard, path: '/' },
@@ -36,6 +39,8 @@ const AppSidebar = () => {
   const gradeLevel = profile?.grade_level ?? 8;
   const showAdmin = gradeLevel <= 2; // DA or DM
   const { isAdmin: isSuperAdmin } = useIsPlatformAdmin();
+  const depotsCount = usePendingDepositsCount();
+
 
   // Unread message count
   const { data: unreadMessages = 0 } = useQuery({
@@ -191,6 +196,22 @@ const AppSidebar = () => {
                   )}
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive('/depots')}
+                  onClick={() => navigate('/depots')}
+                  tooltip="Dépôts clients"
+                >
+                  <Upload className="h-4 w-4" />
+                  <span className="flex-1">Dépôts clients</span>
+                  {depotsCount > 0 && (
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
+                      {depotsCount > 99 ? '99+' : depotsCount}
+                    </span>
+                  )}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
               {gradeLevel <= 3 && (
                 <SidebarMenuItem>
                   <SidebarMenuButton
