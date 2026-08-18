@@ -214,7 +214,7 @@ const CopilPortalPage = () => {
               <div className="h-6 w-px" style={{ background: 'hsla(0,0%,100%,0.25)' }} />
               <span className="text-sm font-semibold tracking-wide uppercase" style={{ color: 'hsla(0,0%,100%,0.7)', letterSpacing: '0.08em' }}>Portail COPIL</span>
             </div>
-            <Badge className="text-xs font-medium px-3 py-1.5 rounded-lg" style={{ background: 'hsla(0,0%,100%,0.2)', color: 'white', borderColor: 'hsla(0,0%,100%,0.3)', backdropFilter: 'blur(8px)' }}>
+            <Badge className="text-xs font-medium px-3 py-1.5 rounded-lg" style={{ background: 'hsla(0,0%,100%,0.2)', color: 'white', borderColor: 'hsla(0,0%,100%,0.3)' }}>
               {email}
             </Badge>
           </div>
@@ -222,7 +222,7 @@ const CopilPortalPage = () => {
           {/* Committee name */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-1">
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, hsla(0,0%,100%,0.3), hsla(0,0%,100%,0.1))', backdropFilter: 'blur(10px)', border: '1px solid hsla(0,0%,100%,0.25)' }}>
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, hsla(0,0%,100%,0.3), hsla(0,0%,100%,0.1))', border: '1px solid hsla(0,0%,100%,0.25)' }}>
                 <Award className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -233,7 +233,7 @@ const CopilPortalPage = () => {
           </div>
 
           {/* Mission Card */}
-          <div className="rounded-2xl p-6 shadow-xl" style={{ background: 'hsla(40,30%,97%,0.95)', backdropFilter: 'blur(16px)', border: '1px solid hsla(40,40%,88%,0.6)' }}>
+          <div className="rounded-2xl p-6 shadow-xl" style={{ background: 'hsl(40,30%,97%)', border: '1px solid hsla(40,40%,88%,0.6)' }}>
             <div className="grid grid-cols-3 gap-3">
               {[
                 { value: documents.length, label: 'Documents', icon: FileText },
