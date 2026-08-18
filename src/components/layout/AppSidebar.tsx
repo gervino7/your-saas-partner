@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Briefcase, FolderKanban, FileText, MessageSquare,
   Calendar, Clock, Monitor, Settings, LogOut, ChevronDown, Eye,
-  ClipboardCheck, CalendarRange, LineChart, CalendarClock, FolderOpen, Building2, UsersRound, Upload,
+  ClipboardCheck, CalendarRange, LineChart, CalendarClock, FolderOpen, Building2, UsersRound, Upload, LifeBuoy, ShieldCheck,
 } from 'lucide-react';
 
 import {
@@ -281,6 +281,16 @@ const AppSidebar = () => {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isActive('/support')}
+                  onClick={() => navigate('/support')}
+                  tooltip="Support"
+                >
+                  <LifeBuoy className="h-4 w-4" />
+                  <span>Support</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -315,9 +325,10 @@ const AppSidebar = () => {
         {isSuperAdmin && (
           <button
             onClick={() => navigate('/super-admin')}
-            className="mt-2 text-[10px] text-sidebar-foreground/40 hover:text-sidebar-foreground/80 transition-colors text-left"
+            className="mt-2 flex items-center gap-1.5 text-[10px] text-sidebar-foreground/40 transition-colors hover:text-sidebar-foreground/80"
           >
-            ⚙ Super Admin
+            <ShieldCheck className="h-3 w-3" />
+            Super Admin
           </button>
         )}
       </SidebarFooter>
