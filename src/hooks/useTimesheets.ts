@@ -203,11 +203,13 @@ export function useTeamTimesheets(weekStart: Date) {
         .eq('organization_id', profile.organization_id)
         .eq('week_start', weekStr)
         .eq('status', 'submitted')
+        .neq('user_id', profile.id)
         .order('date');
       if (error) throw error;
       return data ?? [];
     },
-    enabled: !!profile?.organization_id && (profile?.grade_level ?? 99) <= 4,
+    enabled: !!profile?.organization_id && (profile?.grade_level ?? 99) <= 3,
+
   });
 }
 
