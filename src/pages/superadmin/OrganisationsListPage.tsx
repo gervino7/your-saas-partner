@@ -25,6 +25,8 @@ export default function OrganisationsListPage() {
   const { data: orgs = [], isLoading } = useAllOrgs();
   const { canManage } = useIsPlatformAdmin();
   const toggleOrg = useToggleOrg();
+  const { data: plans = [] } = usePlans();
+
 
   const [search, setSearch] = useState('');
   const [plan, setPlan] = useState('all');
