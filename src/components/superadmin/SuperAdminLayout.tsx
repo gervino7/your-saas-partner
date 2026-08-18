@@ -2,14 +2,17 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useIsPlatformAdmin } from '@/hooks/useSuperAdmin';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useOpenTicketsCount } from '@/hooks/useSupport';
 import {
-  LayoutDashboard, Building2, CreditCard, Users, Activity, ScrollText, ShieldCheck, ArrowLeft,
+  LayoutDashboard, Building2, CreditCard, Package, LifeBuoy, Users, Activity, ScrollText, ShieldCheck, ArrowLeft,
 } from 'lucide-react';
 
 const NAV = [
   { label: 'Tableau de bord', to: '/super-admin', icon: LayoutDashboard, end: true },
   { label: 'Organisations', to: '/super-admin/organisations', icon: Building2 },
   { label: 'Abonnements', to: '/super-admin/abonnements', icon: CreditCard },
+  { label: 'Plans', to: '/super-admin/plans', icon: Package },
+  { label: 'Support', to: '/super-admin/support', icon: LifeBuoy, badge: 'tickets' },
   { label: 'Utilisateurs', to: '/super-admin/utilisateurs', icon: Users },
   { label: 'Santé plateforme', to: '/super-admin/sante', icon: Activity },
   { label: "Journal d'audit", to: '/super-admin/journal', icon: ScrollText },
@@ -18,6 +21,7 @@ const NAV = [
 export default function SuperAdminLayout() {
   const navigate = useNavigate();
   const { role, isOwner } = useIsPlatformAdmin();
+  const { data: openTickets = 0 } = useOpenTicketsCount();
 
   const items = isOwner
     ? [...NAV, { label: 'Administrateurs', to: '/super-admin/administrateurs', icon: ShieldCheck }]
@@ -64,7 +68,12 @@ export default function SuperAdminLayout() {
                   }
                 >
                   <item.icon className="h-4 w-4" />
-                  {item.label}
+                  <span className="flex-1">{item.label}</span>
+                  {(item as any).badge === 'tickets' && openTickets > 0 && (
+                    <span className="rounded-full bg-[#E67433] px-1.5 py-0.5 text-[10px] font-medium text-white">
+                      {openTickets}
+                    </span>
+                  )}
                 </NavLink>
               </li>
             ))}
