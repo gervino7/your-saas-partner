@@ -161,24 +161,30 @@ export function useApproveTimeEntries() {
 
   return useMutation({
     mutationFn: async (params: { ids: string[]; action: 'approved' | 'rejected'; comment?: string }) => {
+      if (params.action === 'rejected' && (params.comment?.trim().length ?? 0) < 5) {
+        throw new Error('Précisez ce qui doit être corrigé');
+      }
       const { error } = await supabase
         .from('time_entries')
         .update({
           status: params.action,
           reviewer_id: profile!.id,
           reviewed_at: new Date().toISOString(),
-          review_comment: params.comment || null,
+          review_comment: params.comment?.trim() || null,
         })
         .in('id', params.ids);
       if (error) throw error;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['time-entries'] });
+      qc.invalidateQueries({ queryKey: ['team-timesheets'] });
       toast.success('Mise à jour effectuée');
     },
+    // Surface the database trigger's French messages as-is
     onError: (e: Error) => toast.error(e.message),
   });
 }
+
 
 export function useTeamTimesheets(weekStart: Date) {
   const profile = useAuthStore((s) => s.profile);
