@@ -5065,6 +5065,10 @@ export type Database = {
       }
     }
     Functions: {
+      attach_free_upload_to_obligation: {
+        Args: { _obligation_document_id: string; _portal_document_id: string }
+        Returns: Json
+      }
       can_access_document: {
         Args: { _doc_id: string; _user_id: string }
         Returns: boolean
@@ -5289,6 +5293,7 @@ export type Database = {
         Args: { _client_id: string }
         Returns: Json
       }
+      get_deposits_inbox: { Args: { _only_mine?: boolean }; Returns: Json }
       get_invitation_by_token: {
         Args: { _token: string }
         Returns: {
@@ -5371,6 +5376,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_rejection_context: { Args: { _document_id: string }; Returns: Json }
       get_user_conversation_ids: {
         Args: { _user_id: string }
         Returns: string[]
@@ -5458,6 +5464,10 @@ export type Database = {
       purge_old_attendance: { Args: never; Returns: undefined }
       remove_mission_member: {
         Args: { _mission_id: string; _reason: string; _user_id: string }
+        Returns: Json
+      }
+      review_deposited_documents: {
+        Args: { _action: string; _document_ids: string[]; _reason?: string }
         Returns: Json
       }
       seed_obligation_documents: {
