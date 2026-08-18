@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { useSuperAdminKpis, useGrowth, useAllOrgs, usePlatformHealth } from '@/hooks/useSuperAdmin';
 import { computeMrr, planBreakdown, fcfa, ALERT_META } from '@/lib/superAdmin';
+import { usePlans } from '@/hooks/usePlans';
 import { AlertTriangle } from 'lucide-react';
 
 const COLORS = ['#16519C', '#E67433', '#2E9E6B', '#B5852E'];
@@ -27,8 +28,9 @@ export default function SuperAdminDashboard() {
   const { data: orgs = [] } = useAllOrgs();
   const { data: health = [] } = usePlatformHealth();
 
-  const mrr = useMemo(() => computeMrr(orgs as any), [orgs]);
-  const breakdown = useMemo(() => planBreakdown(orgs as any), [orgs]);
+  const { data: plans = [] } = usePlans();
+  const mrr = useMemo(() => computeMrr(plans, orgs as any), [plans, orgs]);
+  const breakdown = useMemo(() => planBreakdown(plans, orgs as any), [plans, orgs]);
   const alerts = (health as any[]).filter((h) => h.alert_level !== 'ok');
 
   if (isLoading) return <Skeleton className="h-96 w-full" />;

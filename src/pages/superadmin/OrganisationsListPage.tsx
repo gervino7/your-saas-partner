@@ -10,8 +10,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAllOrgs, useToggleOrg, useIsPlatformAdmin } from '@/hooks/useSuperAdmin';
 import PlanChangeDialog from '@/components/superadmin/PlanChangeDialog';
 import SuspendDialog from '@/components/superadmin/SuspendDialog';
-import { PLANS, PLAN_ORDER } from '@/lib/plans';
-import { planOf, daysUntil, daysSince, barClass } from '@/lib/superAdmin';
+import { usePlans } from '@/hooks/usePlans';
+import { planOf, planNameOf, daysUntil, daysSince, barClass } from '@/lib/superAdmin';
 import { exportToCSV } from '@/lib/exportUtils';
 import { cn } from '@/lib/utils';
 import { Download, Search } from 'lucide-react';
@@ -44,7 +44,7 @@ export default function OrganisationsListPage() {
     const q = search.trim().toLowerCase();
     let list = (orgs as Org[]).filter((o) => {
       if (q && ![o.name, o.slug, o.billing_email].some((v) => (v ?? '').toLowerCase().includes(q))) return false;
-      if (plan !== 'all' && planOf(o.subscription_plan) !== plan) return false;
+      if (plan !== 'all' && planOf(plans, o.subscription_plan) !== plan) return false;
       if (country !== 'all' && o.country !== country) return false;
       if (status === 'active' && o.is_active === false) return false;
       if (status === 'suspended' && o.is_active !== false) return false;
@@ -96,7 +96,7 @@ export default function OrganisationsListPage() {
           onClick={() =>
             exportToCSV(
               rows.map((o) => ({
-                nom: o.name, slug: o.slug, plan: PLANS[planOf(o.subscription_plan)].name,
+                nom: o.name, slug: o.slug, plan: planNameOf(plans, o.subscription_plan),
                 utilisateurs: `${o.user_count}/${o.max_users}`, missions: o.mission_count,
                 clients: o.client_count, stockage_mo: o.storage_used_mb,
                 statut: o.is_active === false ? 'Suspendue' : 'Active',
@@ -119,7 +119,7 @@ export default function OrganisationsListPage() {
             <SelectTrigger><SelectValue placeholder="Plan" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tous les plans</SelectItem>
-              {PLAN_ORDER.map((p) => <SelectItem key={p} value={p}>{PLANS[p].name}</SelectItem>)}
+              {plans.map((p) => <SelectItem key={p.code} value={p.code}>{p.name}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={status} onValueChange={setStatus}>
@@ -167,7 +167,7 @@ export default function OrganisationsListPage() {
                       <p className="font-medium">{o.name}</p>
                       <p className="text-xs text-muted-foreground">{o.slug}</p>
                     </TableCell>
-                    <TableCell><Badge variant="outline">{PLANS[planOf(o.subscription_plan)].name}</Badge></TableCell>
+                    <TableCell><Badge variant="outline">{planNameOf(plans, o.subscription_plan)}</Badge></TableCell>
                     <TableCell>
                       <span className="text-sm">{o.user_count} / {o.max_users}</span>
                       {usageBar(Number(o.user_count ?? 0), Number(o.max_users ?? 0))}
