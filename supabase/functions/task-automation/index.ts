@@ -1,12 +1,26 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+// Machine-to-machine function: no browser CORS.
+const jsonHeaders = { "Content-Type": "application/json" };
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const CRON_SECRET = Deno.env.get("CRON_SECRET");
+  const provided = req.headers.get("x-cron-secret");
+
+  if (!CRON_SECRET) {
+    console.error("[cron] CRON_SECRET not configured — refusing to run");
+    return new Response(JSON.stringify({ error: "Configuration manquante" }), {
+      status: 500,
+      headers: jsonHeaders,
+    });
+  }
+  if (provided !== CRON_SECRET) {
+    console.warn("[cron] rejected call without valid secret");
+    return new Response(JSON.stringify({ error: "Non autorisé" }), {
+      status: 401,
+      headers: jsonHeaders,
+    });
+  }
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -81,12 +95,12 @@ Deno.serve(async (req) => {
 
     return new Response(
       JSON.stringify({ success: true, deadline: deadlineTasks?.length || 0, overdue: overdueTasks?.length || 0 }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { headers: jsonHeaders }
     );
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: (error as Error).message }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: jsonHeaders,
     });
   }
 });

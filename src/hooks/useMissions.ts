@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
+import { sanitizeSearchTerm } from '@/lib/search';
+
 
 export interface MissionFilters {
   status?: string;
@@ -42,7 +44,9 @@ export function useMissions(filters: MissionFilters = {}) {
         query = query.eq('client_id', filters.clientId);
       }
       if (filters.search) {
-        query = query.or(`name.ilike.%${filters.search}%,code.ilike.%${filters.search}%`);
+        const term = sanitizeSearchTerm(filters.search);
+        if (term) query = query.or(`name.ilike.%${term}%,code.ilike.%${term}%`);
+
       }
 
       const { data, error } = await query;

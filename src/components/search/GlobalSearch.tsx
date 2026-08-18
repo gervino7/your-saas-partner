@@ -6,6 +6,8 @@ import {
 } from '@/components/ui/command';
 import { Briefcase, FolderOpen, CheckSquare, FileText, Users, MessageSquare } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { sanitizeSearchTerm } from '@/lib/search';
+
 
 interface SearchResult {
   id: string;
@@ -57,27 +59,44 @@ export function GlobalSearch() {
     return () => clearTimeout(timer);
   }, [query]);
 
-  const performSearch = useCallback(async (q: string) => {
+  const performSearch = useCallback(async (raw: string) => {
+    const q = sanitizeSearchTerm(raw);
+    if (q.length < 2) {
+      setResults([]);
+      return;
+    }
     setLoading(true);
     const searchTerm = `%${q}%`;
     const all: SearchResult[] = [];
 
     try {
-      const [missions, projects, tasks, documents, users] = await Promise.all([
-        supabase.from('missions').select('id, name, code').or(`name.ilike.${searchTerm},code.ilike.${searchTerm}`).limit(5),
-        supabase.from('projects').select('id, name, mission_id').ilike('name', searchTerm).limit(5),
-        supabase.from('tasks').select('id, title, project_id').ilike('title', searchTerm).limit(5),
-        supabase.from('documents').select('id, name').ilike('name', searchTerm).limit(5),
-        supabase.from('profiles_safe').select('id, full_name, email').or(`full_name.ilike.${searchTerm},email.ilike.${searchTerm}`).limit(5),
-      ]);
+      // Separate .ilike() queries: the term is passed as a bound value, immune to filter injection.
+      const [missionsByName, missionsByCode, projects, tasks, documents, usersByName, usersByEmail] =
+        await Promise.all([
+          supabase.from('missions').select('id, name, code').ilike('name', searchTerm).limit(5),
+          supabase.from('missions').select('id, name, code').ilike('code', searchTerm).limit(5),
+          supabase.from('projects').select('id, name, mission_id').ilike('name', searchTerm).limit(5),
+          supabase.from('tasks').select('id, title, project_id').ilike('title', searchTerm).limit(5),
+          supabase.from('documents').select('id, name').ilike('name', searchTerm).limit(5),
+          supabase.from('profiles_safe').select('id, full_name, email').ilike('full_name', searchTerm).limit(5),
+          supabase.from('profiles_safe').select('id, full_name, email').ilike('email', searchTerm).limit(5),
+        ]);
 
-      missions.data?.forEach((m) => all.push({ id: m.id, label: m.name, sublabel: m.code ?? undefined, path: `/missions/${m.id}`, category: 'missions' }));
+      const missionRows = [...(missionsByName.data ?? []), ...(missionsByCode.data ?? [])]
+        .filter((m, i, arr) => arr.findIndex((x) => x.id === m.id) === i)
+        .slice(0, 5);
+      const userRows = [...(usersByName.data ?? []), ...(usersByEmail.data ?? [])]
+        .filter((u, i, arr) => arr.findIndex((x) => x.id === u.id) === i)
+        .slice(0, 5);
+
+      missionRows.forEach((m) => all.push({ id: m.id, label: m.name, sublabel: m.code ?? undefined, path: `/missions/${m.id}`, category: 'missions' }));
       projects.data?.forEach((p) => all.push({ id: p.id, label: p.name, path: `/projects/${p.id}`, category: 'projects' }));
       tasks.data?.forEach((t) => all.push({ id: t.id, label: t.title, path: `/projects/${t.project_id}`, category: 'tasks' }));
       documents.data?.forEach((d) => all.push({ id: d.id, label: d.name, path: '/documents', category: 'documents' }));
-      users.data?.forEach((u) => all.push({ id: u.id, label: u.full_name ?? '', sublabel: u.email ?? undefined, path: '/admin', category: 'users' }));
+      userRows.forEach((u) => all.push({ id: u.id, label: u.full_name ?? '', sublabel: u.email ?? undefined, path: '/admin', category: 'users' }));
 
       setResults(all);
+
     } catch (err) {
       console.error('Search error:', err);
     } finally {
