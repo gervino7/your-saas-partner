@@ -1,10 +1,28 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
-import { PLANS, PlanId, getNextPlan } from '@/lib/plans';
+import { usePlans } from '@/hooks/usePlans';
+import { findPlan, missionQuota, nextPlan as nextPlanOf, UNLIMITED, type Plan } from '@/lib/plans';
+
+const FALLBACK: Plan = {
+  id: 'fallback',
+  code: 'free',
+  name: 'Gratuit',
+  description: null,
+  price_monthly: 0,
+  max_users: 5,
+  max_missions: 1,
+  max_storage_gb: 2,
+  max_clients: null,
+  features: [],
+  is_active: true,
+  is_public: true,
+  sort_order: 0,
+};
 
 export const useSubscriptionLimits = () => {
   const orgId = useAuthStore((s) => s.profile?.organization_id);
+  const { data: plans = [], isLoading: plansLoading } = usePlans();
 
   const { data, isLoading } = useQuery({
     queryKey: ['subscription-limits', orgId],
@@ -16,53 +34,49 @@ export const useSubscriptionLimits = () => {
         .eq('id', orgId!)
         .maybeSingle();
 
-      const planId = ((org?.subscription_plan as PlanId) || 'free');
-      const plan = PLANS[planId] ?? PLANS.free;
-
       const [{ count: userCount }, { count: missionCount }] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('organization_id', orgId!),
         supabase.from('missions').select('id', { count: 'exact', head: true }).eq('organization_id', orgId!),
       ]);
 
-      // Storage: sum of file_size from documents
       const { data: docAgg } = await supabase
         .from('documents')
         .select('file_size')
         .eq('organization_id', orgId!);
       const totalBytes = (docAgg ?? []).reduce((s, d: any) => s + (d.file_size || 0), 0);
-      const storageGb = totalBytes / (1024 ** 3);
 
       return {
-        plan,
-        currentPlanId: planId,
+        planCode: (org?.subscription_plan as string) || 'free',
         userCount: userCount ?? 0,
         missionCount: missionCount ?? 0,
-        storageGb,
-        nextPlan: getNextPlan(planId),
+        storageGb: totalBytes / 1024 ** 3,
       };
     },
   });
 
-  const plan = data?.plan ?? PLANS.free;
-  const canCreateMission = (data?.missionCount ?? 0) < plan.maxMissions;
-  const canInviteUser = (data?.userCount ?? 0) < plan.maxUsers;
+  const plan = (plans.length ? findPlan(plans, data?.planCode) : null) ?? FALLBACK;
+  const maxMissions = missionQuota(plan);
+
+  const canCreateMission = (data?.missionCount ?? 0) < maxMissions;
+  const canInviteUser = (data?.userCount ?? 0) < plan.max_users;
   const canUploadFile = (sizeBytes = 0) =>
-    ((data?.storageGb ?? 0) + sizeBytes / 1024 ** 3) < plan.maxStorageGb;
+    ((data?.storageGb ?? 0) + sizeBytes / 1024 ** 3) < plan.max_storage_gb;
 
   const usagePercent = {
-    users: Math.min(100, ((data?.userCount ?? 0) / plan.maxUsers) * 100),
-    missions: Math.min(100, ((data?.missionCount ?? 0) / plan.maxMissions) * 100),
-    storage: Math.min(100, ((data?.storageGb ?? 0) / plan.maxStorageGb) * 100),
+    users: Math.min(100, ((data?.userCount ?? 0) / plan.max_users) * 100),
+    missions: maxMissions >= UNLIMITED ? 0 : Math.min(100, ((data?.missionCount ?? 0) / maxMissions) * 100),
+    storage: Math.min(100, ((data?.storageGb ?? 0) / plan.max_storage_gb) * 100),
   };
 
   return {
-    isLoading,
+    isLoading: isLoading || plansLoading,
+    plans,
     plan,
-    currentPlanId: data?.currentPlanId ?? ('free' as PlanId),
+    currentPlanId: data?.planCode ?? 'free',
     userCount: data?.userCount ?? 0,
     missionCount: data?.missionCount ?? 0,
     storageGb: data?.storageGb ?? 0,
-    nextPlan: data?.nextPlan ?? null,
+    nextPlan: nextPlanOf(plans, data?.planCode),
     canCreateMission,
     canInviteUser,
     canUploadFile,
