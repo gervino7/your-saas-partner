@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { PLANS, PLAN_ORDER, PlanId, formatFcfa } from '@/lib/plans';
-import { planOf } from '@/lib/superAdmin';
+import { formatFcfa, formatQuota } from '@/lib/plans';
+import { usePlans } from '@/hooks/usePlans';
+import { planByCode, planNameOf } from '@/lib/superAdmin';
 import { useChangePlan } from '@/hooks/useSuperAdmin';
 import { cn } from '@/lib/utils';
 import { AlertTriangle, Check } from 'lucide-react';
@@ -22,31 +23,33 @@ interface Props {
     user_count?: number | null;
     storage_used_mb?: number | null;
   } | null;
-  defaultPlan?: PlanId;
+  defaultPlan?: string;
 }
 
 export default function PlanChangeDialog({ open, onOpenChange, org, defaultPlan }: Props) {
-  const current = planOf(org?.subscription_plan);
-  const [plan, setPlan] = useState<PlanId>(defaultPlan ?? current);
-  const [maxUsers, setMaxUsers] = useState<number>(PLANS[defaultPlan ?? current].maxUsers);
-  const [maxStorage, setMaxStorage] = useState<number>(PLANS[defaultPlan ?? current].maxStorageGb);
+  const { data: plans = [] } = usePlans();
+  const current = org?.subscription_plan ?? plans[0]?.code ?? 'free';
+  const [plan, setPlan] = useState<string>(defaultPlan ?? current);
+  const [maxUsers, setMaxUsers] = useState<number>(0);
+  const [maxStorage, setMaxStorage] = useState<number>(0);
   const [reason, setReason] = useState('');
   const changePlan = useChangePlan();
 
   useEffect(() => {
-    if (open) {
-      const p = defaultPlan ?? current;
-      setPlan(p);
-      setMaxUsers(PLANS[p].maxUsers);
-      setMaxStorage(PLANS[p].maxStorageGb);
-      setReason('');
-    }
-  }, [open, defaultPlan, current]);
+    if (!open || plans.length === 0) return;
+    const code = defaultPlan ?? current;
+    const p = planByCode(plans, code);
+    setPlan(code);
+    setMaxUsers(p?.max_users ?? 5);
+    setMaxStorage(p?.max_storage_gb ?? 2);
+    setReason('');
+  }, [open, defaultPlan, current, plans]);
 
-  const selectPlan = (p: PlanId) => {
-    setPlan(p);
-    setMaxUsers(PLANS[p].maxUsers);
-    setMaxStorage(PLANS[p].maxStorageGb);
+  const selectPlan = (code: string) => {
+    const p = planByCode(plans, code);
+    setPlan(code);
+    setMaxUsers(p?.max_users ?? 5);
+    setMaxStorage(p?.max_storage_gb ?? 2);
   };
 
   const usedUsers = Number(org?.user_count ?? 0);
@@ -62,7 +65,7 @@ export default function PlanChangeDialog({ open, onOpenChange, org, defaultPlan 
         _new_plan: plan,
         _max_users: maxUsers,
         _max_storage_gb: maxStorage,
-        _new_price: PLANS[plan].price,
+        _new_price: planByCode(plans, plan)?.price_monthly ?? 0,
         _reason: reason.trim(),
       },
       { onSuccess: () => onOpenChange(false) },
@@ -71,39 +74,36 @@ export default function PlanChangeDialog({ open, onOpenChange, org, defaultPlan 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Changer le plan — {org?.name}</DialogTitle>
           <DialogDescription>
-            Plan actuel : {PLANS[current].name}. Les quotas sont pré-remplis mais restent modifiables.
+            Plan actuel : {planNameOf(plans, current)}. Les quotas sont pré-remplis mais restent modifiables.
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          {PLAN_ORDER.map((id) => {
-            const p = PLANS[id];
-            return (
-              <button
-                key={id}
-                type="button"
-                onClick={() => selectPlan(id)}
-                className={cn(
-                  'rounded-lg border p-3 text-left transition-colors',
-                  plan === id ? 'border-primary bg-primary/5' : 'hover:bg-muted',
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">{p.name}</span>
-                  {id === current && <span className="text-[10px] text-muted-foreground">Actuel</span>}
-                  {plan === id && <Check className="h-4 w-4 text-primary" />}
-                </div>
-                <p className="text-sm text-muted-foreground">{formatFcfa(p.price)}</p>
-                <p className="text-xs text-muted-foreground">
-                  {p.maxUsers} utilisateurs · {p.maxStorageGb} Go
-                </p>
-              </button>
-            );
-          })}
+          {plans.map((p) => (
+            <button
+              key={p.code}
+              type="button"
+              onClick={() => selectPlan(p.code)}
+              className={cn(
+                'rounded-lg border p-3 text-left transition-colors',
+                plan === p.code ? 'border-primary bg-primary/5' : 'hover:bg-muted',
+              )}
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-medium">{p.name}</span>
+                {p.code === current && <span className="text-[10px] text-muted-foreground">Actuel</span>}
+                {plan === p.code && <Check className="h-4 w-4 text-primary" />}
+              </div>
+              <p className="text-sm text-muted-foreground">{formatFcfa(p.price_monthly)}</p>
+              <p className="text-xs text-muted-foreground">
+                {p.max_users} utilisateurs · {formatQuota(p.max_missions)} missions · {p.max_storage_gb} Go
+              </p>
+            </button>
+          ))}
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">

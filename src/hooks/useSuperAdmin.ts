@@ -177,7 +177,63 @@ export function useToggleOrg() {
   });
 }
 
+// ── Diagnostic d'organisation ──
+export interface OrgDiagnostic {
+  organization: Record<string, any>;
+  health_checks: Record<string, any>;
+  volumes: Record<string, number>;
+  recent_logins: Record<string, any>[];
+  recent_activity: Record<string, any>[];
+}
+
+export function useOrgDiagnostic(orgId?: string, enabled = true) {
+  return useQuery({
+    queryKey: ['sa-org-diagnostic', orgId],
+    enabled: !!orgId && enabled,
+    queryFn: async (): Promise<OrgDiagnostic> => {
+      const { data, error } = await supabase.rpc('super_admin_org_diagnostic', { _org_id: orgId! } as any);
+      if (error) throw error;
+      const d = (data ?? {}) as any;
+      return {
+        organization: d.organization ?? {},
+        health_checks: d.health_checks ?? {},
+        volumes: d.volumes ?? {},
+        recent_logins: d.recent_logins ?? [],
+        recent_activity: d.recent_activity ?? [],
+      };
+    },
+  });
+}
+
+export function useFixOrg() {
+  const qc = useQueryClient();
+  const { toast } = useToast();
+  return useMutation({
+    mutationFn: async (payload: { _org_id: string; _action: string; _params?: Record<string, any> }) => {
+      const { data, error } = await supabase.rpc('super_admin_fix_org', {
+        _org_id: payload._org_id,
+        _action: payload._action,
+        _params: payload._params ?? {},
+      } as any);
+      if (error) throw error;
+      return data as any;
+    },
+    onSuccess: (data, v) => {
+      const detail = data?.detail ?? {};
+      const count = detail.missions_fixed ?? detail.users_fixed;
+      toast({
+        title: 'Correction appliquée',
+        description: count !== undefined ? `${count} enregistrement(s) corrigé(s)` : 'Référentiels initialisés',
+      });
+      qc.invalidateQueries({ queryKey: ['sa-org-diagnostic', v._org_id] });
+      qc.invalidateQueries({ queryKey: ['sa-org-detail', v._org_id] });
+    },
+    onError: (e: any) => toast({ title: 'Correction refusée', description: e.message, variant: 'destructive' }),
+  });
+}
+
 // ── Support utilisateurs ──
+
 export function useSearchUsers(query: string) {
   return useQuery({
     queryKey: ['sa-search-users', query],
