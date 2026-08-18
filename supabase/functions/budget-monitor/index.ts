@@ -1,12 +1,26 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+// Machine-to-machine function: no browser CORS.
+const jsonHeaders = { "Content-Type": "application/json" };
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const CRON_SECRET = Deno.env.get("CRON_SECRET");
+  const provided = req.headers.get("x-cron-secret");
+
+  if (!CRON_SECRET) {
+    console.error("[cron] CRON_SECRET not configured — refusing to run");
+    return new Response(JSON.stringify({ error: "Configuration manquante" }), {
+      status: 500,
+      headers: jsonHeaders,
+    });
+  }
+  if (provided !== CRON_SECRET) {
+    console.warn("[cron] rejected call without valid secret");
+    return new Response(JSON.stringify({ error: "Non autorisé" }), {
+      status: 401,
+      headers: jsonHeaders,
+    });
+  }
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -22,20 +36,20 @@ Deno.serve(async (req) => {
 
     if (!missions?.length) {
       return new Response(JSON.stringify({ message: "No active missions with budget" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: jsonHeaders,
       });
     }
 
     let alertCount = 0;
 
     for (const mission of missions) {
-      // Calculate actual cost from timesheets
-      const { data: timesheets } = await supabase
-        .from("timesheets")
+      // Calculate actual cost from time entries
+      const { data: entries } = await supabase
+        .from("time_entries")
         .select("hours, user_id")
         .eq("mission_id", mission.id);
 
-      if (!timesheets?.length) continue;
+      if (!entries?.length) continue;
 
       // Get daily rates
       const { data: rates } = await supabase
@@ -46,7 +60,7 @@ Deno.serve(async (req) => {
       const rateMap = new Map(rates?.map((r: any) => [r.grade, r.daily_rate]) || []);
 
       // Get user grades
-      const userIds = [...new Set(timesheets.map((t: any) => t.user_id))];
+      const userIds = [...new Set(entries.map((t: any) => t.user_id))];
       const { data: profiles } = await supabase
         .from("profiles")
         .select("id, grade")
@@ -55,7 +69,7 @@ Deno.serve(async (req) => {
       const userGrade = new Map(profiles?.map((p: any) => [p.id, p.grade]) || []);
 
       let totalCost = 0;
-      for (const ts of timesheets) {
+      for (const ts of entries) {
         const grade = userGrade.get(ts.user_id);
         const dailyRate = rateMap.get(grade) || 0;
         totalCost += (ts.hours / 8) * Number(dailyRate);
@@ -83,12 +97,12 @@ Deno.serve(async (req) => {
 
     return new Response(
       JSON.stringify({ success: true, missions_checked: missions.length, alerts: alertCount }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { headers: jsonHeaders }
     );
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: (error as Error).message }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: jsonHeaders,
     });
   }
 });
