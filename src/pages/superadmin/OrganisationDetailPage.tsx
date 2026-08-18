@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -12,8 +12,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useOrgDetail, useUpdateOrg, useToggleOrg, useIsPlatformAdmin } from '@/hooks/useSuperAdmin';
 import PlanChangeDialog from '@/components/superadmin/PlanChangeDialog';
 import SuspendDialog from '@/components/superadmin/SuspendDialog';
-import { PLANS, formatFcfa } from '@/lib/plans';
-import { planOf, barClass } from '@/lib/superAdmin';
+import { formatFcfa } from '@/lib/plans';
+import { usePlans } from '@/hooks/usePlans';
+import OrgDiagnosticTab from '@/components/superadmin/OrgDiagnosticTab';
+import { planByCode, barClass } from '@/lib/superAdmin';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -41,7 +43,9 @@ const UsageCard = ({ label, used, max, unit = '' }: { label: string; used: numbe
 export default function OrganisationDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { data, isLoading } = useOrgDetail(id);
+  const { data: plans = [] } = usePlans();
   const { canManage } = useIsPlatformAdmin();
   const updateOrg = useUpdateOrg();
   const toggleOrg = useToggleOrg();
@@ -71,7 +75,7 @@ export default function OrganisationDetailPage() {
 
   if (isLoading) return <Skeleton className="h-96 w-full" />;
 
-  const plan = PLANS[planOf(org.subscription_plan)];
+  const plan = planByCode(plans, org.subscription_plan);
   const storageMb = Number(usage.storage_used_mb ?? 0);
 
   return (
@@ -85,7 +89,7 @@ export default function OrganisationDetailPage() {
           <h1 className="font-display text-2xl font-bold">{org.name}</h1>
           <p className="text-sm text-muted-foreground">{org.slug}</p>
         </div>
-        <Badge variant="outline">{plan.name}</Badge>
+        <Badge variant="outline">{plan?.name ?? org.subscription_plan}</Badge>
         {org.is_active === false
           ? <Badge variant="destructive">Suspendue</Badge>
           : <Badge className="bg-emerald-600 text-white">Active</Badge>}
@@ -96,11 +100,12 @@ export default function OrganisationDetailPage() {
         )}
       </div>
 
-      <Tabs defaultValue="overview">
+      <Tabs defaultValue={searchParams.get('tab') ?? 'overview'}>
         <TabsList>
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
           <TabsTrigger value="members">Membres</TabsTrigger>
           <TabsTrigger value="subscription">Abonnement</TabsTrigger>
+          <TabsTrigger value="diagnostic">Diagnostic</TabsTrigger>
           {canManage && <TabsTrigger value="actions">Actions</TabsTrigger>}
         </TabsList>
 
@@ -225,8 +230,8 @@ export default function OrganisationDetailPage() {
           <Card>
             <CardHeader><CardTitle className="text-base">Plan actuel</CardTitle></CardHeader>
             <CardContent className="space-y-2">
-              <p className="text-xl font-bold">{plan.name}</p>
-              <p className="text-sm text-muted-foreground">{formatFcfa(plan.price)}</p>
+              <p className="text-xl font-bold">{plan?.name ?? org.subscription_plan}</p>
+              <p className="text-sm text-muted-foreground">{formatFcfa(plan?.price_monthly ?? 0)}</p>
               <p className="text-sm">
                 {org.max_users} utilisateurs · {org.max_storage_gb} Go de stockage
               </p>
@@ -259,6 +264,10 @@ export default function OrganisationDetailPage() {
               </Table>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="diagnostic">
+          <OrgDiagnosticTab orgId={id!} members={data?.members ?? []} />
         </TabsContent>
 
         {canManage && (
