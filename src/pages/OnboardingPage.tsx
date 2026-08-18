@@ -9,7 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Check, Building2, User as UserIcon, CreditCard, CheckCircle2 } from 'lucide-react';
-import { PLANS, PLAN_ORDER, PlanId, formatFcfa } from '@/lib/plans';
+import { formatFcfa, findPlan } from '@/lib/plans';
+import { usePublicPlans } from '@/hooks/usePlans';
 import { useToast } from '@/hooks/use-toast';
 
 const SECTORS = ['Cabinet d\'audit', 'Cabinet de conseil', 'Bureau d\'études', 'Expertise comptable', 'Autre'];
@@ -33,7 +34,7 @@ type CreateOrganizationRpc = (
   args: {
     _name: string;
     _slug: string;
-    _subscription_plan: PlanId;
+    _subscription_plan: string;
     _max_users: number;
     _max_storage_gb: number;
     _settings: { sector: string; country: string; city: string };
@@ -58,7 +59,9 @@ const OnboardingPage = () => {
   const [phone, setPhone] = useState('');
   const [position, setPosition] = useState('Directeur Associé');
 
-  const [planId, setPlanId] = useState<PlanId>('free');
+  const { data: plans = [] } = usePublicPlans();
+  const [planId, setPlanId] = useState<string>('free');
+  const selectedPlan = findPlan(plans, planId);
 
   const slug = slugify(orgName);
 
@@ -66,7 +69,7 @@ const OnboardingPage = () => {
     if (!user) return;
     setLoading(true);
     try {
-      const plan = PLANS[planId];
+      const plan = selectedPlan;
       const { data: createdOrg, error: orgErr } = await (supabase.rpc as unknown as CreateOrganizationRpc).call(
         supabase,
         'create_organization_for_current_user',
@@ -74,8 +77,8 @@ const OnboardingPage = () => {
         _name: orgName.trim(),
         _slug: slug,
         _subscription_plan: planId,
-        _max_users: plan.maxUsers,
-        _max_storage_gb: plan.maxStorageGb,
+        _max_users: plan?.max_users ?? 5,
+        _max_storage_gb: plan?.max_storage_gb ?? 2,
         _settings: { sector, country, city },
         _full_name: fullName.trim(),
         _phone: phone.trim() || null,
@@ -127,8 +130,8 @@ const OnboardingPage = () => {
             organizationName: orgFull?.name || orgName,
             slug: finalSlug,
             plan: orgFull?.subscription_plan || planId,
-            maxUsers: orgFull?.max_users || plan.maxUsers,
-            maxStorageGb: orgFull?.max_storage_gb || plan.maxStorageGb,
+            maxUsers: orgFull?.max_users || plan?.max_users || 5,
+            maxStorageGb: orgFull?.max_storage_gb || plan?.max_storage_gb || 2,
           },
         });
       } catch (mailErr) {
@@ -243,8 +246,8 @@ const OnboardingPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {PLAN_ORDER.map((pid) => {
-                    const p = PLANS[pid];
+                  {plans.map((p) => {
+                    const pid = p.code;
                     const selected = planId === pid;
                     return (
                       <button
@@ -258,12 +261,12 @@ const OnboardingPage = () => {
                         <div className="flex items-start justify-between mb-2">
                           <div>
                             <h3 className="font-semibold">{p.name}</h3>
-                            <p className="text-sm text-muted-foreground">{formatFcfa(p.price)}</p>
+                            <p className="text-sm text-muted-foreground">{formatFcfa(p.price_monthly)}</p>
                           </div>
                           {selected && <Check className="h-5 w-5 text-primary" />}
                         </div>
                         <ul className="text-sm space-y-1 text-muted-foreground">
-                          {p.features.map((f) => <li key={f}>• {f}</li>)}
+                          {(p.features ?? []).map((f) => <li key={f}>• {f}</li>)}
                         </ul>
                       </button>
                     );
@@ -287,7 +290,7 @@ const OnboardingPage = () => {
                 <div className="grid grid-cols-2 gap-2"><span className="text-muted-foreground">Téléphone</span><span>{phone || '—'}</span></div>
                 <div className="grid grid-cols-2 gap-2"><span className="text-muted-foreground">Poste</span><span>{position}</span></div>
                 <div className="grid grid-cols-2 gap-2"><span className="text-muted-foreground">Grade</span><span>DA — Directeur Associé</span></div>
-                <div className="grid grid-cols-2 gap-2"><span className="text-muted-foreground">Plan</span><span className="font-medium">{PLANS[planId].name} — {formatFcfa(PLANS[planId].price)}</span></div>
+                <div className="grid grid-cols-2 gap-2"><span className="text-muted-foreground">Plan</span><span className="font-medium">{selectedPlan?.name ?? planId} — {formatFcfa(selectedPlan?.price_monthly ?? 0)}</span></div>
               </CardContent>
             </>
           )}
