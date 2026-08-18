@@ -36,6 +36,25 @@ export function usePlans() {
   });
 }
 
+/** Plans actifs et publics — page tarifs, onboarding. */
+export function usePublicPlans() {
+  return useQuery({
+    queryKey: ['plans', 'public'],
+    staleTime: 5 * 60 * 1000,
+    queryFn: async (): Promise<Plan[]> => {
+      const { data, error } = await supabase
+        .from('subscription_plans')
+        .select('*')
+        .eq('is_active', true)
+        .eq('is_public', true)
+        .order('sort_order', { ascending: true });
+      if (error) throw error;
+      return (data ?? []).map(mapPlan);
+    },
+  });
+}
+
+
 /** Tous les plans, y compris inactifs — console super admin. */
 export function useAllPlans() {
   return useQuery({
