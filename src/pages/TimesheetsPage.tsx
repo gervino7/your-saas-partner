@@ -539,6 +539,8 @@ function TeamValidation() {
   const [currentWeek, setCurrentWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const { data: teamEntries = [] } = useTeamTimesheets(currentWeek);
   const approve = useApproveTimeEntries();
+  const [rejectTarget, setRejectTarget] = useState<{ ids: string[]; name: string } | null>(null);
+  const [rejectComment, setRejectComment] = useState('');
 
   const byUser = useMemo(() => {
     const map = new Map<string, { user: any; entries: any[]; totalHours: number }>();
@@ -553,7 +555,8 @@ function TeamValidation() {
     return Array.from(map.values());
   }, [teamEntries]);
 
-  if ((profile?.grade_level ?? 99) > 4) return null;
+  if ((profile?.grade_level ?? 99) > 3) return null;
+
 
   return (
     <div className="space-y-5">
