@@ -4,7 +4,7 @@ import {
   Search, Bell, ChevronRight, LogOut, User, Settings,
   ClipboardList, Clock, AlertTriangle, Send, RotateCcw, CheckCircle,
   Video, FileText, AtSign, MessageSquare, Mail, DollarSign, Star, UserPlus,
-  Building2, Link as LinkIcon, Check,
+  Building2, Link as LinkIcon, Check, Upload,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -44,7 +44,9 @@ const typeIconMap: Record<string, React.ElementType> = {
   message_mention: AtSign, new_message: MessageSquare, copil_report: Mail,
   budget_alert: DollarSign, new_evaluation: Star, timesheet_reminder: Clock,
   invitation_received: UserPlus,
+  document_deposited: Upload, portal_document_received: Upload,
 };
+
 
 const Header = () => {
   const location = useLocation();
