@@ -4,7 +4,7 @@ import {
   Search, Bell, ChevronRight, LogOut, User, Settings,
   ClipboardList, Clock, AlertTriangle, Send, RotateCcw, CheckCircle,
   Video, FileText, AtSign, MessageSquare, Mail, DollarSign, Star, UserPlus,
-  Building2, Link as LinkIcon, Check,
+  Building2, Link as LinkIcon, Check, Upload,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
