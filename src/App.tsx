@@ -57,6 +57,8 @@ import SuiviExecutionPage from '@/pages/SuiviExecutionPage';
 import StaffingPage from '@/pages/StaffingPage';
 import EcheancierPage from '@/pages/EcheancierPage';
 import DossiersPage from '@/pages/DossiersPage';
+import DepotsPage from '@/pages/DepotsPage';
+
 import ServiceWorkerUpdater from '@/components/ServiceWorkerUpdater';
 import PortalGuard from '@/components/portal/PortalGuard';
 import PortalActivationPage from '@/pages/PortalActivationPage';
@@ -313,6 +315,8 @@ const App = () => (
                 <Route path="/staffing" element={<StaffingPage />} />
                 <Route path="/echeancier" element={<EcheancierPage />} />
                 <Route path="/dossiers" element={<DossiersPage />} />
+                <Route path="/depots" element={<DepotsPage />} />
+
               </Route>
               <Route
                 path="/super-admin"

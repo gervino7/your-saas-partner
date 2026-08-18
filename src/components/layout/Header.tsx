@@ -44,7 +44,9 @@ const typeIconMap: Record<string, React.ElementType> = {
   message_mention: AtSign, new_message: MessageSquare, copil_report: Mail,
   budget_alert: DollarSign, new_evaluation: Star, timesheet_reminder: Clock,
   invitation_received: UserPlus,
+  document_deposited: Upload, portal_document_received: Upload,
 };
+
 
 const Header = () => {
   const location = useLocation();
