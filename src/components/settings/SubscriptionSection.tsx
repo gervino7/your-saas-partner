@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Check } from 'lucide-react';
-import { PLANS, PLAN_ORDER, PlanId, formatFcfa } from '@/lib/plans';
+import { formatFcfa, formatQuota, findPlan } from '@/lib/plans';
+import { usePlans } from '@/hooks/usePlans';
 import { useSubscriptionLimits } from '@/hooks/useSubscriptionLimits';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
@@ -14,18 +15,22 @@ import { useQueryClient } from '@tanstack/react-query';
 
 const SubscriptionSection = () => {
   const limits = useSubscriptionLimits();
+  const { data: plans = [] } = usePlans();
   const orgId = useAuthStore((s) => s.profile?.organization_id);
   const { toast } = useToast();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<PlanId>(limits.currentPlanId);
+  const [selected, setSelected] = useState<string>(limits.currentPlanId);
+
+  useEffect(() => setSelected(limits.currentPlanId), [limits.currentPlanId]);
 
   const change = async () => {
     if (!orgId) return;
-    const p = PLANS[selected];
+    const p = findPlan(plans, selected);
+    if (!p) return;
     const { error } = await supabase
       .from('organizations')
-      .update({ subscription_plan: selected, max_users: p.maxUsers, max_storage_gb: p.maxStorageGb })
+      .update({ subscription_plan: p.code, max_users: p.max_users, max_storage_gb: p.max_storage_gb })
       .eq('id', orgId);
     if (error) toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
     else {
@@ -43,49 +48,48 @@ const SubscriptionSection = () => {
         <div>
           <CardTitle>Mon abonnement</CardTitle>
           <CardDescription>
-            Plan actuel : <Badge variant="outline" className="ml-1">{plan.name}</Badge> — {formatFcfa(plan.price)}
+            Plan actuel : <Badge variant="outline" className="ml-1">{plan.name}</Badge> — {formatFcfa(plan.price_monthly)}
           </CardDescription>
         </div>
         <Button onClick={() => setOpen(true)}>Changer de plan</Button>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <div className="flex justify-between text-sm mb-1"><span>Utilisateurs</span><span>{userCount} / {plan.maxUsers}</span></div>
+          <div className="mb-1 flex justify-between text-sm"><span>Utilisateurs</span><span>{userCount} / {plan.max_users}</span></div>
           <Progress value={usagePercent.users} />
         </div>
         <div>
-          <div className="flex justify-between text-sm mb-1"><span>Missions</span><span>{missionCount} / {plan.maxMissions}</span></div>
+          <div className="mb-1 flex justify-between text-sm"><span>Missions</span><span>{missionCount} / {formatQuota(plan.max_missions)}</span></div>
           <Progress value={usagePercent.missions} />
         </div>
         <div>
-          <div className="flex justify-between text-sm mb-1"><span>Stockage</span><span>{storageGb.toFixed(2)} / {plan.maxStorageGb} Go</span></div>
+          <div className="mb-1 flex justify-between text-sm"><span>Stockage</span><span>{storageGb.toFixed(2)} / {plan.max_storage_gb} Go</span></div>
           <Progress value={usagePercent.storage} />
         </div>
       </CardContent>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
           <DialogHeader><DialogTitle>Choisir un plan</DialogTitle></DialogHeader>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {PLAN_ORDER.map((pid) => {
-              const p = PLANS[pid];
-              const sel = selected === pid;
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {plans.map((p) => {
+              const sel = selected === p.code;
               return (
                 <button
-                  key={pid}
+                  key={p.code}
                   type="button"
-                  onClick={() => setSelected(pid)}
-                  className={`text-left rounded-lg border-2 p-4 transition-all ${sel ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}
+                  onClick={() => setSelected(p.code)}
+                  className={`rounded-lg border-2 p-4 text-left transition-all ${sel ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}
                 >
-                  <div className="flex items-start justify-between mb-2">
+                  <div className="mb-2 flex items-start justify-between">
                     <div>
                       <h3 className="font-semibold">{p.name}</h3>
-                      <p className="text-sm text-muted-foreground">{formatFcfa(p.price)}</p>
+                      <p className="text-sm text-muted-foreground">{formatFcfa(p.price_monthly)}</p>
                     </div>
                     {sel && <Check className="h-5 w-5 text-primary" />}
                   </div>
-                  <ul className="text-sm space-y-1 text-muted-foreground">
-                    {p.features.map((f) => <li key={f}>• {f}</li>)}
+                  <ul className="space-y-1 text-sm text-muted-foreground">
+                    {(p.features ?? []).map((f) => <li key={f}>• {f}</li>)}
                   </ul>
                 </button>
               );

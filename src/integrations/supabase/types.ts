@@ -4205,6 +4205,66 @@ export type Database = {
           },
         ]
       }
+      subscription_plans: {
+        Row: {
+          code: string
+          created_at: string | null
+          currency: string
+          description: string | null
+          features: Json | null
+          id: string
+          is_active: boolean
+          is_public: boolean
+          max_clients: number | null
+          max_missions: number | null
+          max_storage_gb: number
+          max_users: number
+          name: string
+          price_monthly: number
+          price_yearly: number | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          currency?: string
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean
+          is_public?: boolean
+          max_clients?: number | null
+          max_missions?: number | null
+          max_storage_gb?: number
+          max_users?: number
+          name: string
+          price_monthly?: number
+          price_yearly?: number | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          currency?: string
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean
+          is_public?: boolean
+          max_clients?: number | null
+          max_missions?: number | null
+          max_storage_gb?: number
+          max_users?: number
+          name?: string
+          price_monthly?: number
+          price_yearly?: number | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       super_admin_audit_log: {
         Row: {
           action: string
@@ -4252,6 +4312,145 @@ export type Database = {
             columns: ["admin_id"]
             isOneToOne: false
             referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_ticket_messages: {
+        Row: {
+          author_id: string | null
+          created_at: string | null
+          id: string
+          is_internal_note: boolean
+          is_platform_side: boolean
+          message: string
+          ticket_id: string
+        }
+        Insert: {
+          author_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_internal_note?: boolean
+          is_platform_side?: boolean
+          message: string
+          ticket_id: string
+        }
+        Update: {
+          author_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_internal_note?: boolean
+          is_platform_side?: boolean
+          message?: string
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_ticket_messages_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_ticket_messages_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_ticket_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_tickets: {
+        Row: {
+          assigned_to: string | null
+          category: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string
+          id: string
+          organization_id: string | null
+          priority: string | null
+          reference: string
+          resolution: string | null
+          resolved_at: string | null
+          status: string
+          subject: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description: string
+          id?: string
+          organization_id?: string | null
+          priority?: string | null
+          reference?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          status?: string
+          subject: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string
+          id?: string
+          organization_id?: string | null
+          priority?: string | null
+          reference?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_tickets_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_tickets_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_tickets_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "support_tickets_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -5069,6 +5268,10 @@ export type Database = {
         Args: { _obligation_document_id: string; _portal_document_id: string }
         Returns: Json
       }
+      can_access_committee: {
+        Args: { _committee_id: string }
+        Returns: boolean
+      }
       can_access_document: {
         Args: { _doc_id: string; _user_id: string }
         Returns: boolean
@@ -5404,6 +5607,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_committee_member: { Args: { _committee_id: string }; Returns: boolean }
       is_conversation_creator: {
         Args: { _conversation_id: string; _user_id: string }
         Returns: boolean
@@ -5487,6 +5691,10 @@ export type Database = {
         }
         Returns: Json
       }
+      super_admin_fix_org: {
+        Args: { _action: string; _org_id: string; _params?: Json }
+        Returns: Json
+      }
       super_admin_get_all_orgs: {
         Args: never
         Returns: {
@@ -5550,6 +5758,7 @@ export type Database = {
         }[]
       }
       super_admin_org_detail: { Args: { _org_id: string }; Returns: Json }
+      super_admin_org_diagnostic: { Args: { _org_id: string }; Returns: Json }
       super_admin_search_users: {
         Args: { _query: string }
         Returns: {
@@ -5563,6 +5772,24 @@ export type Database = {
           last_seen_at: string
           organization_id: string
           organization_name: string
+        }[]
+      }
+      super_admin_tickets: {
+        Args: { _status?: string }
+        Returns: {
+          category: string
+          created_at: string
+          created_by_email: string
+          created_by_name: string
+          id: string
+          last_message_at: string
+          message_count: number
+          organization_id: string
+          organization_name: string
+          priority: string
+          reference: string
+          status: string
+          subject: string
         }[]
       }
       super_admin_toggle_org: {
@@ -5579,6 +5806,21 @@ export type Database = {
           _org_id: string
           _phone?: string
           _trial_ends_at?: string
+        }
+        Returns: Json
+      }
+      super_admin_upsert_plan: {
+        Args: {
+          _code: string
+          _description?: string
+          _features?: Json
+          _is_active?: boolean
+          _is_public?: boolean
+          _max_missions: number
+          _max_storage_gb: number
+          _max_users: number
+          _name: string
+          _price_monthly: number
         }
         Returns: Json
       }

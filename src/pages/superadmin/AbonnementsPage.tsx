@@ -5,16 +5,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAllOrgs, usePlanChanges } from '@/hooks/useSuperAdmin';
-import { computeMrr, planBreakdown, fcfa, planOf, daysUntil } from '@/lib/superAdmin';
-import { PLANS } from '@/lib/plans';
+import { computeMrr, planBreakdown, fcfa, planNameOf, daysUntil } from '@/lib/superAdmin';
+import { usePlans } from '@/hooks/usePlans';
 import { format } from 'date-fns';
 
 export default function AbonnementsPage() {
   const { data: orgs = [], isLoading } = useAllOrgs();
   const { data: changes = [] } = usePlanChanges(50);
 
-  const mrr = useMemo(() => computeMrr(orgs as any), [orgs]);
-  const breakdown = useMemo(() => planBreakdown(orgs as any), [orgs]);
+  const { data: plans = [] } = usePlans();
+  const mrr = useMemo(() => computeMrr(plans, orgs as any), [plans, orgs]);
+  const breakdown = useMemo(() => planBreakdown(plans, orgs as any), [plans, orgs]);
   const orgName = useMemo(() => {
     const map: Record<string, string> = {};
     (orgs as any[]).forEach((o) => { map[o.id] = o.name; });
@@ -83,7 +84,7 @@ export default function AbonnementsPage() {
                       <TableCell>
                         <Link className="font-medium hover:underline" to={`/super-admin/organisations/${o.id}`}>{o.name}</Link>
                       </TableCell>
-                      <TableCell><Badge variant="outline">{PLANS[planOf(o.subscription_plan)].name}</Badge></TableCell>
+                      <TableCell><Badge variant="outline">{planNameOf(plans, o.subscription_plan)}</Badge></TableCell>
                       <TableCell>{format(new Date(o.trial_ends_at), 'dd/MM/yyyy')}</TableCell>
                       <TableCell>
                         <Badge variant={left <= 3 ? 'destructive' : 'outline'}>J-{Math.max(left, 0)}</Badge>

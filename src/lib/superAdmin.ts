@@ -1,4 +1,4 @@
-import { PLANS, PLAN_ORDER, PlanId } from '@/lib/plans';
+import type { Plan } from '@/lib/plans';
 
 export const AUDIT_ACTION_LABELS: Record<string, string> = {
   org_viewed: "Consultation d'organisation",
@@ -7,34 +7,46 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   org_reactivated: 'Réactivation',
   user_search: 'Recherche utilisateur',
   org_updated: 'Mise à jour fiche',
+  org_diagnostic: 'Diagnostic organisation',
+  org_fix: 'Action corrective',
+  plan_upserted: 'Plan créé ou modifié',
 };
 
 export const auditLabel = (action: string) => AUDIT_ACTION_LABELS[action] ?? action;
 
-export const planOf = (plan?: string | null): PlanId =>
-  (plan && plan in PLANS ? plan : 'free') as PlanId;
+/** Code de plan effectif d'une organisation, replié sur le premier plan connu. */
+export const planOf = (plans: Plan[], plan?: string | null): string =>
+  plans.some((p) => p.code === plan) ? (plan as string) : plans[0]?.code ?? 'free';
 
-export const priceOf = (plan?: string | null) => PLANS[planOf(plan)].price;
+export const planByCode = (plans: Plan[], plan?: string | null): Plan | null =>
+  plans.find((p) => p.code === plan) ?? plans[0] ?? null;
 
-export const computeMrr = (orgs: { subscription_plan?: string | null; is_active?: boolean | null }[]) =>
-  orgs.filter((o) => o.is_active !== false).reduce((sum, o) => sum + priceOf(o.subscription_plan), 0);
+export const planNameOf = (plans: Plan[], plan?: string | null) =>
+  planByCode(plans, plan)?.name ?? (plan ?? '—');
 
-export const planBreakdown = (orgs: { subscription_plan?: string | null; is_active?: boolean | null }[]) =>
-  PLAN_ORDER.map((id) => {
-    const list = orgs.filter((o) => planOf(o.subscription_plan) === id);
+export const priceOf = (plans: Plan[], plan?: string | null) => planByCode(plans, plan)?.price_monthly ?? 0;
+
+type OrgLike = { subscription_plan?: string | null; is_active?: boolean | null };
+
+export const computeMrr = (plans: Plan[], orgs: OrgLike[]) =>
+  orgs.filter((o) => o.is_active !== false).reduce((sum, o) => sum + priceOf(plans, o.subscription_plan), 0);
+
+export const planBreakdown = (plans: Plan[], orgs: OrgLike[]) =>
+  plans.map((p) => {
+    const list = orgs.filter((o) => planOf(plans, o.subscription_plan) === p.code);
     const active = list.filter((o) => o.is_active !== false);
     return {
-      id,
-      name: PLANS[id].name,
-      price: PLANS[id].price,
+      id: p.code,
+      name: p.name,
+      price: p.price_monthly,
       count: list.length,
-      subtotal: active.length * PLANS[id].price,
+      subtotal: active.length * p.price_monthly,
     };
   });
 
-export const nextPlanId = (plan?: string | null): PlanId => {
-  const idx = PLAN_ORDER.indexOf(planOf(plan));
-  return PLAN_ORDER[Math.min(idx + 1, PLAN_ORDER.length - 1)];
+export const nextPlanCode = (plans: Plan[], plan?: string | null): string => {
+  const idx = plans.findIndex((p) => p.code === planOf(plans, plan));
+  return plans[Math.min(idx + 1, plans.length - 1)]?.code ?? planOf(plans, plan);
 };
 
 export const fcfa = (n: number) => `${Math.round(n).toLocaleString('fr-FR')} FCFA`;

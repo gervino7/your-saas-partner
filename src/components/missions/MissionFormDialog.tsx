@@ -76,7 +76,7 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
     if (!isEdit && !limits.canCreateMission) {
       toast({
         title: 'Limite atteinte',
-        description: `Vous avez atteint la limite de ${limits.plan.maxMissions} missions pour le plan ${limits.plan.name}.${limits.nextPlan ? ` Passez au plan ${limits.nextPlan.name} pour continuer.` : ''}`,
+        description: `Vous avez atteint la limite de ${limits.plan.max_missions ?? '∞'} missions pour le plan ${limits.plan.name}.${limits.nextPlan ? ` Passez au plan ${limits.nextPlan.name} pour continuer.` : ''}`,
         variant: 'destructive',
       });
       return;
