@@ -58,7 +58,7 @@ export function useDashboardData() {
     queryFn: async () => {
       if (!user) return 0;
       const query = supabase
-        .from('timesheets')
+        .from('time_entries')
         .select('hours')
         .gte('date', weekStart)
         .lte('date', weekEnd);
@@ -73,6 +73,7 @@ export function useDashboardData() {
     },
     enabled: !!user,
   });
+
 
   const urgentTasks = useQuery({
     queryKey: ['dashboard', 'urgentTasks', user?.id],

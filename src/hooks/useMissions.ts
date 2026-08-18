@@ -42,7 +42,9 @@ export function useMissions(filters: MissionFilters = {}) {
         query = query.eq('client_id', filters.clientId);
       }
       if (filters.search) {
-        query = query.or(`name.ilike.%${filters.search}%,code.ilike.%${filters.search}%`);
+        const term = sanitizeSearchTerm(filters.search);
+        if (term) query = query.or(`name.ilike.%${term}%,code.ilike.%${term}%`);
+
       }
 
       const { data, error } = await query;
