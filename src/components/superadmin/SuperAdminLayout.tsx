@@ -21,7 +21,7 @@ const NAV = [
 export default function SuperAdminLayout() {
   const navigate = useNavigate();
   const { role, isOwner } = useIsPlatformAdmin();
-  const { data: openTickets = 0 } = useOpenTicketsCount();
+  const openTickets = useOpenTicketsCount();
 
   const items = isOwner
     ? [...NAV, { label: 'Administrateurs', to: '/super-admin/administrateurs', icon: ShieldCheck }]
