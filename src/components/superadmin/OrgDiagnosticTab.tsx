@@ -47,25 +47,25 @@ export default function OrgDiagnosticTab({ orgId, members }: Props) {
     {
       label: 'Grades des collaborateurs',
       ok: n('users_without_grade') === 0,
-      problem: `${n('users_without_grade')} collaborateur(s) sans grade — ils ne verront aucune mission`,
+      problem: `${n('users_without_grade')} collaborateur(s) sans grade - ils ne verront aucune mission`,
       fix: canManage ? { label: 'Attribuer un grade', run: () => setGradeOpen(true) } : null,
     },
     {
       label: 'Directeurs de mission',
       ok: n('missions_without_director') === 0,
-      problem: `${n('missions_without_director')} mission(s) sans directeur — la validation est bloquée`,
+      problem: `${n('missions_without_director')} mission(s) sans directeur - la validation est bloquée`,
       fix: null,
     },
     {
       label: 'Chefs de projet',
       ok: n('projects_without_lead') === 0,
-      problem: `${n('projects_without_lead')} projet(s) sans chef — les travaux ne peuvent pas être validés`,
+      problem: `${n('projects_without_lead')} projet(s) sans chef - les travaux ne peuvent pas être validés`,
       fix: null,
     },
     {
       label: 'Rattachement des missions',
       ok: n('orphan_records') === 0,
-      problem: `${n('orphan_records')} mission(s) sans organisation — invisibles pour le cabinet`,
+      problem: `${n('orphan_records')} mission(s) sans organisation - invisibles pour le cabinet`,
       fix: canManage
         ? {
             label: 'Réparer les enregistrements orphelins',
@@ -81,7 +81,7 @@ export default function OrgDiagnosticTab({ orgId, members }: Props) {
     {
       label: 'Taux journaliers',
       ok: hc.has_daily_rates === true,
-      problem: 'Aucun taux journalier — les coûts affichent 0',
+      problem: 'Aucun taux journalier - les coûts affichent 0',
       fix: null,
     },
     {
@@ -191,11 +191,11 @@ export default function OrgDiagnosticTab({ orgId, members }: Props) {
                 <Fragment key={i}>
                   <TableRow className="h-11 cursor-pointer" onClick={() => setExpanded(expanded === i ? null : i)}>
                     <TableCell className="text-sm">
-                      {a.created_at ? format(new Date(a.created_at), 'dd/MM/yyyy HH:mm') : '—'}
+                      {a.created_at ? format(new Date(a.created_at), 'dd/MM/yyyy HH:mm') : '-'}
                     </TableCell>
-                    <TableCell className="text-sm">{a.user_name ?? '—'}</TableCell>
+                    <TableCell className="text-sm">{a.user_name ?? '-'}</TableCell>
                     <TableCell className="text-sm">{a.action}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{a.entity_type ?? '—'}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{a.entity_type ?? '-'}</TableCell>
                     <TableCell>
                       {expanded === i ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                     </TableCell>

@@ -68,14 +68,14 @@ export default function UtilisateursPage() {
                           <Link className="hover:underline" to={`/super-admin/organisations/${u.organization_id}`}>
                             {u.organization_name ?? u.organization_id}
                           </Link>
-                        ) : '—'}
+                        ) : '-'}
                       </TableCell>
                       <TableCell><Badge variant="outline">{u.grade}</Badge></TableCell>
                       <TableCell className="text-sm">
-                        {u.last_login_at ? format(new Date(u.last_login_at), 'dd/MM/yyyy HH:mm') : '—'}
+                        {u.last_login_at ? format(new Date(u.last_login_at), 'dd/MM/yyyy HH:mm') : '-'}
                       </TableCell>
                       <TableCell className="text-sm">
-                        {u.created_at ? format(new Date(u.created_at), 'dd/MM/yyyy') : '—'}
+                        {u.created_at ? format(new Date(u.created_at), 'dd/MM/yyyy') : '-'}
                       </TableCell>
                     </TableRow>
                   ))}

@@ -161,7 +161,7 @@ const DepotsPage = () => {
                     <>
                       <TableRow key={`h-${clientId}`} className="sticky top-0 h-9 bg-muted/60 hover:bg-muted/60">
                         <TableCell colSpan={8} className="py-1 text-[13px] font-semibold uppercase tracking-wide text-muted-foreground">
-                          {group.client_name} — {group.rows.length} pièce(s)
+                          {group.client_name} - {group.rows.length} pièce(s)
                         </TableCell>
                       </TableRow>
                       {group.rows.map((row) => (
@@ -207,7 +207,7 @@ const DepotsPage = () => {
                             )}
                           </TableCell>
                           <TableCell className="py-1 text-[13px] text-muted-foreground">
-                            {row.deposited_by ?? '—'}
+                            {row.deposited_by ?? '-'}
                           </TableCell>
                           <TableCell className="py-1">
                             <div className="flex justify-end gap-1">
@@ -269,13 +269,13 @@ const DepotsPage = () => {
                       <TableCell className="py-1 text-sm">
                         <span className="inline-flex items-center gap-2">
                           <Upload className="h-4 w-4 text-muted-foreground" />
-                          {u.title || '—'}
+                          {u.title || '-'}
                         </span>
                       </TableCell>
-                      <TableCell className="py-1 text-[13px] text-muted-foreground">{u.category ?? '—'}</TableCell>
-                      <TableCell className="py-1 text-[13px] text-muted-foreground">{u.file_name ?? '—'}</TableCell>
+                      <TableCell className="py-1 text-[13px] text-muted-foreground">{u.category ?? '-'}</TableCell>
+                      <TableCell className="py-1 text-[13px] text-muted-foreground">{u.file_name ?? '-'}</TableCell>
                       <TableCell className="py-1 text-right text-sm tabular-nums">
-                        {u.uploaded_at ? format(new Date(u.uploaded_at), 'dd/MM/yyyy') : '—'}
+                        {u.uploaded_at ? format(new Date(u.uploaded_at), 'dd/MM/yyyy') : '-'}
                       </TableCell>
                       <TableCell className="py-1 text-sm">{u.client_name}</TableCell>
                       <TableCell className="py-1">

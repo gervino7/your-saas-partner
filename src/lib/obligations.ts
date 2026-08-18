@@ -17,7 +17,7 @@ export const STATUS_FLOW: ObligationStatus[] = [
 
 export const DOC_STATUS = {
   attendue:        { label: 'Attendue',            color: 'slate'  },
-  deposee:         { label: 'Déposée — à valider', color: 'amber'  },
+  deposee:         { label: 'Déposée - à valider', color: 'amber'  },
   recue:           { label: 'Reçue',               color: 'green'  },
   non_applicable:  { label: 'Non applicable',      color: 'gray'   },
   rejetee:         { label: 'Rejetée',             color: 'red'    },

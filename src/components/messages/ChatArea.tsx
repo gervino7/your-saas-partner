@@ -196,7 +196,7 @@ export default function ChatArea({
   return (
     <div className="flex h-full flex-col bg-gradient-to-b from-muted/10 to-background">
       {/* Header */}
-      <div className="flex items-center gap-3 border-b border-border/60 bg-card/80 backdrop-blur-sm px-5 py-3.5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+      <div className="flex items-center gap-3 border-b border-border/60 bg-card px-5 py-3.5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
         <div className="flex-1 min-w-0">
           <h3 className="font-bold text-sm font-display truncate">
             {conversation.name ||
@@ -303,7 +303,7 @@ export default function ChatArea({
                     {msg.reply_message && (
                       <div className="mb-1 ml-1 rounded-xl border-l-[3px] border-primary/30 bg-primary/[0.04] px-3 py-1.5 text-xs text-muted-foreground">
                         <span className="font-semibold text-primary/70">{msg.reply_message.sender_name}</span>
-                        <p className="mt-0.5 opacity-70">{msg.reply_message.content.slice(0, 60)}</p>
+                        <p className="mt-0.5 text-muted-foreground">{msg.reply_message.content.slice(0, 60)}</p>
                       </div>
                     )}
 
@@ -461,7 +461,7 @@ export default function ChatArea({
       )}
 
       {/* Input area */}
-      <div className="relative border-t border-border/50 bg-card/60 backdrop-blur-sm p-3">
+      <div className="relative border-t border-border/50 bg-card p-3">
         {/* Mention autocomplete */}
         {mentionCandidates.length > 0 && (
           <div className="absolute bottom-full left-3 right-3 mb-2 rounded-xl border bg-popover p-1.5 shadow-xl">

@@ -43,7 +43,7 @@ function EntryCard({ e, onEdit, onDelete }: { e: PlanEntry; onEdit: () => void; 
         <span className="font-medium tabular-nums">{formatHours(Number(e.planned_hours))}</span>
         <Badge variant={badge.variant} className={`text-[9px] px-1 py-0 ${badge.className ?? ''}`}>{badge.label}</Badge>
       </div>
-      <div className="mt-0.5 truncate">{e.title ?? e.task?.title ?? e.mission?.name ?? '—'}</div>
+      <div className="mt-0.5 truncate">{e.title ?? e.task?.title ?? e.mission?.name ?? '-'}</div>
       {e.mission && (
         <div className="text-[10px] text-muted-foreground truncate">{e.mission.name}</div>
       )}
@@ -153,7 +153,7 @@ function MonthView({ month, entries, onDayClick }: { month: Date; entries: PlanE
             <div className="mt-1 space-y-0.5">
               {items.slice(0, 2).map((e) => (
                 <div key={e.id} className={`text-[10px] truncate border-l-2 pl-1 ${TYPE_COLOR[e.entry_type]}`}>
-                  {e.title ?? e.mission?.name ?? '—'}
+                  {e.title ?? e.mission?.name ?? '-'}
                 </div>
               ))}
               {items.length > 2 && <div className="text-[10px] text-muted-foreground">+{items.length - 2}</div>}
@@ -260,7 +260,7 @@ export default function PlanningPage() {
                   Total semaine : <span className="font-semibold">{formatHours(weekTotal)}</span>
                   {anyStatus && (
                     <>
-                      {' — Statut : '}
+                      {' - Statut : '}
                       <Badge variant={STATUS_BADGE[anyStatus].variant} className={STATUS_BADGE[anyStatus].className}>
                         {STATUS_BADGE[anyStatus].label}
                       </Badge>

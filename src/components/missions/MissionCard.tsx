@@ -63,9 +63,9 @@ export default function MissionCard({ mission }: MissionCardProps) {
             <div className="flex items-center gap-1 text-xs text-muted-foreground min-w-0 truncate">
               <Calendar className="h-3 w-3 flex-shrink-0" />
               <span className="truncate">
-                {mission.start_date ? format(new Date(mission.start_date), 'dd MMM', { locale: fr }) : '—'}
-                {' — '}
-                {mission.end_date ? format(new Date(mission.end_date), 'dd MMM yyyy', { locale: fr }) : '—'}
+                {mission.start_date ? format(new Date(mission.start_date), 'dd MMM', { locale: fr }) : '-'}
+                {' - '}
+                {mission.end_date ? format(new Date(mission.end_date), 'dd MMM yyyy', { locale: fr }) : '-'}
               </span>
             </div>
             <div className="flex-shrink-0">

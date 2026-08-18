@@ -53,7 +53,7 @@ export default function AssignGradeDialog({ open, onOpenChange, orgId, users }: 
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
               {(Object.keys(GRADE_LABELS) as Grade[]).map((g) => (
-                <SelectItem key={g} value={g}>{g} — {GRADE_LABELS[g]}</SelectItem>
+                <SelectItem key={g} value={g}>{g} - {GRADE_LABELS[g]}</SelectItem>
               ))}
             </SelectContent>
           </Select>

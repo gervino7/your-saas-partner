@@ -49,9 +49,9 @@ export default function ClientContactsTab({ clientId }: { clientId: string }) {
                   <TableCell className="font-medium flex items-center gap-2">
                     {c.name} {c.is_primary && <Badge variant="secondary" className="text-xs"><Star className="h-3 w-3 mr-1" />Principal</Badge>}
                   </TableCell>
-                  <TableCell>{c.position || '—'}</TableCell>
-                  <TableCell>{c.email || '—'}</TableCell>
-                  <TableCell>{c.phone || '—'}</TableCell>
+                  <TableCell>{c.position || '-'}</TableCell>
+                  <TableCell>{c.email || '-'}</TableCell>
+                  <TableCell>{c.phone || '-'}</TableCell>
                   <TableCell>
                     <Button variant="ghost" size="icon" onClick={() => remove.mutate({ id: c.id, clientId })}>
                       <Trash2 className="h-4 w-4 text-destructive" />

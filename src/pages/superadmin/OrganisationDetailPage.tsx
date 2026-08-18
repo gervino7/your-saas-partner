@@ -213,10 +213,10 @@ export default function OrganisationDetailPage() {
                             : <span className="text-xs text-muted-foreground">Hors ligne</span>}
                         </TableCell>
                         <TableCell className="text-sm">
-                          {m.last_login_at ? format(new Date(m.last_login_at), 'dd/MM/yyyy HH:mm') : '—'}
+                          {m.last_login_at ? format(new Date(m.last_login_at), 'dd/MM/yyyy HH:mm') : '-'}
                         </TableCell>
                         <TableCell className="text-sm">
-                          {m.created_at ? format(new Date(m.created_at), 'dd/MM/yyyy') : '—'}
+                          {m.created_at ? format(new Date(m.created_at), 'dd/MM/yyyy') : '-'}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -254,10 +254,10 @@ export default function OrganisationDetailPage() {
                 <TableBody>
                   {(data?.plan_history ?? []).map((h: any) => (
                     <TableRow key={h.id}>
-                      <TableCell className="text-sm">{h.created_at ? format(new Date(h.created_at), 'dd/MM/yyyy HH:mm') : '—'}</TableCell>
-                      <TableCell className="text-sm">{h.old_plan ?? '—'} → <strong>{h.new_plan}</strong></TableCell>
-                      <TableCell className="text-sm">{h.changed_by_email ?? '—'}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{h.reason ?? '—'}</TableCell>
+                      <TableCell className="text-sm">{h.created_at ? format(new Date(h.created_at), 'dd/MM/yyyy HH:mm') : '-'}</TableCell>
+                      <TableCell className="text-sm">{h.old_plan ?? '-'} → <strong>{h.new_plan}</strong></TableCell>
+                      <TableCell className="text-sm">{h.changed_by_email ?? '-'}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{h.reason ?? '-'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -278,7 +278,7 @@ export default function OrganisationDetailPage() {
                 {org.is_active === false ? (
                   <>
                     <p className="text-sm">
-                      Suspendue {org.suspended_at ? `le ${format(new Date(org.suspended_at), 'dd/MM/yyyy')}` : ''} —{' '}
+                      Suspendue {org.suspended_at ? `le ${format(new Date(org.suspended_at), 'dd/MM/yyyy')}` : ''} -{' '}
                       <span className="text-muted-foreground">{org.suspension_reason}</span>
                     </p>
                     <Button onClick={() => toggleOrg.mutate({ _org_id: id!, _activate: true })}>Réactiver</Button>

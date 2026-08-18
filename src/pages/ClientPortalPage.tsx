@@ -151,7 +151,7 @@ const ClientPortalPage = () => {
               <div className="h-6 w-px" style={{ background: 'hsla(0,0%,100%,0.25)' }} />
               <span className="text-sm font-semibold tracking-wide uppercase" style={{ color: 'hsla(0,0%,100%,0.7)', letterSpacing: '0.08em' }}>Portail Client</span>
             </div>
-            <Badge className="text-xs font-bold px-3 py-1.5 rounded-lg" style={{ background: 'hsla(0,0%,100%,0.2)', color: 'white', borderColor: 'hsla(0,0%,100%,0.3)', backdropFilter: 'blur(8px)' }}>
+            <Badge className="text-xs font-bold px-3 py-1.5 rounded-lg" style={{ background: 'hsla(0,0%,100%,0.2)', color: 'white', borderColor: 'hsla(0,0%,100%,0.3)' }}>
               <Sparkles className="h-3 w-3 mr-1.5" />
               {missionData?.code}
             </Badge>
@@ -160,7 +160,7 @@ const ClientPortalPage = () => {
           {/* Client name */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, hsla(0,0%,100%,0.3), hsla(0,0%,100%,0.1))', backdropFilter: 'blur(10px)', border: '1px solid hsla(0,0%,100%,0.25)' }}>
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, hsla(0,0%,100%,0.3), hsla(0,0%,100%,0.1))', border: '1px solid hsla(0,0%,100%,0.25)' }}>
                 <Building2 className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -170,7 +170,7 @@ const ClientPortalPage = () => {
           </div>
 
           {/* Mission Card */}
-          <div className="rounded-2xl p-6 shadow-xl" style={{ background: 'hsla(40,30%,97%,0.95)', backdropFilter: 'blur(16px)', border: '1px solid hsla(40,40%,88%,0.6)' }}>
+          <div className="rounded-2xl p-6 shadow-xl" style={{ background: 'hsl(40,30%,97%)', border: '1px solid hsla(40,40%,88%,0.6)' }}>
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
                 <Award className="h-4 w-4" style={{ color: 'hsl(35,85%,48%)' }} />
@@ -423,7 +423,7 @@ const ClientPortalPage = () => {
           <div className="flex items-center gap-3">
             <img src={logoImg} alt="Logo" className="h-7 w-auto opacity-60" />
             <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} Mission-DGC — Portail client sécurisé
+              © {new Date().getFullYear()} Mission-DGC - Portail client sécurisé
             </p>
           </div>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">

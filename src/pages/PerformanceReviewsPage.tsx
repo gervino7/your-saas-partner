@@ -155,7 +155,7 @@ export default function PerformanceReviewsPage() {
             <div className="text-2xl font-bold">
               {performanceData.length > 0
                 ? (performanceData.reduce((sum: number, s: any) => sum + (s.rating || 0), 0) / performanceData.length).toFixed(1)
-                : '—'}
+                : '-'}
             </div>
             <p className="text-xs text-muted-foreground">Note moyenne globale</p>
           </CardContent>
@@ -268,7 +268,7 @@ export default function PerformanceReviewsPage() {
                   <TableCell>
                     <Badge variant="outline" className="text-xs">{emp.grade}</Badge>
                   </TableCell>
-                  <TableCell className="text-sm max-w-[200px] truncate">{emp.missionsStr || '—'}</TableCell>
+                  <TableCell className="text-sm max-w-[200px] truncate">{emp.missionsStr || '-'}</TableCell>
                   <TableCell className="text-center text-sm">{emp.taskCount}</TableCell>
                   <TableCell className="text-center">
                     <Badge className={ratingColors[Math.round(emp.avgRating)] ?? 'bg-muted text-muted-foreground'}>

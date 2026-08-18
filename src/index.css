@@ -92,12 +92,19 @@
   }
 }
 @layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    text-size-adjust: 100%;
+  }
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-family: "Inter", sans-serif;
+    font-weight: 400;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: "Plus Jakarta Sans", sans-serif;
@@ -105,8 +112,9 @@
 }
 @layer utilities {
   .glass {
-    @apply bg-card/80 backdrop-blur-xl border border-border/50;
+    @apply bg-card/95 border border-border/50;
   }
+
   .shadow-card {
     box-shadow: var(--shadow-card);
   }

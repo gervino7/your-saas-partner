@@ -46,7 +46,7 @@ import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
 
 function formatDate(d: string | null) {
-  if (!d) return '—';
+  if (!d) return '-';
   return format(new Date(d), 'dd MMM yyyy HH:mm', { locale: fr });
 }
 
@@ -407,7 +407,7 @@ export default function WorkspacePage() {
           </div>
         </TableCell>
         <TableCell className="hidden sm:table-cell text-muted-foreground text-sm tabular-nums">
-          {file.is_folder ? '—' : formatFileSize(file.file_size || 0)}
+          {file.is_folder ? '-' : formatFileSize(file.file_size || 0)}
         </TableCell>
         <TableCell className="hidden md:table-cell text-muted-foreground text-sm tabular-nums">
           {formatDate(file.last_modified_remote || file.updated_at)}
@@ -527,7 +527,7 @@ export default function WorkspacePage() {
                 <SelectItem value="self">Mon bureau</SelectItem>
                 {subordinates.map((s: any) => (
                   <SelectItem key={s.id} value={s.id}>
-                    {s.full_name} ({s.grade || '—'})
+                    {s.full_name} ({s.grade || '-'})
                   </SelectItem>
                 ))}
               </SelectContent>

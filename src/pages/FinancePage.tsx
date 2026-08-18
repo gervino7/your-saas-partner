@@ -88,11 +88,11 @@ function BudgetTab() {
                     <div className="font-medium text-sm">{m.name}</div>
                     <div className="text-xs text-muted-foreground">{m.code}</div>
                   </TableCell>
-                  <TableCell className="text-right text-sm">{m.budget ? `${m.budget.toLocaleString('fr-FR')} FCFA` : '—'}</TableCell>
+                  <TableCell className="text-right text-sm">{m.budget ? `${m.budget.toLocaleString('fr-FR')} FCFA` : '-'}</TableCell>
                   <TableCell className="text-right text-sm">{m.total_hours.toFixed(1)}h</TableCell>
                   <TableCell className="text-right text-sm">{m.total_cost.toLocaleString('fr-FR')} FCFA</TableCell>
                   <TableCell className="text-right text-sm">
-                    {m.budget ? `${(m.budget - m.total_cost).toLocaleString('fr-FR')} FCFA` : '—'}
+                    {m.budget ? `${(m.budget - m.total_cost).toLocaleString('fr-FR')} FCFA` : '-'}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
@@ -327,9 +327,9 @@ function ExpensesTab() {
               {sortedExpenses.map((exp: any) => (
                 <TableRow key={exp.id}>
                   <TableCell className="text-sm">{format(new Date(exp.date), 'dd/MM/yyyy')}</TableCell>
-                  <TableCell className="text-sm">{exp.user?.full_name || '—'}</TableCell>
-                  <TableCell className="text-sm">{exp.category || '—'}</TableCell>
-                  <TableCell className="text-sm">{exp.mission?.name || '—'}</TableCell>
+                  <TableCell className="text-sm">{exp.user?.full_name || '-'}</TableCell>
+                  <TableCell className="text-sm">{exp.category || '-'}</TableCell>
+                  <TableCell className="text-sm">{exp.mission?.name || '-'}</TableCell>
                   <TableCell className="text-right text-sm font-medium">{Number(exp.amount).toLocaleString('fr-FR')} FCFA</TableCell>
                   <TableCell><Badge variant={statusVariant[exp.status] || 'secondary'}>{statusLabel[exp.status] || exp.status}</Badge></TableCell>
                   {isSuperior && (
@@ -512,11 +512,11 @@ function InvoicesTab() {
               {sortedInvoices.map((inv: any) => (
                 <TableRow key={inv.id}>
                   <TableCell className="font-mono text-sm">{inv.invoice_number}</TableCell>
-                  <TableCell className="text-sm">{inv.client?.name || '—'}</TableCell>
-                  <TableCell className="text-sm">{inv.mission?.name || '—'}</TableCell>
+                  <TableCell className="text-sm">{inv.client?.name || '-'}</TableCell>
+                  <TableCell className="text-sm">{inv.mission?.name || '-'}</TableCell>
                   <TableCell className="text-sm capitalize">{inv.type}</TableCell>
                   <TableCell className="text-right text-sm font-medium">{Number(inv.total_amount).toLocaleString('fr-FR')} FCFA</TableCell>
-                  <TableCell className="text-sm">{inv.due_date ? format(new Date(inv.due_date), 'dd/MM/yyyy') : '—'}</TableCell>
+                  <TableCell className="text-sm">{inv.due_date ? format(new Date(inv.due_date), 'dd/MM/yyyy') : '-'}</TableCell>
                   <TableCell><Badge variant={statusVariant[inv.status] || 'secondary'}>{statusLabel[inv.status] || inv.status}</Badge></TableCell>
                   <TableCell>
                     {inv.status === 'draft' && (

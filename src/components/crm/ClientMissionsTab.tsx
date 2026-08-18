@@ -92,9 +92,9 @@ export default function ClientMissionsTab({ clientId }: { clientId: string }) {
                   <TableCell className="font-mono text-xs">{m.code}</TableCell>
                   <TableCell className="font-medium">{m.name}</TableCell>
                   <TableCell><Badge variant={(statusColors[m.status] || 'secondary') as any}>{statusLabels[m.status] || m.status}</Badge></TableCell>
-                  <TableCell>{(m.chief as any)?.full_name || '—'}</TableCell>
+                  <TableCell>{(m.chief as any)?.full_name || '-'}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">
-                    {m.start_date ? format(new Date(m.start_date), 'dd MMM yyyy', { locale: fr }) : '—'}
+                    {m.start_date ? format(new Date(m.start_date), 'dd MMM yyyy', { locale: fr }) : '-'}
                     {m.end_date ? ` → ${format(new Date(m.end_date), 'dd MMM yyyy', { locale: fr })}` : ''}
                   </TableCell>
                   <TableCell><div className="flex items-center gap-2"><Progress value={m.progress ?? 0} className="h-2 w-20" /><span className="text-xs">{m.progress ?? 0}%</span></div></TableCell>
@@ -129,7 +129,7 @@ export default function ClientMissionsTab({ clientId }: { clientId: string }) {
                 ) : (
                   unlinkedMissions.map((m: any) => (
                     <SelectItem key={m.id} value={m.id}>
-                      {m.code ? `${m.code} — ` : ''}{m.name}
+                      {m.code ? `${m.code} - ` : ''}{m.name}
                     </SelectItem>
                   ))
                 )}

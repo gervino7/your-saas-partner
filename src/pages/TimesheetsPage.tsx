@@ -283,7 +283,7 @@ function WeeklyView() {
               ...DAYS.map((d) => ({ key: d, label: d })),
               { key: 'Total', label: 'Total' },
             ]}
-            title={`Feuille de temps — Semaine du ${format(currentWeek, 'dd MMMM yyyy', { locale: fr })}`}
+            title={`Feuille de temps - Semaine du ${format(currentWeek, 'dd MMMM yyyy', { locale: fr })}`}
           />
         </div>
       </div>
@@ -337,7 +337,7 @@ function WeeklyView() {
                   const rowTotal = dateStrs.reduce((s, d) => s + (row.entries[d]?.hours || 0), 0);
                   const isLocked = Object.values(row.entries).some((e) => e.status === 'approved' || e.status === 'submitted');
                   return (
-                    <TableRow key={row.key} className={cn(isLocked && "opacity-70")}>
+                    <TableRow key={row.key} className={cn(isLocked && "text-muted-foreground")}>
                       <TableCell className="py-2.5">
                         <div className="flex items-center gap-2">
                           <div className="w-1 h-8 rounded-full bg-primary/60 shrink-0" />
@@ -387,7 +387,7 @@ function WeeklyView() {
                           "text-sm font-bold",
                           rowTotal > 0 ? "text-foreground" : "text-muted-foreground/40"
                         )}>
-                          {rowTotal > 0 ? `${rowTotal.toFixed(1)}h` : '—'}
+                          {rowTotal > 0 ? `${rowTotal.toFixed(1)}h` : '-'}
                         </span>
                       </TableCell>
                     </TableRow>
@@ -408,7 +408,7 @@ function WeeklyView() {
                         i < 5 && t > 0 && t < 4 && "text-amber-600 dark:text-amber-400",
                         t === 0 && "text-muted-foreground/30"
                       )}>
-                        {t > 0 ? `${t.toFixed(1)}` : '—'}
+                        {t > 0 ? `${t.toFixed(1)}` : '-'}
                       </TableCell>
                     ))}
                     <TableCell className="text-center">

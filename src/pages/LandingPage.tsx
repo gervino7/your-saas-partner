@@ -42,7 +42,7 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+      <nav className="sticky top-0 z-50 border-b border-border/50 bg-background">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2.5">
             <img src={logoImg} alt="Mission-DGC" className="h-9 w-9 rounded-xl object-contain" />
@@ -71,14 +71,14 @@ const LandingPage = () => {
             <div className="absolute bottom-0 left-1/3 w-72 h-72 rounded-full bg-info/15 blur-3xl" />
           </div>
           <div className="container mx-auto px-4 text-center relative z-10">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 backdrop-blur-sm px-4 py-1.5 text-sm text-white/80 mb-8">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-sm text-white/80 mb-8">
               <Star className="h-3.5 w-3.5 text-warning" /> Conçu pour l'Afrique francophone
             </div>
             <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight max-w-4xl mx-auto leading-[1.1] text-white">
               La plateforme de gestion de missions pour les cabinets d'excellence
             </h1>
             <p className="mt-6 text-lg md:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
-              Planifiez vos missions, pilotez vos équipes, gérez vos COPIL et suivez la rentabilité — le tout dans une seule plateforme.
+              Planifiez vos missions, pilotez vos équipes, gérez vos COPIL et suivez la rentabilité - le tout dans une seule plateforme.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button size="lg" onClick={() => navigate('/login')} className="text-base px-8 h-12 bg-white text-foreground hover:bg-white/90 font-semibold shadow-elevated">
@@ -264,7 +264,7 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="mt-10 pt-8 border-t border-border/50 text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Mission-DGC — D&G CONSEIL. Tous droits réservés.
+            © {new Date().getFullYear()} Mission-DGC - D&G CONSEIL. Tous droits réservés.
           </div>
         </div>
       </footer>

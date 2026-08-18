@@ -189,7 +189,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       if (!session?.user) {
-        // User signed out — mark offline
+        // User signed out - mark offline
         if (currentUserId) {
           await setUserOffline(currentUserId);
           currentUserId = null;

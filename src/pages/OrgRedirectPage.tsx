@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { Loader2 } from 'lucide-react';
 
 /**
- * /org/:slug — URL personnalisée de l'organisation.
+ * /org/:slug - URL personnalisée de l'organisation.
  * - Si l'utilisateur est connecté et appartient à l'org (slug), redirige vers /.
  * - Sinon redirige vers /login avec ?org=<slug> (mémorisé après login).
  */

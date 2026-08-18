@@ -91,10 +91,10 @@ export default function SuperAdminSupportPage() {
                     onClick={() => navigate(`/super-admin/support/${t.id}`)}
                   >
                     <TableCell className="font-mono text-xs">{t.reference}</TableCell>
-                    <TableCell className="text-sm">{t.organization_name ?? '—'}</TableCell>
+                    <TableCell className="text-sm">{t.organization_name ?? '-'}</TableCell>
                     <TableCell className="font-medium">{t.subject}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {TICKET_CATEGORY_LABELS[t.category ?? ''] ?? t.category ?? '—'}
+                      {TICKET_CATEGORY_LABELS[t.category ?? ''] ?? t.category ?? '-'}
                     </TableCell>
                     <TableCell>
                       <Badge className={priorityBadge(t.priority)}>
@@ -105,7 +105,7 @@ export default function SuperAdminSupportPage() {
                     <TableCell className="text-sm">
                       {t.last_message_at || t.created_at
                         ? format(new Date(t.last_message_at ?? t.created_at!), 'dd/MM/yyyy HH:mm')
-                        : '—'}
+                        : '-'}
                     </TableCell>
                   </TableRow>
                 ))}

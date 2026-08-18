@@ -194,8 +194,8 @@ export default function AdminSettings() {
               <Select defaultValue="XOF">
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="XOF">FCFA (XOF) — BCEAO</SelectItem>
-                  <SelectItem value="XAF">FCFA (XAF) — CEMAC</SelectItem>
+                  <SelectItem value="XOF">FCFA (XOF) - BCEAO</SelectItem>
+                  <SelectItem value="XAF">FCFA (XAF) - CEMAC</SelectItem>
                   <SelectItem value="EUR">Euro (EUR)</SelectItem>
                   <SelectItem value="USD">Dollar US (USD)</SelectItem>
                 </SelectContent>
@@ -333,15 +333,15 @@ export default function AdminSettings() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-sm">
                 <p className="text-muted-foreground">Utilisateurs</p>
-                <p className="font-semibold">— / {org?.max_users ?? 5}</p>
+                <p className="font-semibold">- / {org?.max_users ?? 5}</p>
               </div>
               <div className="text-sm">
                 <p className="text-muted-foreground">Stockage</p>
-                <p className="font-semibold">— / {org?.max_storage_gb ?? 2} Go</p>
+                <p className="font-semibold">- / {org?.max_storage_gb ?? 2} Go</p>
               </div>
               <div className="text-sm">
                 <p className="text-muted-foreground">Missions</p>
-                <p className="font-semibold">— / ∞</p>
+                <p className="font-semibold">- / ∞</p>
               </div>
             </div>
             <Button variant="outline" size="sm" onClick={() => setShowPlanDialog(true)}>Changer de plan</Button>

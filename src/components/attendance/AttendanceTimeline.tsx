@@ -35,7 +35,7 @@ export default function AttendanceTimeline({ events }: { events: AttendanceEvent
                       <div className="text-sm font-medium">
                         {cfg.label}
                         {e.event_type === 'sortie_pro' && e.reason && (
-                          <span className="font-normal text-muted-foreground"> — {e.reason}</span>
+                          <span className="font-normal text-muted-foreground"> - {e.reason}</span>
                         )}
                       </div>
                       <div className="flex flex-wrap gap-1 mt-1 text-xs text-muted-foreground">

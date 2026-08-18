@@ -147,7 +147,7 @@ export default function SupportPage() {
                     <TableCell className="text-sm">{TICKET_PRIORITY_LABELS[t.priority ?? ''] ?? t.priority}</TableCell>
                     <TableCell><Badge variant="outline">{TICKET_STATUS_LABELS[t.status] ?? t.status}</Badge></TableCell>
                     <TableCell className="text-sm">
-                      {t.created_at ? format(new Date(t.created_at), 'dd/MM/yyyy') : '—'}
+                      {t.created_at ? format(new Date(t.created_at), 'dd/MM/yyyy') : '-'}
                     </TableCell>
                   </TableRow>
                 ))}

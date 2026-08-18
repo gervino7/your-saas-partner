@@ -114,7 +114,7 @@ export default function TeamTab({ projectId, missionId }: { projectId: string; m
                     <p className="text-sm font-medium truncate">{m.user?.full_name}</p>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <Badge variant="outline" className="text-[10px]">
-                        {GRADE_LABELS[m.user?.grade as Grade] ?? m.user?.grade ?? '—'}
+                        {GRADE_LABELS[m.user?.grade as Grade] ?? m.user?.grade ?? '-'}
                       </Badge>
                       <Badge variant="secondary" className="text-[10px]">
                         {roleLabels[m.role] ?? m.role}

@@ -45,7 +45,7 @@ const CRMPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold font-display">CRM — Clients</h1>
+        <h1 className="text-2xl font-bold font-display">CRM - Clients</h1>
         {gradeLevel <= 3 && (
           <Button onClick={() => setShowCreate(true)}>
             <Plus className="h-4 w-4 mr-2" /> Nouveau client
@@ -93,10 +93,10 @@ const CRMPage = () => {
               {sortedClients.map(client => (
                 <TableRow key={client.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/admin/clients/${client.id}`)}>
                   <TableCell className="font-medium">{client.name}</TableCell>
-                  <TableCell>{client.industry ? <Badge variant="outline">{client.industry}</Badge> : '—'}</TableCell>
-                  <TableCell>{client.contact_name || '—'}</TableCell>
-                  <TableCell className="text-muted-foreground">{client.contact_email || '—'}</TableCell>
-                  <TableCell>{client.country || '—'}</TableCell>
+                  <TableCell>{client.industry ? <Badge variant="outline">{client.industry}</Badge> : '-'}</TableCell>
+                  <TableCell>{client.contact_name || '-'}</TableCell>
+                  <TableCell className="text-muted-foreground">{client.contact_email || '-'}</TableCell>
+                  <TableCell>{client.country || '-'}</TableCell>
                   <TableCell>
                     <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/admin/clients/${client.id}`); }}>
                       Voir

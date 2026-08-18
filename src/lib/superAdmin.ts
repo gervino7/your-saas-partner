@@ -22,7 +22,7 @@ export const planByCode = (plans: Plan[], plan?: string | null): Plan | null =>
   plans.find((p) => p.code === plan) ?? plans[0] ?? null;
 
 export const planNameOf = (plans: Plan[], plan?: string | null) =>
-  planByCode(plans, plan)?.name ?? (plan ?? '—');
+  planByCode(plans, plan)?.name ?? (plan ?? '-');
 
 export const priceOf = (plans: Plan[], plan?: string | null) => planByCode(plans, plan)?.price_monthly ?? 0;
 

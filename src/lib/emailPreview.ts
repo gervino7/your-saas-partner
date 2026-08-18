@@ -1,4 +1,4 @@
-// Mirror of supabase/functions/_shared/email-template.ts — used to preview
+// Mirror of supabase/functions/_shared/email-template.ts - used to preview
 // the exact email HTML before sending a client reminder.
 
 export const EMAIL_LOGO_URL =

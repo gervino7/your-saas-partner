@@ -49,7 +49,7 @@ export default function PlansPage() {
         <div>
           <h1 className="font-display text-2xl font-bold">Plans</h1>
           <p className="text-sm text-muted-foreground">
-            Offres commerciales lues en base — un changement de tarif ne demande aucune mise en production.
+            Offres commerciales lues en base - un changement de tarif ne demande aucune mise en production.
           </p>
         </div>
         {canManage && (

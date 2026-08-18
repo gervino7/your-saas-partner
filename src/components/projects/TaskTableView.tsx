@@ -81,10 +81,10 @@ export default function TaskTableView({ tasks, projectLeadId, onEditTask, onDele
                   </div>
                 </TableCell>
                 <TableCell className="text-sm">
-                  {task.due_date ? format(new Date(task.due_date), 'd MMM yyyy', { locale: fr }) : '—'}
+                  {task.due_date ? format(new Date(task.due_date), 'd MMM yyyy', { locale: fr }) : '-'}
                 </TableCell>
-                <TableCell className="text-sm">{task.estimated_hours ?? '—'}</TableCell>
-                <TableCell className="text-sm">{task.compartment ?? '—'}</TableCell>
+                <TableCell className="text-sm">{task.estimated_hours ?? '-'}</TableCell>
+                <TableCell className="text-sm">{task.compartment ?? '-'}</TableCell>
               </TableRow>
             ))
           )}

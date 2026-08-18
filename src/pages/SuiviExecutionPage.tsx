@@ -78,7 +78,7 @@ export default function SuiviExecutionPage() {
   const chartData = useMemo(() => {
     const map = new Map<string, { name: string; prévu: number; réalisé: number }>();
     for (const r of rows) {
-      const key = r.mission_name ?? '—';
+      const key = r.mission_name ?? '-';
       if (!map.has(key)) map.set(key, { name: key, prévu: 0, réalisé: 0 });
       const item = map.get(key)!;
       item.prévu += Number(r.planned_hours || 0);
@@ -191,7 +191,7 @@ export default function SuiviExecutionPage() {
                   return (
                     <TableRow key={`${r.user_id}-${r.mission_id}-${i}`}>
                       <TableCell>{r.full_name}</TableCell>
-                      <TableCell>{r.mission_name ?? '—'}</TableCell>
+                      <TableCell>{r.mission_name ?? '-'}</TableCell>
                       <TableCell>{formatHours(Number(r.planned_hours))}</TableCell>
                       <TableCell>{formatHours(Number(r.actual_hours))}</TableCell>
                       <TableCell>

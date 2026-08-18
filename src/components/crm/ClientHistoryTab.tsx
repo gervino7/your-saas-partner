@@ -57,7 +57,7 @@ export default function ClientHistoryTab({ clientId }: { clientId: string }) {
                       </span>
                     </div>
                     {item.description && <p className="text-sm text-muted-foreground mt-1">{item.description}</p>}
-                    <p className="text-xs text-muted-foreground mt-1">Par {(item.creator as any)?.full_name || '—'}</p>
+                    <p className="text-xs text-muted-foreground mt-1">Par {(item.creator as any)?.full_name || '-'}</p>
                   </div>
                 </div>
               );

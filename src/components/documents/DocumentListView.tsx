@@ -54,7 +54,7 @@ export default function DocumentListView({ documents, onAction }: Props) {
               {formatFileSize(doc.file_size)}
             </TableCell>
             <TableCell className="hidden lg:table-cell text-xs text-muted-foreground">
-              {(doc.uploader as any)?.full_name || '—'}
+              {(doc.uploader as any)?.full_name || '-'}
             </TableCell>
             <TableCell className="hidden sm:table-cell text-xs text-muted-foreground">
               {doc.created_at ? format(new Date(doc.created_at), 'dd/MM/yy', { locale: fr }) : ''}

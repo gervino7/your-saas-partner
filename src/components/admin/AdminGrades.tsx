@@ -121,7 +121,7 @@ export default function AdminGrades() {
   };
 
   const formatRate = (rate: number, currency: string) => {
-    if (!rate) return '—';
+    if (!rate) return '-';
     return `${rate.toLocaleString('fr-FR')} ${currency}`;
   };
 
@@ -172,7 +172,7 @@ export default function AdminGrades() {
               </TableHeader>
               <TableBody>
                 {grades.map((g) => (
-                  <TableRow key={g.id} className={!g.is_active ? 'opacity-50' : ''}>
+                  <TableRow key={g.id} className={!g.is_active ? 'text-muted-foreground' : ''}>
                     <TableCell>
                       <Badge variant="outline" className="font-mono">{g.level}</Badge>
                     </TableCell>
@@ -329,7 +329,7 @@ export default function AdminGrades() {
                                 ${isSelected
                                   ? 'bg-primary/15 border-l-3 border-l-primary text-foreground'
                                   : 'hover:bg-accent/50 text-foreground border-l-3 border-l-transparent'}
-                                ${!g.is_active ? 'opacity-50' : ''}`}
+                                ${!g.is_active ? 'text-muted-foreground' : ''}`}
                               onPointerDown={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -345,7 +345,7 @@ export default function AdminGrades() {
                                 </div>
                               </div>
                               <span className="text-xs font-medium text-foreground/70 shrink-0 ml-2 pointer-events-none">
-                                {g.daily_rate ? `${g.daily_rate.toLocaleString('fr-FR')} ${g.currency}` : '—'}
+                                {g.daily_rate ? `${g.daily_rate.toLocaleString('fr-FR')} ${g.currency}` : '-'}
                               </span>
                             </button>
                           </li>

@@ -358,7 +358,7 @@ const LoginPage = () => {
 
           {/* Footer */}
           <div className="flex items-center justify-between">
-            <p className="text-white/25 text-xs">© {new Date().getFullYear()} D&G CONSEIL — Tous droits réservés</p>
+            <p className="text-white/25 text-xs">© {new Date().getFullYear()} D&G CONSEIL - Tous droits réservés</p>
             <div className="flex items-center gap-1.5">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="h-1.5 rounded-full transition-all" style={{ width: i === 1 ? '24px' : '6px', background: i === 1 ? 'hsl(22 78% 55%)' : 'hsl(0 0% 100% / 0.15)' }} />
@@ -429,7 +429,7 @@ const LoginPage = () => {
                     <div>
                       <p className="text-xs text-muted-foreground">Grade attribué</p>
                       <p className="text-sm font-medium">
-                        {invitation ? `${invitation.grade} — ${gradeLabel || invitation.grade}` : (loadingInvitation ? 'Chargement…' : '—')}
+                        {invitation ? `${invitation.grade} - ${gradeLabel || invitation.grade}` : (loadingInvitation ? 'Chargement…' : '-')}
                       </p>
                     </div>
                   </div>

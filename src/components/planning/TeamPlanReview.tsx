@@ -30,7 +30,7 @@ export default function TeamPlanReview({ weekStart }: { weekStart: Date }) {
     for (const e of entries) {
       const key = e.user_id;
       if (!map.has(key)) {
-        map.set(key, { name: e.profile?.full_name ?? '—', grade: e.profile?.grade ?? '', items: [] });
+        map.set(key, { name: e.profile?.full_name ?? '-', grade: e.profile?.grade ?? '', items: [] });
       }
       map.get(key)!.items.push(e);
     }
@@ -150,10 +150,10 @@ export default function TeamPlanReview({ weekStart }: { weekStart: Date }) {
                               <TableCell>{format(new Date(it.plan_date), 'EEE dd/MM', { locale: fr })}</TableCell>
                               <TableCell>{TYPE_LABEL[it.entry_type] ?? it.entry_type}</TableCell>
                               <TableCell className="text-xs text-muted-foreground">
-                                {[it.mission?.name, it.project?.name, it.task?.title].filter(Boolean).join(' / ') || '—'}
+                                {[it.mission?.name, it.project?.name, it.task?.title].filter(Boolean).join(' / ') || '-'}
                               </TableCell>
                               <TableCell>{formatHours(Number(it.planned_hours))}</TableCell>
-                              <TableCell>{it.title ?? '—'}</TableCell>
+                              <TableCell>{it.title ?? '-'}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>

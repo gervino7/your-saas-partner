@@ -58,7 +58,7 @@ export default function ShareDialog({ doc, open, onClose }: Props) {
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Share2 className="h-4 w-4" /> Partager — {doc?.name}
+            <Share2 className="h-4 w-4" /> Partager - {doc?.name}
           </DialogTitle>
         </DialogHeader>
 
@@ -92,7 +92,7 @@ export default function ShareDialog({ doc, open, onClose }: Props) {
               <p className="text-xs font-medium text-muted-foreground">Partagé avec :</p>
               {shares.map((s: any) => (
                 <div key={s.id} className="flex items-center justify-between py-1 text-sm">
-                  <span>{s.shared_user?.full_name || '—'}</span>
+                  <span>{s.shared_user?.full_name || '-'}</span>
                   <span className="text-xs text-muted-foreground capitalize">{s.permission}</span>
                 </div>
               ))}

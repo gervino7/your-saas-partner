@@ -106,6 +106,6 @@ export async function refreshOfflineCache(userId: string) {
       await offlineDb.notifications.bulkPut(notifs.map((n) => ({ ...n, is_read: n.is_read ?? false })));
     }
   } catch {
-    // Silently fail — we're probably offline
+    // Silently fail - we're probably offline
   }
 }
