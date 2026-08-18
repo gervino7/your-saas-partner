@@ -49,6 +49,10 @@ import UtilisateursPage from '@/pages/superadmin/UtilisateursPage';
 import SantePage from '@/pages/superadmin/SantePage';
 import JournalPage from '@/pages/superadmin/JournalPage';
 import AdministrateursPage from '@/pages/superadmin/AdministrateursPage';
+import PlansPage from '@/pages/superadmin/PlansPage';
+import SuperAdminSupportPage from '@/pages/superadmin/SupportPage';
+import SuperAdminSupportTicketPage from '@/pages/superadmin/SupportTicketPage';
+import SupportPage from '@/pages/SupportPage';
 import OrgRedirectPage from '@/pages/OrgRedirectPage';
 import SupervisionPage from '@/pages/SupervisionPage';
 import PointagePage from '@/pages/PointagePage';
@@ -316,6 +320,7 @@ const App = () => (
                 <Route path="/echeancier" element={<EcheancierPage />} />
                 <Route path="/dossiers" element={<DossiersPage />} />
                 <Route path="/depots" element={<DepotsPage />} />
+                <Route path="/support" element={<SupportPage />} />
 
               </Route>
               <Route
@@ -329,6 +334,9 @@ const App = () => (
                 <Route path="utilisateurs" element={<UtilisateursPage />} />
                 <Route path="sante" element={<SantePage />} />
                 <Route path="journal" element={<JournalPage />} />
+                <Route path="plans" element={<PlansPage />} />
+                <Route path="support" element={<SuperAdminSupportPage />} />
+                <Route path="support/:id" element={<SuperAdminSupportTicketPage />} />
                 <Route path="administrateurs" element={<AdministrateursPage />} />
               </Route>
               <Route path="*" element={<NotFound />} />
