@@ -62,7 +62,7 @@ export default function OrganisationsListPage() {
       return sortAsc ? cmp : -cmp;
     });
     return list;
-  }, [orgs, search, plan, status, country, sortKey, sortAsc]);
+  }, [orgs, plans, search, plan, status, country, sortKey, sortAsc]);
 
   const sort = (key: string) => {
     if (sortKey === key) setSortAsc(!sortAsc);
