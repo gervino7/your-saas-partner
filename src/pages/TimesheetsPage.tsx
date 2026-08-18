@@ -604,7 +604,10 @@ function TeamValidation() {
                       size="sm"
                       variant="outline"
                       className="text-destructive border-destructive/30 hover:bg-destructive/10"
-                      onClick={() => approve.mutate({ ids: userEntries.map((e: any) => e.id), action: 'rejected' })}
+                      onClick={() => {
+                        setRejectComment('');
+                        setRejectTarget({ ids: userEntries.map((e: any) => e.id), name: user.full_name ?? '' });
+                      }}
                     >
                       <XCircle className="h-4 w-4 mr-1" /> Rejeter
                     </Button>
@@ -621,9 +624,46 @@ function TeamValidation() {
           ))}
         </div>
       )}
+
+      <Dialog open={!!rejectTarget} onOpenChange={(o) => !o && setRejectTarget(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Rejeter la feuille de temps</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground">{rejectTarget?.name}</p>
+            <Textarea
+              value={rejectComment}
+              onChange={(e) => setRejectComment(e.target.value)}
+              placeholder="Précisez ce qui doit être corrigé"
+              rows={4}
+            />
+            {rejectComment.trim().length > 0 && rejectComment.trim().length < 5 && (
+              <p className="text-xs text-destructive">Précisez ce qui doit être corrigé</p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRejectTarget(null)}>Annuler</Button>
+            <Button
+              variant="destructive"
+              disabled={rejectComment.trim().length < 5 || approve.isPending}
+              onClick={() => {
+                if (!rejectTarget) return;
+                approve.mutate(
+                  { ids: rejectTarget.ids, action: 'rejected', comment: rejectComment },
+                  { onSuccess: () => setRejectTarget(null) },
+                );
+              }}
+            >
+              Rejeter
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+
 
 const TimesheetsPage = () => {
   const profile = useAuthStore((s) => s.profile);
