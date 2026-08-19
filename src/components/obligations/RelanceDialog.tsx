@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { format } from 'date-fns';
-import { Copy, Send, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Copy, Send, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
