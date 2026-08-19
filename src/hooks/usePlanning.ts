@@ -168,26 +168,48 @@ export function usePlannableMissions() {
   });
 }
 
-export function useTeamPlans(weekStart: Date) {
+export function useTeamPlans(weekStart: Date, allWeeks = false) {
   const profile = useAuthStore((s) => s.profile);
   const ws = format(getWeekStart(weekStart), 'yyyy-MM-dd');
   return useQuery({
-    queryKey: ['team-plans', profile?.id, ws],
+    queryKey: ['team-plans', profile?.id, allWeeks ? 'all' : ws],
     queryFn: async () => {
       if (!profile?.id) return [] as PlanEntry[];
-      const { data, error } = await supabase
+      let q = supabase
         .from('plan_entries')
         .select('*, mission:missions(id, name), project:projects(id, name), task:tasks(id, title), profile:profiles!plan_entries_user_id_fkey(id, full_name, grade)')
         .eq('status', 'submitted')
-        .eq('week_start', ws)
-        .neq('user_id', profile.id)
+        .neq('user_id', profile.id);
+      if (!allWeeks) q = q.eq('week_start', ws);
+      const { data, error } = await q
+        .order('week_start', { ascending: true })
         .order('plan_date', { ascending: true });
       if (error) throw error;
+      console.log('[TeamPlans] rows:', data?.length, 'week:', allWeeks ? 'toutes' : ws);
       return (data ?? []) as unknown as PlanEntry[];
     },
     enabled: !!profile?.id,
   });
 }
+
+export function usePendingPlansCount() {
+  const profile = useAuthStore((s) => s.profile);
+  return useQuery({
+    queryKey: ['team-plans-pending-count', profile?.id],
+    enabled: !!profile?.id,
+    queryFn: async () => {
+      if (!profile?.id) return 0;
+      const { count, error } = await supabase
+        .from('plan_entries')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'submitted')
+        .neq('user_id', profile.id);
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+}
+
 
 export function useReviewPlan() {
   const profile = useAuthStore((s) => s.profile);
