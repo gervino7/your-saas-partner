@@ -13,7 +13,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuthStore } from '@/stores/authStore';
 import { getWeekStart, formatHours } from '@/lib/timeUtils';
-import { usePlanEntries, useSubmitWeek, useDeletePlanEntry, type PlanEntry } from '@/hooks/usePlanning';
+import { usePlanEntries, useSubmitWeek, useDeletePlanEntry, usePendingPlansCount, type PlanEntry } from '@/hooks/usePlanning';
 import PlanEntryDialog from '@/components/planning/PlanEntryDialog';
 import TeamPlanReview from '@/components/planning/TeamPlanReview';
 
@@ -186,6 +186,7 @@ export default function PlanningPage() {
   }, [view, cursor]);
 
   const { data: entries = [] } = usePlanEntries(range.start, range.end);
+  const { data: pendingCount = 0 } = usePendingPlansCount();
   const submitWeek = useSubmitWeek();
   const del = useDeletePlanEntry();
 
@@ -214,7 +215,14 @@ export default function PlanningPage() {
       <Tabs defaultValue="mine">
         <TabsList>
           <TabsTrigger value="mine">Mon planning</TabsTrigger>
-          {isLead && <TabsTrigger value="team">Mon équipe</TabsTrigger>}
+          {isLead && (
+            <TabsTrigger value="team" className="gap-2">
+              Mon équipe
+              {pendingCount > 0 && (
+                <Badge variant="secondary" className="tabular-nums px-1.5 py-0 text-[10px]">{pendingCount}</Badge>
+              )}
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="mine" className="space-y-4">
