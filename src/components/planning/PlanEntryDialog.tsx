@@ -295,21 +295,23 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
 
           <div className="space-y-1.5">
             <Label>Intitulé</Label>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex : Réunion de cadrage" />
+            <Input value={title} disabled={readOnly} onChange={(e) => setTitle(e.target.value)} placeholder="Ex : Réunion de cadrage" />
           </div>
 
           {type === 'rendez_vous' && (
             <div className="space-y-1.5">
               <Label>Lieu</Label>
-              <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Ex : Siège client" />
+              <Input value={location} disabled={readOnly} onChange={(e) => setLocation(e.target.value)} placeholder="Ex : Siège client" />
             </div>
           )}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Annuler</Button>
-          <Button onClick={submit} disabled={!canSave || upsert.isPending}>
-            {upsert.isPending ? 'Enregistrement…' : 'Enregistrer'}
-          </Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>{readOnly ? 'Fermer' : 'Annuler'}</Button>
+          {!readOnly && (
+            <Button onClick={submit} disabled={!canSave || upsert.isPending}>
+              {upsert.isPending ? 'Enregistrement…' : 'Enregistrer'}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
