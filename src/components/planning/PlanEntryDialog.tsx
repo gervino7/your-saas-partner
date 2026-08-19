@@ -246,7 +246,7 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
                   <Select
                     value={taskId ?? ''}
                     onValueChange={(v) => setTaskId(v || null)}
-                    disabled={!projectId}
+                    disabled={!projectId || readOnly}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder={!projectId ? 'Choisir d\'abord un projet' : 'Sélectionner une tâche'} />
