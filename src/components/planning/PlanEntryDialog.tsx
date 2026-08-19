@@ -137,34 +137,46 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
 
   const requiresMission = type === 'mission';
   const requiresTimes = type === 'rendez_vous';
-  const noStaffing = requiresMission && !missionsLoading && myMissions.length === 0;
+  const noStaffing =
+    (type === 'mission' || type === 'rendez_vous') && !missionsLoading && myMissions.length === 0;
+  const readOnly = entry?.status === 'submitted' || entry?.status === 'approved';
+
+  const invalidTimes = requiresTimes && !!startTime && !!endTime && endTime <= startTime;
 
   const canSave = useMemo(() => {
+    if (readOnly) return false;
     if (!date) return false;
     const h = Number(hours);
     if (isNaN(h) || h <= 0 || h > 24) return false;
     if (requiresMission && !missionId) return false;
     if (requiresTimes && (!startTime || !endTime)) return false;
+    if (invalidTimes) return false;
     return true;
-  }, [date, hours, missionId, requiresMission, requiresTimes, startTime, endTime]);
+  }, [readOnly, date, hours, missionId, requiresMission, requiresTimes, startTime, endTime, invalidTimes]);
 
   const submit = async () => {
     if (!canSave || !date) return;
-    await upsert.mutateAsync({
-      id: entry?.id,
-      entry_type: type,
-      plan_date: format(date, 'yyyy-MM-dd'),
-      planned_hours: Number(hours),
-      start_time: startTime || null,
-      end_time: endTime || null,
-      title: title.trim() || null,
-      location: location.trim() || null,
-      mission_id: type === 'mission' || type === 'rendez_vous' ? missionId : null,
-      project_id: type === 'mission' || type === 'rendez_vous' ? projectId : null,
-      task_id: type === 'mission' ? taskId : null,
-      status: entry?.status ?? 'draft',
-    });
-    onOpenChange(false);
+    try {
+      await upsert.mutateAsync({
+        id: entry?.id,
+        entry_type: type,
+        plan_date: format(date, 'yyyy-MM-dd'),
+        planned_hours: Number(hours),
+        start_time: startTime || null,
+        end_time: endTime || null,
+        title: title.trim() || null,
+        location: location.trim() || null,
+        mission_id: type === 'mission' || type === 'rendez_vous' ? missionId : null,
+        project_id: type === 'mission' || type === 'rendez_vous' ? projectId : null,
+        task_id: type === 'mission' ? taskId : null,
+        status: entry?.status ?? 'draft',
+      });
+      onOpenChange(false);
+    } catch (e: any) {
+      toast.error('Enregistrement impossible', {
+        description: e?.message ?? 'Une erreur est survenue.',
+      });
+    }
   };
 
   return (
