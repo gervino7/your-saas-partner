@@ -62,7 +62,7 @@ export default function ShareDialog({ doc, open, onClose }: Props) {
           </DialogTitle>
         </DialogHeader>
 
-        <div className="px-5 py-4 space-y-3 dialog-form-bg">
+        <div className="space-y-3">
           <div><Label>Rechercher un utilisateur</Label><Input placeholder="Rechercher..." value={search} onChange={(e) => setSearch(e.target.value)} /></div>
 
           {search && filteredUsers.length > 0 && (

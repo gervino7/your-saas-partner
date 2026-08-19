@@ -115,7 +115,7 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>Ajouter un membre</DialogTitle></DialogHeader>
-          <div className="px-5 py-4 space-y-3 dialog-form-bg">
+          <div className="space-y-3">
             <div><Label>Utilisateur</Label>
               <Select value={selectedUser} onValueChange={setSelectedUser}>
                 <SelectTrigger><SelectValue placeholder="Sélectionner un utilisateur" /></SelectTrigger>
@@ -129,7 +129,7 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
               </Select>
             </div>
           </div>
-          <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex items-center justify-end gap-2">
+          <div className="px-5 py-3 border-t border-amber-300/40 flex items-center justify-end gap-2">
             <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => setAddOpen(false)}>Annuler</Button>
             <Button size="sm" className="h-9 px-5" onClick={handleAdd} disabled={!selectedUser || addMember.isPending}>{addMember.isPending ? 'Ajout...' : 'Ajouter'}</Button>
           </div>

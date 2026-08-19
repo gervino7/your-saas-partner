@@ -29,7 +29,7 @@ export default function VersionHistoryDialog({ doc, open, onClose }: Props) {
         <DialogHeader>
           <DialogTitle className="font-display">Historique des versions - {doc.name}</DialogTitle>
         </DialogHeader>
-        <div className="px-5 py-4 space-y-2 max-h-[65vh] overflow-y-auto dialog-form-bg">
+        <div className="space-y-2">
           {versions.map((v) => (
             <div key={v.id} className="flex items-center justify-between p-3 rounded-md bg-muted/50">
               <div>

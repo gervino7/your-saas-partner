@@ -463,7 +463,7 @@ function SubmitWorkDialog({ taskId, open, onClose, onSubmitted }: {
         <DialogHeader>
           <DialogTitle>Soumettre au chef de projet</DialogTitle>
         </DialogHeader>
-        <div className="px-5 py-4 space-y-3 dialog-form-bg">
+        <div className="space-y-3">
           <div>
             <Label>Commentaire</Label>
             <Textarea
@@ -486,7 +486,7 @@ function SubmitWorkDialog({ taskId, open, onClose, onSubmitted }: {
             )}
           </div>
         </div>
-        <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex items-center justify-end gap-2">
+        <div className="px-5 py-3 border-t border-amber-300/40 flex items-center justify-end gap-2">
           <Button variant="outline" size="sm" className="h-9 px-4" onClick={onClose}>Annuler</Button>
           <Button size="sm" className="h-9 px-5" onClick={handleSubmit} disabled={uploading || createSubmission.isPending}>
             {uploading ? 'Envoi...' : 'Envoyer'}
@@ -523,7 +523,7 @@ function ValidateDialog({ taskId, open, onClose, onValidated }: {
         <DialogHeader>
           <DialogTitle>Valider et noter</DialogTitle>
         </DialogHeader>
-        <div className="px-5 py-4 space-y-3 dialog-form-bg">
+        <div className="space-y-3">
           <div>
             <Label>Évaluation</Label>
             <div className="grid grid-cols-2 gap-2 mt-2">
@@ -557,7 +557,7 @@ function ValidateDialog({ taskId, open, onClose, onValidated }: {
             />
           </div>
         </div>
-        <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex items-center justify-end gap-2">
+        <div className="px-5 py-3 border-t border-amber-300/40 flex items-center justify-end gap-2">
           <Button variant="outline" size="sm" className="h-9 px-4" onClick={onClose}>Annuler</Button>
           <Button size="sm" className="h-9 px-5" onClick={handleValidate} disabled={createSubmission.isPending}>
             {createSubmission.isPending ? 'Validation...' : 'Valider et noter'}
@@ -613,7 +613,7 @@ function RejectDialog({ taskId, open, onClose, onRejected }: {
         <DialogHeader>
           <DialogTitle>Renvoyer pour correction</DialogTitle>
         </DialogHeader>
-        <div className="px-5 py-4 space-y-3 dialog-form-bg">
+        <div className="space-y-3">
           <div>
             <Label>Commentaires et amendements *</Label>
             <Textarea
@@ -633,7 +633,7 @@ function RejectDialog({ taskId, open, onClose, onRejected }: {
             />
           </div>
         </div>
-        <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex items-center justify-end gap-2">
+        <div className="px-5 py-3 border-t border-amber-300/40 flex items-center justify-end gap-2">
           <Button variant="outline" size="sm" className="h-9 px-4" onClick={onClose}>Annuler</Button>
           <Button variant="destructive" size="sm" className="h-9 px-5" onClick={handleReject} disabled={!comment.trim() || uploading || createSubmission.isPending}>
             {uploading ? 'Envoi...' : 'Renvoyer'}

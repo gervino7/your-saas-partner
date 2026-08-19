@@ -73,7 +73,7 @@ export default function MeetingDetailDialog({ open, onOpenChange, event, onRespo
           </div>
         </DialogHeader>
 
-        <div className="px-5 py-4 space-y-3 dialog-form-bg">
+        <div className="space-y-3">
           <div className="flex items-center gap-2 text-sm">
             <CalendarDays className="h-4 w-4 text-muted-foreground" />
             <span>{format(event.start, "EEEE d MMMM yyyy", { locale: fr })}</span>
@@ -232,7 +232,7 @@ export default function MeetingDetailDialog({ open, onOpenChange, event, onRespo
         </div>
 
         {isOrganizer && onDelete && (
-          <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex justify-end gap-3">
+          <div className="px-5 py-3 border-t border-amber-300/40 flex justify-end gap-3">
             <Button variant="destructive" size="sm" onClick={() => { onDelete(meta.id); onOpenChange(false); }}>
               Supprimer
             </Button>

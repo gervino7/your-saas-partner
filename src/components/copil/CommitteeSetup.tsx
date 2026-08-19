@@ -40,7 +40,7 @@ const CommitteeSetup = ({ missionId, canManage }: Props) => {
         <DialogHeader>
           <DialogTitle>Nouveau comité</DialogTitle>
         </DialogHeader>
-        <div className="px-5 py-4 space-y-3 dialog-form-bg">
+        <div className="space-y-3">
           <div>
             <Label>Type</Label>
             <Select value={form.type} onValueChange={(v) => setForm((p) => ({ ...p, type: v }))}>
@@ -85,7 +85,7 @@ const CommitteeSetup = ({ missionId, canManage }: Props) => {
             <Textarea value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} />
           </div>
         </div>
-        <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex justify-end gap-3">
+        <div className="px-5 py-3 border-t border-amber-300/40 flex justify-end gap-3">
           <Button variant="outline" onClick={() => setOpen(false)}>Annuler</Button>
           <Button onClick={handleSubmit} disabled={!form.name || create.isPending}>
             {create.isPending ? 'Création...' : 'Créer le comité'}

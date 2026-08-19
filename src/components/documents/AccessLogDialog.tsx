@@ -44,7 +44,7 @@ export default function AccessLogDialog({ doc, open, onClose }: Props) {
         <DialogHeader>
           <DialogTitle className="font-display">Historique d'accès - {doc.name}</DialogTitle>
         </DialogHeader>
-        <div className="px-5 py-4 max-h-[65vh] overflow-y-auto dialog-form-bg">
+        <div className="">
           <Table>
             <TableHeader>
               <TableRow>

@@ -80,7 +80,7 @@ export default function ProjectFormDialog({ open, onOpenChange, missionId, proje
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] dialog-form-bg">
+            <div className="space-y-3">
               <div>
                 <SectionHeader icon={Info} label="Informations générales" />
                 <div className="space-y-3">
@@ -149,7 +149,7 @@ export default function ProjectFormDialog({ open, onOpenChange, missionId, proje
               </div>
             </div>
 
-            <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex items-center justify-end gap-2">
+            <div className="px-5 py-3 border-t border-amber-300/40 flex items-center justify-end gap-2">
               <Button type="button" variant="outline" size="sm" className="h-9 px-4" onClick={() => onOpenChange(false)}>
                 Annuler
               </Button>

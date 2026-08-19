@@ -69,7 +69,7 @@ export default function ClientContactsTab({ clientId }: { clientId: string }) {
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
             <DialogTitle className="text-white">Nouveau contact</DialogTitle>
           </DialogHeader>
-          <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] dialog-form-bg">
+          <div className="space-y-3">
             <div><Label>Nom *</Label><Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} /></div>
             <div><Label>Poste</Label><Input value={form.position} onChange={e => setForm(f => ({ ...f, position: e.target.value }))} /></div>
             <div className="grid grid-cols-2 gap-3">
@@ -81,7 +81,7 @@ export default function ClientContactsTab({ clientId }: { clientId: string }) {
               Contact principal
             </label>
           </div>
-          <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex justify-end gap-3">
+          <div className="px-5 py-3 border-t border-amber-300/40 flex justify-end gap-3">
             <Button variant="outline" onClick={() => setShowAdd(false)}>Annuler</Button>
             <Button onClick={handleAdd} disabled={create.isPending}>Ajouter</Button>
           </div>
