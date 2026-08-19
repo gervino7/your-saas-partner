@@ -27,7 +27,7 @@ const UsageCard = ({ label, used, max, unit = '' }: { label: string; used: numbe
     <Card>
       <CardContent className="space-y-2 p-4">
         <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="text-xl font-bold">
+        <p className="text-xl font-semibold">
           {used}{unit} {max ? <span className="text-sm font-normal text-muted-foreground">/ {max}{unit}</span> : null}
         </p>
         {!!max && (
@@ -86,7 +86,7 @@ export default function OrganisationDetailPage() {
 
       <div className="flex flex-wrap items-center gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold">{org.name}</h1>
+          <h1 className="text-2xl font-semibold">{org.name}</h1>
           <p className="text-sm text-muted-foreground">{org.slug}</p>
         </div>
         <Badge variant="outline">{plan?.name ?? org.subscription_plan}</Badge>
@@ -230,7 +230,7 @@ export default function OrganisationDetailPage() {
           <Card>
             <CardHeader><CardTitle className="text-base">Plan actuel</CardTitle></CardHeader>
             <CardContent className="space-y-2">
-              <p className="text-xl font-bold">{plan?.name ?? org.subscription_plan}</p>
+              <p className="text-xl font-semibold">{plan?.name ?? org.subscription_plan}</p>
               <p className="text-sm text-muted-foreground">{formatFcfa(plan?.price_monthly ?? 0)}</p>
               <p className="text-sm">
                 {org.max_users} utilisateurs · {org.max_storage_gb} Go de stockage

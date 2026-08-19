@@ -93,7 +93,7 @@ export default function TeamTab({ projectId, missionId }: { projectId: string; m
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold font-display">Équipe ({members.length})</h3>
+        <h3 className="text-lg font-semibold ">Équipe ({members.length})</h3>
         <Button size="sm" onClick={() => setDialogOpen(true)}>
           <Plus className="h-4 w-4 mr-1" /> Ajouter un membre
         </Button>
@@ -149,7 +149,7 @@ function AddMemberDialog({ open, onOpenChange, availableMembers, selectedUser, o
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle className="font-display">Ajouter un membre</DialogTitle>
+          <DialogTitle className="">Ajouter un membre</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <Select value={selectedUser} onValueChange={onSelectUser}>

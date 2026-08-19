@@ -54,7 +54,7 @@ export default function PortalLayout({ clientName, children }: PortalLayoutProps
           <button className="flex items-center gap-3 text-left" onClick={() => navigate('/espace-client')}>
             <img src={logo} alt={dash?.organization_name ?? 'Cabinet'} className="h-9 w-9 rounded-lg object-contain" />
             <div>
-              <p className="font-display text-sm font-bold leading-tight">{dash?.organization_name ?? 'Espace client'}</p>
+              <p className="text-sm font-semibold leading-tight">{dash?.organization_name ?? 'Espace client'}</p>
               <p className="text-xs text-muted-foreground">Espace client</p>
             </div>
           </button>

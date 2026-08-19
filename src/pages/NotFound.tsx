@@ -11,8 +11,8 @@ const NotFound = () => {
         <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-muted">
           <FileQuestion className="h-10 w-10 text-muted-foreground" />
         </div>
-        <h1 className="font-display text-6xl font-extrabold text-primary mb-2">404</h1>
-        <h2 className="font-display text-xl font-semibold mb-2">Page non trouvée</h2>
+        <h1 className="text-6xl font-semibold text-primary mb-2">404</h1>
+        <h2 className="text-xl font-semibold mb-2">Page non trouvée</h2>
         <p className="text-muted-foreground mb-8">
           La page que vous recherchez n'existe pas ou a été déplacée.
         </p>

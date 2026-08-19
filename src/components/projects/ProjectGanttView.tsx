@@ -212,7 +212,7 @@ export default function ProjectGanttView({ tasks, activities }: ProjectGanttView
                   )}
 
                   <span className="text-[11px] truncate flex-1">{row.label}</span>
-                  {row.code && <Badge variant="outline" className="text-[9px] font-mono px-1 py-0">{row.code}</Badge>}
+                  {row.code && <Badge variant="outline" className="text-[9px] tabular-nums px-1 py-0">{row.code}</Badge>}
                 </div>
               ))}
             </div>

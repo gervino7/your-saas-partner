@@ -108,7 +108,7 @@ export default function MissionOverviewTab({ mission }: { mission: any }) {
             )}
             <div>
               <p className="text-xs text-muted-foreground mb-1">Code</p>
-              <p className="text-sm font-mono">{mission.code ?? '-'}</p>
+              <p className="text-sm tabular-nums">{mission.code ?? '-'}</p>
             </div>
           </CardContent>
         </Card>

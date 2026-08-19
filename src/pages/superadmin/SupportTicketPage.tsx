@@ -56,9 +56,9 @@ export default function SuperAdminSupportTicketPage() {
 
       <div className="flex flex-wrap items-center gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold">{ticket.subject}</h1>
+          <h1 className="text-2xl font-semibold">{ticket.subject}</h1>
           <p className="text-sm text-muted-foreground">
-            <span className="font-mono text-xs">{ticket.reference}</span>
+            <span className="tabular-nums text-xs">{ticket.reference}</span>
             {row?.organization_name && (
               <>
                 {' · '}

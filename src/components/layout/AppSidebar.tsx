@@ -108,7 +108,7 @@ const AppSidebar = () => {
         <div className="flex items-center gap-3">
           <img src={logoImg} alt="Mission-DGC" className="h-9 w-9 rounded-lg object-contain" />
           <div className="flex flex-col">
-            <span className="text-sm font-semibold font-display text-sidebar-foreground">Mission-DGC</span>
+            <span className="text-sm font-semibold text-sidebar-foreground">Mission-DGC</span>
             <span className="text-xs text-sidebar-foreground/60">Gestion de missions</span>
           </div>
         </div>
@@ -129,7 +129,7 @@ const AppSidebar = () => {
                     <item.icon className="h-4 w-4" />
                     <span className="flex-1">{item.label}</span>
                     {item.path === '/messages' && unreadMessages > 0 && (
-                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground">
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-semibold text-destructive-foreground">
                         {unreadMessages > 99 ? '99+' : unreadMessages}
                       </span>
                     )}
@@ -154,7 +154,7 @@ const AppSidebar = () => {
                     <item.icon className="h-4 w-4" />
                     <span className="flex-1">{item.label}</span>
                     {item.path === '/staffing' && staffingBadge > 0 && (
-                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-white">
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-semibold text-white">
                         {staffingBadge > 99 ? '99+' : staffingBadge}
                       </span>
                     )}
@@ -190,7 +190,7 @@ const AppSidebar = () => {
                   <CalendarClock className="h-4 w-4" />
                   <span className="flex-1">Échéancier</span>
                   {enRetardCount > 0 && (
-                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground">
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-semibold text-destructive-foreground">
                       {enRetardCount > 99 ? '99+' : enRetardCount}
                     </span>
                   )}
@@ -205,7 +205,7 @@ const AppSidebar = () => {
                   <Upload className="h-4 w-4" />
                   <span className="flex-1">Dépôts clients</span>
                   {depotsCount > 0 && (
-                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-semibold text-primary-foreground">
                       {depotsCount > 99 ? '99+' : depotsCount}
                     </span>
                   )}

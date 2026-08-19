@@ -36,8 +36,8 @@ function TicketDetail({ ticketId, onBack }: { ticketId: string; onBack: () => vo
 
       <div className="flex flex-wrap items-center gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold">{ticket.subject}</h1>
-          <p className="font-mono text-xs text-muted-foreground">{ticket.reference}</p>
+          <h1 className="text-2xl font-semibold">{ticket.subject}</h1>
+          <p className="tabular-nums text-xs text-muted-foreground">{ticket.reference}</p>
         </div>
         <Badge variant="outline">{TICKET_STATUS_LABELS[ticket.status] ?? ticket.status}</Badge>
         <Badge variant="outline">{TICKET_CATEGORY_LABELS[ticket.category ?? ''] ?? ticket.category}</Badge>
@@ -105,7 +105,7 @@ export default function SupportPage() {
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold">Support</h1>
+          <h1 className="text-2xl font-semibold">Support</h1>
           <p className="text-sm text-muted-foreground">Vos demandes auprès de l'équipe Mission-DGC</p>
         </div>
         <Button onClick={() => setOpen(true)}>
@@ -139,7 +139,7 @@ export default function SupportPage() {
               <TableBody>
                 {tickets.map((t) => (
                   <TableRow key={t.id} className="h-11 cursor-pointer" onClick={() => setSelected(t.id)}>
-                    <TableCell className="font-mono text-xs">{t.reference}</TableCell>
+                    <TableCell className="tabular-nums text-xs">{t.reference}</TableCell>
                     <TableCell className="font-medium">{t.subject}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {TICKET_CATEGORY_LABELS[t.category ?? ''] ?? t.category}

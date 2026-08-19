@@ -40,7 +40,7 @@ interface TaskFormDialogProps {
 
 function SectionHeader({ icon: Icon, label }: { icon: any; label: string }) {
   return (
-    <div className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider pb-2 mb-3 border-b border-amber-200/60 dark:border-amber-800/30 flex items-center gap-2">
+    <div className="text-xs font-semibold text-amber-800 dark:text-amber-400 uppercase tracking-wider pb-2 mb-3 border-b border-amber-200/60 dark:border-amber-800/30 flex items-center gap-2">
       <Icon className="h-3.5 w-3.5" />
       {label}
     </div>

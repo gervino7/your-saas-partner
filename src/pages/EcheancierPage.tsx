@@ -190,7 +190,7 @@ const EcheancierPage = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold font-display">Échéancier</h1>
+        <h1 className="text-2xl font-semibold ">Échéancier</h1>
         <p className="text-muted-foreground text-sm">Ne rien rater - pilotage quotidien des dossiers.</p>
       </div>
 
@@ -206,7 +206,7 @@ const EcheancierPage = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{k.label}</p>
-                  <p className="text-2xl font-bold font-display mt-1">{k.value}</p>
+                  <p className="text-2xl font-semibold mt-1">{k.value}</p>
                 </div>
                 <div className={cn('h-10 w-10 rounded-lg flex items-center justify-center', k.tone)}>
                   <k.icon className="h-5 w-5" />

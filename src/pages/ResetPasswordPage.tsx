@@ -98,7 +98,7 @@ const ResetPasswordPage = () => {
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl shadow-lg" style={{ background: 'var(--gradient-primary)' }}>
             <img src={logoImg} alt="Mission-DGC" className="h-9 w-9 rounded-lg object-contain" />
           </div>
-          <h1 className="text-xl font-bold">Lien invalide</h1>
+          <h1 className="text-xl font-semibold">Lien invalide</h1>
           <p className="text-muted-foreground text-sm">
             Ce lien de réinitialisation est invalide ou a expiré.
           </p>
@@ -117,7 +117,7 @@ const ResetPasswordPage = () => {
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl shadow-lg mb-1" style={{ background: 'var(--gradient-primary)' }}>
             <img src={logoImg} alt="Mission-DGC" className="h-9 w-9 rounded-lg object-contain" />
           </div>
-          <h1 className="text-2xl font-extrabold font-display tracking-tight text-foreground">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             Nouveau mot de passe
           </h1>
           <p className="text-muted-foreground text-sm">

@@ -46,7 +46,7 @@ export default function NotesTab({ projectId }: { projectId: string }) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h3 className="text-lg font-semibold font-display">Notes</h3>
+          <h3 className="text-lg font-semibold ">Notes</h3>
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -92,7 +92,7 @@ export default function NotesTab({ projectId }: { projectId: string }) {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className="font-display">Nouvelle note</DialogTitle>
+            <DialogTitle className="">Nouvelle note</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <Input placeholder="Titre (optionnel)" value={title} onChange={(e) => setTitle(e.target.value)} />

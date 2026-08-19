@@ -149,7 +149,7 @@ export default function ProjectSettingsTab({ projectId }: { projectId: string })
                 onChange={(e) => setField('code', e.target.value)}
                 disabled={!canEdit}
                 placeholder="PRJ-2026-001"
-                className="font-mono"
+                className="tabular-nums"
               />
             </div>
           </div>

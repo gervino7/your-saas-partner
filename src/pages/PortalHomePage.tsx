@@ -60,7 +60,7 @@ export default function PortalHomePage() {
     <PortalLayout clientName={data?.client_name}>
       <div className="space-y-6">
         <div>
-          <h1 className="font-display text-2xl font-bold">Bonjour, {data?.client_name ?? ''}</h1>
+          <h1 className="text-2xl font-semibold">Bonjour, {data?.client_name ?? ''}</h1>
           {data?.organization_name && (
             <p className="text-sm text-muted-foreground">
               Votre espace ouvert par <strong className="text-foreground">{data.organization_name}</strong>

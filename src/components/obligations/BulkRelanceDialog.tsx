@@ -137,7 +137,7 @@ ${profile?.full_name ?? ''} - ${cabinet}`
             </div>
             <div>
               <Label>Message</Label>
-              <Textarea className="mt-1 font-mono text-sm" rows={11} value={message} onChange={(e) => setMessage(e.target.value)} />
+              <Textarea className="mt-1 tabular-nums text-sm" rows={11} value={message} onChange={(e) => setMessage(e.target.value)} />
             </div>
 
           </div>

@@ -32,7 +32,7 @@ export default function AbonnementsPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="font-display text-2xl font-bold">Abonnements</h1>
+        <h1 className="text-2xl font-semibold">Abonnements</h1>
         <p className="text-sm text-muted-foreground">Revenus estimés à partir des plans attribués</p>
       </div>
 
@@ -42,11 +42,11 @@ export default function AbonnementsPage() {
           <div className="flex flex-wrap gap-8">
             <div>
               <p className="text-xs text-muted-foreground">MRR</p>
-              <p className="text-3xl font-bold text-primary">{fcfa(mrr)}</p>
+              <p className="text-3xl font-semibold text-primary">{fcfa(mrr)}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground">ARR</p>
-              <p className="text-3xl font-bold">{fcfa(mrr * 12)}</p>
+              <p className="text-3xl font-semibold">{fcfa(mrr * 12)}</p>
             </div>
           </div>
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">

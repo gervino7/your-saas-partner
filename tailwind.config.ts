@@ -14,8 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        display: ['Plus Jakarta Sans', 'sans-serif'],
+        sans: ['Inter', '"Segoe UI"', 'Arial', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

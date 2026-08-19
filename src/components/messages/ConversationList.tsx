@@ -65,7 +65,7 @@ export default function ConversationList({
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
             <MessageCircle className="h-4.5 w-4.5 text-primary" />
           </div>
-          <h2 className="text-lg font-bold font-display tracking-tight">Messages</h2>
+          <h2 className="text-lg font-semibold tracking-tight">Messages</h2>
         </div>
         <Button
           size="icon"
@@ -139,7 +139,7 @@ export default function ConversationList({
                   )}
                 </div>
                 {conv.unread_count > 0 && (
-                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground shadow-md shadow-primary/25 animate-in fade-in">
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-semibold text-primary-foreground shadow-md shadow-primary/25 animate-in fade-in">
                     {conv.unread_count}
                   </span>
                 )}
@@ -153,7 +153,7 @@ export default function ConversationList({
       <Dialog open={showNew} onOpenChange={setShowNew}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-display">Nouvelle conversation</DialogTitle>
+            <DialogTitle className="">Nouvelle conversation</DialogTitle>
           </DialogHeader>
 
           <div className="flex gap-2 mb-4">

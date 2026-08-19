@@ -129,7 +129,7 @@ export default function PerformanceReviewsPage() {
   if (!canAccess) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold font-display">Évaluations de performance</h1>
+        <h1 className="text-2xl font-semibold ">Évaluations de performance</h1>
         <EmptyState icon={Shield} title="Accès restreint" description="Cette section est réservée aux grades DA, DM et CM." />
       </div>
     );
@@ -138,7 +138,7 @@ export default function PerformanceReviewsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold font-display">Évaluations de performance</h1>
+        <h1 className="text-2xl font-semibold ">Évaluations de performance</h1>
         <p className="text-muted-foreground">Suivi des notes et de la qualité des livrables par collaborateur.</p>
       </div>
 
@@ -146,13 +146,13 @@ export default function PerformanceReviewsPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{performanceData.length}</div>
+            <div className="text-2xl font-semibold">{performanceData.length}</div>
             <p className="text-xs text-muted-foreground">Évaluations totales</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-semibold">
               {performanceData.length > 0
                 ? (performanceData.reduce((sum: number, s: any) => sum + (s.rating || 0), 0) / performanceData.length).toFixed(1)
                 : '-'}
@@ -162,13 +162,13 @@ export default function PerformanceReviewsPage() {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{employeeStats.length}</div>
+            <div className="text-2xl font-semibold">{employeeStats.length}</div>
             <p className="text-xs text-muted-foreground">Collaborateurs évalués</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold">{allMissions.length}</div>
+            <div className="text-2xl font-semibold">{allMissions.length}</div>
             <p className="text-xs text-muted-foreground">Missions couvertes</p>
           </CardContent>
         </Card>

@@ -35,7 +35,7 @@ export default function MissionsTable({ missions }: { missions: any[] }) {
           {sorted.map((m) => (
             <TableRow key={m.id} className="cursor-pointer hover:bg-muted/50">
               <TableCell>
-                <Link to={`/missions/${m.id}`} className="font-mono text-xs text-muted-foreground hover:text-primary">
+                <Link to={`/missions/${m.id}`} className="tabular-nums text-xs text-muted-foreground hover:text-primary">
                   {m.code}
                 </Link>
               </TableCell>

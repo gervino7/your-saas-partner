@@ -64,7 +64,7 @@ const CalendarPage = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold font-display">Calendrier</h1>
+        <h1 className="text-2xl font-semibold ">Calendrier</h1>
         <p className="text-sm text-muted-foreground">Réunions, échéances et jalons</p>
       </div>
 

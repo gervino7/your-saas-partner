@@ -198,7 +198,7 @@ export default function ChatArea({
       {/* Header */}
       <div className="flex items-center gap-3 border-b border-border/60 bg-card px-5 py-3.5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-sm font-display truncate">
+          <h3 className="font-semibold text-sm truncate">
             {conversation.name ||
               otherMembers.map((m) => m.full_name).join(', ') ||
               'Conversation'}
@@ -235,7 +235,7 @@ export default function ChatArea({
             </TooltipProvider>
           ))}
           {otherMembers.length > 4 && (
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted ring-2 ring-card text-[10px] font-bold text-muted-foreground">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted ring-2 ring-card text-[10px] font-semibold text-muted-foreground">
               +{otherMembers.length - 4}
             </div>
           )}

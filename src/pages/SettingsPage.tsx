@@ -15,7 +15,7 @@ const SettingsPage = () => {
   if (gradeLevel > 2) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold font-display">Paramètres</h1>
+        <h1 className="text-2xl font-semibold ">Paramètres</h1>
         <DataSaverSettings />
         <EmptyState icon={Shield} title="Accès restreint" description="Les paramètres d'administration sont réservés aux administrateurs." />
       </div>
@@ -25,7 +25,7 @@ const SettingsPage = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold font-display">Paramètres</h1>
+        <h1 className="text-2xl font-semibold ">Paramètres</h1>
         <p className="text-muted-foreground">Configuration de votre organisation.</p>
       </div>
       <Tabs defaultValue="general">

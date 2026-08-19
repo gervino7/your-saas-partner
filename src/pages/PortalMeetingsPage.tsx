@@ -59,7 +59,7 @@ export default function PortalMeetingsPage() {
   return (
     <PortalLayout>
       <div className="space-y-6">
-        <h1 className="font-display text-2xl font-bold">Réunions</h1>
+        <h1 className="text-2xl font-semibold">Réunions</h1>
 
         {isLoading && <Loading />}
 
@@ -73,14 +73,14 @@ export default function PortalMeetingsPage() {
 
         {upcoming.length > 0 && (
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold">À venir</h2>
+            <h2 className="text-lg font-semibold">À venir</h2>
             {upcoming.map((m) => <UpcomingCard key={m.id} m={m} />)}
           </section>
         )}
 
         {past.length > 0 && (
           <section className="space-y-3">
-            <h2 className="font-display text-lg font-semibold">Passées</h2>
+            <h2 className="text-lg font-semibold">Passées</h2>
             {past.map((m) => <PastCard key={m.id} m={m} />)}
           </section>
         )}

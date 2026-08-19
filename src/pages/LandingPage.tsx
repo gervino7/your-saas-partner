@@ -46,7 +46,7 @@ const LandingPage = () => {
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2.5">
             <img src={logoImg} alt="Mission-DGC" className="h-9 w-9 rounded-xl object-contain" />
-            <span className="font-display font-bold text-lg">Mission-DGC</span>
+            <span className="font-semibold text-lg">Mission-DGC</span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
             <a href="#features" className="hover:text-foreground transition-colors">Fonctionnalités</a>
@@ -74,7 +74,7 @@ const LandingPage = () => {
             <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-sm text-white/80 mb-8">
               <Star className="h-3.5 w-3.5 text-warning" /> Conçu pour l'Afrique francophone
             </div>
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight max-w-4xl mx-auto leading-[1.1] text-white">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight max-w-4xl mx-auto leading-[1.1] text-white">
               La plateforme de gestion de missions pour les cabinets d'excellence
             </h1>
             <p className="mt-6 text-lg md:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
@@ -97,7 +97,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <p className="text-primary font-semibold text-sm tracking-wide uppercase mb-3">Fonctionnalités</p>
-            <h2 className="font-display text-3xl md:text-4xl font-bold">Tout ce dont votre cabinet a besoin</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold">Tout ce dont votre cabinet a besoin</h2>
             <p className="mt-4 text-muted-foreground max-w-xl mx-auto text-lg">Une suite complète pour digitaliser vos missions de conseil et d'audit.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -107,7 +107,7 @@ const LandingPage = () => {
                   <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/8 text-primary mb-3 group-hover:bg-primary group-hover:text-white transition-all duration-300">
                     <f.icon className="h-5 w-5" />
                   </div>
-                  <CardTitle className="text-lg font-display">{f.title}</CardTitle>
+                  <CardTitle className="text-lg ">{f.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
@@ -123,7 +123,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <p className="text-primary font-semibold text-sm tracking-wide uppercase mb-3">Tarification</p>
-            <h2 className="font-display text-3xl md:text-4xl font-bold">Tarifs adaptés à votre cabinet</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold">Tarifs adaptés à votre cabinet</h2>
             <p className="mt-4 text-muted-foreground text-lg">Tous les prix sont en FCFA par mois.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -135,9 +135,9 @@ const LandingPage = () => {
                   </div>
                 )}
                 <CardHeader className="text-center pt-8">
-                  <CardTitle className="font-display text-lg">{plan.name}</CardTitle>
+                  <CardTitle className="text-lg">{plan.name}</CardTitle>
                   <div className="mt-3">
-                    <span className="text-3xl font-bold font-display">{plan.price}</span>
+                    <span className="text-3xl font-semibold ">{plan.price}</span>
                     {plan.price !== 'Sur devis' && <span className="text-sm text-muted-foreground ml-1">FCFA/mois</span>}
                   </div>
                 </CardHeader>
@@ -165,7 +165,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <p className="text-primary font-semibold text-sm tracking-wide uppercase mb-3">Témoignages</p>
-            <h2 className="font-display text-3xl md:text-4xl font-bold">Ils nous font confiance</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold">Ils nous font confiance</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((t) => (
@@ -196,7 +196,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-4 max-w-3xl">
           <div className="text-center mb-16">
             <p className="text-primary font-semibold text-sm tracking-wide uppercase mb-3">FAQ</p>
-            <h2 className="font-display text-3xl md:text-4xl font-bold">Questions fréquentes</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold">Questions fréquentes</h2>
           </div>
           <div className="space-y-4">
             {faqs.map((f) => (
@@ -217,7 +217,7 @@ const LandingPage = () => {
           <div className="absolute top-1/2 left-1/4 w-64 h-64 rounded-full bg-primary/30 blur-3xl" />
         </div>
         <div className="container mx-auto px-4 text-center relative z-10">
-          <h2 className="font-display text-3xl md:text-4xl font-bold mb-5 text-white">Prêt à digitaliser vos missions ?</h2>
+          <h2 className="text-3xl md:text-4xl font-semibold mb-5 text-white">Prêt à digitaliser vos missions ?</h2>
           <p className="text-white/60 mb-10 max-w-xl mx-auto text-lg">
             Rejoignez les cabinets qui font confiance à Mission-DGC pour piloter leurs engagements.
           </p>
@@ -234,7 +234,7 @@ const LandingPage = () => {
             <div>
               <div className="flex items-center gap-2.5 mb-4">
                 <img src={logoImg} alt="Mission-DGC" className="h-8 w-8 rounded-xl object-contain" />
-                <span className="font-display font-bold">Mission-DGC</span>
+                <span className="font-semibold">Mission-DGC</span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">La plateforme de gestion de missions pour les cabinets d'Afrique francophone.</p>
             </div>

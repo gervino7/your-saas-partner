@@ -17,7 +17,7 @@ const Kpi = ({ label, value, danger }: { label: string; value: React.ReactNode; 
   <Card>
     <CardContent className="p-4">
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className={`text-2xl font-bold ${danger ? 'text-destructive' : ''}`}>{value}</p>
+      <p className={`text-2xl font-semibold ${danger ? 'text-destructive' : ''}`}>{value}</p>
     </CardContent>
   </Card>
 );
@@ -38,7 +38,7 @@ export default function SuperAdminDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold">Tableau de bord plateforme</h1>
+        <h1 className="text-2xl font-semibold">Tableau de bord plateforme</h1>
         <p className="text-sm text-muted-foreground">Vue consolidée de toutes les organisations</p>
       </div>
 
@@ -63,7 +63,7 @@ export default function SuperAdminDashboard() {
           </p>
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-3xl font-bold text-primary">{fcfa(mrr)}</p>
+          <p className="text-3xl font-semibold text-primary">{fcfa(mrr)}</p>
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {breakdown.map((b) => (
               <div key={b.id} className="rounded-md border p-3">

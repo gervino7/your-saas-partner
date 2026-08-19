@@ -790,7 +790,7 @@ function InlineReviewPanel({ taskId, submission, onValidated, onRejected }: {
             >
               <div className="flex items-center justify-center gap-1">
                 <Star className="h-3 w-3" fill="currentColor" />
-                <span className="text-sm font-bold">{r.value}</span>
+                <span className="text-sm font-semibold">{r.value}</span>
               </div>
               <p className="text-[10px] mt-0.5">{r.label}</p>
             </button>

@@ -500,7 +500,7 @@ export default function WorkspacePage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold font-display flex items-center gap-2">
+          <h1 className="text-2xl font-semibold flex items-center gap-2">
             <HardDrive className="h-6 w-6" />
             {isOwnWorkspace ? 'Mon Bureau' : `Bureau de ${targetProfile?.full_name || '...'}`}
           </h1>
@@ -807,7 +807,7 @@ export default function WorkspacePage() {
       <Dialog open={showNewFolder} onOpenChange={setShowNewFolder}>
         <DialogContent className="">
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
-            <DialogTitle className="text-white font-display">Nouveau dossier</DialogTitle>
+            <DialogTitle className="text-white ">Nouveau dossier</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <Input value={newFolderName} onChange={(e) => setNewFolderName(e.target.value)} placeholder="Nom du dossier" onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()} autoFocus />
@@ -823,7 +823,7 @@ export default function WorkspacePage() {
       <Dialog open={!!renamingFile} onOpenChange={() => setRenamingFile(null)}>
         <DialogContent className="">
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
-            <DialogTitle className="text-white font-display">Renommer</DialogTitle>
+            <DialogTitle className="text-white ">Renommer</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <Input value={renameValue} onChange={(e) => setRenameValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleRename()} autoFocus />
@@ -839,7 +839,7 @@ export default function WorkspacePage() {
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
         <DialogContent className="max-w-md">
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
-            <DialogTitle className="text-white font-display">Paramètres de synchronisation</DialogTitle>
+            <DialogTitle className="text-white ">Paramètres de synchronisation</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div>

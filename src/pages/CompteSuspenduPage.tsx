@@ -47,7 +47,7 @@ export default function CompteSuspenduPage() {
           <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
             <ShieldAlert className="h-6 w-6 text-muted-foreground" />
           </div>
-          <CardTitle className="font-display text-xl">Compte suspendu</CardTitle>
+          <CardTitle className="text-xl">Compte suspendu</CardTitle>
           <CardDescription>
             L'accès de votre organisation à Mission-DGC a été suspendu.
           </CardDescription>

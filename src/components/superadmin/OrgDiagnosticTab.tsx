@@ -132,7 +132,7 @@ export default function OrgDiagnosticTab({ orgId, members }: Props) {
           {VOLUME_LABELS.map(([key, label]) => (
             <div key={key} className="rounded-md border p-3">
               <p className="text-xs text-muted-foreground">{label}</p>
-              <p className="text-xl font-bold">{Number(data.volumes?.[key] ?? 0).toLocaleString('fr-FR')}</p>
+              <p className="text-xl font-semibold">{Number(data.volumes?.[key] ?? 0).toLocaleString('fr-FR')}</p>
             </div>
           ))}
         </CardContent>

@@ -207,7 +207,7 @@ export default function PlanningPage() {
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-2xl font-semibold font-display">Planning</h1>
+        <h1 className="text-2xl font-semibold ">Planning</h1>
         <p className="text-sm text-muted-foreground">Planifiez votre semaine par mission, projet et tâche.</p>
       </div>
 

@@ -136,7 +136,7 @@ function ActivityNode({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-semibold text-primary">{numbering}</span>
+            <span className="text-xs tabular-nums font-semibold text-primary">{numbering}</span>
             <span className="text-sm font-medium truncate">{activity.name}</span>
             {activityTasks.length > 0 && (
               <span className="text-[10px] text-muted-foreground">
@@ -384,7 +384,7 @@ export default function ActivitiesTab({ projectId }: { projectId: string }) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold font-display">Structure du projet</h3>
+          <h3 className="text-lg font-semibold ">Structure du projet</h3>
           <p className="text-xs text-muted-foreground">Glissez-déposez pour réorganiser les activités</p>
         </div>
         <Button size="sm" onClick={() => handleAdd(null, 0)}>
@@ -468,7 +468,7 @@ function ActivityFormDialog({ open, onOpenChange, form, setForm, onSubmit, isPen
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-display">
+          <DialogTitle className="">
             {isEditing ? `Modifier ${levelLabel.toLowerCase()}` : `Nouvelle ${levelLabel.toLowerCase()}`}
           </DialogTitle>
         </DialogHeader>

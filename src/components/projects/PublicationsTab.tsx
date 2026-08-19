@@ -63,7 +63,7 @@ export default function PublicationsTab({ projectId }: { projectId: string }) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h3 className="text-lg font-semibold font-display">Publications</h3>
+          <h3 className="text-lg font-semibold ">Publications</h3>
           <Select value={filterType} onValueChange={setFilterType}>
             <SelectTrigger className="h-8 w-32"><SelectValue /></SelectTrigger>
             <SelectContent>
@@ -119,7 +119,7 @@ export default function PublicationsTab({ projectId }: { projectId: string }) {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className="font-display">Nouvelle publication</DialogTitle>
+            <DialogTitle className="">Nouvelle publication</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <Input placeholder="Titre" value={title} onChange={(e) => setTitle(e.target.value)} />
