@@ -229,7 +229,7 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
                 <Select
                   value={projectId ?? ''}
                   onValueChange={handleProjectChange}
-                  disabled={!missionId}
+                  disabled={!missionId || readOnly}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder={!missionId ? 'Choisir d\'abord une mission' : 'Sélectionner un projet'} />
