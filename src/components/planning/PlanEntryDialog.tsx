@@ -186,9 +186,14 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
           <DialogTitle>{entry ? 'Modifier une entrée' : 'Nouvelle entrée'}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
+          {readOnly && (
+            <div className="rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground">
+              Cette entrée a été soumise et ne peut plus être modifiée.
+            </div>
+          )}
           <div className="space-y-1.5">
             <Label>Type <span className="text-destructive">*</span></Label>
-            <Select value={type} onValueChange={(v) => { setType(v as PlanEntryType); setMissionId(null); setProjectId(null); setTaskId(null); }}>
+            <Select disabled={readOnly} value={type} onValueChange={(v) => { setType(v as PlanEntryType); setMissionId(null); setProjectId(null); setTaskId(null); }}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
