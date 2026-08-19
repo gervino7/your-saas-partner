@@ -94,12 +94,37 @@ export default function TeamPlanReview({ weekStart }: { weekStart: Date }) {
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Plannings à valider</CardTitle>
+        <CardHeader className="flex-row items-center justify-between gap-3 space-y-0">
+          <div>
+            <CardTitle className="text-base">Plannings à valider</CardTitle>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {allWeeks
+                ? 'Toutes les semaines en attente'
+                : `Semaine du ${format(weekStart, 'dd/MM/yyyy')}`}
+            </p>
+          </div>
+          <div className="rounded-md border border-border p-0.5 flex shrink-0">
+            <button
+              onClick={() => setAllWeeks(false)}
+              className={`px-3 py-1 text-xs rounded ${!allWeeks ? 'bg-primary text-primary-foreground' : ''}`}
+            >
+              Semaine affichée
+            </button>
+            <button
+              onClick={() => setAllWeeks(true)}
+              className={`px-3 py-1 text-xs rounded ${allWeeks ? 'bg-primary text-primary-foreground' : ''}`}
+            >
+              Toutes les semaines en attente
+            </button>
+          </div>
         </CardHeader>
         <CardContent>
           {grouped.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Aucun planning en attente de validation.</p>
+            <p className="text-sm text-muted-foreground">
+              {allWeeks
+                ? 'Aucun planning soumis en attente de validation.'
+                : `Aucun planning soumis pour cette semaine (semaine du ${format(weekStart, 'dd/MM/yyyy')}).`}
+            </p>
           ) : (
             <Accordion type="multiple">
               {grouped.map(([uid, group]) => {
@@ -112,7 +137,13 @@ export default function TeamPlanReview({ weekStart }: { weekStart: Date }) {
                         <div className="flex items-center gap-2">
                           <span className="font-medium">{group.name}</span>
                           <Badge variant="outline" className="text-[10px]">{group.grade}</Badge>
+                          {allWeeks && (
+                            <Badge variant="secondary" className="text-[10px] tabular-nums">
+                              Semaine du {format(new Date(group.week), 'dd/MM/yyyy')}
+                            </Badge>
+                          )}
                         </div>
+
                         <div className="text-sm text-muted-foreground">
                           {group.items.length} entrées · {formatHours(total)}
                         </div>
