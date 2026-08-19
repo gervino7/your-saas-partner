@@ -180,7 +180,33 @@ ${profile?.full_name ?? ''} - ${cabinet}`
               </div>
             )}
 
-            <DialogFooter>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="rounded-md border border-border p-3 text-sm space-y-1 bg-muted/30">
+              <div><span className="text-muted-foreground">À :</span> <b>{recipient}</b></div>
+              {ccList.length > 0 && <div><span className="text-muted-foreground">Copie :</span> {ccList.join(', ')}</div>}
+              <div><span className="text-muted-foreground">Objet :</span> {objet}</div>
+            </div>
+
+            <iframe
+              title="Aperçu de l'email"
+              srcDoc={previewHtml}
+              className="w-full h-[420px] rounded-md border border-border bg-white"
+            />
+
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+          </div>
+        )}
+
+        <DialogFooter>
+          {step === 'edit' ? (
+            <>
               <Button variant="outline" onClick={copy}><Copy className="h-4 w-4 mr-2" /> Copier le message</Button>
               <Button variant="ghost" onClick={() => onOpenChange(false)}>Annuler</Button>
               {isEmail ? (
@@ -190,39 +216,19 @@ ${profile?.full_name ?? ''} - ${cabinet}`
                   <Send className="h-4 w-4 mr-2" /> Enregistrer la relance
                 </Button>
               )}
-            </DialogFooter>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="rounded-lg border p-3 text-sm space-y-1 bg-muted/30">
-              <div><span className="text-muted-foreground">À :</span> <b>{recipient}</b></div>
-              {ccList.length > 0 && <div><span className="text-muted-foreground">Copie :</span> {ccList.join(', ')}</div>}
-              <div><span className="text-muted-foreground">Objet :</span> {objet}</div>
-            </div>
-
-            <iframe
-              title="Aperçu de l'email"
-              srcDoc={previewHtml}
-              className="w-full h-[420px] rounded-lg border bg-white"
-            />
-
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            <DialogFooter>
+            </>
+          ) : (
+            <>
               <Button variant="outline" onClick={() => setStep('edit')} disabled={send.isPending}>
                 <ArrowLeft className="h-4 w-4 mr-2" /> Modifier
               </Button>
               <Button onClick={doSend} disabled={send.isPending}>
-                <Send className="h-4 w-4 mr-2" /> {send.isPending ? 'Envoi en cours…' : 'Envoyer'}
+                {send.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
+                {send.isPending ? 'Envoi en cours…' : 'Envoyer'}
               </Button>
-            </DialogFooter>
-          </div>
-        )}
+            </>
+          )}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
