@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { LogIn, UserPlus, Building2, Shield, Mail, Lock, User } from 'lucide-react';
+import { LogIn, UserPlus, Building2, Shield, Mail, Lock, User, BarChart3, Landmark, FolderOpen, Users } from 'lucide-react';
 import logoImg from '@/assets/logo.png';
 import { GRADE_LABELS } from '@/types/database';
 import type { Grade } from '@/types/database';
