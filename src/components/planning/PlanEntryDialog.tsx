@@ -179,22 +179,36 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
     }
   };
 
+  const missionPlaceholder = missionsLoading ? 'Chargement…' : 'Sélectionner une mission';
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>{entry ? 'Modifier une entrée' : 'Nouvelle entrée'}</DialogTitle>
+          <DialogTitle>{entry ? 'Modifier une entrée de planning' : 'Nouvelle entrée de planning'}</DialogTitle>
+          <DialogDescription>
+            Planifiez une intervention sur une mission où vous êtes affecté.
+          </DialogDescription>
         </DialogHeader>
+
+        {readOnly && (
+          <div className="rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground">
+            Cette entrée a été soumise et ne peut plus être modifiée.
+          </div>
+        )}
+
+        {/* Rattachement */}
         <div className="space-y-4">
-          {readOnly && (
-            <div className="rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground">
-              Cette entrée a été soumise et ne peut plus être modifiée.
-            </div>
-          )}
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Rattachement</p>
+
           <div className="space-y-1.5">
-            <Label>Type <span className="text-destructive">*</span></Label>
-            <Select disabled={readOnly} value={type} onValueChange={(v) => { setType(v as PlanEntryType); setMissionId(null); setProjectId(null); setTaskId(null); }}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+            <Label className="text-sm font-medium">Type <span className="text-destructive">*</span></Label>
+            <Select
+              disabled={readOnly}
+              value={type}
+              onValueChange={(v) => { setType(v as PlanEntryType); setMissionId(null); setProjectId(null); setTaskId(null); }}
+            >
+              <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
               </SelectContent>
@@ -204,35 +218,37 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
           {(type === 'mission' || type === 'rendez_vous') && (
             <>
               {noStaffing ? (
-                <div className="rounded-md border border-warning/30 bg-warning/10 p-3 text-sm text-warning-foreground">
+                <div className="rounded-md border border-border bg-muted/50 p-3 text-sm text-muted-foreground">
                   Aucune mission disponible. Créez une mission ou demandez à être ajouté à une équipe.
                 </div>
               ) : (
                 <div className="space-y-1.5">
-                  <Label>Mission {type === 'mission' && <span className="text-destructive">*</span>}</Label>
+                  <Label className="text-sm font-medium">
+                    Mission {type === 'mission' && <span className="text-destructive">*</span>}
+                  </Label>
                   <Select value={missionId ?? ''} onValueChange={handleMissionChange} disabled={missionsLoading || readOnly}>
-                    <SelectTrigger><SelectValue placeholder={missionsLoading ? 'Chargement…' : 'Sélectionner une mission'} /></SelectTrigger>
+                    <SelectTrigger className="h-10"><SelectValue placeholder={missionPlaceholder} /></SelectTrigger>
                     <SelectContent>
                       {myMissions.map((m) => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                  {staffingForMission?.weekly_hours != null && (
+                  {staffingForMission?.weekly_hours != null ? (
                     <p className="text-xs text-muted-foreground">
-                      Affecté : {Number(staffingForMission.weekly_hours)}h/semaine sur cette mission
+                      Affecté : {Number(staffingForMission.weekly_hours)} h/semaine sur cette mission
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Seules les missions en cours ou en planification sont proposées.
                     </p>
                   )}
                 </div>
               )}
 
               <div className="space-y-1.5">
-                <Label>Projet</Label>
-                <Select
-                  value={projectId ?? ''}
-                  onValueChange={handleProjectChange}
-                  disabled={!missionId || readOnly}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={!missionId ? 'Choisir d\'abord une mission' : 'Sélectionner un projet'} />
+                <Label className="text-sm font-medium">Projet</Label>
+                <Select value={projectId ?? ''} onValueChange={handleProjectChange} disabled={!missionId || readOnly}>
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder={!missionId ? "Choisir d'abord une mission" : 'Sélectionner un projet'} />
                   </SelectTrigger>
                   <SelectContent>
                     {projects.map((p: any) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
@@ -242,31 +258,39 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
 
               {type === 'mission' && (
                 <div className="space-y-1.5">
-                  <Label>Tâche</Label>
-                  <Select
-                    value={taskId ?? ''}
-                    onValueChange={(v) => setTaskId(v || null)}
-                    disabled={!projectId || readOnly}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={!projectId ? 'Choisir d\'abord un projet' : 'Sélectionner une tâche'} />
+                  <Label className="text-sm font-medium">Tâche</Label>
+                  <Select value={taskId ?? ''} onValueChange={(v) => setTaskId(v || null)} disabled={!projectId || readOnly}>
+                    <SelectTrigger className="h-10">
+                      <SelectValue placeholder={!projectId ? "Choisir d'abord un projet" : 'Sélectionner une tâche'} />
                     </SelectTrigger>
                     <SelectContent>
                       {(tasks as any[]).map((t) => <SelectItem key={t.id} value={t.id}>{t.title}</SelectItem>)}
                     </SelectContent>
                   </Select>
+                  <p className="text-xs text-muted-foreground">Facultatif : précise le travail prévu ce jour.</p>
                 </div>
               )}
             </>
           )}
+        </div>
+
+        <Separator />
+
+        {/* Planification */}
+        <div className="space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Planification</p>
 
           <div className="space-y-1.5">
-            <Label>Date <span className="text-destructive">*</span></Label>
+            <Label className="text-sm font-medium">Date <span className="text-destructive">*</span></Label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" disabled={readOnly} className={cn('w-full justify-start text-left font-normal', !date && 'text-muted-foreground')}>
+                <Button
+                  variant="outline"
+                  disabled={readOnly}
+                  className={cn('h-10 w-full justify-start text-left font-normal', !date && 'text-muted-foreground')}
+                >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, 'PPP', { locale: fr }) : 'Choisir une date'}
+                  {date ? format(date, 'dd/MM/yyyy', { locale: fr }) : 'Choisir une date'}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -277,40 +301,68 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
 
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
-              <Label>{type === 'conge' ? "Heures d'absence" : 'Heures prévues'} <span className="text-destructive">*</span></Label>
-              <Input type="number" min={0} max={24} step={0.5} value={hours} disabled={readOnly} onChange={(e) => setHours(e.target.value)} />
+              <Label className="text-sm font-medium">
+                {type === 'conge' ? "Heures d'absence" : 'Heures prévues'} <span className="text-destructive">*</span>
+              </Label>
+              <Input className="h-10" type="number" min={0} max={24} step={0.5} value={hours} disabled={readOnly} onChange={(e) => setHours(e.target.value)} />
             </div>
             <div className="space-y-1.5">
-              <Label>Début {requiresTimes && <span className="text-destructive">*</span>}</Label>
-              <Input type="time" value={startTime} disabled={readOnly} onChange={(e) => setStartTime(e.target.value)} />
+              <Label className="text-sm font-medium">Début {requiresTimes && <span className="text-destructive">*</span>}</Label>
+              <Input className="h-10" type="time" value={startTime} disabled={readOnly} onChange={(e) => setStartTime(e.target.value)} />
             </div>
             <div className="space-y-1.5">
-              <Label>Fin {requiresTimes && <span className="text-destructive">*</span>}</Label>
-              <Input type="time" value={endTime} disabled={readOnly} onChange={(e) => setEndTime(e.target.value)} />
+              <Label className="text-sm font-medium">Fin {requiresTimes && <span className="text-destructive">*</span>}</Label>
+              <Input className="h-10" type="time" value={endTime} disabled={readOnly} onChange={(e) => setEndTime(e.target.value)} />
             </div>
           </div>
-          {invalidTimes && (
+          {invalidTimes ? (
             <p className="text-xs text-destructive">L'heure de fin doit être postérieure à l'heure de début.</p>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              {type === 'conge'
+                ? "Les heures d'absence ne sont pas comptées dans la charge planifiée."
+                : 'Les horaires sont facultatifs, sauf pour un rendez-vous.'}
+            </p>
           )}
+        </div>
+
+        <Separator />
+
+        {/* Détails */}
+        <div className="space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Détails</p>
 
           <div className="space-y-1.5">
-            <Label>Intitulé</Label>
-            <Input value={title} disabled={readOnly} onChange={(e) => setTitle(e.target.value)} placeholder="Ex : Réunion de cadrage" />
+            <Label className="text-sm font-medium">Intitulé</Label>
+            <Input className="h-10" value={title} disabled={readOnly} onChange={(e) => setTitle(e.target.value)} placeholder="Ex : Réunion de cadrage" />
           </div>
 
           {type === 'rendez_vous' && (
             <div className="space-y-1.5">
-              <Label>Lieu</Label>
-              <Input value={location} disabled={readOnly} onChange={(e) => setLocation(e.target.value)} placeholder="Ex : Siège client" />
+              <Label className="text-sm font-medium">Lieu</Label>
+              <Input className="h-10" value={location} disabled={readOnly} onChange={(e) => setLocation(e.target.value)} placeholder="Ex : Siège client" />
             </div>
           )}
         </div>
+
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>{readOnly ? 'Fermer' : 'Annuler'}</Button>
           {!readOnly && (
-            <Button onClick={submit} disabled={!canSave || upsert.isPending}>
-              {upsert.isPending ? 'Enregistrement…' : 'Enregistrer'}
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <Button onClick={submit} disabled={!canSave || upsert.isPending}>
+                      {upsert.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      {upsert.isPending ? 'Enregistrement…' : 'Enregistrer'}
+                    </Button>
+                  </span>
+                </TooltipTrigger>
+                {!canSave && missingLabel && (
+                  <TooltipContent side="top">{missingLabel}</TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
           )}
         </DialogFooter>
       </DialogContent>
