@@ -81,7 +81,7 @@ export default function ClientContactsTab({ clientId }: { clientId: string }) {
               Contact principal
             </label>
           </div>
-          <div className="px-5 py-3 border-t border-amber-300/40 flex justify-end gap-3">
+          <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
             <Button variant="outline" onClick={() => setShowAdd(false)}>Annuler</Button>
             <Button onClick={handleAdd} disabled={create.isPending}>Ajouter</Button>
           </div>

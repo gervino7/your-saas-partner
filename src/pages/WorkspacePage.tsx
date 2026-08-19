@@ -812,7 +812,7 @@ export default function WorkspacePage() {
           <div className="space-y-3">
             <Input value={newFolderName} onChange={(e) => setNewFolderName(e.target.value)} placeholder="Nom du dossier" onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()} autoFocus />
           </div>
-          <div className="px-5 py-3 border-t border-amber-300/40 flex justify-end gap-3">
+          <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
             <Button variant="outline" onClick={() => setShowNewFolder(false)}>Annuler</Button>
             <Button onClick={handleCreateFolder} disabled={!newFolderName.trim()}>Créer</Button>
           </div>
@@ -828,7 +828,7 @@ export default function WorkspacePage() {
           <div className="space-y-3">
             <Input value={renameValue} onChange={(e) => setRenameValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleRename()} autoFocus />
           </div>
-          <div className="px-5 py-3 border-t border-amber-300/40 flex justify-end gap-3">
+          <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
             <Button variant="outline" onClick={() => setRenamingFile(null)}>Annuler</Button>
             <Button onClick={handleRename} disabled={!renameValue.trim()}>Renommer</Button>
           </div>

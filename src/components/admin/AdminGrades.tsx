@@ -260,7 +260,7 @@ export default function AdminGrades() {
             </div>
           </div>
 
-          <div className="px-5 py-3 border-t border-amber-300/40 flex items-center justify-end gap-2">
+          <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
             <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => setDialogOpen(false)}>Annuler</Button>
             <Button size="sm" className="h-9 px-5" onClick={() => saveGrade.mutate()} disabled={!form.code || !form.label || saveGrade.isPending}>
               Ajouter
@@ -359,7 +359,7 @@ export default function AdminGrades() {
             </div>
           </div>
 
-          <div className="px-5 py-3 border-t border-amber-300/40 flex items-center justify-end gap-2">
+          <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
             <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => { setDialogOpen(false); setEditingGrade(null); }}>Annuler</Button>
             <Button size="sm" className="h-9 px-5" onClick={() => saveGrade.mutate()} disabled={!form.code || !form.label || saveGrade.isPending}>
               Enregistrer

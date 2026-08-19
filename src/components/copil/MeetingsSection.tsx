@@ -104,7 +104,7 @@ const MeetingsSection = ({ committeeId, canManage }: Props) => {
                 <div><Label>Lieu</Label><Input value={form.location} onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))} placeholder="Salle de réunion ou adresse" /></div>
                 <div><Label>Lien visio</Label><Input value={form.meeting_link} onChange={(e) => setForm((p) => ({ ...p, meeting_link: e.target.value }))} placeholder="https://meet.jit.si/..." /></div>
               </div>
-              <div className="px-5 py-3 border-t border-amber-300/40 flex items-center justify-end gap-2">
+              <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
                 <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => setOpen(false)}>Annuler</Button>
                 <Button size="sm" className="h-9 px-5" onClick={handleCreate} disabled={!form.title || !form.scheduled_at || createMeeting.isPending}>Programmer</Button>
               </div>
