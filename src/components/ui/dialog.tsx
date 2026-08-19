@@ -89,7 +89,13 @@ const DialogContent = React.forwardRef<
           ) : (
             <>
               {header}
-              <div className={cn("flex-1 overflow-y-auto px-6 py-5 space-y-5", bodyClassName)}>
+              <div
+                className={cn(
+                  "flex-1 overflow-y-auto",
+                  /\bp-0\b/.test(className ?? "") ? "" : "px-6 py-5 space-y-5",
+                  bodyClassName,
+                )}
+              >
                 {body}
               </div>
               {footer}
