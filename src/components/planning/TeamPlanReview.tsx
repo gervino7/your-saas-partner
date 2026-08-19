@@ -18,7 +18,8 @@ const TYPE_LABEL: Record<string, string> = {
 };
 
 export default function TeamPlanReview({ weekStart }: { weekStart: Date }) {
-  const { data: entries = [] } = useTeamPlans(weekStart);
+  const [allWeeks, setAllWeeks] = useState(false);
+  const { data: entries = [] } = useTeamPlans(weekStart, allWeeks);
   const { data: workload = [] } = useWorkload(weekStart);
   const review = useReviewPlan();
 
@@ -26,16 +27,21 @@ export default function TeamPlanReview({ weekStart }: { weekStart: Date }) {
   const [rejectDialog, setRejectDialog] = useState<{ ids: string[]; comment: string } | null>(null);
 
   const grouped = useMemo(() => {
-    const map = new Map<string, { name: string; grade: string; items: PlanEntry[] }>();
+    const map = new Map<string, { name: string; grade: string; week: string; items: PlanEntry[] }>();
     for (const e of entries) {
-      const key = e.user_id;
+      const key = allWeeks ? `${e.user_id}|${e.week_start}` : e.user_id;
       if (!map.has(key)) {
-        map.set(key, { name: e.profile?.full_name ?? '-', grade: e.profile?.grade ?? '', items: [] });
+        map.set(key, {
+          name: e.profile?.full_name ?? '-',
+          grade: e.profile?.grade ?? '',
+          week: e.week_start,
+          items: [],
+        });
       }
       map.get(key)!.items.push(e);
     }
     return Array.from(map.entries());
-  }, [entries]);
+  }, [entries, allWeeks]);
 
   const toggle = (id: string) => {
     setSelected((prev) => {
@@ -44,6 +50,7 @@ export default function TeamPlanReview({ weekStart }: { weekStart: Date }) {
       return next;
     });
   };
+
 
   const approveAll = (ids: string[]) => review.mutate({ ids, status: 'approved' });
   const openReject = (ids: string[]) => setRejectDialog({ ids, comment: '' });
@@ -87,12 +94,37 @@ export default function TeamPlanReview({ weekStart }: { weekStart: Date }) {
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Plannings à valider</CardTitle>
+        <CardHeader className="flex-row items-center justify-between gap-3 space-y-0">
+          <div>
+            <CardTitle className="text-base">Plannings à valider</CardTitle>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {allWeeks
+                ? 'Toutes les semaines en attente'
+                : `Semaine du ${format(weekStart, 'dd/MM/yyyy')}`}
+            </p>
+          </div>
+          <div className="rounded-md border border-border p-0.5 flex shrink-0">
+            <button
+              onClick={() => setAllWeeks(false)}
+              className={`px-3 py-1 text-xs rounded ${!allWeeks ? 'bg-primary text-primary-foreground' : ''}`}
+            >
+              Semaine affichée
+            </button>
+            <button
+              onClick={() => setAllWeeks(true)}
+              className={`px-3 py-1 text-xs rounded ${allWeeks ? 'bg-primary text-primary-foreground' : ''}`}
+            >
+              Toutes les semaines en attente
+            </button>
+          </div>
         </CardHeader>
         <CardContent>
           {grouped.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Aucun planning en attente de validation.</p>
+            <p className="text-sm text-muted-foreground">
+              {allWeeks
+                ? 'Aucun planning soumis en attente de validation.'
+                : `Aucun planning soumis pour cette semaine (semaine du ${format(weekStart, 'dd/MM/yyyy')}).`}
+            </p>
           ) : (
             <Accordion type="multiple">
               {grouped.map(([uid, group]) => {
@@ -105,7 +137,13 @@ export default function TeamPlanReview({ weekStart }: { weekStart: Date }) {
                         <div className="flex items-center gap-2">
                           <span className="font-medium">{group.name}</span>
                           <Badge variant="outline" className="text-[10px]">{group.grade}</Badge>
+                          {allWeeks && (
+                            <Badge variant="secondary" className="text-[10px] tabular-nums">
+                              Semaine du {format(new Date(group.week), 'dd/MM/yyyy')}
+                            </Badge>
+                          )}
                         </div>
+
                         <div className="text-sm text-muted-foreground">
                           {group.items.length} entrées · {formatHours(total)}
                         </div>
