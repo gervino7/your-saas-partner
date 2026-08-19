@@ -264,7 +264,7 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
             <Label>Date <span className="text-destructive">*</span></Label>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className={cn('w-full justify-start text-left font-normal', !date && 'text-muted-foreground')}>
+                <Button variant="outline" disabled={readOnly} className={cn('w-full justify-start text-left font-normal', !date && 'text-muted-foreground')}>
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {date ? format(date, 'PPP', { locale: fr }) : 'Choisir une date'}
                 </Button>
