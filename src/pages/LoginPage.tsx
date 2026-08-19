@@ -341,14 +341,14 @@ const LoginPage = () => {
 
             <div className="space-y-3">
               {[
-                { icon: '📊', text: 'Suivi des missions en temps réel' },
-                { icon: '🏛️', text: 'Gouvernance COPIL intégrée' },
-                { icon: '📁', text: 'Gestion documentaire avancée' },
-                { icon: '👥', text: 'Collaboration d\'équipe fluide' },
+                { Icon: BarChart3, text: 'Suivi des missions en temps réel' },
+                { Icon: Landmark, text: 'Gouvernance COPIL intégrée' },
+                { Icon: FolderOpen, text: 'Gestion documentaire avancée' },
+                { Icon: Users, text: 'Collaboration d\'équipe fluide' },
               ].map((feature) => (
                 <div key={feature.text} className="flex items-center gap-3 group">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl text-sm transition-transform group-hover:scale-110" style={{ background: 'hsl(0 0% 100% / 0.06)' }}>
-                    {feature.icon}
+                  <div className="flex h-9 w-9 items-center justify-center rounded-md transition-transform group-hover:scale-110" style={{ background: 'hsl(0 0% 100% / 0.06)' }}>
+                    <feature.Icon className="h-[18px] w-[18px] text-white/70" />
                   </div>
                   <span className="text-sm text-white/65 group-hover:text-white/85 transition-colors">{feature.text}</span>
                 </div>
