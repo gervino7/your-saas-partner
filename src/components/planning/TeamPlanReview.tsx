@@ -18,7 +18,8 @@ const TYPE_LABEL: Record<string, string> = {
 };
 
 export default function TeamPlanReview({ weekStart }: { weekStart: Date }) {
-  const { data: entries = [] } = useTeamPlans(weekStart);
+  const [allWeeks, setAllWeeks] = useState(false);
+  const { data: entries = [] } = useTeamPlans(weekStart, allWeeks);
   const { data: workload = [] } = useWorkload(weekStart);
   const review = useReviewPlan();
 
@@ -26,16 +27,21 @@ export default function TeamPlanReview({ weekStart }: { weekStart: Date }) {
   const [rejectDialog, setRejectDialog] = useState<{ ids: string[]; comment: string } | null>(null);
 
   const grouped = useMemo(() => {
-    const map = new Map<string, { name: string; grade: string; items: PlanEntry[] }>();
+    const map = new Map<string, { name: string; grade: string; week: string; items: PlanEntry[] }>();
     for (const e of entries) {
-      const key = e.user_id;
+      const key = allWeeks ? `${e.user_id}|${e.week_start}` : e.user_id;
       if (!map.has(key)) {
-        map.set(key, { name: e.profile?.full_name ?? '-', grade: e.profile?.grade ?? '', items: [] });
+        map.set(key, {
+          name: e.profile?.full_name ?? '-',
+          grade: e.profile?.grade ?? '',
+          week: e.week_start,
+          items: [],
+        });
       }
       map.get(key)!.items.push(e);
     }
     return Array.from(map.entries());
-  }, [entries]);
+  }, [entries, allWeeks]);
 
   const toggle = (id: string) => {
     setSelected((prev) => {
@@ -44,6 +50,7 @@ export default function TeamPlanReview({ weekStart }: { weekStart: Date }) {
       return next;
     });
   };
+
 
   const approveAll = (ids: string[]) => review.mutate({ ids, status: 'approved' });
   const openReject = (ids: string[]) => setRejectDialog({ ids, comment: '' });
