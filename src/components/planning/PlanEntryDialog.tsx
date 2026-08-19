@@ -156,6 +156,16 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
     return true;
   }, [readOnly, date, hours, missionId, requiresMission, requiresTimes, startTime, endTime, invalidTimes]);
 
+  const missingLabel = useMemo(() => {
+    if (!date) return 'Choisissez une date.';
+    const h = Number(hours);
+    if (isNaN(h) || h <= 0 || h > 24) return 'Indiquez un nombre d\'heures entre 0 et 24.';
+    if (requiresMission && !missionId) return 'Sélectionnez une mission.';
+    if (requiresTimes && (!startTime || !endTime)) return 'Renseignez les heures de début et de fin.';
+    if (invalidTimes) return 'L\'heure de fin doit être postérieure à l\'heure de début.';
+    return null;
+  }, [date, hours, missionId, requiresMission, requiresTimes, startTime, endTime, invalidTimes]);
+
   const submit = async () => {
     if (!canSave || !date) return;
     try {
