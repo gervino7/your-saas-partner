@@ -164,7 +164,7 @@ export default function AdminUsers() {
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Modifier l'utilisateur</DialogTitle></DialogHeader>
-          <div className="px-5 py-4 space-y-3 dialog-form-bg">
+          <div className="space-y-3">
             <div>
               <Label>Nom complet</Label>
               <Input value={editingUser?.full_name ?? ''} onChange={(e) => setEditingUser((prev) => prev ? { ...prev, full_name: e.target.value } : null)} />
@@ -181,7 +181,7 @@ export default function AdminUsers() {
               </Select>
             </div>
           </div>
-          <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex items-center justify-end gap-2">
+          <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
             <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => setEditOpen(false)}>Annuler</Button>
             <Button size="sm" className="h-9 px-5" onClick={handleSaveEdit} disabled={updateUser.isPending || !editingUser?.full_name?.trim()}>
               {updateUser.isPending ? 'Enregistrement...' : 'Enregistrer'}
@@ -212,7 +212,7 @@ export default function AdminUsers() {
       <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Inviter un collaborateur</DialogTitle></DialogHeader>
-          <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] dialog-form-bg">
+          <div className="space-y-3">
             <div><Label>Email</Label><Input type="email" placeholder="nom@cabinet.com" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} /></div>
             <div><Label>Grade</Label>
               <Select value={inviteGrade} onValueChange={(v) => setInviteGrade(v as Grade)}>
@@ -221,7 +221,7 @@ export default function AdminUsers() {
               </Select>
             </div>
           </div>
-          <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex items-center justify-end gap-2">
+          <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
             <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => setInviteOpen(false)}>Annuler</Button>
             <Button size="sm" className="h-9 px-5" onClick={handleInvite} disabled={inviteUser.isPending || !inviteEmail.trim()}>
               {inviteUser.isPending ? 'Envoi...' : 'Envoyer l\'invitation'}

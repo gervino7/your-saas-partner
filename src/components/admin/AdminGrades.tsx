@@ -229,7 +229,7 @@ export default function AdminGrades() {
             <DialogDescription>Ajoutez un nouveau grade à votre organisation.</DialogDescription>
           </DialogHeader>
 
-          <div className="px-5 py-4 space-y-4 overflow-y-auto max-h-[65vh] dialog-form-bg">
+          <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>Code</Label>
@@ -260,7 +260,7 @@ export default function AdminGrades() {
             </div>
           </div>
 
-          <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex items-center justify-end gap-2">
+          <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
             <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => setDialogOpen(false)}>Annuler</Button>
             <Button size="sm" className="h-9 px-5" onClick={() => saveGrade.mutate()} disabled={!form.code || !form.label || saveGrade.isPending}>
               Ajouter
@@ -277,7 +277,7 @@ export default function AdminGrades() {
             <DialogDescription>Modifiez les informations du grade sélectionné.</DialogDescription>
           </DialogHeader>
 
-          <div className="px-5 py-4 space-y-5 overflow-y-auto max-h-[65vh] dialog-form-bg">
+          <div className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Left: Form */}
               <div className="space-y-4">
@@ -359,7 +359,7 @@ export default function AdminGrades() {
             </div>
           </div>
 
-          <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex items-center justify-end gap-2">
+          <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
             <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => { setDialogOpen(false); setEditingGrade(null); }}>Annuler</Button>
             <Button size="sm" className="h-9 px-5" onClick={() => saveGrade.mutate()} disabled={!form.code || !form.label || saveGrade.isPending}>
               Enregistrer

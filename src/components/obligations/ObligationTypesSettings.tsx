@@ -155,7 +155,7 @@ const ObligationTypesSettings = () => {
 
       {/* Dialog d'édition */}
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>{editing?.id ? 'Modifier' : 'Ajouter'} un type d'obligation</DialogTitle>
           </DialogHeader>

@@ -198,11 +198,11 @@ export default function DocumentExplorer({ missionId, projectId, activityId }: D
 
       {/* Upload dialog */}
       <Dialog open={showUpload} onOpenChange={setShowUpload}>
-        <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
+        <DialogContent className="">
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
             <DialogTitle className="text-white font-display">Uploader des documents</DialogTitle>
           </DialogHeader>
-          <div className="px-5 py-4 dialog-form-bg">
+          <div className="">
             <UploadZone
               folderId={selectedFolderId}
               missionId={missionId}
@@ -216,14 +216,14 @@ export default function DocumentExplorer({ missionId, projectId, activityId }: D
       {/* Preview dialog */}
       {previewDoc && (
         <Dialog open={!!previewDoc} onOpenChange={() => setActionDialog(null)}>
-          <DialogContent className="max-w-3xl overflow-hidden border-0 shadow-2xl rounded-2xl">
+          <DialogContent className="max-w-3xl">
             <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
               <DialogTitle className="text-white font-display flex items-center gap-2">
                 {previewDoc.name}
                 <DocumentStatusBadge status={previewDoc.status} />
               </DialogTitle>
             </DialogHeader>
-            <div className="px-5 py-4 overflow-auto max-h-[65vh] dialog-form-bg">
+            <div className="">
               {previewDoc.mime_type?.startsWith('image/') ? (
                 <img
                   src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/authenticated/documents/${previewDoc.file_path}`}

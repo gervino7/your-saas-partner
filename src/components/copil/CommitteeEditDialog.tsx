@@ -48,7 +48,7 @@ const CommitteeEditDialog = ({ committee, open, onOpenChange }: Props) => {
         <DialogHeader>
           <DialogTitle>Modifier le comité</DialogTitle>
         </DialogHeader>
-        <div className="px-5 py-4 space-y-3 dialog-form-bg">
+        <div className="space-y-3">
           <div>
             <Label>Type</Label>
             <Select value={form.type} onValueChange={(v) => setForm((p) => ({ ...p, type: v }))}>
@@ -93,7 +93,7 @@ const CommitteeEditDialog = ({ committee, open, onOpenChange }: Props) => {
             <Textarea value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} />
           </div>
         </div>
-        <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex justify-end gap-3">
+        <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>Annuler</Button>
           <Button onClick={handleSubmit} disabled={!form.name || update.isPending}>
             {update.isPending ? 'Enregistrement...' : 'Enregistrer'}

@@ -244,7 +244,7 @@ function DetailDialog({
 
   return (
     <Dialog open={!!user} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle style={{ color: NAVY }}>{user?.name}</DialogTitle>
         </DialogHeader>

@@ -80,7 +80,7 @@ export default function PlanFormDialog({ open, onOpenChange, plan, orgsUsingPlan
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>{isEdit ? `Modifier le plan - ${plan?.name}` : 'Créer un plan'}</DialogTitle>
           <DialogDescription>

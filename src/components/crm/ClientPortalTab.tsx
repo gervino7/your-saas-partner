@@ -151,7 +151,7 @@ export default function ClientPortalTab({ clientId }: { clientId: string }) {
 
       {/* Dialog création */}
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
-        <DialogContent className="rounded-2xl shadow-2xl border-0 overflow-hidden p-0">
+        <DialogContent className="">
           <div className="bg-primary px-6 py-5 flex items-center gap-3">
             <Link2 className="h-5 w-5 text-primary-foreground" />
             <DialogHeader className="p-0 space-y-0">

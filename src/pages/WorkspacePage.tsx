@@ -805,14 +805,14 @@ export default function WorkspacePage() {
 
       {/* New folder dialog */}
       <Dialog open={showNewFolder} onOpenChange={setShowNewFolder}>
-        <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
+        <DialogContent className="">
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
             <DialogTitle className="text-white font-display">Nouveau dossier</DialogTitle>
           </DialogHeader>
-          <div className="px-5 py-4 space-y-3 dialog-form-bg">
+          <div className="space-y-3">
             <Input value={newFolderName} onChange={(e) => setNewFolderName(e.target.value)} placeholder="Nom du dossier" onKeyDown={(e) => e.key === 'Enter' && handleCreateFolder()} autoFocus />
           </div>
-          <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex justify-end gap-3">
+          <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
             <Button variant="outline" onClick={() => setShowNewFolder(false)}>Annuler</Button>
             <Button onClick={handleCreateFolder} disabled={!newFolderName.trim()}>Créer</Button>
           </div>
@@ -821,14 +821,14 @@ export default function WorkspacePage() {
 
       {/* Rename dialog */}
       <Dialog open={!!renamingFile} onOpenChange={() => setRenamingFile(null)}>
-        <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
+        <DialogContent className="">
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
             <DialogTitle className="text-white font-display">Renommer</DialogTitle>
           </DialogHeader>
-          <div className="px-5 py-4 space-y-3 dialog-form-bg">
+          <div className="space-y-3">
             <Input value={renameValue} onChange={(e) => setRenameValue(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleRename()} autoFocus />
           </div>
-          <div className="px-5 py-3 border-t border-amber-300/40 dialog-footer-bg flex justify-end gap-3">
+          <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
             <Button variant="outline" onClick={() => setRenamingFile(null)}>Annuler</Button>
             <Button onClick={handleRename} disabled={!renameValue.trim()}>Renommer</Button>
           </div>
@@ -837,11 +837,11 @@ export default function WorkspacePage() {
 
       {/* Settings dialog */}
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
-        <DialogContent className="max-w-md overflow-hidden border-0 shadow-2xl rounded-2xl">
+        <DialogContent className="max-w-md">
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
             <DialogTitle className="text-white font-display">Paramètres de synchronisation</DialogTitle>
           </DialogHeader>
-          <div className="px-5 py-4 space-y-3 overflow-y-auto max-h-[65vh] dialog-form-bg">
+          <div className="space-y-3">
             <div>
               <Label className="text-sm">Chemin du répertoire local</Label>
               <Input value={workspace?.sync_folder_path || '~/MissionFlow/'} readOnly className="mt-1 bg-muted" />
