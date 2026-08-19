@@ -805,7 +805,7 @@ export default function WorkspacePage() {
 
       {/* New folder dialog */}
       <Dialog open={showNewFolder} onOpenChange={setShowNewFolder}>
-        <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
+        <DialogContent className="">
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
             <DialogTitle className="text-white font-display">Nouveau dossier</DialogTitle>
           </DialogHeader>
@@ -821,7 +821,7 @@ export default function WorkspacePage() {
 
       {/* Rename dialog */}
       <Dialog open={!!renamingFile} onOpenChange={() => setRenamingFile(null)}>
-        <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
+        <DialogContent className="">
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
             <DialogTitle className="text-white font-display">Renommer</DialogTitle>
           </DialogHeader>
@@ -837,7 +837,7 @@ export default function WorkspacePage() {
 
       {/* Settings dialog */}
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
-        <DialogContent className="max-w-md overflow-hidden border-0 shadow-2xl rounded-2xl">
+        <DialogContent className="max-w-md">
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
             <DialogTitle className="text-white font-display">Paramètres de synchronisation</DialogTitle>
           </DialogHeader>

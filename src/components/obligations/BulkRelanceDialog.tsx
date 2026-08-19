@@ -102,7 +102,7 @@ ${profile?.full_name ?? ''} - ${cabinet}`
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (progress === null) onOpenChange(o); }}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Relancer la sélection ({rows.length})</DialogTitle>
         </DialogHeader>

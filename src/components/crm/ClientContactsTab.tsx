@@ -65,7 +65,7 @@ export default function ClientContactsTab({ clientId }: { clientId: string }) {
       </CardContent>
 
       <Dialog open={showAdd} onOpenChange={setShowAdd}>
-        <DialogContent className="overflow-hidden border-0 shadow-2xl rounded-2xl">
+        <DialogContent className="">
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
             <DialogTitle className="text-white">Nouveau contact</DialogTitle>
           </DialogHeader>

@@ -69,7 +69,7 @@ const SubscriptionSection = () => {
       </CardContent>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+        <DialogContent className="max-w-3xl">
           <DialogHeader><DialogTitle>Choisir un plan</DialogTitle></DialogHeader>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {plans.map((p) => {

@@ -67,7 +67,7 @@ export default function ClientHistoryTab({ clientId }: { clientId: string }) {
       </CardContent>
 
       <Dialog open={showAdd} onOpenChange={setShowAdd}>
-        <DialogContent className="max-w-md p-0 rounded-2xl shadow-2xl overflow-hidden">
+        <DialogContent className="max-w-md p-0">
           <DialogHeader className="bg-amber-600 dark:bg-amber-700 px-6 py-4 rounded-t-2xl">
             <DialogTitle className="text-white flex items-center gap-2">
               <Plus className="h-5 w-5" /> Nouvelle interaction

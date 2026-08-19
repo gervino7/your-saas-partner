@@ -117,7 +117,7 @@ ${profile?.full_name ?? ''} - ${cabinet}`
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Relancer {row.client_name} - {row.obligation_label} {row.period_label}</DialogTitle>
         </DialogHeader>

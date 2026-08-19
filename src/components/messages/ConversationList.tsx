@@ -151,7 +151,7 @@ export default function ConversationList({
 
       {/* New conversation dialog */}
       <Dialog open={showNew} onOpenChange={setShowNew}>
-        <DialogContent className="sm:max-w-md rounded-2xl">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="font-display">Nouvelle conversation</DialogTitle>
           </DialogHeader>
