@@ -234,6 +234,8 @@ export function useReviewPlan() {
     onSuccess: (_d, vars) => {
       qc.invalidateQueries({ queryKey: ['team-plans'] });
       qc.invalidateQueries({ queryKey: ['team-plans-pending-count'] });
+      qc.invalidateQueries({ queryKey: ['workload'] });
+
 
       toast.success(vars.status === 'approved' ? 'Planning validé' : 'Planning renvoyé');
     },
