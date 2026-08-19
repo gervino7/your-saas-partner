@@ -277,18 +277,21 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
 
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
-              <Label>Heures prévues <span className="text-destructive">*</span></Label>
-              <Input type="number" min={0} max={24} step={0.5} value={hours} onChange={(e) => setHours(e.target.value)} />
+              <Label>{type === 'conge' ? "Heures d'absence" : 'Heures prévues'} <span className="text-destructive">*</span></Label>
+              <Input type="number" min={0} max={24} step={0.5} value={hours} disabled={readOnly} onChange={(e) => setHours(e.target.value)} />
             </div>
             <div className="space-y-1.5">
               <Label>Début {requiresTimes && <span className="text-destructive">*</span>}</Label>
-              <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+              <Input type="time" value={startTime} disabled={readOnly} onChange={(e) => setStartTime(e.target.value)} />
             </div>
             <div className="space-y-1.5">
               <Label>Fin {requiresTimes && <span className="text-destructive">*</span>}</Label>
-              <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+              <Input type="time" value={endTime} disabled={readOnly} onChange={(e) => setEndTime(e.target.value)} />
             </div>
           </div>
+          {invalidTimes && (
+            <p className="text-xs text-destructive">L'heure de fin doit être postérieure à l'heure de début.</p>
+          )}
 
           <div className="space-y-1.5">
             <Label>Intitulé</Label>
