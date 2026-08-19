@@ -89,7 +89,7 @@ export function useUpsertPlanEntry() {
       qc.invalidateQueries({ queryKey: ['plan-entries'] });
       toast.success('Planning enregistré');
     },
-    onError: (e: Error) => toast.error(e.message),
+    // L'erreur est affichée par l'appelant (message de la base tel quel)
   });
 }
 
