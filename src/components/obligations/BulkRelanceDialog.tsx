@@ -140,12 +140,6 @@ ${profile?.full_name ?? ''} - ${cabinet}`
               <Textarea className="mt-1 font-mono text-sm" rows={11} value={message} onChange={(e) => setMessage(e.target.value)} />
             </div>
 
-            <DialogFooter>
-              <Button variant="ghost" onClick={() => onOpenChange(false)}>Annuler</Button>
-              <Button onClick={() => setStep('preview')} disabled={sendable.length === 0 || !objet.trim() || !message.trim()}>
-                Aperçu
-              </Button>
-            </DialogFooter>
           </div>
         ) : (
           <div className="space-y-4">
@@ -153,9 +147,21 @@ ${profile?.full_name ?? ''} - ${cabinet}`
               Aperçu du premier message - les autres suivront le même modèle.
               {skipped.length > 0 && ` ${skipped.length} destinataire(s) sans email seront ignorés.`}
             </p>
-            <iframe title="Aperçu" srcDoc={previewHtml} className="w-full h-[400px] rounded-lg border bg-white" />
+            <iframe title="Aperçu" srcDoc={previewHtml} className="w-full h-[400px] rounded-md border border-border bg-white" />
             {progress !== null && <Progress value={progress} />}
-            <DialogFooter>
+          </div>
+        )}
+
+        <DialogFooter>
+          {step === 'edit' ? (
+            <>
+              <Button variant="ghost" onClick={() => onOpenChange(false)}>Annuler</Button>
+              <Button onClick={() => setStep('preview')} disabled={sendable.length === 0 || !objet.trim() || !message.trim()}>
+                Aperçu
+              </Button>
+            </>
+          ) : (
+            <>
               <Button variant="outline" onClick={() => setStep('edit')} disabled={progress !== null}>
                 <ArrowLeft className="h-4 w-4 mr-2" /> Modifier
               </Button>
@@ -163,9 +169,9 @@ ${profile?.full_name ?? ''} - ${cabinet}`
                 <Send className="h-4 w-4 mr-2" />
                 {progress !== null ? 'Envoi en cours…' : `Envoyer (${sendable.length})`}
               </Button>
-            </DialogFooter>
-          </div>
-        )}
+            </>
+          )}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
