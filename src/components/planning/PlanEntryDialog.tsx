@@ -82,7 +82,7 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
   // Informational staffing lookup for the selected mission
   const staffingForMission = useMemo(() => {
     if (!missionId) return null;
-    return (staffing as any[]).find((s) => s.mission?.id === missionId) ?? null;
+    return (staffing as any[]).find((s) => (s.mission?.id ?? s.mission_id) === missionId) ?? null;
   }, [staffing, missionId]);
 
   // Projects for selected mission
