@@ -210,15 +210,15 @@ export default function PlanEntryDialog({ open, onOpenChange, defaultDate, entry
               ) : (
                 <div className="space-y-1.5">
                   <Label>Mission {type === 'mission' && <span className="text-destructive">*</span>}</Label>
-                  <Select value={missionId ?? ''} onValueChange={handleMissionChange} disabled={missionsLoading}>
+                  <Select value={missionId ?? ''} onValueChange={handleMissionChange} disabled={missionsLoading || readOnly}>
                     <SelectTrigger><SelectValue placeholder={missionsLoading ? 'Chargement…' : 'Sélectionner une mission'} /></SelectTrigger>
                     <SelectContent>
                       {myMissions.map((m) => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                  {staffingForMission && (
+                  {staffingForMission?.weekly_hours != null && (
                     <p className="text-xs text-muted-foreground">
-                      Affecté : {staffingForMission.allocated_hours_per_week ?? staffingForMission.hours_per_week ?? '-'}h/semaine sur cette mission
+                      Affecté : {Number(staffingForMission.weekly_hours)}h/semaine sur cette mission
                     </p>
                   )}
                 </div>
