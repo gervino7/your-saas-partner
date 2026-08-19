@@ -71,7 +71,7 @@ const CopilTab = ({ missionId, missionName, canManage }: Props) => {
         <div className="flex items-center gap-3">
           {committees.length > 1 ? (
             <Select value={selected?.id} onValueChange={setSelectedId}>
-              <SelectTrigger className="w-[260px] text-gold font-bold">
+              <SelectTrigger className="w-[260px] text-gold font-semibold">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -81,7 +81,7 @@ const CopilTab = ({ missionId, missionName, canManage }: Props) => {
               </SelectContent>
             </Select>
           ) : (
-            <h3 className="text-lg font-bold text-gold">{selected?.name}</h3>
+            <h3 className="text-lg font-semibold text-gold">{selected?.name}</h3>
           )}
           <Badge variant="outline">{selected?.type === 'copil' ? 'COPIL' : 'CODIR'}</Badge>
           <Badge variant="secondary">{FREQ_LABELS[selected?.meeting_frequency ?? 'monthly']}</Badge>

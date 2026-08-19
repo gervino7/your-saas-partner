@@ -477,7 +477,7 @@ function InvoicesTab() {
               </div>
               {form.amount && (
                 <div className="text-sm text-right text-muted-foreground">
-                  Total TTC : <span className="font-bold text-foreground">{(Number(form.amount) * (1 + Number(form.tax_pct) / 100)).toLocaleString('fr-FR')} FCFA</span>
+                  Total TTC : <span className="font-semibold text-foreground">{(Number(form.amount) * (1 + Number(form.tax_pct) / 100)).toLocaleString('fr-FR')} FCFA</span>
                 </div>
               )}
               <div>
@@ -511,7 +511,7 @@ function InvoicesTab() {
               )}
               {sortedInvoices.map((inv: any) => (
                 <TableRow key={inv.id}>
-                  <TableCell className="font-mono text-sm">{inv.invoice_number}</TableCell>
+                  <TableCell className="tabular-nums text-sm">{inv.invoice_number}</TableCell>
                   <TableCell className="text-sm">{inv.client?.name || '-'}</TableCell>
                   <TableCell className="text-sm">{inv.mission?.name || '-'}</TableCell>
                   <TableCell className="text-sm capitalize">{inv.type}</TableCell>
@@ -544,7 +544,7 @@ const FinancePage = () => (
   <div className="space-y-6">
     <div className="flex items-center gap-3">
       <DollarSign className="h-6 w-6 text-primary" />
-      <h1 className="text-2xl font-bold font-display">Suivi financier</h1>
+      <h1 className="text-2xl font-semibold ">Suivi financier</h1>
     </div>
 
     <Tabs defaultValue="budget" className="space-y-4">

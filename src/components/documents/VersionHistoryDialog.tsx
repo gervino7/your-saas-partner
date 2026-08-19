@@ -27,7 +27,7 @@ export default function VersionHistoryDialog({ doc, open, onClose }: Props) {
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle className="font-display">Historique des versions - {doc.name}</DialogTitle>
+          <DialogTitle className="">Historique des versions - {doc.name}</DialogTitle>
         </DialogHeader>
         <div className="space-y-2">
           {versions.map((v) => (

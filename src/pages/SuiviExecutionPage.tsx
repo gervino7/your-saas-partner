@@ -97,7 +97,7 @@ export default function SuiviExecutionPage() {
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-2xl font-semibold font-display">Suivi d'exécution</h1>
+        <h1 className="text-2xl font-semibold ">Suivi d'exécution</h1>
         <p className="text-sm text-muted-foreground">Compare le prévu (planning validé) au réalisé (feuilles de temps approuvées).</p>
       </div>
 

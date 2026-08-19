@@ -62,7 +62,7 @@ export default function MissionProjectsTab({ missionId, canCreate }: { missionId
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold font-display">Projets ({projects.length})</h3>
+        <h3 className="text-lg font-semibold ">Projets ({projects.length})</h3>
         {canCreate && (
           <Button size="sm" onClick={() => { setEditProject(null); setFormOpen(true); }}>
             <Plus className="h-4 w-4 mr-2" /> Créer un projet
@@ -95,7 +95,7 @@ export default function MissionProjectsTab({ missionId, canCreate }: { missionId
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between pr-8">
                   <div>
-                    <p className="text-xs font-mono text-muted-foreground">{p.code}</p>
+                    <p className="text-xs tabular-nums text-muted-foreground">{p.code}</p>
                     <h4 className="font-semibold text-sm mt-1">{p.name}</h4>
                   </div>
                   <Badge variant="outline">{statusLabels[p.status] ?? p.status}</Badge>

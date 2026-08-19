@@ -88,7 +88,7 @@ function AdminSidebarContent({
 }) {
   return (
     <div className="space-y-1">
-      <h2 className="text-lg font-bold font-display mb-4 px-2">Administration</h2>
+      <h2 className="text-lg font-semibold mb-4 px-2">Administration</h2>
       {sections.map((s) => (
         <button
           key={s.id}
@@ -119,7 +119,7 @@ const AdminPage = () => {
   if (!canAccess) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold font-display">Administration</h1>
+        <h1 className="text-2xl font-semibold ">Administration</h1>
         <EmptyState icon={Shield} title="Accès restreint" description="Cette section est réservée aux Directeurs Associés et Directeurs de Mission." />
       </div>
     );
@@ -191,7 +191,7 @@ const AdminPage = () => {
               </SheetContent>
             </Sheet>
           </div>
-          <h1 className="text-xl font-bold font-display">{activeItem?.label}</h1>
+          <h1 className="text-xl font-semibold ">{activeItem?.label}</h1>
         </div>
         {renderSection()}
       </div>

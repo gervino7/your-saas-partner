@@ -67,8 +67,8 @@ const MissionDetailPage = () => {
         </Button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl font-bold font-display truncate">{mission.name}</h1>
-            <span className="text-sm font-mono text-muted-foreground">{mission.code}</span>
+            <h1 className="text-2xl font-semibold truncate">{mission.name}</h1>
+            <span className="text-sm tabular-nums text-muted-foreground">{mission.code}</span>
             <PriorityBadge priority={mission.priority} />
           </div>
         </div>

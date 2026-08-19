@@ -95,7 +95,7 @@ const ObligationTypesSettings = () => {
             <TableBody>
               {types.map((t: any) => (
                 <TableRow key={t.id} className="cursor-pointer hover:bg-muted/50" onClick={() => openEdit(t)}>
-                  <TableCell className="font-mono text-xs">{t.code}</TableCell>
+                  <TableCell className="tabular-nums text-xs">{t.code}</TableCell>
                   <TableCell className="font-medium">{t.label}</TableCell>
                   <TableCell>{CATEGORY_LABELS[t.category] ?? t.category}</TableCell>
                   <TableCell>{PERIODICITE_LABELS[t.periodicite] ?? t.periodicite}</TableCell>

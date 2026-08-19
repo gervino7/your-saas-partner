@@ -17,7 +17,7 @@ export default function UtilisateursPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="font-display text-2xl font-bold">Recherche utilisateur</h1>
+        <h1 className="text-2xl font-semibold">Recherche utilisateur</h1>
         <p className="text-sm text-muted-foreground">
           Outil de support. Chaque recherche est enregistrée dans le journal d'audit.
         </p>

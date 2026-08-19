@@ -113,7 +113,7 @@ const ClientPortalPage = () => {
           <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
             <Shield className="h-8 w-8 text-destructive" />
           </div>
-          <h2 className="text-xl font-bold font-display">Lien invalide ou expiré</h2>
+          <h2 className="text-xl font-semibold ">Lien invalide ou expiré</h2>
           <p className="text-muted-foreground text-sm">
             Ce lien de portail client n'est plus valide. Veuillez contacter votre consultant pour obtenir un nouveau lien d'accès.
           </p>
@@ -151,7 +151,7 @@ const ClientPortalPage = () => {
               <div className="h-6 w-px" style={{ background: 'hsla(0,0%,100%,0.25)' }} />
               <span className="text-sm font-semibold tracking-wide uppercase" style={{ color: 'hsla(0,0%,100%,0.7)', letterSpacing: '0.08em' }}>Portail Client</span>
             </div>
-            <Badge className="text-xs font-bold px-3 py-1.5 rounded-lg" style={{ background: 'hsla(0,0%,100%,0.2)', color: 'white', borderColor: 'hsla(0,0%,100%,0.3)' }}>
+            <Badge className="text-xs font-semibold px-3 py-1.5 rounded-lg" style={{ background: 'hsla(0,0%,100%,0.2)', color: 'white', borderColor: 'hsla(0,0%,100%,0.3)' }}>
               <Sparkles className="h-3 w-3 mr-1.5" />
               {missionData?.code}
             </Badge>
@@ -164,7 +164,7 @@ const ClientPortalPage = () => {
                 <Building2 className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-extrabold font-display text-white tracking-tight drop-shadow-sm">{clientData?.name}</h1>
+                <h1 className="text-3xl font-semibold text-white tracking-tight drop-shadow-sm">{clientData?.name}</h1>
               </div>
             </div>
           </div>
@@ -176,9 +176,9 @@ const ClientPortalPage = () => {
                 <Award className="h-4 w-4" style={{ color: 'hsl(35,85%,48%)' }} />
                 <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'hsl(35,30%,45%)' }}>Mission en cours</span>
               </div>
-              <span className="text-3xl font-extrabold tabular-nums" style={{ color: 'hsl(30,80%,40%)' }}>{progress}<span className="text-lg">%</span></span>
+              <span className="text-3xl font-semibold tabular-nums" style={{ color: 'hsl(30,80%,40%)' }}>{progress}<span className="text-lg">%</span></span>
             </div>
-            <h2 className="text-xl font-bold font-display mb-4" style={{ color: 'hsl(218,35%,15%)' }}>{missionData?.name}</h2>
+            <h2 className="text-xl font-semibold mb-4" style={{ color: 'hsl(218,35%,15%)' }}>{missionData?.name}</h2>
 
             {/* Progress bar */}
             <div className="w-full rounded-full h-3.5 overflow-hidden mb-1" style={{ background: 'hsl(40,25%,90%)' }}>
@@ -212,7 +212,7 @@ const ClientPortalPage = () => {
                   style={{ background: 'hsl(40,30%,94%)', border: '1px solid hsl(40,25%,88%)' }}
                 >
                   <stat.icon className="h-4 w-4 mx-auto mb-1.5" style={{ color: 'hsl(35,80%,48%)' }} />
-                  <p className="text-2xl font-extrabold tabular-nums" style={{ color: 'hsl(218,35%,15%)' }}>{stat.value}</p>
+                  <p className="text-2xl font-semibold tabular-nums" style={{ color: 'hsl(218,35%,15%)' }}>{stat.value}</p>
                   <p className="text-[10px] font-semibold uppercase tracking-wider mt-0.5" style={{ color: 'hsl(218,10%,55%)' }}>{stat.label}</p>
                 </div>
               ))}
@@ -234,7 +234,7 @@ const ClientPortalPage = () => {
             <TabsTrigger value="copil" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md gap-2">
               <Calendar className="h-4 w-4" /> COPIL
               {upcomingMeetings > 0 && (
-                <span className="ml-1 w-5 h-5 rounded-full bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center">{upcomingMeetings}</span>
+                <span className="ml-1 w-5 h-5 rounded-full bg-accent text-accent-foreground text-xs font-semibold flex items-center justify-center">{upcomingMeetings}</span>
               )}
             </TabsTrigger>
           </TabsList>
@@ -270,7 +270,7 @@ const ClientPortalPage = () => {
                         <div className="p-5">
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex-1">
-                              <h3 className="font-semibold font-display text-base group-hover:text-primary transition-colors">{p.name}</h3>
+                              <h3 className="font-semibold text-base group-hover:text-primary transition-colors">{p.name}</h3>
                               {p.code && <p className="text-xs text-muted-foreground mt-0.5">{p.code}</p>}
                             </div>
                             <Badge variant="outline" className={`${cfg.color} border text-xs font-medium`}>
@@ -281,7 +281,7 @@ const ClientPortalPage = () => {
                           <div className="space-y-2">
                             <div className="flex items-center justify-between text-sm">
                               <span className="text-muted-foreground">Progression</span>
-                              <span className="font-bold tabular-nums">{prog}%</span>
+                              <span className="font-semibold tabular-nums">{prog}%</span>
                             </div>
                             <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden">
                               <div className="h-full rounded-full transition-all duration-700" style={{
@@ -370,7 +370,7 @@ const ClientPortalPage = () => {
                       <CardContent className="p-5">
                         <div className="flex items-start justify-between">
                           <div className="space-y-1.5">
-                            <h4 className="font-semibold font-display">{m.title}</h4>
+                            <h4 className="font-semibold ">{m.title}</h4>
                             <p className="text-sm text-muted-foreground flex items-center gap-1.5">
                               <Calendar className="h-3.5 w-3.5" />
                               {format(new Date(m.scheduled_at), "EEEE dd MMMM yyyy 'à' HH:mm", { locale: fr })}

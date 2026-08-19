@@ -47,7 +47,7 @@ export default function PlansPage() {
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold">Plans</h1>
+          <h1 className="text-2xl font-semibold">Plans</h1>
           <p className="text-sm text-muted-foreground">
             Offres commerciales lues en base - un changement de tarif ne demande aucune mise en production.
           </p>
@@ -78,7 +78,7 @@ export default function PlansPage() {
             <TableBody>
               {plans.map((p) => (
                 <TableRow key={p.id} className="h-11">
-                  <TableCell className="font-mono text-xs">{p.code}</TableCell>
+                  <TableCell className="tabular-nums text-xs">{p.code}</TableCell>
                   <TableCell className="font-medium">
                     {p.name}
                     {usage[p.code] ? (

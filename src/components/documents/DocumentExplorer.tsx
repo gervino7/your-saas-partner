@@ -200,7 +200,7 @@ export default function DocumentExplorer({ missionId, projectId, activityId }: D
       <Dialog open={showUpload} onOpenChange={setShowUpload}>
         <DialogContent className="">
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
-            <DialogTitle className="text-white font-display">Uploader des documents</DialogTitle>
+            <DialogTitle className="text-white ">Uploader des documents</DialogTitle>
           </DialogHeader>
           <div className="">
             <UploadZone
@@ -218,7 +218,7 @@ export default function DocumentExplorer({ missionId, projectId, activityId }: D
         <Dialog open={!!previewDoc} onOpenChange={() => setActionDialog(null)}>
           <DialogContent className="max-w-3xl">
             <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
-              <DialogTitle className="text-white font-display flex items-center gap-2">
+              <DialogTitle className="text-white flex items-center gap-2">
                 {previewDoc.name}
                 <DocumentStatusBadge status={previewDoc.status} />
               </DialogTitle>

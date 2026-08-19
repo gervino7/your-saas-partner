@@ -34,7 +34,7 @@ const ClientDetailPage = () => {
           <ChevronLeft className="h-5 w-5" />
         </Button>
         <div>
-          <h1 className="text-2xl font-bold font-display">{client.name}</h1>
+          <h1 className="text-2xl font-semibold ">{client.name}</h1>
           <p className="text-muted-foreground">{client.industry ? `${client.industry} - ` : ''}{client.city || ''} {client.country || ''}</p>
         </div>
       </div>

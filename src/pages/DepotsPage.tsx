@@ -181,7 +181,7 @@ const DepotsPage = () => {
                           </TableCell>
                           <TableCell className="py-1">
                             <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="font-mono text-[11px]">{row.obligation_code}</Badge>
+                              <Badge variant="outline" className="tabular-nums text-[11px]">{row.obligation_code}</Badge>
                               <span className="text-[13px] text-muted-foreground">{row.obligation_label}</span>
                             </div>
                           </TableCell>

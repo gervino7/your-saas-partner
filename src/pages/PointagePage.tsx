@@ -26,7 +26,7 @@ export default function PointagePage() {
   return (
     <div className="p-6 space-y-6 max-w-5xl mx-auto">
       <div>
-        <h1 className="text-2xl font-semibold font-display">Pointage</h1>
+        <h1 className="text-2xl font-semibold ">Pointage</h1>
         <p className="text-sm text-muted-foreground">Déclarez vos arrivées, sorties et départ de la journée.</p>
       </div>
 

@@ -45,7 +45,7 @@ const CRMPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold font-display">CRM - Clients</h1>
+        <h1 className="text-2xl font-semibold ">CRM - Clients</h1>
         {gradeLevel <= 3 && (
           <Button onClick={() => setShowCreate(true)}>
             <Plus className="h-4 w-4 mr-2" /> Nouveau client

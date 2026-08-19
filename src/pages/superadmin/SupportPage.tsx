@@ -33,7 +33,7 @@ export default function SuperAdminSupportPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="font-display text-2xl font-bold">Support</h1>
+        <h1 className="text-2xl font-semibold">Support</h1>
         <p className="text-sm text-muted-foreground">Demandes des cabinets, triées par priorité puis par date</p>
       </div>
 
@@ -90,7 +90,7 @@ export default function SuperAdminSupportPage() {
                     className={cn('h-11 cursor-pointer', t.priority === 'urgente' && 'border-l-2 border-l-destructive')}
                     onClick={() => navigate(`/super-admin/support/${t.id}`)}
                   >
-                    <TableCell className="font-mono text-xs">{t.reference}</TableCell>
+                    <TableCell className="tabular-nums text-xs">{t.reference}</TableCell>
                     <TableCell className="text-sm">{t.organization_name ?? '-'}</TableCell>
                     <TableCell className="font-medium">{t.subject}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">

@@ -89,7 +89,7 @@ export default function CalendarGrid({ events, onDateClick, onEventClick, onCrea
           <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl border-border/50" onClick={() => navigate('prev')}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <h2 className="text-lg font-semibold font-display capitalize min-w-[200px] text-center text-foreground">
+          <h2 className="text-lg font-semibold capitalize min-w-[200px] text-center text-foreground">
             {title}
           </h2>
           <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl border-border/50" onClick={() => navigate('next')}>
@@ -216,7 +216,7 @@ export default function CalendarGrid({ events, onDateClick, onEventClick, onCrea
                     {format(day, 'EEE', { locale: fr })}
                   </div>
                   <div className={cn(
-                    'text-sm font-bold mt-1 h-8 w-8 mx-auto flex items-center justify-center rounded-full',
+                    'text-sm font-semibold mt-1 h-8 w-8 mx-auto flex items-center justify-center rounded-full',
                     today ? 'bg-primary text-primary-foreground shadow-sm' : 'text-foreground'
                   )}>
                     {format(day, 'd')}
@@ -330,7 +330,7 @@ export default function CalendarGrid({ events, onDateClick, onEventClick, onCrea
                 <div key={date.toISOString()} className="p-4">
                   <div className="flex items-center gap-2.5 mb-3">
                     <div className={cn(
-                      'h-9 w-9 rounded-xl flex items-center justify-center text-xs font-bold',
+                      'h-9 w-9 rounded-xl flex items-center justify-center text-xs font-semibold',
                       isToday(date) ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted/60 text-muted-foreground',
                     )}>
                       {format(date, 'd')}

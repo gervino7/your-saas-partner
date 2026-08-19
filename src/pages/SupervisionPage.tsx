@@ -72,7 +72,7 @@ export default function SupervisionPage() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold font-display" style={{ color: NAVY }}>
+        <h1 className="text-2xl font-semibold " style={{ color: NAVY }}>
           Supervision de l'activité
         </h1>
         <p className="text-sm text-muted-foreground">
@@ -192,7 +192,7 @@ function KpiCard({ icon, label, value, accent }: { icon: React.ReactNode; label:
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           {icon}<span>{label}</span>
         </div>
-        <div className="mt-2 text-2xl font-bold font-display" style={{ color: accent ?? NAVY }}>
+        <div className="mt-2 text-2xl font-semibold " style={{ color: accent ?? NAVY }}>
           {value}
         </div>
       </CardContent>

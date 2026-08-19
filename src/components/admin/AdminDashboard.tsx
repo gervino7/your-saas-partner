@@ -23,7 +23,7 @@ function KPICard({ icon: Icon, label, value, sub }: { icon: any; label: string; 
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-[10px] leading-tight text-muted-foreground truncate">{label}</p>
-            <p className="text-sm font-bold leading-tight truncate" title={value}>{value}</p>
+            <p className="text-sm font-semibold leading-tight truncate" title={value}>{value}</p>
             {sub && <p className="text-[9px] leading-tight text-muted-foreground truncate">{sub}</p>}
           </div>
         </div>

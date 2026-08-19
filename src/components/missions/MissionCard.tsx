@@ -23,8 +23,8 @@ export default function MissionCard({ mission }: MissionCardProps) {
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">
-              <p className="text-xs text-muted-foreground font-mono truncate">{mission.code}</p>
-              <h3 className="font-semibold font-display text-sm mt-1 truncate" title={mission.name}>{mission.name}</h3>
+              <p className="text-xs text-muted-foreground tabular-nums truncate">{mission.code}</p>
+              <h3 className="font-semibold text-sm mt-1 truncate" title={mission.name}>{mission.name}</h3>
             </div>
             <div className="flex-shrink-0">
               <MissionStatusBadge status={mission.status ?? 'draft'} />

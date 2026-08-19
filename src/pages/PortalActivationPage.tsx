@@ -129,7 +129,7 @@ export default function PortalActivationPage() {
           <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <ShieldCheck className="h-5 w-5" />
           </span>
-          <CardTitle className="font-display text-xl">{context.organization_name}</CardTitle>
+          <CardTitle className="text-xl">{context.organization_name}</CardTitle>
           <CardDescription>
             Espace client de <strong className="text-foreground">{context.client_name}</strong>
             <br />

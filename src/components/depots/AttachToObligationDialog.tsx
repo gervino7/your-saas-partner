@@ -62,7 +62,7 @@ const AttachToObligationDialog = ({ open, onOpenChange, upload }: Props) => {
                       {d.due_date ? ` - échéance ${format(new Date(d.due_date), 'dd/MM/yyyy')}` : ''}
                     </span>
                   </span>
-                  <Badge variant="outline" className="font-mono text-[11px]">{d.obligation_code}</Badge>
+                  <Badge variant="outline" className="tabular-nums text-[11px]">{d.obligation_code}</Badge>
                 </Label>
               ))}
             </RadioGroup>

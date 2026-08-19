@@ -317,7 +317,7 @@ const LoginPage = () => {
               <img src={logoImg} alt="Mission-DGC" className="h-8 w-8 rounded-lg object-contain" />
             </div>
             <div>
-              <span className="font-display font-bold text-lg tracking-tight">Mission-DGC</span>
+              <span className="font-semibold text-lg tracking-tight">Mission-DGC</span>
               <p className="text-[11px] text-white/40 -mt-0.5">by D&G CONSEIL</p>
             </div>
           </div>
@@ -329,7 +329,7 @@ const LoginPage = () => {
                 <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" />
                 Plateforme SaaS
               </div>
-              <h2 className="font-display text-[2.5rem] font-extrabold leading-[1.1] tracking-tight">
+              <h2 className="text-[2.5rem] font-semibold leading-[1.1] tracking-tight">
                 Gérez vos missions
                 <br />
                 <span style={{ color: 'hsl(22 78% 58%)' }}>avec excellence</span>
@@ -379,13 +379,13 @@ const LoginPage = () => {
             <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl shadow-lg mb-3" style={{ background: 'var(--gradient-primary)' }}>
               <img src={logoImg} alt="Mission-DGC" className="h-9 w-9 rounded-lg object-contain" />
             </div>
-            <h1 className="text-xl font-bold font-display">Mission-DGC</h1>
+            <h1 className="text-xl font-semibold ">Mission-DGC</h1>
             <p className="text-sm text-muted-foreground">Plateforme de gestion de missions</p>
           </div>
 
           {/* Desktop header */}
           <div className="hidden lg:block space-y-2">
-            <h1 className="text-[1.75rem] font-extrabold font-display tracking-tight text-foreground">
+            <h1 className="text-[1.75rem] font-semibold tracking-tight text-foreground">
               {isSignUp ? 'Créer un compte' : 'Bon retour !'}
             </h1>
             <p className="text-muted-foreground text-[15px]">
@@ -399,7 +399,7 @@ const LoginPage = () => {
 
           <Card className="shadow-elevated border-border/40 rounded-2xl overflow-hidden">
             <CardHeader className="lg:hidden pb-2">
-              <CardTitle className="font-display text-lg">{isSignUp ? 'Créer un compte' : 'Connexion'}</CardTitle>
+              <CardTitle className="text-lg">{isSignUp ? 'Créer un compte' : 'Connexion'}</CardTitle>
               <CardDescription>
                 {invitationToken
                   ? 'Complétez votre inscription'

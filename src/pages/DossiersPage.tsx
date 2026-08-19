@@ -51,7 +51,7 @@ const DossiersPage = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold font-display">Dossiers comptables</h1>
+        <h1 className="text-2xl font-semibold ">Dossiers comptables</h1>
         <p className="text-muted-foreground text-sm">Vue portefeuille - santé et prochaines échéances par client.</p>
       </div>
 

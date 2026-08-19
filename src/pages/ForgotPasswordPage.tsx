@@ -60,7 +60,7 @@ const ForgotPasswordPage = () => {
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl shadow-lg mb-1" style={{ background: 'var(--gradient-primary)' }}>
             <img src={logoImg} alt="Mission-DGC" className="h-9 w-9 rounded-lg object-contain" />
           </div>
-          <h1 className="text-2xl font-extrabold font-display tracking-tight text-foreground">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             Mot de passe oublié
           </h1>
           <p className="text-muted-foreground text-sm">

@@ -165,7 +165,7 @@ ${profile?.full_name ?? ''} - ${cabinet}`
 
             <div>
               <Label>Message</Label>
-              <Textarea className="mt-1 font-mono text-sm" rows={12} value={message} onChange={(e) => setMessage(e.target.value)} />
+              <Textarea className="mt-1 tabular-nums text-sm" rows={12} value={message} onChange={(e) => setMessage(e.target.value)} />
             </div>
 
             {missingDocs.length > 0 && (

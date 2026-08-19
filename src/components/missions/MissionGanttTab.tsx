@@ -330,7 +330,7 @@ export default function MissionGanttTab({ missionId }: MissionGanttTabProps) {
                   )}
                   <span className="text-xs truncate flex-1">{row.label}</span>
                   {row.code && (
-                    <span className="text-[10px] text-muted-foreground font-mono flex-shrink-0">
+                    <span className="text-[10px] text-muted-foreground tabular-nums flex-shrink-0">
                       {row.code}
                     </span>
                   )}

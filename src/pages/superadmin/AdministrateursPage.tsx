@@ -37,7 +37,7 @@ export default function AdministrateursPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="font-display text-2xl font-bold">Administrateurs plateforme</h1>
+        <h1 className="text-2xl font-semibold">Administrateurs plateforme</h1>
         <p className="text-sm text-muted-foreground">
           {isOwner ? 'Gérez les accès à cette console.' : 'Consultation seule - réservé au propriétaire.'}
         </p>

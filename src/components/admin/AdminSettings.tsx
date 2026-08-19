@@ -166,7 +166,7 @@ export default function AdminSettings() {
                 <img src={logoUrl} alt="Logo" className="h-20 w-20 rounded-lg border border-border object-contain bg-white p-1" />
               ) : (
                 <Avatar className="h-20 w-20 rounded-lg border">
-                  <AvatarFallback className="rounded-lg text-xl font-bold">{orgName?.charAt(0) || 'O'}</AvatarFallback>
+                  <AvatarFallback className="rounded-lg text-xl font-semibold">{orgName?.charAt(0) || 'O'}</AvatarFallback>
                 </Avatar>
               )}
               <div className="flex flex-col gap-1.5">
@@ -258,8 +258,8 @@ export default function AdminSettings() {
           </div>
           <div className="bg-muted/50 rounded-lg p-3 text-xs text-muted-foreground space-y-1">
             <p className="font-medium text-foreground">Aperçu :</p>
-            <p>Mission : <span className="font-mono text-foreground">{missionFormat.replace('{YYYY}', '2026').replace('{YY}', '26').replace('{NNNN}', '0001').replace('{NNN}', '001')}</span></p>
-            <p>Projet : <span className="font-mono text-foreground">{projectFormat.replace('{YYYY}', '2026').replace('{YY}', '26').replace('{NNNN}', '0001').replace('{NNN}', '001')}</span></p>
+            <p>Mission : <span className="tabular-nums text-foreground">{missionFormat.replace('{YYYY}', '2026').replace('{YY}', '26').replace('{NNNN}', '0001').replace('{NNN}', '001')}</span></p>
+            <p>Projet : <span className="tabular-nums text-foreground">{projectFormat.replace('{YYYY}', '2026').replace('{YY}', '26').replace('{NNNN}', '0001').replace('{NNN}', '001')}</span></p>
           </div>
         </SettingsSection>
       </TabsContent>
@@ -368,7 +368,7 @@ export default function AdminSettings() {
                         {plan.name}
                         {current && <Badge variant="secondary" className="text-[10px]">Actuel</Badge>}
                       </CardTitle>
-                      <p className="text-lg font-bold">{plan.price} <span className="text-xs font-normal text-muted-foreground">FCFA/mois</span></p>
+                      <p className="text-lg font-semibold">{plan.price} <span className="text-xs font-normal text-muted-foreground">FCFA/mois</span></p>
                     </CardHeader>
                     <CardContent className="space-y-2 text-sm">
                       <div className="flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-primary" />{plan.users} utilisateurs</div>

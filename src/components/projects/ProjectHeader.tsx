@@ -39,13 +39,13 @@ export default function ProjectHeader({ project }: ProjectHeaderProps) {
           {project.mission?.name ?? 'Mission'}
         </Link>
         <span>/</span>
-        <span className="font-mono text-xs">{project.code}</span>
+        <span className="tabular-nums text-xs">{project.code}</span>
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold font-display">{project.name}</h1>
+            <h1 className="text-2xl font-semibold ">{project.name}</h1>
             <Badge variant="outline" className={statusColors[project.status] ?? ''}>
               {statusLabels[project.status] ?? project.status}
             </Badge>

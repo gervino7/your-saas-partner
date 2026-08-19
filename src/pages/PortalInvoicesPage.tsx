@@ -43,7 +43,7 @@ export default function PortalInvoicesPage() {
   return (
     <PortalLayout>
       <div className="space-y-6">
-        <h1 className="font-display text-2xl font-bold">Mes factures</h1>
+        <h1 className="text-2xl font-semibold">Mes factures</h1>
 
         {isLoading && <Loading />}
 
@@ -55,7 +55,7 @@ export default function PortalInvoicesPage() {
                   <CardTitle className="text-sm text-muted-foreground">Total dû</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold">{formatFcfa(data?.summary?.total_due)}</p>
+                  <p className="text-2xl font-semibold">{formatFcfa(data?.summary?.total_due)}</p>
                 </CardContent>
               </Card>
               <Card className={cn(overdue > 0 && 'border-destructive')}>
@@ -63,7 +63,7 @@ export default function PortalInvoicesPage() {
                   <CardTitle className="text-sm text-muted-foreground">Factures en retard</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className={cn('text-2xl font-bold', overdue > 0 && 'text-destructive')}>
+                  <p className={cn('text-2xl font-semibold', overdue > 0 && 'text-destructive')}>
                     {overdue} facture{overdue > 1 ? 's' : ''} en retard
                   </p>
                 </CardContent>

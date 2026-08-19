@@ -111,7 +111,7 @@ function WeeklyStatsCards({ rows, dateStrs, entries }: { rows: TimesheetRow[]; d
             <div className="flex items-start justify-between">
               <div className="space-y-1">
                 <p className="text-xs font-medium text-muted-foreground">{stat.label}</p>
-                <p className={cn("text-xl font-bold font-display", stat.color)}>{stat.value}</p>
+                <p className={cn("text-xl font-semibold ", stat.color)}>{stat.value}</p>
                 <p className="text-[11px] text-muted-foreground/70">{stat.subtitle}</p>
               </div>
               <div className={cn("rounded-lg p-2", stat.bgColor)}>
@@ -315,7 +315,7 @@ function WeeklyView() {
                     );
                   })}
                   <TableHead className="w-20 text-center">
-                    <span className="font-bold text-primary">Total</span>
+                    <span className="font-semibold text-primary">Total</span>
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -350,7 +350,7 @@ function WeeklyView() {
                       </TableCell>
                       <TableCell className="text-center">
                         {row.is_billable ? (
-                          <Badge className="text-[10px] px-1.5 py-0 bg-primary/10 text-primary border-0 font-bold">F</Badge>
+                          <Badge className="text-[10px] px-1.5 py-0 bg-primary/10 text-primary border-0 font-semibold">F</Badge>
                         ) : (
                           <Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-medium">INT</Badge>
                         )}
@@ -384,7 +384,7 @@ function WeeklyView() {
                       })}
                       <TableCell className="text-center">
                         <span className={cn(
-                          "text-sm font-bold",
+                          "text-sm font-semibold",
                           rowTotal > 0 ? "text-foreground" : "text-muted-foreground/40"
                         )}>
                           {rowTotal > 0 ? `${rowTotal.toFixed(1)}h` : '-'}
@@ -397,12 +397,12 @@ function WeeklyView() {
               {rows.length > 0 && (
                 <TableFooter>
                   <TableRow className="bg-muted/30 border-t-2 border-border/40">
-                    <TableCell colSpan={2} className="font-bold text-xs uppercase tracking-wider text-muted-foreground">
+                    <TableCell colSpan={2} className="font-semibold text-xs uppercase tracking-wider text-muted-foreground">
                       Total journalier
                     </TableCell>
                     {dayTotals.map((t, i) => (
                       <TableCell key={i} className={cn(
-                        "text-center font-bold text-sm",
+                        "text-center font-semibold text-sm",
                         i < 5 && t >= 7 && t <= 9 && "text-emerald-600 dark:text-emerald-400",
                         i < 5 && t > 9 && "text-destructive",
                         i < 5 && t > 0 && t < 4 && "text-amber-600 dark:text-amber-400",
@@ -412,7 +412,7 @@ function WeeklyView() {
                       </TableCell>
                     ))}
                     <TableCell className="text-center">
-                      <span className="text-sm font-extrabold text-primary">{weekTotal.toFixed(1)}h</span>
+                      <span className="text-sm font-semibold text-primary">{weekTotal.toFixed(1)}h</span>
                     </TableCell>
                   </TableRow>
                 </TableFooter>
@@ -513,7 +513,7 @@ function MonthlyView() {
                       isToday && "ring-2 ring-primary/50"
                     )}>
                       <span className={cn("font-semibold", isToday && "text-primary")}>{day}</span>
-                      {hours !== undefined && <span className="text-[10px] font-bold mt-0.5">{hours}h</span>}
+                      {hours !== undefined && <span className="text-[10px] font-semibold mt-0.5">{hours}h</span>}
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>{hours ? `${hours}h saisies` : 'Non saisi'}</TooltipContent>
@@ -588,7 +588,7 @@ function TeamValidation() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary">
                       {user.full_name?.charAt(0) || '?'}
                     </div>
                     <div>
@@ -678,7 +678,7 @@ const TimesheetsPage = () => {
             <Clock className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-xl font-bold font-display">Feuilles de temps</h1>
+            <h1 className="text-xl font-semibold ">Feuilles de temps</h1>
             <p className="text-xs text-muted-foreground mt-0.5">Saisissez et soumettez vos heures de travail</p>
           </div>
         </div>

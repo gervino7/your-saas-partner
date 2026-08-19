@@ -89,7 +89,7 @@ export default function ClientMissionsTab({ clientId }: { clientId: string }) {
             <TableBody>
               {sortedMissions.map((m: any) => (
                 <TableRow key={m.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/missions/${m.id}`)}>
-                  <TableCell className="font-mono text-xs">{m.code}</TableCell>
+                  <TableCell className="tabular-nums text-xs">{m.code}</TableCell>
                   <TableCell className="font-medium">{m.name}</TableCell>
                   <TableCell><Badge variant={(statusColors[m.status] || 'secondary') as any}>{statusLabels[m.status] || m.status}</Badge></TableCell>
                   <TableCell>{(m.chief as any)?.full_name || '-'}</TableCell>

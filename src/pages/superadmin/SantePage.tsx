@@ -27,7 +27,7 @@ export default function SantePage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="font-display text-2xl font-bold">Santé de la plateforme</h1>
+        <h1 className="text-2xl font-semibold">Santé de la plateforme</h1>
         <p className="text-sm text-muted-foreground">
           {critical.length} dépassement(s) · {warning.length} organisation(s) à surveiller
         </p>

@@ -67,7 +67,7 @@ const SatisfactionSurveyPage = () => {
         <Card className="max-w-md">
           <CardContent className="pt-6 text-center">
             <CheckCircle2 className="h-12 w-12 text-success mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">Merci !</h2>
+            <h2 className="text-xl font-semibold mb-2">Merci !</h2>
             <p className="text-muted-foreground">Votre réponse a déjà été enregistrée.</p>
           </CardContent>
         </Card>
@@ -101,7 +101,7 @@ const SatisfactionSurveyPage = () => {
         <Card className="max-w-md">
           <CardContent className="pt-6 text-center">
             <CheckCircle2 className="h-12 w-12 text-success mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">Merci pour votre retour !</h2>
+            <h2 className="text-xl font-semibold mb-2">Merci pour votre retour !</h2>
             <p className="text-muted-foreground">Votre satisfaction est importante pour nous.</p>
           </CardContent>
         </Card>
@@ -113,7 +113,7 @@ const SatisfactionSurveyPage = () => {
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold font-display">Enquête de satisfaction</h1>
+          <h1 className="text-2xl font-semibold ">Enquête de satisfaction</h1>
           <p className="text-muted-foreground mt-2">
             Mission : <strong>{(survey.mission as any)?.name}</strong> - {(survey.client as any)?.name}
           </p>
@@ -152,7 +152,7 @@ const SatisfactionSurveyPage = () => {
             <div className="flex items-center gap-4">
               <span className="text-sm text-muted-foreground">0</span>
               <Slider value={[form.nps_score]} onValueChange={([v]) => setForm(f => ({ ...f, nps_score: v }))} min={0} max={10} step={1} className="flex-1" />
-              <span className="font-bold text-lg w-8 text-center">{form.nps_score}</span>
+              <span className="font-semibold text-lg w-8 text-center">{form.nps_score}</span>
               <span className="text-sm text-muted-foreground">10</span>
             </div>
           </CardContent>

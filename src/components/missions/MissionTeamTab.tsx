@@ -62,7 +62,7 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold font-display">Équipe ({members.length})</h3>
+        <h3 className="text-lg font-semibold ">Équipe ({members.length})</h3>
         {canManage && (<Button size="sm" onClick={() => setAddOpen(true)}><UserPlus className="h-4 w-4 mr-2" /> Ajouter un membre</Button>)}
       </div>
 

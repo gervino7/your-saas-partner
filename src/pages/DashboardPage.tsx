@@ -54,7 +54,7 @@ const DashboardPage = () => {
     <div className="space-y-8">
       {/* Greeting */}
       <div className="space-y-1">
-        <h1 className="text-2xl font-bold font-display tracking-tight">Bienvenue, {firstName}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Bienvenue, {firstName}</h1>
         {organization && (
           <p className="text-muted-foreground text-sm">
             <span className="font-medium text-foreground">{organization.name}</span>
@@ -85,7 +85,7 @@ const DashboardPage = () => {
                   {isLoading ? (
                     <Skeleton className="h-8 w-16" />
                   ) : (
-                    <p className="text-2xl font-bold font-display">{statValues[i]}</p>
+                    <p className="text-2xl font-semibold ">{statValues[i]}</p>
                   )}
                 </div>
                 <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${stat.bgClass}`}>
@@ -110,7 +110,7 @@ const DashboardPage = () => {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-warning/10">
               <AlertTriangle className="h-4 w-4 text-warning" />
             </div>
-            <CardTitle className="text-base font-display">Mes tâches urgentes</CardTitle>
+            <CardTitle className="text-base ">Mes tâches urgentes</CardTitle>
           </CardHeader>
           <CardContent>
             {urgentTasks.length === 0 ? (
@@ -149,7 +149,7 @@ const DashboardPage = () => {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/8">
               <CalendarClock className="h-4 w-4 text-primary" />
             </div>
-            <CardTitle className="text-base font-display">Prochaines réunions</CardTitle>
+            <CardTitle className="text-base ">Prochaines réunions</CardTitle>
           </CardHeader>
           <CardContent>
             {upcomingMeetings.length === 0 ? (
@@ -190,7 +190,7 @@ const DashboardPage = () => {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/8">
               <Activity className="h-4 w-4 text-accent" />
             </div>
-            <CardTitle className="text-base font-display">Activité récente</CardTitle>
+            <CardTitle className="text-base ">Activité récente</CardTitle>
           </CardHeader>
           <CardContent>
             {recentActivity.length === 0 ? (

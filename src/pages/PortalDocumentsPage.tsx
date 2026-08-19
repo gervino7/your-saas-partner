@@ -62,7 +62,7 @@ export default function PortalDocumentsPage() {
       <div className="space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="font-display text-2xl font-bold">Mes documents</h1>
+            <h1 className="text-2xl font-semibold">Mes documents</h1>
             <p className="text-sm text-muted-foreground">Documents échangés avec votre cabinet.</p>
           </div>
           <Button onClick={() => setOpen(true)}>

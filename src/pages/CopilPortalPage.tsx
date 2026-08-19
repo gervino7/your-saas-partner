@@ -103,7 +103,7 @@ const CopilPortalPage = () => {
               <img src={logoImg} alt="Logo" className="h-10 w-auto mx-auto drop-shadow-lg mb-3" />
               <div className="flex items-center justify-center gap-2">
                 <div className="h-px w-8" style={{ background: 'hsla(0,0%,100%,0.3)' }} />
-                <span className="text-xs font-bold uppercase tracking-[0.15em] text-white/70">Portail COPIL</span>
+                <span className="text-xs font-semibold uppercase tracking-[0.15em] text-white/70">Portail COPIL</span>
                 <div className="h-px w-8" style={{ background: 'hsla(0,0%,100%,0.3)' }} />
               </div>
             </div>
@@ -115,7 +115,7 @@ const CopilPortalPage = () => {
                   <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-md" style={{ background: goldGradient }}>
                     {step === 'email' ? <Lock className="h-6 w-6 text-white" /> : <Mail className="h-6 w-6 text-white" />}
                   </div>
-                  <h2 className="text-xl font-bold font-display" style={{ color: 'hsl(218,35%,15%)' }}>
+                  <h2 className="text-xl font-semibold " style={{ color: 'hsl(218,35%,15%)' }}>
                     {step === 'email' ? 'Accès sécurisé' : 'Vérification'}
                   </h2>
                   <p className="text-sm mt-1.5" style={{ color: 'hsl(218,10%,50%)' }}>
@@ -226,7 +226,7 @@ const CopilPortalPage = () => {
                 <Award className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-extrabold font-display text-white tracking-tight drop-shadow-sm">{committee?.name || 'COPIL'}</h1>
+                <h1 className="text-3xl font-semibold text-white tracking-tight drop-shadow-sm">{committee?.name || 'COPIL'}</h1>
                 <p className="text-sm" style={{ color: 'hsla(0,0%,100%,0.65)' }}>{mission?.name} - {mission?.code}</p>
               </div>
             </div>
@@ -246,7 +246,7 @@ const CopilPortalPage = () => {
                   style={{ background: 'hsl(40,30%,94%)', border: '1px solid hsl(40,25%,88%)' }}
                 >
                   <stat.icon className="h-4 w-4 mx-auto mb-1.5" style={{ color: 'hsl(35,80%,48%)' }} />
-                  <p className="text-2xl font-extrabold tabular-nums" style={{ color: 'hsl(218,35%,15%)' }}>{stat.value}</p>
+                  <p className="text-2xl font-semibold tabular-nums" style={{ color: 'hsl(218,35%,15%)' }}>{stat.value}</p>
                   <p className="text-[10px] font-semibold uppercase tracking-wider mt-0.5" style={{ color: 'hsl(218,10%,55%)' }}>{stat.label}</p>
                 </div>
               ))}
@@ -265,7 +265,7 @@ const CopilPortalPage = () => {
             <TabsTrigger value="meetings" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md gap-2">
               <CalendarDays className="h-4 w-4" /> Réunions ({meetings.length})
               {upcomingMeetings > 0 && (
-                <span className="ml-1 w-5 h-5 rounded-full bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center">{upcomingMeetings}</span>
+                <span className="ml-1 w-5 h-5 rounded-full bg-accent text-accent-foreground text-xs font-semibold flex items-center justify-center">{upcomingMeetings}</span>
               )}
             </TabsTrigger>
           </TabsList>
@@ -334,7 +334,7 @@ const CopilPortalPage = () => {
                       <CardContent className="p-5">
                         <div className="flex items-start justify-between">
                           <div className="space-y-1.5">
-                            <h4 className="font-semibold font-display">{m.title}</h4>
+                            <h4 className="font-semibold ">{m.title}</h4>
                             <p className="text-sm text-muted-foreground flex items-center gap-1.5">
                               <CalendarDays className="h-3.5 w-3.5" />
                               {format(new Date(m.scheduled_at), "EEEE dd MMMM yyyy 'à' HH:mm", { locale: fr })}

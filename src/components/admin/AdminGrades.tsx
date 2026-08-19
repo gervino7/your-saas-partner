@@ -174,9 +174,9 @@ export default function AdminGrades() {
                 {grades.map((g) => (
                   <TableRow key={g.id} className={!g.is_active ? 'text-muted-foreground' : ''}>
                     <TableCell>
-                      <Badge variant="outline" className="font-mono">{g.level}</Badge>
+                      <Badge variant="outline" className="tabular-nums">{g.level}</Badge>
                     </TableCell>
-                    <TableCell className="font-mono font-semibold">{g.code}</TableCell>
+                    <TableCell className="tabular-nums font-semibold">{g.code}</TableCell>
                     <TableCell>{g.label}</TableCell>
                     <TableCell className="text-muted-foreground">{formatRate(g.daily_rate, g.currency)}</TableCell>
                     <TableCell>
@@ -338,7 +338,7 @@ export default function AdminGrades() {
                               }}
                             >
                               <div className="flex items-center gap-2.5 min-w-0 pointer-events-none">
-                                <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0">{g.level}</span>
+                                <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 text-primary text-xs font-semibold shrink-0">{g.level}</span>
                                 <div className="min-w-0">
                                   <span className="font-semibold text-foreground">{g.code}</span>
                                   <span className="ml-1.5 text-muted-foreground truncate">{g.label}</span>
