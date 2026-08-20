@@ -178,6 +178,7 @@ export function useApproveTimeEntries() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['time-entries'] });
       qc.invalidateQueries({ queryKey: ['team-timesheets'] });
+      qc.invalidateQueries({ queryKey: ['team-timesheets-pending-count'] });
       toast.success('Mise à jour effectuée');
     },
     // Surface the database trigger's French messages as-is
