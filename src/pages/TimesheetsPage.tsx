@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { format, startOfWeek, addDays, addWeeks, subWeeks, startOfMonth, getDaysInMonth, getDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Clock, ChevronLeft, ChevronRight, Plus, Save, Send, CalendarDays, LayoutGrid, CheckCircle2, XCircle, Timer, TrendingUp, FileCheck, BarChart3 } from 'lucide-react';
+import { Clock, ChevronLeft, ChevronRight, Plus, Save, Send, CalendarDays, LayoutGrid, CheckCircle2, Timer, TrendingUp, FileCheck, BarChart3 } from 'lucide-react';
 import ExportMenu from '@/components/common/ExportMenu';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
