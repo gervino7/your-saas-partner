@@ -178,6 +178,7 @@ export function useApproveTimeEntries() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['time-entries'] });
       qc.invalidateQueries({ queryKey: ['team-timesheets'] });
+      qc.invalidateQueries({ queryKey: ['team-timesheets-pending-count'] });
       toast.success('Mise à jour effectuée');
     },
     // Surface the database trigger's French messages as-is
@@ -186,30 +187,52 @@ export function useApproveTimeEntries() {
 }
 
 
-export function useTeamTimesheets(weekStart: Date) {
+export function useTeamTimesheets(weekStart: Date, allWeeks = false) {
   const profile = useAuthStore((s) => s.profile);
   const weekStr = format(startOfWeek(weekStart, { weekStartsOn: 1 }), 'yyyy-MM-dd');
 
   return useQuery({
-    queryKey: ['team-timesheets', weekStr, profile?.organization_id],
+    queryKey: ['team-timesheets', profile?.id, allWeeks ? 'all' : weekStr],
     queryFn: async () => {
       if (!profile?.organization_id) return [];
-      const { data, error } = await supabase
+      let q = supabase
         .from('time_entries')
         .select(`
           *,
           user:profiles!time_entries_user_id_fkey(id, full_name, avatar_url, grade)
         `)
         .eq('organization_id', profile.organization_id)
-        .eq('week_start', weekStr)
         .eq('status', 'submitted')
-        .neq('user_id', profile.id)
+        .neq('user_id', profile.id);
+      if (!allWeeks) q = q.eq('week_start', weekStr);
+      const { data, error } = await q
+        .order('week_start', { ascending: true })
         .order('date');
       if (error) throw error;
       return data ?? [];
     },
     enabled: !!profile?.organization_id && (profile?.grade_level ?? 99) <= 3,
 
+  });
+}
+
+export function usePendingTimesheetsCount() {
+  const profile = useAuthStore((s) => s.profile);
+
+  return useQuery({
+    queryKey: ['team-timesheets-pending-count', profile?.id],
+    queryFn: async () => {
+      if (!profile?.organization_id) return 0;
+      const { count, error } = await supabase
+        .from('time_entries')
+        .select('id', { count: 'exact', head: true })
+        .eq('organization_id', profile.organization_id)
+        .eq('status', 'submitted')
+        .neq('user_id', profile.id);
+      if (error) throw error;
+      return count ?? 0;
+    },
+    enabled: !!profile?.organization_id && (profile?.grade_level ?? 99) <= 3,
   });
 }
 

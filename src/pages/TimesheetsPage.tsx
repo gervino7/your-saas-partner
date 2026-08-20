@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { format, startOfWeek, addDays, addWeeks, subWeeks, startOfMonth, getDaysInMonth, getDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Clock, ChevronLeft, ChevronRight, Plus, Save, Send, CalendarDays, LayoutGrid, CheckCircle2, XCircle, Timer, TrendingUp, FileCheck, BarChart3 } from 'lucide-react';
+import { Clock, ChevronLeft, ChevronRight, Plus, Save, Send, CalendarDays, LayoutGrid, CheckCircle2, Timer, TrendingUp, FileCheck, BarChart3 } from 'lucide-react';
 import ExportMenu from '@/components/common/ExportMenu';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,8 +15,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useAuthStore } from '@/stores/authStore';
-import { useTimeEntries, useMonthTimeEntries, useUpsertTimeEntry, useAddTimesheetRow, useSubmitTimesheet, useTeamTimesheets, useApproveTimeEntries } from '@/hooks/useTimesheets';
+import { useTimeEntries, useMonthTimeEntries, useUpsertTimeEntry, useAddTimesheetRow, useSubmitTimesheet, useTeamTimesheets, useApproveTimeEntries, usePendingTimesheetsCount } from '@/hooks/useTimesheets';
 import { useMissions } from '@/hooks/useMissions';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -537,26 +538,45 @@ function MonthlyView() {
 function TeamValidation() {
   const profile = useAuthStore((s) => s.profile);
   const [currentWeek, setCurrentWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
-  const { data: teamEntries = [] } = useTeamTimesheets(currentWeek);
+  const [allWeeks, setAllWeeks] = useState(false);
+  const { data: teamEntries = [] } = useTeamTimesheets(currentWeek, allWeeks);
   const approve = useApproveTimeEntries();
-  const [rejectTarget, setRejectTarget] = useState<{ ids: string[]; name: string } | null>(null);
-  const [rejectComment, setRejectComment] = useState('');
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [rejectDialog, setRejectDialog] = useState<{ ids: string[]; comment: string } | null>(null);
 
-  const byUser = useMemo(() => {
-    const map = new Map<string, { user: any; entries: any[]; totalHours: number }>();
+  const grouped = useMemo(() => {
+    const map = new Map<string, { user: any; week: string; items: any[]; totalHours: number }>();
     for (const e of teamEntries) {
       const uid = (e as any).user?.id;
       if (!uid) continue;
-      if (!map.has(uid)) map.set(uid, { user: (e as any).user, entries: [], totalHours: 0 });
-      const u = map.get(uid)!;
-      u.entries.push(e);
-      u.totalHours += Number(e.hours);
+      const key = allWeeks ? `${uid}|${e.week_start}` : uid;
+      if (!map.has(key)) {
+        map.set(key, {
+          user: (e as any).user,
+          week: e.week_start,
+          items: [],
+          totalHours: 0,
+        });
+      }
+      const group = map.get(key)!;
+      group.items.push(e);
+      group.totalHours += Number(e.hours);
     }
-    return Array.from(map.values());
-  }, [teamEntries]);
+    return Array.from(map.entries());
+  }, [teamEntries, allWeeks]);
+
+  const toggle = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const approveAll = (ids: string[]) => approve.mutate({ ids, action: 'approved' });
+  const openReject = (ids: string[]) => setRejectDialog({ ids, comment: '' });
 
   if ((profile?.grade_level ?? 99) > 3) return null;
-
 
   return (
     <div className="space-y-5">
@@ -566,93 +586,150 @@ function TeamValidation() {
         onNext={() => setCurrentWeek(addWeeks(currentWeek, 1))}
       />
 
-      {byUser.length === 0 ? (
-        <Card className="border-border/30">
-          <CardContent className="p-10 text-center">
-            <div className="flex flex-col items-center gap-2">
+      <Card className="border-border/30">
+        <CardHeader className="flex-row items-center justify-between gap-3 space-y-0">
+          <div>
+            <CardTitle className="text-base">Feuilles de temps à valider</CardTitle>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {allWeeks
+                ? 'Toutes les semaines en attente'
+                : `Semaine du ${format(currentWeek, 'dd/MM/yyyy')}`}
+            </p>
+          </div>
+          <div className="rounded-md border border-border p-0.5 flex shrink-0">
+            <button
+              onClick={() => setAllWeeks(false)}
+              className={`px-3 py-1 text-xs rounded ${!allWeeks ? 'bg-primary text-primary-foreground' : ''}`}
+            >
+              Semaine affichée
+            </button>
+            <button
+              onClick={() => setAllWeeks(true)}
+              className={`px-3 py-1 text-xs rounded ${allWeeks ? 'bg-primary text-primary-foreground' : ''}`}
+            >
+              Toutes les semaines
+            </button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {grouped.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 py-10">
               <div className="rounded-full bg-emerald-500/10 p-3">
                 <CheckCircle2 className="h-6 w-6 text-emerald-500" />
               </div>
-              <p className="text-sm font-medium">Tout est à jour</p>
-              <p className="text-xs text-muted-foreground">Aucune feuille de temps en attente de validation.</p>
+              <p className="text-sm font-medium">
+                {allWeeks
+                  ? 'Aucune feuille de temps soumise en attente de validation.'
+                  : `Aucune feuille de temps soumise pour cette semaine (semaine du ${format(currentWeek, 'dd/MM/yyyy')}).`}
+              </p>
+              {!allWeeks && (
+                <p className="text-xs text-muted-foreground">
+                  Activez « Toutes les semaines » pour voir les feuilles de temps des autres semaines.
+                </p>
+              )}
             </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-3">
-          <p className="text-xs font-medium text-muted-foreground">
-            {byUser.length} feuille{byUser.length > 1 ? 's' : ''} en attente de validation
-          </p>
-          {byUser.map(({ user, entries: userEntries, totalHours }) => (
-            <Card key={user.id} className="border-border/30">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary">
-                      {user.full_name?.charAt(0) || '?'}
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold">{user.full_name}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{user.grade}</Badge>
-                        <span className="text-xs text-muted-foreground">{totalHours.toFixed(1)}h total</span>
+          ) : (
+            <Accordion type="multiple">
+              {grouped.map(([key, group]) => {
+                const ids = group.items.map((i) => i.id);
+                return (
+                  <AccordionItem key={key} value={key}>
+                    <AccordionTrigger>
+                      <div className="flex flex-1 items-center justify-between pr-4">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{group.user.full_name}</span>
+                          <Badge variant="outline" className="text-[10px]">{group.user.grade}</Badge>
+                          {allWeeks && (
+                            <Badge variant="secondary" className="text-[10px] tabular-nums">
+                              Semaine du {format(new Date(group.week), 'dd/MM/yyyy')}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {group.items.length} entrées · {group.totalHours.toFixed(1)}h
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-destructive border-destructive/30 hover:bg-destructive/10"
-                      onClick={() => {
-                        setRejectComment('');
-                        setRejectTarget({ ids: userEntries.map((e: any) => e.id), name: user.full_name ?? '' });
-                      }}
-                    >
-                      <XCircle className="h-4 w-4 mr-1" /> Rejeter
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => approve.mutate({ ids: userEntries.map((e: any) => e.id), action: 'approved' })}
-                    >
-                      <CheckCircle2 className="h-4 w-4 mr-1" /> Approuver
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="flex gap-2 mb-3">
+                        <Button size="sm" onClick={() => approveAll(ids)} className="bg-success hover:bg-success/90">
+                          Tout approuver
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => openReject(ids)}>
+                          Renvoyer
+                        </Button>
+                        {selected.size > 0 && (
+                          <>
+                            <Button size="sm" variant="secondary" onClick={() => approveAll(Array.from(selected))}>
+                              Approuver sélection ({selected.size})
+                            </Button>
+                            <Button size="sm" variant="ghost" onClick={() => openReject(Array.from(selected))}>
+                              Renvoyer sélection
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-8"></TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Mission / Projet / Tâche</TableHead>
+                            <TableHead>Heures</TableHead>
+                            <TableHead>Description</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {group.items.map((it) => (
+                            <TableRow key={it.id}>
+                              <TableCell>
+                                <Checkbox checked={selected.has(it.id)} onCheckedChange={() => toggle(it.id)} />
+                              </TableCell>
+                              <TableCell>{format(new Date(it.date), 'EEE dd/MM', { locale: fr })}</TableCell>
+                              <TableCell className="text-xs text-muted-foreground">
+                                {[it.mission?.name, it.project?.name, it.task?.title].filter(Boolean).join(' / ') || '-'}
+                              </TableCell>
+                              <TableCell>{Number(it.hours).toFixed(1)}h</TableCell>
+                              <TableCell>{it.description ?? '-'}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
+          )}
+        </CardContent>
+      </Card>
 
-      <Dialog open={!!rejectTarget} onOpenChange={(o) => !o && setRejectTarget(null)}>
+      <Dialog open={!!rejectDialog} onOpenChange={(v) => !v && setRejectDialog(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Rejeter la feuille de temps</DialogTitle>
           </DialogHeader>
           <div className="space-y-2">
-            <p className="text-xs text-muted-foreground">{rejectTarget?.name}</p>
+            <p className="text-sm text-muted-foreground">Précisez ce qui doit être corrigé :</p>
             <Textarea
-              value={rejectComment}
-              onChange={(e) => setRejectComment(e.target.value)}
-              placeholder="Précisez ce qui doit être corrigé"
+              value={rejectDialog?.comment ?? ''}
+              onChange={(e) => setRejectDialog((r) => r ? { ...r, comment: e.target.value } : r)}
               rows={4}
             />
-            {rejectComment.trim().length > 0 && rejectComment.trim().length < 5 && (
-              <p className="text-xs text-destructive">Précisez ce qui doit être corrigé</p>
+            {rejectDialog?.comment && rejectDialog.comment.trim().length > 0 && rejectDialog.comment.trim().length < 5 && (
+              <p className="text-xs text-destructive">Précisez ce qui doit être corrigé (au moins 5 caractères).</p>
             )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRejectTarget(null)}>Annuler</Button>
+            <Button variant="outline" onClick={() => setRejectDialog(null)}>Annuler</Button>
             <Button
               variant="destructive"
-              disabled={rejectComment.trim().length < 5 || approve.isPending}
-              onClick={() => {
-                if (!rejectTarget) return;
-                approve.mutate(
-                  { ids: rejectTarget.ids, action: 'rejected', comment: rejectComment },
-                  { onSuccess: () => setRejectTarget(null) },
-                );
+              disabled={(rejectDialog?.comment?.trim()?.length ?? 0) < 5 || approve.isPending}
+              onClick={async () => {
+                if (!rejectDialog) return;
+                await approve.mutateAsync({ ids: rejectDialog.ids, action: 'rejected', comment: rejectDialog.comment.trim() });
+                setRejectDialog(null);
+                setSelected(new Set());
               }}
             >
               Rejeter
@@ -668,6 +745,7 @@ function TeamValidation() {
 const TimesheetsPage = () => {
   const profile = useAuthStore((s) => s.profile);
   const isSuperior = (profile?.grade_level ?? 99) <= 3;
+  const { data: pendingCount = 0 } = usePendingTimesheetsCount();
 
   return (
     <div className="space-y-6">
@@ -695,6 +773,11 @@ const TimesheetsPage = () => {
           {isSuperior && (
             <TabsTrigger value="validation" className="rounded-lg gap-1.5 data-[state=active]:bg-primary data-[state=active]:text-white">
               <CheckCircle2 className="h-3.5 w-3.5" /> Validation
+              {pendingCount > 0 && (
+                <Badge className="ml-1 h-4 min-w-4 px-1 text-[10px] bg-destructive text-destructive-foreground hover:bg-destructive">
+                  {pendingCount}
+                </Badge>
+              )}
             </TabsTrigger>
           )}
         </TabsList>
