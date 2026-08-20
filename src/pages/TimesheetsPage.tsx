@@ -745,6 +745,7 @@ function TeamValidation() {
 const TimesheetsPage = () => {
   const profile = useAuthStore((s) => s.profile);
   const isSuperior = (profile?.grade_level ?? 99) <= 3;
+  const { data: pendingCount = 0 } = usePendingTimesheetsCount();
 
   return (
     <div className="space-y-6">
@@ -772,6 +773,11 @@ const TimesheetsPage = () => {
           {isSuperior && (
             <TabsTrigger value="validation" className="rounded-lg gap-1.5 data-[state=active]:bg-primary data-[state=active]:text-white">
               <CheckCircle2 className="h-3.5 w-3.5" /> Validation
+              {pendingCount > 0 && (
+                <Badge className="ml-1 h-4 min-w-4 px-1 text-[10px] bg-destructive text-destructive-foreground hover:bg-destructive">
+                  {pendingCount}
+                </Badge>
+              )}
             </TabsTrigger>
           )}
         </TabsList>
