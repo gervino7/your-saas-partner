@@ -1,0 +1,11 @@
+import { useState } from 'react';
+import { useOrganizationUsers } from '@/hooks/useMissions';
+import { useAssignEvaluator } from '@/hooks/useEvaluations';
+import { Select,SelectContent,SelectItem,SelectTrigger,SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { EvaluationDialog } from './EvaluationUI';
+export default function AssignEvaluatorDialog({open,onOpenChange,missionId=null,userId='',exercice,type='mission'}:{open:boolean;onOpenChange:(b:boolean)=>void;missionId?:string|null;userId?:string;exercice?:number;type?:string}) {
+ const users=useOrganizationUsers();const save=useAssignEvaluator();const [target,setTarget]=useState(userId);const [evaluator,setEvaluator]=useState('');const [due,setDue]=useState('');const selected=users.data?.find(u=>u.id===(userId||target));
+ return <EvaluationDialog open={open} onOpenChange={onOpenChange} title="Désigner un évaluateur" pending={save.isPending} disabled={!(userId||target)||!evaluator||!due} onConfirm={()=>save.mutate({_mission_id:missionId,_evaluatee_id:userId||target,_evaluator_id:evaluator,_eval_type:type,_exercice:exercice??null,_due_date:due},{onSuccess:()=>onOpenChange(false)})}><Label>Collaborateur</Label><Select value={userId||target||undefined} disabled={!!userId} onValueChange={v=>{setTarget(v);setEvaluator('');}}><SelectTrigger><SelectValue placeholder="Choisir un collaborateur"/></SelectTrigger><SelectContent>{users.data?.map(u=><SelectItem key={u.id} value={u.id}>{u.full_name} - {u.grade}</SelectItem>)}</SelectContent></Select><Label>Évaluateur</Label><Select value={evaluator||undefined} onValueChange={setEvaluator}><SelectTrigger><SelectValue placeholder="Choisir un évaluateur"/></SelectTrigger><SelectContent>{users.data?.filter(u=>(u.grade_level??8)<(selected?.grade_level??0)).map(u=><SelectItem key={u.id} value={u.id}>{u.full_name} - {u.grade}</SelectItem>)}</SelectContent></Select><Label>Échéance</Label><Input aria-label="Échéance" type="date" value={due} onChange={e=>setDue(e.target.value)}/></EvaluationDialog>;
+}
