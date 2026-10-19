@@ -9,7 +9,7 @@ export type EvaluationData = Record<string, any>;
 export type EvaluationForm = { evaluation: EvaluationData; categories: Category[]; scale: {label: string; min: number; max: number}[]; exchanges: EvaluationData[] };
 export async function evaluationRpc<T = EvaluationData>(name: string, args: Record<string, unknown> = {}): Promise<T> {
   const invoke = supabase.rpc as unknown as (name: string, args: Record<string, unknown>) => Promise<{ data: T; error: { message: string } | null }>;
-  const { data, error } = await invoke(name, args);
+  const { data, error } = await invoke.call(supabase, name, args);
   if (error) throw new Error(error.message);
   return data;
 }

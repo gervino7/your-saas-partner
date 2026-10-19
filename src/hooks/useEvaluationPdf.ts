@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAuthStore } from '@/stores/authStore';
 type Args = { kind: 'evaluation'; evaluationId: string } | { kind: 'synthese'; userId: string; exercice: number };
 export function useEvaluationPdf() {
   const [loading,setLoading] = useState(false);
@@ -9,7 +10,7 @@ export function useEvaluationPdf() {
     if (busy.current) return;
     busy.current = true; setLoading(true);
     try {
-      const {data:{session}} = await supabase.auth.getSession();
+      const session = useAuthStore.getState().session;
       if(!session) throw new Error('Session expirée, reconnectez-vous.');
       const body = args.kind === 'evaluation' ? {kind:args.kind,evaluation_id:args.evaluationId} : {kind:args.kind,user_id:args.userId,exercice:args.exercice};
       const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/export-evaluation-pdf`, {method:'POST',headers:{Authorization:`Bearer ${session.access_token}`,'Content-Type':'application/json',apikey:import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY},body:JSON.stringify(body)});
