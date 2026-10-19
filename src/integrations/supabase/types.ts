@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.1"
   }
   public: {
     Tables: {
@@ -1659,6 +1659,925 @@ export type Database = {
           },
         ]
       }
+      evaluation_arbitrations: {
+        Row: {
+          decided_at: string | null
+          decided_by: string | null
+          decision: string | null
+          decision_comment: string | null
+          evaluation_id: string
+          id: string
+          reason: string
+          requested_at: string | null
+          requested_by: string | null
+          revised_score: number | null
+        }
+        Insert: {
+          decided_at?: string | null
+          decided_by?: string | null
+          decision?: string | null
+          decision_comment?: string | null
+          evaluation_id: string
+          id?: string
+          reason: string
+          requested_at?: string | null
+          requested_by?: string | null
+          revised_score?: number | null
+        }
+        Update: {
+          decided_at?: string | null
+          decided_by?: string | null
+          decision?: string | null
+          decision_comment?: string | null
+          evaluation_id?: string
+          id?: string
+          reason?: string
+          requested_at?: string | null
+          requested_by?: string | null
+          revised_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluation_arbitrations_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_arbitrations_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_arbitrations_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "evaluations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_arbitrations_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_arbitrations_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evaluation_assignments: {
+        Row: {
+          assigned_by: string | null
+          created_at: string | null
+          due_date: string | null
+          eval_type: Database["public"]["Enums"]["eval_type"]
+          evaluatee_id: string
+          evaluator_id: string
+          exercice: number | null
+          id: string
+          mission_id: string | null
+          organization_id: string | null
+          status: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          created_at?: string | null
+          due_date?: string | null
+          eval_type?: Database["public"]["Enums"]["eval_type"]
+          evaluatee_id: string
+          evaluator_id: string
+          exercice?: number | null
+          id?: string
+          mission_id?: string | null
+          organization_id?: string | null
+          status?: string
+        }
+        Update: {
+          assigned_by?: string | null
+          created_at?: string | null
+          due_date?: string | null
+          eval_type?: Database["public"]["Enums"]["eval_type"]
+          evaluatee_id?: string
+          evaluator_id?: string
+          exercice?: number | null
+          id?: string
+          mission_id?: string | null
+          organization_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluation_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_assignments_evaluatee_id_fkey"
+            columns: ["evaluatee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_assignments_evaluatee_id_fkey"
+            columns: ["evaluatee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_assignments_evaluator_id_fkey"
+            columns: ["evaluator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_assignments_evaluator_id_fkey"
+            columns: ["evaluator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_assignments_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_assignments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evaluation_categories: {
+        Row: {
+          code: string
+          id: string
+          label: string
+          sort_order: number
+          template_id: string
+          weight: number
+        }
+        Insert: {
+          code: string
+          id?: string
+          label: string
+          sort_order?: number
+          template_id: string
+          weight: number
+        }
+        Update: {
+          code?: string
+          id?: string
+          label?: string
+          sort_order?: number
+          template_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluation_categories_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "evaluation_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evaluation_exchanges: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string | null
+          evaluation_id: string
+          id: string
+          message: string | null
+          round: number
+          score_after: number | null
+          score_before: number | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string | null
+          evaluation_id: string
+          id?: string
+          message?: string | null
+          round: number
+          score_after?: number | null
+          score_before?: number | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string | null
+          evaluation_id?: string
+          id?: string
+          message?: string | null
+          round?: number
+          score_after?: number | null
+          score_before?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluation_exchanges_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_exchanges_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_exchanges_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "evaluations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evaluation_exports: {
+        Row: {
+          downloaded_at: string | null
+          downloaded_by: string | null
+          evaluation_id: string | null
+          exercice: number | null
+          file_size: number | null
+          id: string
+          kind: string
+          organization_id: string | null
+          storage_path: string | null
+          user_id: string | null
+        }
+        Insert: {
+          downloaded_at?: string | null
+          downloaded_by?: string | null
+          evaluation_id?: string | null
+          exercice?: number | null
+          file_size?: number | null
+          id?: string
+          kind: string
+          organization_id?: string | null
+          storage_path?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          downloaded_at?: string | null
+          downloaded_by?: string | null
+          evaluation_id?: string | null
+          exercice?: number | null
+          file_size?: number | null
+          id?: string
+          kind?: string
+          organization_id?: string | null
+          storage_path?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluation_exports_downloaded_by_fkey"
+            columns: ["downloaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_exports_downloaded_by_fkey"
+            columns: ["downloaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_exports_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "evaluations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_exports_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_exports_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_exports_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evaluation_feedback: {
+        Row: {
+          contributor_id: string
+          evaluation_id: string
+          id: string
+          improvements: string | null
+          mission_id: string | null
+          organization_id: string | null
+          overall: number | null
+          requested_at: string | null
+          requested_by: string
+          status: string
+          strengths: string | null
+          submitted_at: string | null
+        }
+        Insert: {
+          contributor_id: string
+          evaluation_id: string
+          id?: string
+          improvements?: string | null
+          mission_id?: string | null
+          organization_id?: string | null
+          overall?: number | null
+          requested_at?: string | null
+          requested_by: string
+          status?: string
+          strengths?: string | null
+          submitted_at?: string | null
+        }
+        Update: {
+          contributor_id?: string
+          evaluation_id?: string
+          id?: string
+          improvements?: string | null
+          mission_id?: string | null
+          organization_id?: string | null
+          overall?: number | null
+          requested_at?: string | null
+          requested_by?: string
+          status?: string
+          strengths?: string | null
+          submitted_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluation_feedback_contributor_id_fkey"
+            columns: ["contributor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_feedback_contributor_id_fkey"
+            columns: ["contributor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_feedback_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "evaluations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_feedback_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_feedback_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_feedback_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_feedback_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evaluation_grades: {
+        Row: {
+          echelon: string
+          family: string
+          id: string
+          is_active: boolean
+          maps_to_grade: string | null
+          organization_id: string | null
+          practice: Database["public"]["Enums"]["eval_practice"]
+          rank: number
+        }
+        Insert: {
+          echelon: string
+          family: string
+          id?: string
+          is_active?: boolean
+          maps_to_grade?: string | null
+          organization_id?: string | null
+          practice: Database["public"]["Enums"]["eval_practice"]
+          rank: number
+        }
+        Update: {
+          echelon?: string
+          family?: string
+          id?: string
+          is_active?: boolean
+          maps_to_grade?: string | null
+          organization_id?: string | null
+          practice?: Database["public"]["Enums"]["eval_practice"]
+          rank?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluation_grades_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evaluation_objectives: {
+        Row: {
+          achievable: string | null
+          achievement_comment: string | null
+          achievement_rate: number | null
+          created_at: string | null
+          deadline: string | null
+          evaluated_at: string | null
+          evaluator_id: string | null
+          exercice: number
+          id: string
+          measurable: string | null
+          organization_id: string | null
+          realistic: string | null
+          sort_order: number
+          specific: string | null
+          status: string
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          achievable?: string | null
+          achievement_comment?: string | null
+          achievement_rate?: number | null
+          created_at?: string | null
+          deadline?: string | null
+          evaluated_at?: string | null
+          evaluator_id?: string | null
+          exercice: number
+          id?: string
+          measurable?: string | null
+          organization_id?: string | null
+          realistic?: string | null
+          sort_order?: number
+          specific?: string | null
+          status?: string
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          achievable?: string | null
+          achievement_comment?: string | null
+          achievement_rate?: number | null
+          created_at?: string | null
+          deadline?: string | null
+          evaluated_at?: string | null
+          evaluator_id?: string | null
+          exercice?: number
+          id?: string
+          measurable?: string | null
+          organization_id?: string | null
+          realistic?: string | null
+          sort_order?: number
+          specific?: string | null
+          status?: string
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluation_objectives_evaluator_id_fkey"
+            columns: ["evaluator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_objectives_evaluator_id_fkey"
+            columns: ["evaluator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_objectives_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_objectives_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_objectives_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evaluation_scale: {
+        Row: {
+          code: string
+          color: string | null
+          hr_consequence: string | null
+          id: string
+          label: string
+          max_score: number
+          min_score: number
+          organization_id: string
+          sort_order: number
+        }
+        Insert: {
+          code: string
+          color?: string | null
+          hr_consequence?: string | null
+          id?: string
+          label: string
+          max_score: number
+          min_score: number
+          organization_id: string
+          sort_order: number
+        }
+        Update: {
+          code?: string
+          color?: string | null
+          hr_consequence?: string | null
+          id?: string
+          label?: string
+          max_score?: number
+          min_score?: number
+          organization_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluation_scale_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evaluation_scores: {
+        Row: {
+          comment: string | null
+          evaluation_id: string
+          id: string
+          score: number | null
+          subcriterion_id: string
+        }
+        Insert: {
+          comment?: string | null
+          evaluation_id: string
+          id?: string
+          score?: number | null
+          subcriterion_id: string
+        }
+        Update: {
+          comment?: string | null
+          evaluation_id?: string
+          id?: string
+          score?: number | null
+          subcriterion_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluation_scores_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "evaluations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_scores_subcriterion_id_fkey"
+            columns: ["subcriterion_id"]
+            isOneToOne: false
+            referencedRelation: "evaluation_subcriteria"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evaluation_subcriteria: {
+        Row: {
+          category_id: string
+          id: string
+          label: string
+          sort_order: number
+        }
+        Insert: {
+          category_id: string
+          id?: string
+          label: string
+          sort_order?: number
+        }
+        Update: {
+          category_id?: string
+          id?: string
+          label?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluation_subcriteria_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "evaluation_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evaluation_templates: {
+        Row: {
+          created_at: string | null
+          echelon: string
+          eval_type: Database["public"]["Enums"]["eval_type"]
+          id: string
+          is_active: boolean
+          label: string
+          organization_id: string | null
+          practice: Database["public"]["Enums"]["eval_practice"]
+          version: number
+        }
+        Insert: {
+          created_at?: string | null
+          echelon: string
+          eval_type: Database["public"]["Enums"]["eval_type"]
+          id?: string
+          is_active?: boolean
+          label: string
+          organization_id?: string | null
+          practice: Database["public"]["Enums"]["eval_practice"]
+          version?: number
+        }
+        Update: {
+          created_at?: string | null
+          echelon?: string
+          eval_type?: Database["public"]["Enums"]["eval_type"]
+          id?: string
+          is_active?: boolean
+          label?: string
+          organization_id?: string | null
+          practice?: Database["public"]["Enums"]["eval_practice"]
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluation_templates_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evaluations: {
+        Row: {
+          acknowledged_at: string | null
+          appreciation: string | null
+          appreciation_label: string | null
+          assignment_id: string | null
+          collaborator_comment: string | null
+          created_at: string | null
+          disagreement: boolean
+          disagreement_reason: string | null
+          echelon: string
+          eval_type: Database["public"]["Enums"]["eval_type"]
+          evaluatee_id: string
+          evaluator_comment: string | null
+          evaluator_id: string
+          exercice: number | null
+          has_objection: boolean
+          id: string
+          is_significant: boolean
+          mission_code: string | null
+          mission_id: string | null
+          observed_at: string | null
+          organization_id: string | null
+          period_end: string | null
+          period_start: string | null
+          practice: Database["public"]["Enums"]["eval_practice"]
+          round_count: number
+          sent_at: string | null
+          status: string
+          template_id: string
+          updated_at: string | null
+          validated_at: string | null
+          validated_by: string | null
+          weight_basis: number | null
+          weighted_score: number | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          appreciation?: string | null
+          appreciation_label?: string | null
+          assignment_id?: string | null
+          collaborator_comment?: string | null
+          created_at?: string | null
+          disagreement?: boolean
+          disagreement_reason?: string | null
+          echelon: string
+          eval_type: Database["public"]["Enums"]["eval_type"]
+          evaluatee_id: string
+          evaluator_comment?: string | null
+          evaluator_id: string
+          exercice?: number | null
+          has_objection?: boolean
+          id?: string
+          is_significant?: boolean
+          mission_code?: string | null
+          mission_id?: string | null
+          observed_at?: string | null
+          organization_id?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          practice: Database["public"]["Enums"]["eval_practice"]
+          round_count?: number
+          sent_at?: string | null
+          status?: string
+          template_id: string
+          updated_at?: string | null
+          validated_at?: string | null
+          validated_by?: string | null
+          weight_basis?: number | null
+          weighted_score?: number | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          appreciation?: string | null
+          appreciation_label?: string | null
+          assignment_id?: string | null
+          collaborator_comment?: string | null
+          created_at?: string | null
+          disagreement?: boolean
+          disagreement_reason?: string | null
+          echelon?: string
+          eval_type?: Database["public"]["Enums"]["eval_type"]
+          evaluatee_id?: string
+          evaluator_comment?: string | null
+          evaluator_id?: string
+          exercice?: number | null
+          has_objection?: boolean
+          id?: string
+          is_significant?: boolean
+          mission_code?: string | null
+          mission_id?: string | null
+          observed_at?: string | null
+          organization_id?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          practice?: Database["public"]["Enums"]["eval_practice"]
+          round_count?: number
+          sent_at?: string | null
+          status?: string
+          template_id?: string
+          updated_at?: string | null
+          validated_at?: string | null
+          validated_by?: string | null
+          weight_basis?: number | null
+          weighted_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluations_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "evaluation_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluations_evaluatee_id_fkey"
+            columns: ["evaluatee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluations_evaluatee_id_fkey"
+            columns: ["evaluatee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluations_evaluator_id_fkey"
+            columns: ["evaluator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluations_evaluator_id_fkey"
+            columns: ["evaluator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluations_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluations_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "evaluation_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluations_validated_by_fkey"
+            columns: ["validated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluations_validated_by_fkey"
+            columns: ["validated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       expenses: {
         Row: {
           amount: number
@@ -2974,6 +3893,11 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string | null
+          eval_history_cycles: number
+          eval_mission_aggregation: string
+          eval_weight_annuelle: number
+          eval_weight_missions: number
+          fiscal_year_start_month: number
           id: string
           internal_notes: string | null
           is_active: boolean
@@ -2997,6 +3921,11 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
+          eval_history_cycles?: number
+          eval_mission_aggregation?: string
+          eval_weight_annuelle?: number
+          eval_weight_missions?: number
+          fiscal_year_start_month?: number
           id?: string
           internal_notes?: string | null
           is_active?: boolean
@@ -3020,6 +3949,11 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
+          eval_history_cycles?: number
+          eval_mission_aggregation?: string
+          eval_weight_annuelle?: number
+          eval_weight_missions?: number
+          fiscal_year_start_month?: number
           id?: string
           internal_notes?: string | null
           is_active?: boolean
@@ -3814,16 +4748,20 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string | null
+          departure_date: string | null
           email: string
           full_name: string
           grade: string | null
+          grade_echelon: string | null
           grade_level: number | null
           id: string
+          is_active: boolean
           is_online: boolean | null
           last_login_at: string | null
           last_seen_at: string | null
           organization_id: string | null
           phone: string | null
+          practice: Database["public"]["Enums"]["eval_practice"] | null
           skills: Json | null
           updated_at: string | null
           weekly_capacity_hours: number | null
@@ -3831,16 +4769,20 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string | null
+          departure_date?: string | null
           email: string
           full_name: string
           grade?: string | null
+          grade_echelon?: string | null
           grade_level?: number | null
           id: string
+          is_active?: boolean
           is_online?: boolean | null
           last_login_at?: string | null
           last_seen_at?: string | null
           organization_id?: string | null
           phone?: string | null
+          practice?: Database["public"]["Enums"]["eval_practice"] | null
           skills?: Json | null
           updated_at?: string | null
           weekly_capacity_hours?: number | null
@@ -3848,16 +4790,20 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string | null
+          departure_date?: string | null
           email?: string
           full_name?: string
           grade?: string | null
+          grade_echelon?: string | null
           grade_level?: number | null
           id?: string
+          is_active?: boolean
           is_online?: boolean | null
           last_login_at?: string | null
           last_seen_at?: string | null
           organization_id?: string | null
           phone?: string | null
+          practice?: Database["public"]["Enums"]["eval_practice"] | null
           skills?: Json | null
           updated_at?: string | null
           weekly_capacity_hours?: number | null
@@ -5264,6 +6210,17 @@ export type Database = {
       }
     }
     Functions: {
+      assign_evaluator: {
+        Args: {
+          _due_date?: string
+          _eval_type?: Database["public"]["Enums"]["eval_type"]
+          _evaluatee_id: string
+          _evaluator_id: string
+          _exercice?: number
+          _mission_id: string
+        }
+        Returns: Json
+      }
       attach_free_upload_to_obligation: {
         Args: { _obligation_document_id: string; _portal_document_id: string }
         Returns: Json
@@ -5300,9 +6257,27 @@ export type Database = {
         }
         Returns: boolean
       }
+      can_read_category: { Args: { _category_id: string }; Returns: boolean }
+      can_read_evaluation: {
+        Args: { _evaluation_id: string }
+        Returns: boolean
+      }
+      can_read_template: { Args: { _template_id: string }; Returns: boolean }
+      can_score_evaluation: {
+        Args: { _evaluation_id: string }
+        Returns: boolean
+      }
       can_see_user_info: {
         Args: { target_id: string; viewer_id: string }
         Returns: boolean
+      }
+      check_template_weights: {
+        Args: { _template_id: string }
+        Returns: number
+      }
+      compute_evaluation_score: {
+        Args: { _evaluation_id: string }
+        Returns: Json
       }
       create_mission_with_members: {
         Args: {
@@ -5364,6 +6339,11 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string | null
+          eval_history_cycles: number
+          eval_mission_aggregation: string
+          eval_weight_annuelle: number
+          eval_weight_missions: number
+          fiscal_year_start_month: number
           id: string
           internal_notes: string | null
           is_active: boolean
@@ -5426,7 +6406,26 @@ export type Database = {
         }
       }
       current_portal_client: { Args: never; Returns: string }
+      decide_evaluation_arbitration: {
+        Args: {
+          _comment: string
+          _decision: string
+          _evaluation_id: string
+          _revised_score?: number
+        }
+        Returns: Json
+      }
+      evaluation_weight: {
+        Args: {
+          _mode: string
+          _period_end: string
+          _period_start: string
+          _weight_basis: number
+        }
+        Returns: number
+      }
       expire_portal_invitations: { Args: never; Returns: number }
+      fiscal_exercice: { Args: { _d: string; _org: string }; Returns: number }
       generate_obligation_periods: {
         Args: { _month?: number; _year: number }
         Returns: {
@@ -5477,6 +6476,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_annual_campaign: { Args: { _exercice?: number }; Returns: Json }
       get_client_dossiers: {
         Args: never
         Returns: {
@@ -5497,6 +6497,31 @@ export type Database = {
         Returns: Json
       }
       get_deposits_inbox: { Args: { _only_mine?: boolean }; Returns: Json }
+      get_evaluation_feedback: {
+        Args: { _evaluation_id: string }
+        Returns: Json
+      }
+      get_evaluation_form: { Args: { _evaluation_id: string }; Returns: Json }
+      get_evaluation_history: {
+        Args: { _cycles?: number; _user_id: string }
+        Returns: Json
+      }
+      get_evaluation_pdf_data: {
+        Args: { _evaluation_id: string }
+        Returns: Json
+      }
+      get_evaluation_registre: {
+        Args: {
+          _exercice?: number
+          _practice?: Database["public"]["Enums"]["eval_practice"]
+          _user_id?: string
+        }
+        Returns: Json
+      }
+      get_global_evaluation: {
+        Args: { _exercice: number; _user_id: string }
+        Returns: Json
+      }
       get_invitation_by_token: {
         Args: { _token: string }
         Returns: {
@@ -5511,6 +6536,11 @@ export type Database = {
         Args: { _mission_id: string; _user_id: string }
         Returns: Json
       }
+      get_mission_aggregate: {
+        Args: { _exercice: number; _user_id: string }
+        Returns: Json
+      }
+      get_my_evaluations: { Args: never; Returns: Json }
       get_obligations_echeancier: {
         Args: {
           _client_id?: string
@@ -5580,6 +6610,10 @@ export type Database = {
         }[]
       }
       get_rejection_context: { Args: { _document_id: string }; Returns: Json }
+      get_synthese_pdf_data: {
+        Args: { _exercice: number; _user_id: string }
+        Returns: Json
+      }
       get_user_conversation_ids: {
         Args: { _user_id: string }
         Returns: string[]
@@ -5623,6 +6657,17 @@ export type Database = {
       is_org_active: { Args: { _org_id: string }; Returns: boolean }
       is_platform_admin: { Args: { _min_role?: string }; Returns: boolean }
       is_portal_user: { Args: never; Returns: boolean }
+      log_evaluation_export: {
+        Args: {
+          _evaluation_id?: string
+          _exercice?: number
+          _file_size?: number
+          _kind: string
+          _storage_path?: string
+          _user_id?: string
+        }
+        Returns: undefined
+      }
       log_super_admin_action: {
         Args: {
           _action: string
@@ -5633,6 +6678,12 @@ export type Database = {
         }
         Returns: undefined
       }
+      open_annual_campaign: {
+        Args: { _due_date?: string; _exercice?: number }
+        Returns: Json
+      }
+      open_evaluation: { Args: { _assignment_id: string }; Returns: string }
+      open_mission_evaluations: { Args: { _mission_id: string }; Returns: Json }
       portal_accept_invitation: {
         Args: { _auth_user_id: string; _token: string }
         Returns: Json
@@ -5666,20 +6717,80 @@ export type Database = {
       }
       purge_old_activity_data: { Args: never; Returns: undefined }
       purge_old_attendance: { Args: never; Returns: undefined }
+      rate_evaluation_objective: {
+        Args: {
+          _achievement_rate: number
+          _comment?: string
+          _objective_id: string
+        }
+        Returns: undefined
+      }
       remove_mission_member: {
         Args: { _mission_id: string; _reason: string; _user_id: string }
+        Returns: Json
+      }
+      request_evaluation_arbitration: {
+        Args: { _evaluation_id: string; _reason: string }
+        Returns: Json
+      }
+      request_evaluation_feedback: {
+        Args: { _contributor_ids: string[]; _evaluation_id: string }
         Returns: Json
       }
       review_deposited_documents: {
         Args: { _action: string; _document_ids: string[]; _reason?: string }
         Returns: Json
       }
+      seed_evaluation_referentiel: { Args: { _org: string }; Returns: Json }
+      seed_evaluation_scale: { Args: { _org_id: string }; Returns: undefined }
       seed_obligation_documents: {
         Args: { _org_id: string }
         Returns: undefined
       }
       seed_obligation_types: { Args: { _org_id: string }; Returns: undefined }
       seed_platform_owner: { Args: { _email: string }; Returns: string }
+      send_evaluation: { Args: { _evaluation_id: string }; Returns: Json }
+      set_evaluation_objectives: {
+        Args: { _exercice: number; _objectives: Json; _user_id: string }
+        Returns: Json
+      }
+      set_evaluation_significance: {
+        Args: {
+          _evaluation_id: string
+          _is_significant: boolean
+          _weight_basis?: number
+        }
+        Returns: undefined
+      }
+      set_fiscal_year_start_month: {
+        Args: { _dry_run?: boolean; _month: number }
+        Returns: Json
+      }
+      signal_evaluation_disagreement: {
+        Args: { _evaluation_id: string; _reason: string }
+        Returns: Json
+      }
+      submit_evaluation_feedback: {
+        Args: {
+          _feedback_id: string
+          _improvements?: string
+          _overall: number
+          _strengths?: string
+        }
+        Returns: undefined
+      }
+      submit_evaluation_observations: {
+        Args: {
+          _comment: string
+          _evaluation_id: string
+          _has_objection?: boolean
+        }
+        Returns: Json
+      }
+      suggest_feedback_contributors: {
+        Args: { _evaluation_id: string }
+        Returns: Json
+      }
       super_admin_change_plan: {
         Args: {
           _max_storage_gb: number
@@ -5838,9 +6949,15 @@ export type Database = {
         }
         Returns: string
       }
+      validate_evaluation: {
+        Args: { _evaluation_id: string; _final_comment?: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "owner" | "admin" | "member"
+      eval_practice: "comptable" | "conseil" | "juridique"
+      eval_type: "mission" | "annuelle" | "fin_stage"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -5969,6 +7086,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["owner", "admin", "member"],
+      eval_practice: ["comptable", "conseil", "juridique"],
+      eval_type: ["mission", "annuelle", "fin_stage"],
     },
   },
 } as const
