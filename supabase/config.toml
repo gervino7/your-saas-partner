@@ -33,3 +33,6 @@ verify_jwt = false
 [functions.activate-portal-account]
 verify_jwt = false
 
+[functions.export-evaluation-pdf]
+verify_jwt = true
+

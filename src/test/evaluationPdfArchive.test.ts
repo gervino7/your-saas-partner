@@ -19,7 +19,7 @@ describe('Evaluation PDF confidentiality', () => {
     const bytes = new TextEncoder().encode('%PDF-confidential');
     const encrypted = await encryptArchive(bytes, 'test-only-key', 'internal');
     expect(encrypted).not.toEqual(bytes);
-    expect(await decryptArchive(encrypted, 'test-only-key', 'internal')).toEqual(bytes);
+    expect(Array.from(await decryptArchive(encrypted, 'test-only-key', 'internal'))).toEqual(Array.from(bytes));
     await expect(decryptArchive(encrypted, 'test-only-key', 'collaborator')).rejects.toThrow();
   });
 });

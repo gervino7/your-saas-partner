@@ -1,5 +1,7 @@
 # Evaluation PDF export
 
+- [x] Review second uploaded brief: identical requirements; preserve approved archive separation.
+
 - [ ] Add standalone export function and explicit JWT configuration.
 - [ ] Separate and encrypt archived audience variants, retaining RPC authorization.
 - [ ] Run confidentiality tests and verify deployed PDF generation.

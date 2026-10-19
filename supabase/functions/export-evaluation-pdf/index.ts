@@ -767,7 +767,7 @@ Deno.serve(async (req) => {
             _kind: 'evaluation', _evaluation_id: evaluationId,
             _exercice: exercice, _storage_path: archivePath, _file_size: buf.length,
           });
-          return new Response(buf, {
+          return new Response(new Uint8Array(buf).buffer, {
             headers: {
               ...ch,
               'Content-Type': 'application/pdf',
@@ -818,7 +818,7 @@ Deno.serve(async (req) => {
       _exercice: exercice, _storage_path: archivePath, _file_size: bytes.length,
     });
 
-    return new Response(bytes, {
+    return new Response(new Uint8Array(bytes).buffer, {
       headers: {
         ...ch,
         'Content-Type': 'application/pdf',
