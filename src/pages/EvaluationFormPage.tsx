@@ -32,14 +32,14 @@ export default function EvaluationFormPage() {
      if(mounted.current){setSaved(new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}));setSaveState(pending.current.size?'pending':'saved');}
    } catch(err){for(const row of batch)if(!pending.current.has(row.subcriterion_id))pending.current.set(row.subcriterion_id,row);if(mounted.current)setSaveState('error');toast.error(err instanceof Error?err.message:'Enregistrement impossible.');throw err;} })();
    running.current=job;try{await job;}finally{running.current=null;}
-   if(pending.current.size)await flush();else await qc.invalidateQueries({predicate:evaluationQuery});
+   if(pending.current.size)await flush();else {const fresh=await q.refetch();if(mounted.current&&fresh.data&&!pending.current.size){setCategories(fresh.data.categories);}await qc.invalidateQueries({predicate:evaluationQuery});}
  }
  useEffect(()=>{mounted.current=true;const before=(ev:BeforeUnloadEvent)=>{if(pending.current.size||running.current){ev.preventDefault();ev.returnValue='';}};window.addEventListener('beforeunload',before);return()=>{mounted.current=false;window.removeEventListener('beforeunload',before);if(timer.current)clearTimeout(timer.current);void flush().catch(()=>{});};},[id]);
  function change(subId:string,patch:{score?:number;comment?:string}) {
    if(!editable||!id)return;
    const sub=categories.flatMap(c=>c.subcriteria).find(s=>s.id===subId);if(!sub)return;
-   const next={...sub,...patch};setCategories(cs=>cs.map(c=>({...c,subcriteria:c.subcriteria.map(s=>s.id===subId?next:s)})));
-   pending.current.set(subId,{evaluation_id:id,subcriterion_id:subId,score:next.score,comment:next.comment});setSaveState('pending');if(timer.current)clearTimeout(timer.current);timer.current=setTimeout(()=>void flush().catch(()=>{}),600);
+   const next={...sub,...patch};setCategories(cs=>cs.map(c=>({...c,subcriteria:c.subcriteria.map(s=>s.id===subId?{...s,...patch}:s)})));
+   pending.current.set(subId,{evaluation_id:id,subcriterion_id:subId,score:patch.score??pending.current.get(subId)?.score??next.score,comment:patch.comment??pending.current.get(subId)?.comment??next.comment});setSaveState('pending');if(timer.current)clearTimeout(timer.current);timer.current=setTimeout(()=>void flush().catch(()=>{}),600);
  }
  const live=computeScore(categories);const score=saveState==='saved'&&e?.weighted_score!=null?Number(e.weighted_score):live.weightedScore;const appreciation=appreciationFor(score,q.data?.scale??[]);
  async function confirm() {if(!id)return;try{await flush();if(dialog==='send')await send.mutateAsync({_evaluation_id:id});if(dialog==='validate')await validate.mutateAsync({_evaluation_id:id,_final_comment:finalComment||null});if(dialog==='disagree')await disagree.mutateAsync({_evaluation_id:id,_reason:finalComment});if(dialog==='arbitrate')await arbitration.mutateAsync({_evaluation_id:id,_decision:decision,_comment:finalComment,_revised_score:revised?Number(revised):null});setDialog(null);setFinalComment('');toast.success('Évaluation mise à jour');}catch{/* hooks surface server errors */}}

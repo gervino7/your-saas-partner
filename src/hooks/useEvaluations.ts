@@ -48,13 +48,8 @@ export const useSetFiscalMonth = () => useAction('set_fiscal_year_start_month');
 export const useRequestFeedback = () => useAction('request_evaluation_feedback');
 export const useSubmitFeedback = () => useAction('submit_evaluation_feedback');
 export function usePendingEvaluationFeedback() {
-  const id = useAuthStore(s => s.profile?.id);
-  return useQuery({ queryKey: ['pending-evaluation-feedback', id], enabled: !!id, refetchInterval: 60000, queryFn: async () => {
-    if (!id) return [];
-    const {data, error} = await supabase.from('evaluation_feedback').select('*, evaluation:evaluations!evaluation_feedback_evaluation_id_fkey(evaluatee_id,mission_name:missions(name),evaluatee:profiles!evaluations_evaluatee_id_fkey(full_name)), requester:profiles!evaluation_feedback_requested_by_fkey(full_name)').eq('contributor_id',id).eq('status','sollicite');
-    if (error) throw new Error(error.message);
-    return (data ?? []) as EvaluationData[];
-  }});
+ const id=useAuthStore(s=>s.profile?.id);
+ return useQuery({queryKey:['pending-evaluation-feedback',id],enabled:!!id,refetchInterval:60000,queryFn:()=>evaluationRpc<EvaluationData[]>('get_pending_evaluation_feedback')});
 }
 export function useEvaluationSettings() {
   const orgId = useAuthStore(s => s.profile?.organization_id);
