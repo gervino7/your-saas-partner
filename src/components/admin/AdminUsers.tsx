@@ -143,7 +143,7 @@ export default function AdminUsers() {
                           <Avatar className="h-7 w-7"><AvatarImage src={u.avatar_url} /><AvatarFallback className="text-xs">{u.full_name?.charAt(0)?.toUpperCase()}</AvatarFallback></Avatar>
                           {u.is_online && (<span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-success" />)}
                         </div>
-                        <span className="text-sm font-medium">{u.full_name}</span>{(!u.practice||!u.grade_echelon)&&<AlertCircle className="h-4 w-4 text-warning" aria-label="Profil incomplet" title="Practice ou échelon non renseigné : ce collaborateur ne peut pas être évalué."/>}
+                        <span className="text-sm font-medium">{u.full_name}</span>{(!u.practice||!u.grade_echelon)&&<span title="Practice ou échelon non renseigné : ce collaborateur ne peut pas être évalué."><AlertCircle className="h-4 w-4 text-warning" aria-label="Profil incomplet"/></span>}
                       </div>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">{u.email}</TableCell>

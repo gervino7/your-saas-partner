@@ -100,4 +100,4 @@ export function canSignalDisagreement(round: number) { return round >= 2; }
 export function objectiveStatus(rate: number) { return rate >= 100 ? 'atteint' : rate >= 50 ? 'partiellement_atteint' : 'non_atteint'; }
 export function validateObjectives(rows: { title: string }[]) { return rows.length <= 5 && rows.every(r => r.title.trim().length > 0); }
 export function validatePdfSelection(ids: string[]) { return ids.length > 0 && new Set(ids).size <= 25; }
-export function csvCell(value: unknown) { const text = value == null ? '' : String(value); return '"' + (/^[=+@\-\t\r]/.test(text) ? "'" : '') + text.replaceAll('"', '""') + '"'; }
+export function csvCell(value: unknown) { const text = value == null ? '' : String(value); return '"' + (/^[=+@\-\t\r]/.test(text) ? "'" : '') + text.replace(/"/g, '""') + '"'; }

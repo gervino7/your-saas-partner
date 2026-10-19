@@ -88,7 +88,7 @@ export function useMissionMembers(missionId: string | undefined) {
         .from('mission_members')
         .select(`
           *,
-          user:profiles!mission_members_user_id_fkey(id, full_name, avatar_url, grade, grade_level, is_online, email)
+          user:profiles!mission_members_user_id_fkey(id, full_name, avatar_url, grade, grade_level, practice, grade_echelon, is_online, email)
         `)
         .eq('mission_id', missionId);
       if (error) throw error;
@@ -261,7 +261,7 @@ export function useOrganizationUsers() {
       if (!profile?.organization_id) return [];
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, full_name, avatar_url, grade, grade_level, email, is_online')
+        .select('id, full_name, phone, avatar_url, grade, grade_level, practice, grade_echelon, email, is_online')
         .eq('organization_id', profile.organization_id)
         .order('grade_level', { ascending: true });
       if (error) throw error;

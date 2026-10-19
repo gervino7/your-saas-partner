@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useSearchParams } from 'react-router-dom';
 import { Shield, BarChart3, Users, Briefcase, DollarSign, Star, Activity, Settings, Building2, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -113,7 +113,8 @@ const AdminPage = () => {
   const gradeLevel = profile?.grade_level ?? 8;
   const canAccess = gradeLevel <= 2;
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState('dashboard');
+  const [params]=useSearchParams();
+  const [activeSection, setActiveSection] = useState(params.get('incomplete')==='1'?'users':'dashboard');
   const [sheetOpen, setSheetOpen] = useState(false);
 
   if (!canAccess) {
@@ -156,7 +157,7 @@ const AdminPage = () => {
         return (
           <div className="space-y-4">
             <p className="text-muted-foreground">Suivi des notes et de la qualité des livrables par collaborateur.</p>
-            <Button onClick={() => navigate('/admin/reviews')}>Voir les évaluations</Button>
+            <Button onClick={() => navigate('/evaluations')}>Voir les évaluations</Button>
           </div>
         );
       case 'grades': return <AdminGrades />;
