@@ -8,6 +8,13 @@
       "when": 1792369629049,
       "tag": "0000_evaluation_ui_contracts",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792370155575,
+      "tag": "0001_evaluation_access_and_settings",
+      "breakpoints": true
     }
   ]
 }

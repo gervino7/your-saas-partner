@@ -6754,6 +6754,19 @@ export type Database = {
         Args: { _exercice: number; _objectives: Json; _user_id: string }
         Returns: Json
       }
+      set_evaluation_scale_thresholds: {
+        Args: { _thresholds: Json }
+        Returns: undefined
+      }
+      set_evaluation_settings: {
+        Args: {
+          _aggregation: string
+          _annuelle: number
+          _cycles: number
+          _missions: number
+        }
+        Returns: undefined
+      }
       set_evaluation_significance: {
         Args: {
           _evaluation_id: string
