@@ -1,3 +1,5 @@
+import { useNavigate,useSearchParams } from 'react-router-dom';
+import ProfileEvaluationFields from '@/components/evaluations/ProfileEvaluationFields';
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -9,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Search, UserPlus, Pencil, Trash2 } from 'lucide-react';
+import { Search, UserPlus, Pencil, Trash2, AlertCircle, LineChart } from 'lucide-react';
 import ExportMenu from '@/components/common/ExportMenu';
 import { useOrganizationUsers } from '@/hooks/useMissions';
 import { useUpdateUserProfile, useDeleteUser, useInviteUser } from '@/hooks/useAdmin';
@@ -26,9 +28,13 @@ interface EditingUser {
   full_name: string;
   phone: string;
   grade: Grade;
+  practice: string;
+  grade_echelon: string;
 }
 
 export default function AdminUsers() {
+  const navigate=useNavigate();
+  const [params]=useSearchParams();
   const { data: users = [], isLoading } = useOrganizationUsers();
   const updateUser = useUpdateUserProfile();
   const deleteUser = useDeleteUser();
@@ -47,6 +53,7 @@ export default function AdminUsers() {
   const filtered = users.filter((u: any) => {
     if (search && !u.full_name?.toLowerCase().includes(search.toLowerCase()) && !u.email?.toLowerCase().includes(search.toLowerCase())) return false;
     if (filterGrade !== 'all' && u.grade !== filterGrade) return false;
+    if (params.get('incomplete')==='1' && u.practice && u.grade_echelon) return false;
     if (filterStatus === 'online' && !u.is_online) return false;
     if (filterStatus === 'offline' && u.is_online) return false;
     return true;
@@ -60,6 +67,8 @@ export default function AdminUsers() {
       full_name: u.full_name || '',
       phone: u.phone || '',
       grade: (u.grade as Grade) || 'AUD',
+      practice: u.practice || '',
+      grade_echelon: u.grade_echelon || '',
     });
     setEditOpen(true);
   };
@@ -67,7 +76,7 @@ export default function AdminUsers() {
   const handleSaveEdit = () => {
     if (!editingUser) return;
     updateUser.mutate(
-      { userId: editingUser.id, full_name: editingUser.full_name, phone: editingUser.phone, grade: editingUser.grade, grade_level: GRADE_LEVELS[editingUser.grade] },
+      { userId: editingUser.id, full_name: editingUser.full_name, phone: editingUser.phone, grade: editingUser.grade, practice: editingUser.practice as 'comptable'|'conseil'|'juridique'||null, grade_echelon: editingUser.grade_echelon||null },
       { onSuccess: () => setEditOpen(false) }
     );
   };
@@ -134,14 +143,14 @@ export default function AdminUsers() {
                           <Avatar className="h-7 w-7"><AvatarImage src={u.avatar_url} /><AvatarFallback className="text-xs">{u.full_name?.charAt(0)?.toUpperCase()}</AvatarFallback></Avatar>
                           {u.is_online && (<span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-background bg-success" />)}
                         </div>
-                        <span className="text-sm font-medium">{u.full_name}</span>
+                        <span className="text-sm font-medium">{u.full_name}</span>{(!u.practice||!u.grade_echelon)&&<AlertCircle className="h-4 w-4 text-warning" aria-label="Profil incomplet" title="Practice ou échelon non renseigné : ce collaborateur ne peut pas être évalué."/>}
                       </div>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">{u.email}</TableCell>
                     <TableCell><Badge variant="outline" className="text-xs">{u.grade || '-'}</Badge></TableCell>
                     <TableCell><Badge variant={u.is_online ? 'default' : 'secondary'} className="text-[10px]">{u.is_online ? 'En ligne' : 'Hors ligne'}</Badge></TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1"><Button size="icon" variant="ghost" className="h-7 w-7" title="Synthèse" onClick={()=>navigate(`/evaluations/synthese/${u.id}`)}><LineChart className="h-4 w-4"/></Button>
                         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleOpenEdit(u)} title="Modifier">
                           <Pencil className="h-3.5 w-3.5" />
                         </Button>
@@ -180,6 +189,7 @@ export default function AdminUsers() {
                 <SelectContent>{GRADES.map((g) => <SelectItem key={g} value={g}>{g} - {GRADE_LABELS[g]}</SelectItem>)}</SelectContent>
               </Select>
             </div>
+            <ProfileEvaluationFields practice={editingUser?.practice??''} echelon={editingUser?.grade_echelon??''} onChange={(practice,grade_echelon)=>setEditingUser(prev=>prev?{...prev,practice,grade_echelon}:null)}/>
           </div>
           <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
             <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => setEditOpen(false)}>Annuler</Button>

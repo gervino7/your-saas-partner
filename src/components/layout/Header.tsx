@@ -35,6 +35,7 @@ const routeLabels: Record<string, string> = {
   admin: 'Administration',
   workspace: 'Bureau personnel',
   settings: 'Paramètres',
+  evaluations: 'Évaluations', campagne: 'Campagne annuelle', registre: 'Registre global', exports: 'Journal des exports', synthese: 'Synthèse', profile: 'Profil',
 };
 
 const typeIconMap: Record<string, React.ElementType> = {
@@ -229,8 +230,11 @@ const Header = () => {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate('/settings')}>
+            <DropdownMenuItem onClick={() => navigate('/profile')}>
               <User className="mr-2 h-4 w-4" /> Mon profil
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/evaluations/synthese')}>
+              <ClipboardList className="mr-2 h-4 w-4" /> Ma synthèse
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate('/settings')}>
               <Settings className="mr-2 h-4 w-4" /> Paramètres

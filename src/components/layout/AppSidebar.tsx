@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import logoImg from '@/assets/logo.png';
 import { useIsPlatformAdmin } from '@/hooks/useSuperAdmin';
+import { usePendingEvaluationFeedback } from '@/hooks/useEvaluations';
 import { usePendingDepositsCount } from '@/hooks/useDepositsInbox';
 
 
@@ -40,6 +41,7 @@ const AppSidebar = () => {
   const showAdmin = gradeLevel <= 2; // DA or DM
   const { isAdmin: isSuperAdmin } = useIsPlatformAdmin();
   const depotsCount = usePendingDepositsCount();
+  const evaluationFeedback = usePendingEvaluationFeedback();
 
 
   // Unread message count
@@ -87,7 +89,7 @@ const AppSidebar = () => {
       const { count } = await supabase
         .from('staffing_assignments')
         .select('id', { count: 'exact', head: true })
-        .eq('user_id', user!.id)
+        .eq('user_id', user?.id ?? '')
         .eq('status', 'proposed');
       return count ?? 0;
     },
@@ -243,6 +245,15 @@ const AppSidebar = () => {
 
 
 
+        <SidebarGroup>
+          <SidebarGroupLabel>Évaluations</SidebarGroupLabel>
+          <SidebarGroupContent><SidebarMenu>
+            {[
+              {label:'Mes évaluations',path:'/evaluations'},
+              ...(showAdmin ? [{label:'Campagne annuelle',path:'/evaluations/campagne'},{label:'Registre global',path:'/evaluations/registre'},{label:'Journal des exports',path:'/evaluations/exports'}] : [])
+            ].map(item => <SidebarMenuItem key={item.path}><SidebarMenuButton onClick={()=>navigate(item.path)} isActive={location.pathname===item.path} tooltip={item.label}><ClipboardCheck className="h-4 w-4"/><span>{item.label}</span>{item.path==='/evaluations' && !!evaluationFeedback.data?.length && <span className="h-2 w-2 rounded-full bg-accent" title={`${evaluationFeedback.data.length} avis sollicités`}/>}</SidebarMenuButton></SidebarMenuItem>)}
+          </SidebarMenu></SidebarGroupContent>
+        </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel>Espace de travail</SidebarGroupLabel>
           <SidebarGroupContent>
