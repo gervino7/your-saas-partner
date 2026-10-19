@@ -1,3 +1,4 @@
+import MissionEvaluations from '@/components/evaluations/MissionEvaluations';
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -104,6 +105,7 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
         </div>
       )}
 
+      <MissionEvaluations missionId={missionId} canOpen={viewerLevel<=2 || currentProfile?.id===(mission as any)?.lead_id || allMembers.some(m=>m.user_id===currentProfile?.id && ['chef','chef_de_mission','responsable','lead'].includes(m.role??''))}/>
       <RemoveMemberDialog
         open={!!removeTarget}
         onOpenChange={(v) => { if (!v) setRemoveTarget(null); }}

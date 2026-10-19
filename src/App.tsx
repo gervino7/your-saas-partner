@@ -25,7 +25,13 @@ import MessagesPage from '@/pages/MessagesPage';
 import CalendarPage from '@/pages/CalendarPage';
 import TimesheetsPage from '@/pages/TimesheetsPage';
 import AdminPage from '@/pages/AdminPage';
-import PerformanceReviewsPage from '@/pages/PerformanceReviewsPage';
+import EvaluationsPage from '@/pages/EvaluationsPage';
+import EvaluationFormPage from '@/pages/EvaluationFormPage';
+import EvaluationCampagnePage from '@/pages/EvaluationCampagnePage';
+import EvaluationGlobalePage from '@/pages/EvaluationGlobalePage';
+import EvaluationRegistrePage from '@/pages/EvaluationRegistrePage';
+import EvaluationExportsPage from '@/pages/EvaluationExportsPage';
+import CollaboratorProfilePage from '@/pages/CollaboratorProfilePage';
 import WorkspacePage from '@/pages/WorkspacePage';
 import SettingsPage from '@/pages/SettingsPage';
 import FinancePage from '@/pages/FinancePage';
@@ -305,7 +311,14 @@ const App = () => (
                 <Route path="/timesheets" element={<TimesheetsPage />} />
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/admin/finance" element={<FinancePage />} />
-                <Route path="/admin/reviews" element={<PerformanceReviewsPage />} />
+                <Route path="/admin/reviews" element={<EvaluationsPage />} />
+                <Route path="/evaluations" element={<EvaluationsPage />} />
+                <Route path="/evaluations/campagne" element={<EvaluationCampagnePage />} />
+                <Route path="/evaluations/registre" element={<EvaluationRegistrePage />} />
+                <Route path="/evaluations/exports" element={<EvaluationExportsPage />} />
+                <Route path="/evaluations/synthese/:userId?" element={<EvaluationGlobalePage />} />
+                <Route path="/evaluations/:id" element={<EvaluationFormPage />} />
+                <Route path="/profile/:userId?" element={<CollaboratorProfilePage />} />
                 <Route path="/admin/clients" element={<CRMPage />} />
                 <Route path="/admin/clients/:id" element={<ClientDetailPage />} />
                 <Route path="/workspace" element={<WorkspacePage />} />

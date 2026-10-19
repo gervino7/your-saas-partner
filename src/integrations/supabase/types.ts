@@ -6540,6 +6540,7 @@ export type Database = {
         Args: { _exercice: number; _user_id: string }
         Returns: Json
       }
+      get_mission_evaluations: { Args: { _mission_id: string }; Returns: Json }
       get_my_evaluations: { Args: never; Returns: Json }
       get_obligations_echeancier: {
         Args: {
@@ -6595,6 +6596,7 @@ export type Database = {
           weekly_hours: number
         }[]
       }
+      get_pending_evaluation_feedback: { Args: never; Returns: Json }
       get_period_documents: { Args: { _period_id: string }; Returns: Json }
       get_plan_execution: {
         Args: { _end_date?: string; _start_date?: string; _user_id?: string }
@@ -6753,6 +6755,19 @@ export type Database = {
       set_evaluation_objectives: {
         Args: { _exercice: number; _objectives: Json; _user_id: string }
         Returns: Json
+      }
+      set_evaluation_scale_thresholds: {
+        Args: { _thresholds: Json }
+        Returns: undefined
+      }
+      set_evaluation_settings: {
+        Args: {
+          _aggregation: string
+          _annuelle: number
+          _cycles: number
+          _missions: number
+        }
+        Returns: undefined
       }
       set_evaluation_significance: {
         Args: {

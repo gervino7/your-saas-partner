@@ -1,3 +1,4 @@
+import EvaluationSettings from '@/components/evaluations/EvaluationSettings';
 import AdminSettings from '@/components/admin/AdminSettings';
 import DataSaverSettings from '@/components/settings/DataSaverSettings';
 import AutomationSettings from '@/components/settings/AutomationSettings';
@@ -32,6 +33,7 @@ const SettingsPage = () => {
         <TabsList>
           <TabsTrigger value="general">Général</TabsTrigger>
           <TabsTrigger value="obligations">Obligations</TabsTrigger>
+          <TabsTrigger value="evaluation">Évaluation</TabsTrigger>
         </TabsList>
         <TabsContent value="general" className="space-y-6 mt-4">
           <SubscriptionSection />
@@ -42,6 +44,7 @@ const SettingsPage = () => {
         <TabsContent value="obligations" className="mt-4">
           <ObligationTypesSettings />
         </TabsContent>
+      <TabsContent value="evaluation" className="mt-4"><EvaluationSettings /></TabsContent>
       </Tabs>
     </div>
   );

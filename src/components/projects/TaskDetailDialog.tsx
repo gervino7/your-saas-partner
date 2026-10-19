@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import {
   FileText, History, Paperclip, Activity, Play, Send, Check, RotateCcw,
-  Star, Upload, Download, Clock, User, Pencil, Trash2,
+  Upload, Download, Clock, User, Pencil, Trash2,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -39,13 +39,6 @@ const priorityColors: Record<string, string> = {
   high: 'bg-warning/15 text-warning',
   urgent: 'bg-destructive/15 text-destructive',
 };
-
-const ratingConfig = [
-  { value: 1, label: 'Mauvais', color: 'bg-destructive text-destructive-foreground', desc: 'Travail insuffisant, erreurs majeures' },
-  { value: 2, label: 'À améliorer', color: 'bg-warning text-warning-foreground', desc: 'Travail partiel, corrections importantes' },
-  { value: 3, label: 'Satisfaisant', color: 'bg-success text-success-foreground', desc: 'Travail conforme aux attentes' },
-  { value: 4, label: 'Excellent', color: 'bg-info text-info-foreground', desc: 'Qualité remarquable' },
-];
 
 const submissionIcons: Record<string, any> = {
   submission: Send,
@@ -285,7 +278,6 @@ function SubmissionTimeline({ submissions, loading }: { submissions: any[]; load
       <div className="absolute left-4 top-0 bottom-0 w-px bg-border" />
       {submissions.map((sub) => {
         const Icon = submissionIcons[sub.type] ?? Send;
-        const ratingInfo = sub.rating ? ratingConfig.find(r => r.value === sub.rating) : null;
         const author = sub.type === 'validation' || sub.type === 'rejection' ? sub.reviewer : sub.submitter;
 
         return (
@@ -301,11 +293,6 @@ function SubmissionTimeline({ submissions, loading }: { submissions: any[]; load
                      sub.type === 'validation' ? 'Validation' :
                      sub.type === 'rejection' ? 'Rejet' : sub.type}
                   </Badge>
-                  {ratingInfo && (
-                    <Badge className={`text-[10px] ${ratingInfo.color}`}>
-                      <Star className="h-3 w-3 mr-0.5" /> {ratingInfo.value}/4 - {ratingInfo.label}
-                    </Badge>
-                  )}
                 </div>
                 <span className="text-[10px] text-muted-foreground">
                   {sub.created_at ? format(new Date(sub.created_at), 'd MMM yyyy HH:mm', { locale: fr }) : ''}
@@ -391,7 +378,7 @@ function TaskActivityLog({ submissions, task }: { submissions: any[]; task: any 
     ...submissions.map((s: any) => ({
       date: s.created_at,
       label: s.type === 'submission' ? 'Travail soumis' :
-             s.type === 'validation' ? `Validé (${s.rating}/4)` :
+             s.type === 'validation' ? 'Validé' :
              s.type === 'rejection' ? 'Renvoyé pour correction' : s.type,
       icon: submissionIcons[s.type] ?? Activity,
       user: s.submitter?.full_name ?? s.reviewer?.full_name,
@@ -502,7 +489,6 @@ function ValidateDialog({ taskId, open, onClose, onValidated }: {
   taskId: string; open: boolean; onClose: () => void; onValidated: () => void;
 }) {
   const [comment, setComment] = useState('');
-  const [rating, setRating] = useState<number>(3);
   const createSubmission = useCreateSubmission();
 
   const handleValidate = async () => {
@@ -510,10 +496,9 @@ function ValidateDialog({ taskId, open, onClose, onValidated }: {
       task_id: taskId,
       type: 'validation',
       comment: comment || undefined,
-      rating,
       status: 'approved',
     });
-    toast.success('Tâche validée et notée');
+    toast.success('Tâche validée');
     onValidated();
   };
 
@@ -521,32 +506,9 @@ function ValidateDialog({ taskId, open, onClose, onValidated }: {
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Valider et noter</DialogTitle>
+          <DialogTitle>Valider la tâche</DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
-          <div>
-            <Label>Évaluation</Label>
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              {ratingConfig.map((r) => (
-                <button
-                  key={r.value}
-                  type="button"
-                  onClick={() => setRating(r.value)}
-                  className={`p-3 rounded-lg border-2 text-left transition-all ${
-                    rating === r.value
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border hover:border-muted-foreground/30'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <Badge className={`${r.color} text-xs`}>{r.value}</Badge>
-                    <span className="text-sm font-medium">{r.label}</span>
-                  </div>
-                  <p className="text-[10px] text-muted-foreground mt-1">{r.desc}</p>
-                </button>
-              ))}
-            </div>
-          </div>
           <div>
             <Label>Commentaire</Label>
             <Textarea
@@ -560,7 +522,7 @@ function ValidateDialog({ taskId, open, onClose, onValidated }: {
         <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
           <Button variant="outline" size="sm" className="h-9 px-4" onClick={onClose}>Annuler</Button>
           <Button size="sm" className="h-9 px-5" onClick={handleValidate} disabled={createSubmission.isPending}>
-            {createSubmission.isPending ? 'Validation...' : 'Valider et noter'}
+            {createSubmission.isPending ? 'Validation...' : 'Valider la tâche'}
           </Button>
         </div>
       </DialogContent>
@@ -730,7 +692,6 @@ function InlineReviewPanel({ taskId, submission, onValidated, onRejected }: {
   taskId: string; submission: any; onValidated: () => void; onRejected: () => void;
 }) {
   const [comment, setComment] = useState('');
-  const [rating, setRating] = useState<number>(3);
   const createSubmission = useCreateSubmission();
 
   const att = submission.attachments
@@ -739,7 +700,7 @@ function InlineReviewPanel({ taskId, submission, onValidated, onRejected }: {
 
   const handleValidate = async () => {
     await createSubmission.mutateAsync({
-      task_id: taskId, type: 'validation', comment: comment || undefined, rating, status: 'approved',
+      task_id: taskId, type: 'validation', comment: comment || undefined, status: 'approved',
     });
     toast.success('Tâche validée');
     onValidated();
@@ -774,28 +735,6 @@ function InlineReviewPanel({ taskId, submission, onValidated, onRejected }: {
             ))}
           </div>
         )}
-      </div>
-      <div>
-        <Label className="text-xs">Évaluation</Label>
-        <div className="grid grid-cols-4 gap-1.5 mt-1">
-          {ratingConfig.map((r) => (
-            <button
-              key={r.value}
-              type="button"
-              onClick={() => setRating(r.value)}
-              className={`p-2 rounded-md border-2 text-center transition-all bg-white ${
-                rating === r.value ? 'border-primary' : 'border-border hover:border-muted-foreground/30'
-              }`}
-              title={r.desc}
-            >
-              <div className="flex items-center justify-center gap-1">
-                <Star className="h-3 w-3" fill="currentColor" />
-                <span className="text-sm font-semibold">{r.value}</span>
-              </div>
-              <p className="text-[10px] mt-0.5">{r.label}</p>
-            </button>
-          ))}
-        </div>
       </div>
       <Textarea
         placeholder="Commentaire de revue..."

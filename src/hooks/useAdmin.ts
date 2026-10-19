@@ -53,14 +53,6 @@ export function useAdminKPIs() {
         .gte('paid_at', monthStart.toISOString());
       const monthlyRevenue = (invoices ?? []).reduce((s, i) => s + Number(i.total_amount), 0);
 
-      // Quality: avg task rating from task_submissions
-      const { data: subs } = await supabase
-        .from('task_submissions')
-        .select('rating')
-        .not('rating', 'is', null);
-      const ratings = (subs ?? []).map((s) => s.rating).filter(Boolean) as number[];
-      const avgQuality = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
-
       // Client satisfaction
       const { data: surveys } = await supabase
         .from('client_surveys')
@@ -73,7 +65,7 @@ export function useAdminKPIs() {
 
       return {
         activeMissions, totalMissions, activeToday, totalUsers,
-        utilization, monthlyRevenue, avgQuality, avgSatisfaction,
+        utilization, monthlyRevenue, avgSatisfaction,
         billableHours, totalHours,
       };
     },
@@ -291,10 +283,10 @@ export function useUpdateUserGrade() {
 export function useUpdateUserProfile() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ userId, full_name, phone, grade, grade_level }: { userId: string; full_name: string; phone?: string; grade: string; grade_level: number }) => {
+    mutationFn: async ({ userId, full_name, phone, grade, practice, grade_echelon }: { userId: string; full_name: string; phone?: string; grade: string; practice?: 'comptable'|'conseil'|'juridique'|null; grade_echelon?: string|null }) => {
       const { error } = await supabase
         .from('profiles')
-        .update({ full_name, phone: phone || null, grade, grade_level })
+        .update({ full_name, phone: phone || null, grade, practice, grade_echelon })
         .eq('id', userId);
       if (error) throw error;
     },
