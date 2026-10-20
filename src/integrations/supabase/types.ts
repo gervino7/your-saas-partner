@@ -1746,6 +1746,7 @@ export type Database = {
           id: string
           mission_id: string | null
           organization_id: string | null
+          practice: Database["public"]["Enums"]["eval_practice"] | null
           status: string
         }
         Insert: {
@@ -1759,6 +1760,7 @@ export type Database = {
           id?: string
           mission_id?: string | null
           organization_id?: string | null
+          practice?: Database["public"]["Enums"]["eval_practice"] | null
           status?: string
         }
         Update: {
@@ -1772,6 +1774,7 @@ export type Database = {
           id?: string
           mission_id?: string | null
           organization_id?: string | null
+          practice?: Database["public"]["Enums"]["eval_practice"] | null
           status?: string
         }
         Relationships: [
@@ -3287,6 +3290,7 @@ export type Database = {
           id: string
           name: string
           organization_id: string | null
+          practice: Database["public"]["Enums"]["eval_practice"] | null
           priority: string | null
           progress: number | null
           settings: Json | null
@@ -3309,6 +3313,7 @@ export type Database = {
           id?: string
           name: string
           organization_id?: string | null
+          practice?: Database["public"]["Enums"]["eval_practice"] | null
           priority?: string | null
           progress?: number | null
           settings?: Json | null
@@ -3331,6 +3336,7 @@ export type Database = {
           id?: string
           name?: string
           organization_id?: string | null
+          practice?: Database["public"]["Enums"]["eval_practice"] | null
           priority?: string | null
           progress?: number | null
           settings?: Json | null
@@ -3893,8 +3899,12 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string | null
+          eval_default_practice:
+            | Database["public"]["Enums"]["eval_practice"]
+            | null
           eval_history_cycles: number
           eval_mission_aggregation: string
+          eval_mission_practice_source: string
           eval_weight_annuelle: number
           eval_weight_missions: number
           fiscal_year_start_month: number
@@ -3921,8 +3931,12 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
+          eval_default_practice?:
+            | Database["public"]["Enums"]["eval_practice"]
+            | null
           eval_history_cycles?: number
           eval_mission_aggregation?: string
+          eval_mission_practice_source?: string
           eval_weight_annuelle?: number
           eval_weight_missions?: number
           fiscal_year_start_month?: number
@@ -3949,8 +3963,12 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
+          eval_default_practice?:
+            | Database["public"]["Enums"]["eval_practice"]
+            | null
           eval_history_cycles?: number
           eval_mission_aggregation?: string
+          eval_mission_practice_source?: string
           eval_weight_annuelle?: number
           eval_weight_missions?: number
           fiscal_year_start_month?: number
@@ -6218,6 +6236,7 @@ export type Database = {
           _evaluator_id: string
           _exercice?: number
           _mission_id: string
+          _practice?: Database["public"]["Enums"]["eval_practice"]
         }
         Returns: Json
       }
@@ -6307,6 +6326,7 @@ export type Database = {
           id: string
           name: string
           organization_id: string | null
+          practice: Database["public"]["Enums"]["eval_practice"] | null
           priority: string | null
           progress: number | null
           settings: Json | null
@@ -6339,8 +6359,12 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string | null
+          eval_default_practice:
+            | Database["public"]["Enums"]["eval_practice"]
+            | null
           eval_history_cycles: number
           eval_mission_aggregation: string
+          eval_mission_practice_source: string
           eval_weight_annuelle: number
           eval_weight_missions: number
           fiscal_year_start_month: number
@@ -6738,6 +6762,22 @@ export type Database = {
       request_evaluation_feedback: {
         Args: { _contributor_ids: string[]; _evaluation_id: string }
         Returns: Json
+      }
+      resolve_echelon: {
+        Args: {
+          _practice: Database["public"]["Enums"]["eval_practice"]
+          _user_id: string
+        }
+        Returns: string
+      }
+      resolve_evaluation_practice: {
+        Args: {
+          _assignment_practice: Database["public"]["Enums"]["eval_practice"]
+          _eval_type: Database["public"]["Enums"]["eval_type"]
+          _mission_id: string
+          _user_id: string
+        }
+        Returns: Database["public"]["Enums"]["eval_practice"]
       }
       review_deposited_documents: {
         Args: { _action: string; _document_ids: string[]; _reason?: string }
