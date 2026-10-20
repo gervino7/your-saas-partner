@@ -1,3 +1,5 @@
+import { PRACTICES } from '@/lib/evaluation';
+import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -26,6 +28,7 @@ const missionSchema = z.object({
   start_date: z.string().optional(),
   end_date: z.string().optional(),
   priority: z.string().optional(),
+  practice: z.string().optional(),
 });
 
 type MissionFormValues = z.infer<typeof missionSchema>;
@@ -69,6 +72,7 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
       start_date: mission?.start_date ?? '',
       end_date: mission?.end_date ?? '',
       priority: mission?.priority ?? 'medium',
+      practice: mission?.practice ?? 'none',
     },
   });
 
@@ -81,14 +85,21 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
       });
       return;
     }
+    const { practice: rawPractice, ...rest } = values;
+    const practice = rawPractice && rawPractice !== 'none' ? rawPractice : null;
     const cleaned = Object.fromEntries(
-      Object.entries(values).filter(([, v]) => v !== '' && v !== undefined)
+      Object.entries(rest).filter(([, v]) => v !== '' && v !== undefined)
     );
 
     if (isEdit) {
-      await updateMission.mutateAsync({ id: mission.id, ...cleaned });
+      await updateMission.mutateAsync({ id: mission.id, ...cleaned, practice });
     } else {
-      await createMission.mutateAsync(cleaned as any);
+      const created: any = await createMission.mutateAsync(cleaned as any);
+      const newId = typeof created === 'string' ? created : created?.id ?? created?.mission_id;
+      if (practice && newId) {
+        const { error } = await supabase.from('missions').update({ practice: practice as 'comptable' | 'conseil' | 'juridique' }).eq('id', newId);
+        if (error) toast({ title: 'Practice non enregistrée', description: error.message, variant: 'destructive' });
+      }
     }
     onOpenChange(false);
     form.reset();
@@ -153,6 +164,20 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
                       </FormItem>
                     )} />
                   </div>
+
+                  <FormField control={form.control} name="practice" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Practice</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          <SelectItem value="none">Non précisée</SelectItem>
+                          {Object.entries(PRACTICES).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">Détermine la grille appliquée aux évaluations de fin de mission. Laissée vide, c'est la practice de rattachement de chaque collaborateur qui s'applique.</p>
+                    </FormItem>
+                  )} />
 
                   <FormField control={form.control} name="client_id" render={({ field }) => (
                     <FormItem>

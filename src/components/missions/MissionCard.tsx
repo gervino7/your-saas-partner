@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import MissionStatusBadge from './MissionStatusBadge';
 import PriorityBadge from './PriorityBadge';
+import PracticeChip from './PracticeChip';
 
 interface MissionCardProps {
   mission: any;
@@ -68,7 +69,8 @@ export default function MissionCard({ mission }: MissionCardProps) {
                 {mission.end_date ? format(new Date(mission.end_date), 'dd MMM yyyy', { locale: fr }) : '-'}
               </span>
             </div>
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 flex gap-1">
+              <PracticeChip practice={mission.practice} />
               <PriorityBadge priority={mission.priority} />
             </div>
           </div>
