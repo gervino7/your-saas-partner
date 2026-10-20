@@ -6796,6 +6796,13 @@ export type Database = {
         Args: { _exercice: number; _objectives: Json; _user_id: string }
         Returns: Json
       }
+      set_evaluation_practice_settings: {
+        Args: {
+          _default: Database["public"]["Enums"]["eval_practice"]
+          _source: string
+        }
+        Returns: undefined
+      }
       set_evaluation_scale_thresholds: {
         Args: { _thresholds: Json }
         Returns: undefined
