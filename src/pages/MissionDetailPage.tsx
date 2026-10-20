@@ -10,6 +10,7 @@ import { MISSION_STATUS_LABELS } from '@/types/database';
 import type { MissionStatus } from '@/types/database';
 import MissionStatusBadge from '@/components/missions/MissionStatusBadge';
 import PriorityBadge from '@/components/missions/PriorityBadge';
+import PracticeChip from '@/components/missions/PracticeChip';
 import MissionOverviewTab from '@/components/missions/MissionOverviewTab';
 import MissionProjectsTab from '@/components/missions/MissionProjectsTab';
 import MissionTeamTab from '@/components/missions/MissionTeamTab';
@@ -70,6 +71,7 @@ const MissionDetailPage = () => {
             <h1 className="text-2xl font-semibold truncate">{mission.name}</h1>
             <span className="text-sm tabular-nums text-muted-foreground">{mission.code}</span>
             <PriorityBadge priority={mission.priority} />
+            <PracticeChip practice={(mission as any).practice} />
           </div>
         </div>
         {canManage && (

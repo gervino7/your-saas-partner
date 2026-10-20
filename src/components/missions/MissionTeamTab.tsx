@@ -105,7 +105,7 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
         </div>
       )}
 
-      <MissionEvaluations missionId={missionId} canOpen={viewerLevel<=2 || currentProfile?.id===(mission as any)?.lead_id || allMembers.some(m=>m.user_id===currentProfile?.id && ['chef','chef_de_mission','responsable','lead'].includes(m.role??''))}/>
+      <MissionEvaluations missionId={missionId} practice={(mission as any)?.practice ?? null} mission={mission} canOpen={viewerLevel<=2 || currentProfile?.id===(mission as any)?.lead_id || allMembers.some(m=>m.user_id===currentProfile?.id && ['chef','chef_de_mission','responsable','lead'].includes(m.role??''))}/>
       <RemoveMemberDialog
         open={!!removeTarget}
         onOpenChange={(v) => { if (!v) setRemoveTarget(null); }}

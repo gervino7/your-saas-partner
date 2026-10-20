@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import MissionStatusBadge from './MissionStatusBadge';
 import PriorityBadge from './PriorityBadge';
+import PracticeChip from './PracticeChip';
 import { useTableSort } from '@/hooks/useTableSort';
 import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
@@ -43,6 +44,7 @@ export default function MissionsTable({ missions }: { missions: any[] }) {
                 <Link to={`/missions/${m.id}`} className="font-medium hover:text-primary">
                   {m.name}
                 </Link>
+                {m.practice && <span className="ml-2"><PracticeChip practice={m.practice} /></span>}
               </TableCell>
               <TableCell className="text-sm text-muted-foreground">{m.client?.name ?? '-'}</TableCell>
               <TableCell><MissionStatusBadge status={m.status ?? 'draft'} /></TableCell>
