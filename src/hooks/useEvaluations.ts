@@ -55,7 +55,7 @@ export function useEvaluationSettings() {
   const orgId = useAuthStore(s => s.profile?.organization_id);
   return useQuery({ queryKey: ['evaluation-settings', orgId], enabled: !!orgId, queryFn: async () => {
     if (!orgId) throw new Error('Cabinet introuvable.');
-    const [org, scale] = await Promise.all([supabase.from('organizations').select('fiscal_year_start_month,eval_weight_missions,eval_weight_annuelle,eval_mission_aggregation,eval_history_cycles').eq('id', orgId).single(), supabase.from('evaluation_scale').select('*').eq('organization_id',orgId).order('sort_order')]);
+    const [org, scale] = await Promise.all([supabase.from('organizations').select('fiscal_year_start_month,eval_weight_missions,eval_weight_annuelle,eval_mission_aggregation,eval_history_cycles,eval_mission_practice_source,eval_default_practice').eq('id', orgId).single(), supabase.from('evaluation_scale').select('*').eq('organization_id',orgId).order('sort_order')]);
     if (org.error) throw new Error(org.error.message); if (scale.error) throw new Error(scale.error.message);
     return { ...org.data, scale: scale.data ?? [] };
   }});
