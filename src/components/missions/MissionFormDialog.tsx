@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -118,7 +118,7 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit(onSubmit)} id="mission-form">
             <div className="space-y-3">
               {/* Section: Informations générales */}
               <div>
@@ -292,21 +292,23 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
               </div>
             </div>
 
-            <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
-              <Button type="button" variant="outline" size="sm" className="h-9 px-4" onClick={() => onOpenChange(false)}>
-                Annuler
-              </Button>
-              <Button
-                type="submit"
-                size="sm"
-                className="h-9 px-5"
-                disabled={createMission.isPending || updateMission.isPending}
-              >
-                {createMission.isPending || updateMission.isPending ? 'En cours...' : isEdit ? 'Mettre à jour' : 'Créer la mission'}
-              </Button>
-            </div>
           </form>
         </Form>
+
+        <DialogFooter>
+          <Button type="button" variant="outline" size="sm" className="h-9 px-4" onClick={() => onOpenChange(false)}>
+            Annuler
+          </Button>
+          <Button
+            type="submit"
+            form="mission-form"
+            size="sm"
+            className="h-9 px-5"
+            disabled={createMission.isPending || updateMission.isPending}
+          >
+            {createMission.isPending || updateMission.isPending ? 'En cours...' : isEdit ? 'Mettre à jour' : 'Créer la mission'}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
