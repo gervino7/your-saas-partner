@@ -110,7 +110,7 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-3xl" bodyClassName="pb-12">
         <DialogHeader>
           <DialogTitle>
             {isEdit ? 'Modifier la mission' : 'Nouvelle mission'}
