@@ -20,8 +20,8 @@ export function EvaluationGrid({ rows, score, editable, expanded, onToggleCommen
   return <section aria-label="Grille d’évaluation" className="space-y-3">
     <p className="text-xs text-muted-foreground">Note = moyenne des sous-critères · Score catégorie = note ÷ 5 · Contribution = score catégorie × pondération × 100.</p>
     <div className="max-h-[65vh] overflow-auto">
-      <table className="w-full min-w-[1050px] table-fixed border-separate border-spacing-0 text-sm">
-        <colgroup><col /><col className="w-[110px]" /><col className="w-[200px]" /><col className="w-[130px]" /><col className="w-[130px]" /><col className="w-[110px]" /></colgroup>
+      <table className="w-full min-w-[960px] table-fixed border-separate border-spacing-0 text-sm">
+        <colgroup><col /><col className="w-[100px]" /><col className="w-[190px]" /><col className="w-[120px]" /><col className="w-[110px]" /><col className="w-[100px]" /></colgroup>
         <thead className="sticky top-0 z-10 bg-background"><tr>
           {['CRITÈRES', 'PONDÉRATION', 'NOTE (1-5)', 'SCORE CATÉGORIE', 'CONTRIBUTION', 'COMMENTAIRES'].map((label, i) => <th key={label} className={`border-b border-border px-3 py-3 text-[10px] font-semibold text-muted-foreground ${i === 0 ? 'text-left' : 'text-right'}`}>{label}</th>)}
         </tr></thead>
