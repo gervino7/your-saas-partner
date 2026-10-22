@@ -1,5 +1,9 @@
 # Evaluation PDF export
 
+## Alignement Note / Contribution
+- [x] Placer les notes des sous-critères dans la colonne Note du PDF, sans modifier les calculs ou les archives.
+- [ ] Aligner la fiche d’évaluation sur les colonnes du PDF et vérifier les deux affichages.
+
 ## Module Évaluation V2.1
 - [x] Add live scoring, RPC hooks, profiles and mission integrations.
 - [x] Add evaluations, campaign, objectives, synthesis, register, confidential feedback and export journal.
