@@ -16,7 +16,7 @@ type Props = {
 
 export function EvaluationGrid({ rows, editable, expanded, onToggleComment, onChange }: Props) {
   return <Table className="min-w-[760px] table-fixed">
-    <colgroup><col /><col className="w-[100px]" /><col className="w-[190px]" /><col className="w-[100px]" /><col className="w-[110px]" /></colgroup>
+    <colgroup><col /><col className="w-[100px]" /><col className="w-[190px]" /><col className="w-[100px]" /><col className="w-[130px]" /></colgroup>
     <TableHeader><TableRow>
       <TableHead>Critères</TableHead><TableHead className="text-right">Pondération</TableHead>
       <TableHead className="text-center">Note (1-5)</TableHead><TableHead className="text-right">Score catégorie</TableHead>

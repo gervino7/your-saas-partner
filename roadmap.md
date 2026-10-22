@@ -2,7 +2,7 @@
 
 ## Alignement Note / Contribution
 - [x] Placer les notes des sous-critères dans la colonne Note du PDF, sans modifier les calculs ou les archives.
-- [ ] Aligner la fiche d’évaluation sur les colonnes du PDF et vérifier les deux affichages.
+- [x] Aligner la fiche d’évaluation sur les colonnes du PDF : fiche réelle vérifiée, PDF de contrôle rendu, 16 tests réussis et fonction déployée. Le téléchargement hébergé n’a pas abouti pendant le contrôle ; les archives existantes restent inchangées.
 
 ## Module Évaluation V2.1
 - [x] Add live scoring, RPC hooks, profiles and mission integrations.
