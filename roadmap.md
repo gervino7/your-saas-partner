@@ -1,5 +1,10 @@
 # Evaluation PDF export
 
+## Grille du cabinet - complément
+- [x] Ajouter les 6 colonnes, en-têtes fixes, décimales, totaux et masquer les moyennes partielles.
+- [x] Afficher les 2 blocs de commentaires attribués et l’échelle issue du cabinet.
+- [x] Mettre à jour le PDF, redéployer et vérifier : fiche réelle, PDF de contrôle rendu, PDF hébergé 200 et 18 tests réussis. Archives précédentes conservées.
+
 ## Alignement Note / Contribution
 - [x] Placer les notes des sous-critères dans la colonne Note du PDF, sans modifier les calculs ou les archives.
 - [x] Aligner la fiche d’évaluation sur les colonnes du PDF : fiche réelle vérifiée, PDF de contrôle rendu, 16 tests réussis et fonction déployée. Le téléchargement hébergé n’a pas abouti pendant le contrôle ; les archives existantes restent inchangées.

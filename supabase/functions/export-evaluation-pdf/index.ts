@@ -298,6 +298,8 @@ function scoreHero(L: Layout, score: number | null, appreciation: string, scale:
 function categoryBlock(L: Layout, c: any, idx: number) {
   const weight = Number(c.ponderation) * 100;
   const note = c.note === null || c.note === undefined ? null : Number(c.note);
+  const subs: any[] = c.sous_criteres ?? [];
+  const complete = subs.length > 0 && subs.every(s => s.note !== null && s.note !== undefined);
   const contrib = note === null ? 0 : (note / 5) * weight;
 
   // L'en-tête de catégorie ne doit jamais rester seul en bas de page :
@@ -307,7 +309,7 @@ function categoryBlock(L: Layout, c: any, idx: number) {
   // serrerait la lecture.
   // 200 pt : tous les libellés tiennent sur une ligne sauf le plus long,
   // tout en laissant respirer la colonne de pondération.
-  const labelMax = 200;
+  const labelMax = 170;
   const labelLines = L.wrap(c.libelle, labelMax, 9.5, true).slice(0, 2);
   const bandH = labelLines.length > 1 ? 38 : 27;
 
@@ -318,18 +320,18 @@ function categoryBlock(L: Layout, c: any, idx: number) {
   L.txt(c.code, M + 12, top - 11, 10, true, NAVY);
   labelLines.forEach((ln, i) => L.txt(ln, M + 28, top - 11 - i * 11, 9.5, true, INK));
 
-  L.txtR(`${num(weight, weight % 1 === 0 ? 0 : 1)} %`, M + W - 215, top - 11, 8.5, true, MUTED);
-  L.txtR(note === null ? '—' : num(note, 1), M + W - 150, top - 11, 9.5, true, INK);
+  L.txtR(`${num(weight, weight % 1 === 0 ? 0 : 1)} %`, M + W - 245, top - 11, 8.5, true, MUTED);
+  L.txtR(!complete || note === null ? '—' : num(note, 1), M + W - 190, top - 11, 9.5, true, complete ? INK : MUTED);
   // Score de la catégorie, exprimé en pourcentage : note ÷ 5
-  L.txtR(note === null ? '—' : `${num(note / 5 * 100, 0)} %`, M + W - 78, top - 11, 9.5, true, INK);
-  L.txtR(num(contrib), M + W - 10, top - 11, 9.5, true, NAVY);
+  L.txtR(!complete || note === null ? '—' : `${num(note / 5 * 100, 0)} %`, M + W - 110, top - 11, 9.5, true, complete ? INK : MUTED);
+  L.txtR(num(contrib), M + W - 55, top - 11, 9.5, true, NAVY);
 
   L.y = top - bandH - 11;
 
-  const subs: any[] = c.sous_criteres ?? [];
   subs.forEach((s, i) => {
     const lines = L.wrap(s.libelle, labelMax, 8.5);
-    const rowH = lines.length * 10.5 + 3;
+    const comments = s.commentaire ? L.wrap(s.commentaire, 46, 7) : [];
+    const rowH = Math.max(lines.length, comments.length) * 10.5 + 3;
     L.need(rowH + 4);
     if (i % 2 === 1) {
       L.page.drawRectangle({ x: M, y: L.y - rowH + 11, width: W, height: rowH, color: ZEBRA });
@@ -340,15 +342,12 @@ function categoryBlock(L: Layout, c: any, idx: number) {
     // Les notes des sous-critères partagent l'alignement de la colonne Note.
     const v = s.note;
     if (v !== null && v !== undefined) {
-      L.txtR(num(v, 0), M + W - 150, L.y, 8.5, true, NAVY);
+      L.txtR(num(v, 0), M + W - 190, L.y, 8.5, true, NAVY);
     } else {
-      L.txtR('—', M + W - 150, L.y, 8.5, false, MUTED);
+      L.txtR('—', M + W - 190, L.y, 8.5, false, MUTED);
     }
+    comments.forEach((ln, k) => L.txt(ln, M + W - 46, L.y - k * 10.5, 7, false, MUTED));
     L.y -= rowH;
-    if (s.commentaire) {
-      L.para(s.commentaire, { size: 7.8, x: M + 36, width: labelMax - 8, color: MUTED, lead: 10 });
-      L.gap(2);
-    }
   });
   L.gap(3);
 }
@@ -471,10 +470,11 @@ async function buildEvaluation(d: any): Promise<Uint8Array> {
   // En-têtes de colonnes de la grille
   L.need(16);
   L.txt('CRITÈRES', M + 12, L.y, 6.5, true, MUTED);
-  L.txtR('PONDÉRATION', M + W - 215, L.y, 6.5, true, MUTED);
-  L.txtR('NOTE (1-5)', M + W - 150, L.y, 6.5, true, MUTED);
-  L.txtR('SCORE CATÉGORIE', M + W - 78, L.y, 6.5, true, MUTED);
-  L.txtR('CONTRIBUTION', M + W - 10, L.y, 6.5, true, MUTED);
+  L.txtR('PONDÉRATION', M + W - 245, L.y, 6, true, MUTED);
+  L.txtR('NOTE (1-5)', M + W - 190, L.y, 6, true, MUTED);
+  L.txtR('SCORE CATÉGORIE', M + W - 110, L.y, 6, true, MUTED);
+  L.txtR('CONTRIBUTION', M + W - 55, L.y, 6, true, MUTED);
+  L.txtR('COMMENTAIRES', M + W + 2, L.y, 6, true, MUTED);
   L.y -= 6;
   L.rule(L.y); L.y -= 10;
 
@@ -485,21 +485,18 @@ async function buildEvaluation(d: any): Promise<Uint8Array> {
   L.need(26);
   L.rule(L.y + 8, NAVY, 0.8);
   const totalW = cats.reduce((a, c) => a + Number(c.ponderation) * 100, 0);
-  L.txt('ÉVALUATION GLOBALE PONDÉRÉE', M + 12, L.y - 6, 8.5, true, NAVY);
-  L.txtR(`${num(totalW, 0)} %`, M + W - 215, L.y - 6, 8.5, true, MUTED);
-  L.txtR(num(ev.score), M + W - 10, L.y - 6, 10, true, NAVY);
+  L.txt('ÉVALUATION GLOBALE PONDÉRÉE', M + 12, L.y - 6, 8, true, NAVY);
+  L.txtR(`${num(totalW, 0)} %`, M + W - 245, L.y - 6, 8.5, true, MUTED);
+  L.txtR(num(ev.score), M + W - 55, L.y - 6, 10, true, NAVY);
   L.y -= 26;
 
   // ── Commentaires ──
-  if (ev.commentaire_evaluateur) {
-    L.section('Axes de développement');
-    quote(L, `${d.evaluateur?.nom ?? 'Évaluateur'} — évaluateur`, ev.commentaire_evaluateur, NAVY);
-  }
+  L.section('Commentaires / suggestions de l’évaluateur');
+  quote(L, `${d.evaluateur?.nom ?? 'Évaluateur'} - évaluateur`, ev.commentaire_evaluateur || 'Aucun commentaire de l’évaluateur.', NAVY);
 
+  L.section('Commentaires / suggestions du collaborateur');
+  quote(L, `${who} - collaborateur`, ev.observations_collaborateur || 'Aucun commentaire du collaborateur.', NAVY);
   if (ev.observations_collaborateur) {
-    L.section('Observations du collaborateur');
-    quote(L, `${who} — collaborateur`, ev.observations_collaborateur,
-          ev.objection ? COPPER : NAVY);
     if (ev.objection) {
       L.gap(6);
       L.txt('Le collaborateur a émis une objection sur sa notation.', M, L.y, 8.5, true, COPPER);
