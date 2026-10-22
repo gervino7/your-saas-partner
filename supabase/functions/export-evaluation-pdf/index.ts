@@ -328,7 +328,7 @@ function categoryBlock(L: Layout, c: any, idx: number) {
 
   const subs: any[] = c.sous_criteres ?? [];
   subs.forEach((s, i) => {
-    const lines = L.wrap(s.libelle, W - 110, 8.5);
+    const lines = L.wrap(s.libelle, labelMax, 8.5);
     const rowH = lines.length * 10.5 + 3;
     L.need(rowH + 4);
     if (i % 2 === 1) {
@@ -337,18 +337,16 @@ function categoryBlock(L: Layout, c: any, idx: number) {
     lines.forEach((ln, k) => {
       L.txt(ln, M + 28, L.y - k * 10.5, 8.5, false, INK_2);
     });
-    // Note du sous-critère, en pastille
+    // Les notes des sous-critères partagent l'alignement de la colonne Note.
     const v = s.note;
     if (v !== null && v !== undefined) {
-      const cx = M + W - 22;
-      L.page.drawCircle({ x: cx, y: L.y + 3, size: 8, color: NAVY_L });
-      L.txt(String(v), cx - L.w(String(v), 8.5, true) / 2, L.y, 8.5, true, NAVY);
+      L.txtR(num(v, 0), M + W - 150, L.y, 8.5, true, NAVY);
     } else {
-      L.txtR('—', M + W - 16, L.y, 8.5, false, MUTED);
+      L.txtR('—', M + W - 150, L.y, 8.5, false, MUTED);
     }
     L.y -= rowH;
     if (s.commentaire) {
-      L.para(s.commentaire, { size: 7.8, x: M + 36, width: W - 120, color: MUTED, lead: 10 });
+      L.para(s.commentaire, { size: 7.8, x: M + 36, width: labelMax - 8, color: MUTED, lead: 10 });
       L.gap(2);
     }
   });
