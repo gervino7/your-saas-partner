@@ -94,6 +94,14 @@ export function currentExercice(startMonth: number, d = new Date()) {
 
 export const numberFR = (value: number | string | null | undefined, digits = 2) => value == null ? '-' : Number(value).toLocaleString('fr-FR', { maximumFractionDigits: digits });
 export const dateFR = (value: string | null | undefined) => value ? new Date(value).toLocaleDateString('fr-FR') : '-';
+export function categoryDisplay(row: { complete: boolean; note: number | null; contribution: number }) {
+  const decimal = (n: number, digits: number) => n.toLocaleString('fr-FR', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  return {
+    note: row.complete && row.note != null ? decimal(row.note, 1) : '-',
+    categoryScore: row.complete && row.note != null ? `${decimal(row.note / 5 * 100, 0)} %` : '-',
+    contribution: decimal(row.contribution, 2),
+  };
+}
 export function canEditEvaluation(e: { is_evaluator: boolean; is_evaluatee?: boolean; status: string }) { return e.is_evaluator && !e.is_evaluatee && ['brouillon', 'observations_recues', 'revisee'].includes(e.status); }
 export function objectionValid(comment: string) { return comment.trim().length >= 10; }
 export function canSignalDisagreement(round: number) { return round >= 2; }
