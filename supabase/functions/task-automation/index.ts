@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
             priority: "high",
           }));
           if (notifications.length) {
-            await supabase.from("notifications").insert(notifications);
+            { const fresh = await filterNew(notifications); if (fresh.length) await supabase.from("notifications").insert(fresh); }
           }
         }
       }
@@ -101,7 +101,7 @@ Deno.serve(async (req) => {
             priority: "urgent",
           }));
           if (notifications.length) {
-            await supabase.from("notifications").insert(notifications);
+            { const fresh = await filterNew(notifications); if (fresh.length) await supabase.from("notifications").insert(fresh); }
           }
         }
       }
