@@ -6244,6 +6244,8 @@ export type Database = {
         Args: { _obligation_document_id: string; _portal_document_id: string }
         Returns: Json
       }
+      caller_organization_id: { Args: never; Returns: string }
+      caller_sees_user: { Args: { _user_id: string }; Returns: boolean }
       can_access_committee: {
         Args: { _committee_id: string }
         Returns: boolean
