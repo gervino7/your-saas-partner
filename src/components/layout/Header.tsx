@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Search, Bell, ChevronRight, LogOut, User, Settings,
@@ -53,8 +53,33 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, organization } = useAuthStore();
-  const { notifications, unreadCount, markAsRead, markAllAsRead, getNavigationPath } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, getNavigationPath } = useNotifications(50);
   const [copiedUrl, setCopiedUrl] = useState(false);
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const [scrollbar, setScrollbar] = useState({ visible: false, top: 0, height: 100 });
+
+  const updateScrollbar = () => {
+    const el = listRef.current;
+    if (!el) return;
+    const { scrollHeight, clientHeight, scrollTop } = el;
+    if (scrollHeight <= clientHeight + 4) {
+      setScrollbar((s) => (s.visible ? { ...s, visible: false } : s));
+      return;
+    }
+    const height = Math.max(12, (clientHeight / scrollHeight) * 100);
+    const top = (scrollTop / (scrollHeight - clientHeight)) * (100 - height);
+    setScrollbar({ visible: true, top, height });
+  };
+
+  const setListRef = (node: HTMLDivElement | null) => {
+    listRef.current = node;
+    if (node) requestAnimationFrame(updateScrollbar);
+  };
+
+  useEffect(() => {
+    updateScrollbar();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [notifications]);
 
   const segments = location.pathname.split('/').filter(Boolean);
   const breadcrumbs = segments.length === 0
@@ -153,8 +178,8 @@ const Header = () => {
               )}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
-            <DropdownMenuLabel className="flex items-center justify-between">
+          <DropdownMenuContent align="end" className="flex w-96 max-w-[calc(100vw-2rem)] flex-col overflow-hidden p-0">
+            <DropdownMenuLabel className="flex shrink-0 items-center justify-between border-b border-border px-3 py-2.5">
               <span>Notifications</span>
               {unreadCount > 0 && (
                 <button
@@ -165,7 +190,12 @@ const Header = () => {
                 </button>
               )}
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
+            <div className="relative flex-1 overflow-hidden">
+              <div
+                ref={setListRef}
+                onScroll={updateScrollbar}
+                className="no-bar max-h-[min(60vh,420px)] overflow-y-auto overscroll-contain px-1 py-1"
+              >
             {notifications.length === 0 ? (
               <div className="py-6 text-center text-sm text-muted-foreground">
                 Aucune notification
@@ -201,14 +231,23 @@ const Header = () => {
                   </DropdownMenuItem>
                 );
               })
-            )}
+              )}
+              </div>
+              {scrollbar.visible && (
+                <div className="pointer-events-none absolute bottom-1.5 right-1 top-1.5 w-1.5 rounded-full bg-border/70">
+                  <div
+                    className="absolute left-0 w-full rounded-full bg-primary/55"
+                    style={{ top: `${scrollbar.top}%`, height: `${scrollbar.height}%` }}
+                  />
+                </div>
+              )}
+            </div>
             {notifications.length > 0 && (
-              <>
-                <DropdownMenuSeparator />
+              <div className="shrink-0 border-t border-border">
                 <DropdownMenuItem className="justify-center text-xs text-primary" onClick={() => navigate('/notifications')}>
                   Voir toutes les notifications
                 </DropdownMenuItem>
-              </>
+              </div>
             )}
           </DropdownMenuContent>
         </DropdownMenu>

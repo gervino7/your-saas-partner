@@ -148,4 +148,12 @@
   .dark .dialog-footer-bg {
     background: hsl(218 22% 11%);
   }
+  .no-bar {
+    scrollbar-width: none;
+  }
+  .no-bar::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
 }
