@@ -53,7 +53,7 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, organization } = useAuthStore();
-  const { notifications, unreadCount, markAsRead, markAllAsRead, getNavigationPath } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, getNavigationPath } = useNotifications(50);
   const [copiedUrl, setCopiedUrl] = useState(false);
 
   const segments = location.pathname.split('/').filter(Boolean);

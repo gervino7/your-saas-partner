@@ -51,7 +51,7 @@ function groupByDay(notifications: any[]) {
 
 const NotificationsPage = () => {
   const navigate = useNavigate();
-  const { notifications, markAsRead, markAllAsRead, getNavigationPath, unreadCount } = useNotifications(100);
+  const { notifications, markAsRead, markAllAsRead, getNavigationPath, unreadCount } = useNotifications(200);
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [readFilter, setReadFilter] = useState<string>('all');
 
