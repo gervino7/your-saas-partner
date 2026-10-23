@@ -29,6 +29,20 @@ Deno.serve(async (req) => {
 
     const now = new Date();
 
+    // Skip users who already have an unread notification of this type for this task title
+    async function filterNew(rows: any[]) {
+      const out: any[] = [];
+      for (const r of rows) {
+        const { count } = await supabase.from("notifications")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", r.user_id).eq("type", r.type)
+          .eq("entity_id", r.entity_id).eq("content", r.content)
+          .eq("is_read", false);
+        if (!count) out.push(r);
+      }
+      return out;
+    }
+
     // 1. Tasks approaching deadline (2 days)
     const twoDaysLater = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
     const { data: deadlineTasks } = await supabase
@@ -56,7 +70,7 @@ Deno.serve(async (req) => {
             priority: "high",
           }));
           if (notifications.length) {
-            await supabase.from("notifications").insert(notifications);
+            { const fresh = await filterNew(notifications); if (fresh.length) await supabase.from("notifications").insert(fresh); }
           }
         }
       }
@@ -87,7 +101,7 @@ Deno.serve(async (req) => {
             priority: "urgent",
           }));
           if (notifications.length) {
-            await supabase.from("notifications").insert(notifications);
+            { const fresh = await filterNew(notifications); if (fresh.length) await supabase.from("notifications").insert(fresh); }
           }
         }
       }
