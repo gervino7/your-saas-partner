@@ -165,7 +165,7 @@ const Header = () => {
                 </button>
               )}
             </DropdownMenuLabel>
-            <div className="max-h-[min(60vh,420px)] overflow-y-auto overscroll-contain px-1 py-1">
+            <div className="scroll-thin max-h-[min(60vh,420px)] overflow-y-auto overscroll-contain px-1 py-1">
             {notifications.length === 0 ? (
               <div className="py-6 text-center text-sm text-muted-foreground">
                 Aucune notification
