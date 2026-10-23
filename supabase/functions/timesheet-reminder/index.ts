@@ -53,9 +53,17 @@ Deno.serve(async (req) => {
 
     const usersWithTimesheet = new Set(entries?.map((t: any) => t.user_id) || []);
 
+    // Users who still have an unread reminder are not reminded again
+    const { data: pending } = await supabase
+      .from("notifications")
+      .select("user_id")
+      .eq("type", "timesheet_reminder")
+      .eq("is_read", false);
+    const alreadyReminded = new Set(pending?.map((n: any) => n.user_id) || []);
+
     // Create notifications for users without timesheet
     const notifications = profiles
-      .filter((p: any) => !usersWithTimesheet.has(p.id))
+      .filter((p: any) => !usersWithTimesheet.has(p.id) && !alreadyReminded.has(p.id))
       .map((p: any) => ({
         user_id: p.id,
         type: "timesheet_reminder",
