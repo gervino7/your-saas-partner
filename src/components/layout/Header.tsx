@@ -153,8 +153,8 @@ const Header = () => {
               )}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
-            <DropdownMenuLabel className="flex items-center justify-between">
+          <DropdownMenuContent align="end" className="flex w-96 max-w-[calc(100vw-2rem)] flex-col overflow-hidden p-0">
+            <DropdownMenuLabel className="flex shrink-0 items-center justify-between border-b border-border px-3 py-2.5">
               <span>Notifications</span>
               {unreadCount > 0 && (
                 <button
@@ -165,7 +165,7 @@ const Header = () => {
                 </button>
               )}
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
+            <div className="max-h-[min(60vh,420px)] overflow-y-auto overscroll-contain px-1 py-1">
             {notifications.length === 0 ? (
               <div className="py-6 text-center text-sm text-muted-foreground">
                 Aucune notification
