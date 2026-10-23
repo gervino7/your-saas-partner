@@ -119,7 +119,7 @@ export function useNotifications(limit = 20) {
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from('notifications')
-        .update({ is_read: true, read_at: new Date().toISOString() } as any)
+        .update({ is_read: true })
         .eq('id', id);
       if (error) throw error;
     },
@@ -137,7 +137,7 @@ export function useNotifications(limit = 20) {
       if (!user) return;
       const { error } = await supabase
         .from('notifications')
-        .update({ is_read: true, read_at: new Date().toISOString() } as any)
+        .update({ is_read: true })
         .eq('user_id', user.id)
         .eq('is_read', false);
       if (error) throw error;
