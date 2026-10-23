@@ -202,13 +202,13 @@ const Header = () => {
                 );
               })
             )}
+            </div>
             {notifications.length > 0 && (
-              <>
-                <DropdownMenuSeparator />
+              <div className="shrink-0 border-t border-border">
                 <DropdownMenuItem className="justify-center text-xs text-primary" onClick={() => navigate('/notifications')}>
                   Voir toutes les notifications
                 </DropdownMenuItem>
-              </>
+              </div>
             )}
           </DropdownMenuContent>
         </DropdownMenu>
