@@ -148,21 +148,12 @@
   .dark .dialog-footer-bg {
     background: hsl(218 22% 11%);
   }
-  .scroll-thin::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+  .no-bar {
+    scrollbar-width: none;
   }
-  .scroll-thin::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .scroll-thin::-webkit-scrollbar-thumb {
-    background: hsl(var(--primary) / 0.45);
-    border-radius: 9999px;
-    border: 2px solid transparent;
-    background-clip: content-box;
-  }
-  .scroll-thin::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--primary) / 0.7);
-    background-clip: content-box;
+  .no-bar::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
   }
 }
