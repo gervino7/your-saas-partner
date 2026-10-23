@@ -168,12 +168,11 @@ class Layout {
     }
   }
 
-  // Titre de section : filet cuivre + libellé navy
+  // Titre de section navy, sans tiret décoratif.
   section(label: string) {
     this.need(30);
     this.gap(6);
-    this.page.drawRectangle({ x: M, y: this.y - 3, width: 22, height: 2.2, color: COPPER });
-    this.txt(label.toUpperCase(), M + 30, this.y - 6.5, 8.5, true, NAVY);
+    this.txt(label.toUpperCase(), M, this.y - 6.5, 8.5, true, NAVY);
     this.y -= 18;
   }
 
@@ -390,25 +389,27 @@ function timeline(L: Layout, items: any[]) {
 
 // ── Bloc de signatures ──
 function signatures(L: Layout, pairs: [string, string][]) {
-  L.need(58);
-  L.gap(10);
-  // Sur une page largement vide, les signatures descendent au pied du
-  // document : une pièce que deux personnes paraphent se signe en bas,
-  // pas au milieu d'une page blanche.
-  if (L.y - 62 > M + 150) L.y = M + 130;
-  const top = L.y;
   const colW = W / pairs.length;
-  pairs.forEach(([role, nom], i) => {
+  const names = pairs.map(([, nom]) => L.wrap(nom ?? '', colW - 34, 9.5, true));
+  const nameHeight = Math.max(1, ...names.map(lines => lines.length)) * 12;
+  const height = nameHeight + 112;
+  L.need(height + 10);
+  L.gap(10);
+  // Conserver un véritable espace manuscrit au bas de la dernière page.
+  if (L.y > M + 30 + height) L.y = M + 30 + height;
+  const top = L.y;
+  pairs.forEach(([role], i) => {
     const x = M + i * colW;
-    L.txt(role.toUpperCase(), x, top, 6.5, true, MUTED);
-    L.txt(nom ?? '', x, top - 13, 9.5, true, INK);
+    L.txt(role.toUpperCase(), x, top, 8, true, NAVY);
+    names[i].forEach((line, k) => L.txt(line, x, top - 16 - k * 12, 9.5, true, INK));
+    L.txt('Date : ____ / ____ / ________', x, top - nameHeight - 22, 8, false, INK_2);
+    L.txt('Signature :', x, top - nameHeight - 40, 8, false, INK_2);
     L.page.drawLine({
-      start: { x, y: top - 42 }, end: { x: x + colW - 34, y: top - 42 },
+      start: { x, y: top - height + 8 }, end: { x: x + colW - 34, y: top - height + 8 },
       thickness: 0.6, color: RULE,
     });
-    L.txt('Date et signature', x, top - 52, 6.5, false, MUTED);
   });
-  L.y = top - 62;
+  L.y = top - height;
 }
 
 // ============================================================
@@ -541,8 +542,7 @@ async function buildEvaluation(d: any): Promise<Uint8Array> {
   // ── Validation et signatures ──
   // Réservées ensemble : une page de signatures orpheline n'a pas de sens
   // sur une pièce que deux personnes doivent parapher.
-  const signe = ev.statut === 'validee' || ev.statut === 'cloturee';
-  L.need(30 + 94 + (signe ? 70 : 0));
+  L.need(30 + 94 + 146);
   L.section('Validation');
   identity(L, [
     ['Transmise le', dateFR(ev.envoyee_le)],
@@ -553,12 +553,10 @@ async function buildEvaluation(d: any): Promise<Uint8Array> {
     ['Accusé de lecture', dateFR(ev.accuse_lecture_le)],
   ]);
 
-  if (ev.statut === 'validee' || ev.statut === 'cloturee') {
-    signatures(L, [
-      ['Le collaborateur', d.collaborateur?.nom ?? ''],
-      ['L’évaluateur', d.evaluateur?.nom ?? ''],
-    ]);
-  }
+  signatures(L, [
+    ['L’évaluateur', d.evaluateur?.nom ?? ''],
+    ['Le collaborateur', d.collaborateur?.nom ?? ''],
+  ]);
 
   return L.finish();
 }
