@@ -248,9 +248,9 @@ function identity(L: Layout, rows: [string, string][]) {
   L.y -= h + 10;
 }
 
-// ── Score, échelle à cinq niveaux, appréciation ──
-function scoreHero(L: Layout, score: number | null, appreciation: string, scale: any[]) {
-  const h = 86;
+// ── Score et appréciation ──
+function scoreHero(L: Layout, score: number | null, appreciation: string) {
+  const h = 62;
   L.need(h + 12);
   const top = L.y;
   L.page.drawRectangle({
@@ -267,29 +267,6 @@ function scoreHero(L: Layout, score: number | null, appreciation: string, scale:
   const lines = L.wrap(appreciation || '—', 200, 11, true);
   lines.slice(0, 2).forEach((ln, i) =>
     L.txtR(ln, M + W - 20, top - 40 - i * 14, 11, true, COPPER));
-
-  // Échelle : cinq segments, le segment atteint en navy, un repère sur la position
-  const bx = M + 20, bw = W - 40, by = top - h + 22, bh = 7;
-  const seg = scale.length ? scale : [];
-  if (seg.length) {
-    const minAll = Number(seg[0].min ?? 0);
-    const maxAll = Number(seg[seg.length - 1].max ?? 100);
-    const span = Math.max(1, maxAll - minAll);
-    seg.forEach((s2: any, i: number) => {
-      const a = (Number(s2.min) - minAll) / span, b = (Number(s2.max) - minAll) / span;
-      const x = bx + a * bw, wgt = Math.max(1, (b - a) * bw - 1.5);
-      const reached = score !== null && Number(score) >= Number(s2.min);
-      L.page.drawRectangle({
-        x, y: by, width: wgt, height: bh,
-        color: reached ? NAVY : rgb(0.84, 0.88, 0.93),
-      });
-      L.txt(String(i + 1), x + wgt / 2 - 1.6, by - 9, 6, false, MUTED);
-    });
-    if (score !== null) {
-      const px = bx + ((Number(score) - minAll) / span) * bw;
-      L.page.drawRectangle({ x: px - 1, y: by - 3.5, width: 2, height: bh + 7, color: COPPER });
-    }
-  }
   L.y = top - h - 16;
 }
 
@@ -458,7 +435,7 @@ async function buildEvaluation(d: any): Promise<Uint8Array> {
   ]);
 
   scoreHero(L, ev.score === null || ev.score === undefined ? null : Number(ev.score),
-            ev.appreciation ?? '', d.echelle ?? []);
+            ev.appreciation ?? '');
 
   // Rappel de la règle de calcul, une fois, en petit
   L.txt('Note = moyenne des sous-critères · Score catégorie = note ÷ 5 · Contribution = score catégorie × pondération × 100.',
