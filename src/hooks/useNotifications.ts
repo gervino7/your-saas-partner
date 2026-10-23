@@ -98,17 +98,38 @@ export function useNotifications(limit = 20) {
     };
   }, [user, queryClient]);
 
-  const unreadCount = notifications.filter((n) => !n.is_read).length;
+  // Exact unread count across all notifications (not only the loaded page)
+  const { data: unreadCount = 0 } = useQuery({
+    queryKey: ['notifications', 'unread-count', user?.id],
+    queryFn: async () => {
+      if (!user) return 0;
+      const { count, error } = await supabase
+        .from('notifications')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+      if (error) throw error;
+      return count ?? 0;
+    },
+    enabled: !!user,
+    refetchInterval: 60000,
+  });
 
   const markAsRead = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from('notifications')
-        .update({ is_read: true })
+        .update({ is_read: true, read_at: new Date().toISOString() } as any)
         .eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notifications'] }),
+    onMutate: async (id: string) => {
+      queryClient.setQueriesData({ queryKey: ['notifications', user?.id] }, (old: any) =>
+        Array.isArray(old) ? old.map((n) => (n.id === id ? { ...n, is_read: true } : n)) : old);
+      queryClient.setQueryData(['notifications', 'unread-count', user?.id], (c: number | undefined) =>
+        Math.max(0, (c ?? 1) - 1));
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['notifications'] }),
   });
 
   const markAllAsRead = useMutation({
@@ -116,12 +137,15 @@ export function useNotifications(limit = 20) {
       if (!user) return;
       const { error } = await supabase
         .from('notifications')
-        .update({ is_read: true })
+        .update({ is_read: true, read_at: new Date().toISOString() } as any)
         .eq('user_id', user.id)
         .eq('is_read', false);
       if (error) throw error;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notifications'] }),
+    onMutate: () => {
+      queryClient.setQueryData(['notifications', 'unread-count', user?.id], 0);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['notifications'] }),
   });
 
   const getNavigationPath = useCallback((notification: typeof notifications[0]) => {
@@ -129,16 +153,24 @@ export function useNotifications(limit = 20) {
     if (type === 'staffing_adjustment_requested') return '/staffing?tab=pending';
     if (type === 'staffing_response' || type === 'staffing_assigned') return '/staffing?tab=mine';
     if (type === 'document_deposited' || type === 'portal_document_received') return '/depots';
-    if (!entity_id) return null;
+    if (type === 'timesheet_reminder') return '/timesheets';
+    if (type === 'plan_submitted') return '/planning?tab=team';
+    if (type === 'evaluation_assigned') return '/evaluations';
+    if (type?.startsWith('evaluation_') && entity_id) return `/evaluations/${entity_id}`;
+    if (type === 'new_evaluation') return '/evaluations';
     switch (entity_type) {
-
-      case 'task': return `/projects/${entity_id}`;
-      case 'mission': return `/missions/${entity_id}`;
-      case 'project': return `/projects/${entity_id}`;
+      case 'task': return entity_id ? `/projects/${entity_id}?tab=tasks` : null;
+      case 'mission': return entity_id ? `/missions/${entity_id}` : '/missions';
+      case 'project': return entity_id ? `/projects/${entity_id}` : null;
+      case 'evaluation': return entity_id ? `/evaluations/${entity_id}` : '/evaluations';
+      case 'client': return entity_id ? `/admin/clients/${entity_id}` : '/admin/clients';
+      case 'obligation': return '/echeancier';
+      case 'plan': return '/planning';
+      case 'staffing': return '/staffing';
       case 'meeting': return '/calendar';
       case 'document': return '/documents';
-      case 'conversation': return '/messages';
-      default: return null;
+      case 'conversation': return entity_id ? `/messages?c=${entity_id}` : '/messages';
+      default: return '/notifications';
     }
   }, []);
 
