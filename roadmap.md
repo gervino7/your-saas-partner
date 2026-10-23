@@ -1,5 +1,8 @@
 # Evaluation PDF export
 
+## Signatures après impression
+- [x] Ajouter les zones évaluateur et collaborateur à la fin des PDF d’évaluation et retirer les tirets cuivre des titres ; fonction déployée, 18 tests réussis, PDF hébergé 200 contrôlé visuellement. Archives existantes conservées.
+
 ## Grille du cabinet - complément
 - [x] Ajouter les 6 colonnes, en-têtes fixes, décimales, totaux et masquer les moyennes partielles.
 - [x] Afficher les 2 blocs de commentaires attribués et l’échelle issue du cabinet.
