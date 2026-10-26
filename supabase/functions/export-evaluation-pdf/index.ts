@@ -219,6 +219,35 @@ function headerBand(L: Layout, org: string, docType: string, right1: string, rig
   L.y = top - h - 22;
 }
 
+// ── En-tête du document : libellé à gauche, valeur en regard ──
+// Deux colonnes de paires, comme sur la grille Excel du cabinet. La
+// valeur est sur la même ligne que son libellé, jamais en dessous.
+function headerGrid(L: Layout, rows: [string, string, string, string][]) {
+  const h = rows.length * 17 + 18;
+  L.need(h + 10);
+  const top = L.y + 4;
+  L.page.drawRectangle({
+    x: M, y: top - h, width: W, height: h,
+    color: rgb(0.980, 0.984, 0.990), borderColor: RULE, borderWidth: 0.6,
+  });
+
+  const half = W / 2;
+  const labX = [M + 14, M + half + 10];
+  const valX = [M + 14 + 92, M + half + 10 + 104];
+  const valMax = [half - 104, W - half - 118];
+
+  rows.forEach(([l1, v1, l2, v2], i) => {
+    const y = top - 17 - i * 17;
+    L.txt(l1, labX[0], y, 8.5, false, MUTED);
+    L.txt(L.wrap(v1 || '—', valMax[0], 9.5, true)[0] ?? '—', valX[0], y, 9.5, true, INK);
+    if (l2) {
+      L.txt(l2, labX[1], y, 8.5, false, MUTED);
+      L.txt(L.wrap(v2 || '—', valMax[1], 9.5, true)[0] ?? '—', valX[1], y, 9.5, true, INK);
+    }
+  });
+  L.y = top - h - 10;
+}
+
 // ── Bloc d'identification, en carte claire ──
 function identity(L: Layout, rows: [string, string][]) {
   const cols = 4;
@@ -419,19 +448,18 @@ async function buildEvaluation(d: any): Promise<Uint8Array> {
     L.y -= 32;
   }
 
-  identity(L, [
-    ['Collaborateur', d.collaborateur?.nom],
-    ['Grade', d.collaborateur?.grade],
-    ['Échelon', ev.echelon],
-    ['Évaluateur', d.evaluateur?.nom],
-    ['Grade évaluateur', d.evaluateur?.grade],
-    ['Practice', PRACTICES[ev.practice] ?? ev.practice],
-    ...(ev.type === 'mission'
-      ? ([['Mission', `${ev.code_mission ?? ''} ${ev.mission ?? ''}`.trim()],
-          ['Client', ev.client]] as [string, string][])
-      : ([['Exercice', ev.exercice ? String(ev.exercice) : '']] as [string, string][])),
-    ['Période', ev.periode_debut ? `${dateFR(ev.periode_debut)} au ${dateFR(ev.periode_fin)}` : ''],
-    ['Statut', STATUTS[ev.statut] ?? ev.statut],
+  // En-tête aux libellés du cabinet. Le grade s'écrit en toutes lettres
+  // (l'échelon), jamais en sigle.
+  const h = d.entete ?? {};
+  headerGrid(L, [
+    ['Collaborateur :', h.collaborateur ?? d.collaborateur?.nom,
+     'Département :',           h.departement],
+    ['Grade :',         h.grade ?? ev.echelon,
+     'Client / Dossier :',      h.client ?? ev.client],
+    ['Code mission :',  h.code_mission ?? ev.code_mission,
+     'Période de la mission :', h.periode],
+    ['Evaluateur :',    h.evaluateur ?? d.evaluateur?.nom,
+     'Date d\u2019évaluation :',  dateFR(h.date_evaluation ?? ev.validee_le ?? ev.envoyee_le)],
   ]);
 
   scoreHero(L, ev.score === null || ev.score === undefined ? null : Number(ev.score),
