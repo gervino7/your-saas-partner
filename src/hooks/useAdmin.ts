@@ -283,10 +283,10 @@ export function useUpdateUserGrade() {
 export function useUpdateUserProfile() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ userId, full_name, phone, grade, practice, grade_echelon }: { userId: string; full_name: string; phone?: string; grade: string; practice?: 'comptable'|'conseil'|'juridique'|null; grade_echelon?: string|null }) => {
+    mutationFn: async ({ userId, full_name, phone, departement, grade, practice, grade_echelon }: { userId: string; full_name: string; phone?: string; departement?: string; grade: string; practice?: 'comptable'|'conseil'|'juridique'|null; grade_echelon?: string|null }) => {
       const { error } = await supabase
         .from('profiles')
-        .update({ full_name, phone: phone || null, grade, practice, grade_echelon })
+        .update({ full_name, phone: phone || null, departement: departement?.trim() || null, grade, practice, grade_echelon })
         .eq('id', userId);
       if (error) throw error;
     },
