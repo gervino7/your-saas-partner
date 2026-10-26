@@ -2410,6 +2410,7 @@ export type Database = {
           assignment_id: string | null
           collaborator_comment: string | null
           created_at: string | null
+          departement: string | null
           disagreement: boolean
           disagreement_reason: string | null
           echelon: string
@@ -2445,6 +2446,7 @@ export type Database = {
           assignment_id?: string | null
           collaborator_comment?: string | null
           created_at?: string | null
+          departement?: string | null
           disagreement?: boolean
           disagreement_reason?: string | null
           echelon: string
@@ -2480,6 +2482,7 @@ export type Database = {
           assignment_id?: string | null
           collaborator_comment?: string | null
           created_at?: string | null
+          departement?: string | null
           disagreement?: boolean
           disagreement_reason?: string | null
           echelon?: string
@@ -4766,6 +4769,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string | null
+          departement: string | null
           departure_date: string | null
           email: string
           full_name: string
@@ -4787,6 +4791,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string | null
+          departement?: string | null
           departure_date?: string | null
           email: string
           full_name: string
@@ -4808,6 +4813,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string | null
+          departement?: string | null
           departure_date?: string | null
           email?: string
           full_name?: string
@@ -6450,6 +6456,10 @@ export type Database = {
         }
         Returns: number
       }
+      exercice_label: {
+        Args: { _exercice: number; _org: string }
+        Returns: string
+      }
       expire_portal_invitations: { Args: never; Returns: number }
       fiscal_exercice: { Args: { _d: string; _org: string }; Returns: number }
       generate_obligation_periods: {
@@ -6528,11 +6538,16 @@ export type Database = {
         Returns: Json
       }
       get_evaluation_form: { Args: { _evaluation_id: string }; Returns: Json }
+      get_evaluation_header: { Args: { _evaluation_id: string }; Returns: Json }
       get_evaluation_history: {
         Args: { _cycles?: number; _user_id: string }
         Returns: Json
       }
       get_evaluation_pdf_data: {
+        Args: { _evaluation_id: string }
+        Returns: Json
+      }
+      get_evaluation_pdf_data_base: {
         Args: { _evaluation_id: string }
         Returns: Json
       }
@@ -6794,6 +6809,10 @@ export type Database = {
       seed_obligation_types: { Args: { _org_id: string }; Returns: undefined }
       seed_platform_owner: { Args: { _email: string }; Returns: string }
       send_evaluation: { Args: { _evaluation_id: string }; Returns: Json }
+      set_evaluation_mission_code: {
+        Args: { _code: string; _evaluation_id: string }
+        Returns: Json
+      }
       set_evaluation_objectives: {
         Args: { _exercice: number; _objectives: Json; _user_id: string }
         Returns: Json
