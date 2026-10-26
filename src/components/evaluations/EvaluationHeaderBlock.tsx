@@ -40,7 +40,7 @@ export function EvaluationHeaderBlock({ evaluationId }: { evaluationId: string }
         <Pair label="Département">{h.departement || dash}</Pair>
         <Pair label="Client / Dossier">{h.client || dash}</Pair>
         <Pair label="Période de la mission">{h.periode || dash}</Pair>
-        <Pair label="Date d'évaluation">{h.date_evaluation || dash}</Pair>
+        <Pair label="Date d'évaluation">{h.date_evaluation ? (/^\d{4}-\d{2}-\d{2}/.test(h.date_evaluation) ? h.date_evaluation.slice(0,10).split('-').reverse().join('/') : h.date_evaluation) : dash}</Pair>
       </dl>
     </section>
   );
