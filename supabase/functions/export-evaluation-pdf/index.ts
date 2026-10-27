@@ -424,7 +424,8 @@ function signatures(L: Layout, pairs: [string, string][]) {
 async function buildEvaluation(d: any): Promise<Uint8Array> {
   const ev = d.evaluation ?? {};
   const org = d.organisation?.nom ?? 'Cabinet';
-  const typeLabel = TYPES[ev.type] ?? 'Évaluation';
+  const estDossier = (d.entete?.objet ?? ev.objet) === 'dossier';
+  const typeLabel = estDossier ? 'Évaluation de dossier comptable' : (TYPES[ev.type] ?? 'Évaluation');
   const who = d.collaborateur?.nom ?? '';
 
   const L = await new Layout().init(
@@ -456,8 +457,8 @@ async function buildEvaluation(d: any): Promise<Uint8Array> {
      'Département :',           h.departement],
     ['Grade :',         h.grade ?? ev.echelon,
      'Client / Dossier :',      h.client ?? ev.client],
-    ['Code mission :',  h.code_mission ?? ev.code_mission,
-     'Période de la mission :', h.periode],
+    [estDossier ? 'Code dossier :' : 'Code mission :', h.code_mission ?? ev.code_mission,
+     estDossier ? 'Période du dossier :' : 'Période de la mission :', h.periode],
     ['Evaluateur :',    h.evaluateur ?? d.evaluateur?.nom,
      'Date d\u2019évaluation :',  dateFR(h.date_evaluation ?? ev.validee_le ?? ev.envoyee_le)],
   ]);
@@ -591,7 +592,7 @@ async function buildSynthese(d: any): Promise<Uint8Array> {
     ['Échelon', s.echelon],
     ['Practice de rattachement', PRACTICES[s.practice] ?? s.practice],
     ['Exercice', ex],
-    ['Missions évaluées', String(s.nb_missions ?? 0)],
+    ['Missions et dossiers évalués', String(s.nb_missions ?? 0)],
   ]);
 
   // ── Les trois scores ──
@@ -645,8 +646,8 @@ async function buildSynthese(d: any): Promise<Uint8Array> {
 
   // ── Missions de l'exercice ──
   const agg = s.agregat_missions ?? {};
-  L.section('Évaluations de mission de l’exercice');
-  L.para(`${agg.nb_missions ?? 0} mission(s) significative(s), évaluée(s) par `
+  L.section('Évaluations de mission et de dossier de l’exercice');
+  L.para(`${agg.nb_missions ?? 0} mission(s) et dossier(s) significatifs, évalués par `
        + `${agg.nb_evaluateurs ?? 0} chef(s) de mission. Agrégation : ${MODES[agg.mode] ?? agg.mode}.`,
     { size: 8.5, color: MUTED });
 
@@ -672,7 +673,7 @@ async function buildSynthese(d: any): Promise<Uint8Array> {
     const cx = [M, M + 62, M + 212, M + 322, M + 408, M + W];
     L.need(20);
     L.page.drawRectangle({ x: M, y: L.y - 5, width: W, height: 16, color: rgb(0.945, 0.957, 0.969) });
-    ['CODE', 'MISSION', 'ÉVALUATEUR', 'PRACTICE', 'FIN', 'SCORE'].forEach((t, i) => {
+    ['CODE', 'MISSION / DOSSIER', 'ÉVALUATEUR', 'PRACTICE', 'FIN', 'SCORE'].forEach((t, i) => {
       if (i >= 4) L.txtR(t, (i === 4 ? cx[5] - 58 : cx[5] - 6), L.y, 6.5, true, MUTED);
       else L.txt(t, cx[i] + 6, L.y, 6.5, true, MUTED);
     });
@@ -684,7 +685,7 @@ async function buildSynthese(d: any): Promise<Uint8Array> {
       if (i % 2 === 1) L.page.drawRectangle({ x: M, y: L.y - rowH + 10, width: W, height: rowH, color: ZEBRA });
       const off = m.significative === false;
       const col = off ? MUTED : INK_2;
-      L.txt(m.mission_code ?? '—', cx[0] + 6, L.y, 8, false, col);
+      L.txt(m.mission_code ?? (m.objet === 'dossier' ? 'dossier' : '-'), cx[0] + 6, L.y, 8, false, col);
       nm.forEach((ln, k) => L.txt(ln, cx[1] + 6, L.y - k * 10, 8, false, col));
       L.txt(m.evaluateur ?? '', cx[2] + 6, L.y, 8, false, col);
       L.txt((PRACTICES[m.practice] ?? m.practice ?? '').slice(0, 14), cx[3] + 6, L.y, 8, false, col);
@@ -873,7 +874,7 @@ Deno.serve(async (req) => {
               ...ch,
               'Content-Type': 'application/pdf',
               'Content-Disposition':
-                `attachment; filename="evaluation-${String(ev.code_mission ?? ev.type).replace(/[^A-Za-z0-9_-]/g, '-')}.pdf"`,
+                `attachment; filename="evaluation-${String(ev.code_mission ?? ((data.entete?.objet ?? ev.objet) === 'dossier' ? 'dossier' : ev.type)).replace(/[^A-Za-z0-9_-]/g, '-')}.pdf"`,
               'Cache-Control': 'no-store',
             },
           });
@@ -881,7 +882,7 @@ Deno.serve(async (req) => {
       }
 
       bytes = await buildEvaluation(data);
-      const slug = String(ev.code_mission ?? ev.type ?? 'evaluation')
+      const slug = String(ev.code_mission ?? ((data.entete?.objet ?? ev.objet) === 'dossier' ? 'dossier' : ev.type) ?? 'evaluation')
         .replace(/[^A-Za-z0-9_-]/g, '-');
       filename = `evaluation-${slug}.pdf`;
 
