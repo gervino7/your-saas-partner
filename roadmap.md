@@ -1,5 +1,11 @@
 # Evaluation PDF export
 
+## Département du travail et validation DA
+- [ ] Vérifier les règles serveur déjà installées et actualiser les types.
+- [ ] Paramétrer les départements, ajouter les choix mission/dossier et retirer le champ profil.
+- [ ] Réserver la validation au DA ; PDF avec historique/validation uniquement en cas de désaccord, signatures conservées.
+- [ ] Tester les règles et vérifier les formulaires authentifiés ; déployer l'export.
+
 ## Dossiers comptables évaluables
 - [x] Vérifier les RPC installées, tracer get_mission_evaluations et compléter les repères objet manquants de get_my_evaluations/get_evaluation_form ; types régénérés.
 - [x] Ajouter l'ouverture depuis la fiche fiscale, les repères dans les listes et les libellés fiche/PDF ; fonction déployée.
