@@ -6926,6 +6926,10 @@ export type Database = {
       seed_obligation_types: { Args: { _org_id: string }; Returns: undefined }
       seed_platform_owner: { Args: { _email: string }; Returns: string }
       send_evaluation: { Args: { _evaluation_id: string }; Returns: Json }
+      set_default_dossier_department: {
+        Args: { _department_id: string }
+        Returns: undefined
+      }
       set_evaluation_mission_code: {
         Args: { _code: string; _evaluation_id: string }
         Returns: Json
