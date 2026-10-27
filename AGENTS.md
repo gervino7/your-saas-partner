@@ -6,3 +6,4 @@
 - Evaluation UI uses feature components and RPC hooks for workflow and evaluation reads; score upserts, profile/reference reads and the export journal use authorized tables, while cabinet settings use transactional RPCs to preserve the server-controlled circuit.
 - The evaluation form renders its category and subcriterion columns through the feature EvaluationGrid component to keep rating controls separate from weighted results.
 - Evaluation category display suppresses incomplete averages without changing authoritative scoring; appreciation graphics use RPC-provided scale thresholds.
+- Accounting dossier evaluations reuse mission-type workflows and RPC-derived practice/exercise; their fiscal-tab controls only mirror server permissions, preserving one scoring pipeline.

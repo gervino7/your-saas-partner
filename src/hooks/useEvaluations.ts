@@ -34,6 +34,7 @@ export const useSuggestContributors = (id?: string, enabled = true) => useRead<E
 export const useAssignEvaluator = () => useAction('assign_evaluator');
 export const useOpenEvaluation = () => useAction('open_evaluation');
 export const useOpenMissionEvaluations = () => useAction('open_mission_evaluations');
+export const useOpenDossierEvaluations = () => useAction('open_dossier_evaluations');
 export const useOpenAnnualCampaign = () => useAction('open_annual_campaign');
 export const useSendEvaluation = () => useAction('send_evaluation');
 export const useSubmitObservations = () => useAction('submit_evaluation_observations');

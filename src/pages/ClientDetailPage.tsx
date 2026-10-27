@@ -55,7 +55,7 @@ const ClientDetailPage = () => {
         <TabsContent value="info" className="mt-4"><ClientInfoTab client={client} /></TabsContent>
         <TabsContent value="contacts" className="mt-4"><ClientContactsTab clientId={client.id} /></TabsContent>
         <TabsContent value="missions" className="mt-4"><ClientMissionsTab clientId={client.id} /></TabsContent>
-        <TabsContent value="fiscal" className="mt-4"><ClientFiscalTab clientId={client.id} /></TabsContent>
+        <TabsContent value="fiscal" className="mt-4"><ClientFiscalTab clientId={client.id} clientName={client.name} /></TabsContent>
         <TabsContent value="documents" className="mt-4"><ClientDocumentsTab clientId={client.id} /></TabsContent>
         <TabsContent value="portal" className="mt-4"><ClientPortalTab clientId={client.id} /></TabsContent>
         <TabsContent value="shared-docs" className="mt-4"><ClientSharedDocsTab clientId={client.id} /></TabsContent>

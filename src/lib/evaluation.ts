@@ -109,3 +109,15 @@ export function objectiveStatus(rate: number) { return rate >= 100 ? 'atteint' :
 export function validateObjectives(rows: { title: string }[]) { return rows.length <= 5 && rows.every(r => r.title.trim().length > 0); }
 export function validatePdfSelection(ids: string[]) { return ids.length > 0 && new Set(ids).size <= 25; }
 export function csvCell(value: unknown) { const text = value == null ? '' : String(value); return '"' + (/^[=+@\-\t\r]/.test(text) ? "'" : '') + text.replace(/"/g, '""') + '"'; }
+
+// Affichage seulement : le serveur contrôle à nouveau l'ouverture du dossier.
+export function canOpenDossierEvaluations(
+  profile: { id: string; grade_level: number | null } | null | undefined,
+  dossier: { collaborateur_id?: string | null } | null | undefined,
+  obligations: { responsible_id?: string | null; is_active?: boolean | null }[],
+) {
+  if (!profile || !dossier) return false;
+  return (profile.grade_level ?? 8) <= 2
+    || dossier.collaborateur_id === profile.id
+    || obligations.some(o => o.is_active !== false && o.responsible_id === profile.id);
+}
