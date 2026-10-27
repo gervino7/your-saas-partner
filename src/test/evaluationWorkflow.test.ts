@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { canValidateEvaluation, canManageDepartments, showEvaluationTracking } from '@/lib/evaluationWorkflow';
+import { showEvaluationTracking as pdfTracking } from '../../supabase/functions/export-evaluation-pdf/tracking';
 
 describe('Départements et circuit DA', () => {
   it('reserves validation to DA, not DM or the ordinary evaluator', () => {
@@ -21,5 +22,8 @@ describe('Départements et circuit DA', () => {
     expect(showEvaluationTracking({ desaccord: true }, {})).toBe(true);
     expect(showEvaluationTracking(undefined, { objection: true })).toBe(true);
     expect(showEvaluationTracking({ desaccord: false }, { desaccord: true })).toBe(true);
+    expect(pdfTracking({ desaccord: false }, {})).toBe(false);
+    expect(pdfTracking({ desaccord: true }, {})).toBe(true);
+    expect(pdfTracking(undefined, { objection: true })).toBe(true);
   });
 });
