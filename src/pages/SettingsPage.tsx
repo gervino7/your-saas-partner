@@ -1,3 +1,4 @@
+import DepartmentSettings from '@/components/evaluations/DepartmentSettings';
 import EvaluationSettings from '@/components/evaluations/EvaluationSettings';
 import AdminSettings from '@/components/admin/AdminSettings';
 import DataSaverSettings from '@/components/settings/DataSaverSettings';
@@ -30,10 +31,11 @@ const SettingsPage = () => {
         <p className="text-muted-foreground">Configuration de votre organisation.</p>
       </div>
       <Tabs defaultValue="general">
-        <TabsList>
+        <TabsList className="flex h-auto flex-wrap justify-start">
           <TabsTrigger value="general">Général</TabsTrigger>
           <TabsTrigger value="obligations">Obligations</TabsTrigger>
           <TabsTrigger value="evaluation">Évaluation</TabsTrigger>
+          <TabsTrigger value="departments">Départements</TabsTrigger>
         </TabsList>
         <TabsContent value="general" className="space-y-6 mt-4">
           <SubscriptionSection />
@@ -45,6 +47,7 @@ const SettingsPage = () => {
           <ObligationTypesSettings />
         </TabsContent>
       <TabsContent value="evaluation" className="mt-4"><EvaluationSettings /></TabsContent>
+      <TabsContent value="departments" className="mt-4"><DepartmentSettings /></TabsContent>
       </Tabs>
     </div>
   );

@@ -1,3 +1,4 @@
+import DepartmentSelect from '@/components/evaluations/DepartmentSelect';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { AlertCircle } from 'lucide-react';
@@ -59,6 +60,7 @@ const ClientFiscalTab = ({ clientId, clientName }: Props) => {
     upsertFp.mutate({
       id: fp?.id,
       client_id: clientId,
+      department_id: v.department_id || null,
       numero_contribuable: v.numero_contribuable || null,
       registre_commerce: v.registre_commerce || null,
       forme_juridique: v.forme_juridique || null,
@@ -167,6 +169,7 @@ const ClientFiscalTab = ({ clientId, clientName }: Props) => {
               <Label>Date de clôture</Label>
               <Input placeholder="31/12" {...form.register('date_cloture')} disabled={!isResponsable} />
             </div>
+            <div><Label>Département</Label><DepartmentSelect dossier value={values.department_id} onChange={v => form.setValue('department_id', v)} disabled={!isResponsable} /></div>
             <div>
               <Label>Collaborateur responsable</Label>
               <Select value={values.collaborateur_id ?? ''} onValueChange={(v) => form.setValue('collaborateur_id', v)} disabled={!isResponsable}>
