@@ -1,5 +1,10 @@
 # Evaluation PDF export
 
+## Dossiers comptables évaluables
+- [ ] Vérifier les RPC déjà installées et tracer la fonction mission existante dans les migrations.
+- [ ] Ajouter l'ouverture depuis la fiche fiscale, les repères dans les listes et les libellés fiche/PDF.
+- [ ] Vérifier les permissions, les tests et un dossier réel ; ne pas inventer de notes RH.
+
 ## Signatures après impression
 - [x] Ajouter les zones évaluateur et collaborateur à la fin des PDF d’évaluation et retirer les tirets cuivre des titres ; fonction déployée, 18 tests réussis, PDF hébergé 200 contrôlé visuellement. Archives existantes conservées.
 
