@@ -446,6 +446,7 @@ export type Database = {
           created_at: string | null
           date_cloture: string | null
           date_entree_portefeuille: string | null
+          department_id: string | null
           exercice_end_month: number | null
           exercice_start_month: number | null
           forme_juridique: string | null
@@ -468,6 +469,7 @@ export type Database = {
           created_at?: string | null
           date_cloture?: string | null
           date_entree_portefeuille?: string | null
+          department_id?: string | null
           exercice_end_month?: number | null
           exercice_start_month?: number | null
           forme_juridique?: string | null
@@ -490,6 +492,7 @@ export type Database = {
           created_at?: string | null
           date_cloture?: string | null
           date_entree_portefeuille?: string | null
+          department_id?: string | null
           exercice_end_month?: number | null
           exercice_start_month?: number | null
           forme_juridique?: string | null
@@ -524,6 +527,13 @@ export type Database = {
             columns: ["collaborateur_id"]
             isOneToOne: false
             referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_fiscal_profile_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
             referencedColumns: ["id"]
           },
           {
@@ -1297,6 +1307,50 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "daily_rates_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      departments: {
+        Row: {
+          code: string
+          created_at: string | null
+          id: string
+          is_active: boolean
+          is_default_dossier: boolean
+          label: string
+          organization_id: string
+          sort_order: number
+          updated_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          is_default_dossier?: boolean
+          label: string
+          organization_id: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          is_default_dossier?: boolean
+          label?: string
+          organization_id?: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "departments_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -3307,6 +3361,7 @@ export type Database = {
           client_id: string | null
           code: string | null
           created_at: string | null
+          department_id: string | null
           description: string | null
           director_id: string | null
           end_date: string | null
@@ -3330,6 +3385,7 @@ export type Database = {
           client_id?: string | null
           code?: string | null
           created_at?: string | null
+          department_id?: string | null
           description?: string | null
           director_id?: string | null
           end_date?: string | null
@@ -3353,6 +3409,7 @@ export type Database = {
           client_id?: string | null
           code?: string | null
           created_at?: string | null
+          department_id?: string | null
           description?: string | null
           director_id?: string | null
           end_date?: string | null
@@ -3388,6 +3445,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "missions_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
             referencedColumns: ["id"]
           },
           {
@@ -6348,6 +6412,7 @@ export type Database = {
           client_id: string | null
           code: string | null
           created_at: string | null
+          department_id: string | null
           description: string | null
           director_id: string | null
           end_date: string | null
@@ -6834,6 +6899,10 @@ export type Database = {
         }
         Returns: string
       }
+      resolve_evaluation_departement: {
+        Args: { _dossier_id: string; _mission_id: string; _org: string }
+        Returns: string
+      }
       resolve_evaluation_practice: {
         Args: {
           _assignment_practice: Database["public"]["Enums"]["eval_practice"]
@@ -6857,6 +6926,10 @@ export type Database = {
       seed_obligation_types: { Args: { _org_id: string }; Returns: undefined }
       seed_platform_owner: { Args: { _email: string }; Returns: string }
       send_evaluation: { Args: { _evaluation_id: string }; Returns: Json }
+      set_default_dossier_department: {
+        Args: { _department_id: string }
+        Returns: undefined
+      }
       set_evaluation_mission_code: {
         Args: { _code: string; _evaluation_id: string }
         Returns: Json

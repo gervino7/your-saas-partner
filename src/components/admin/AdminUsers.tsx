@@ -27,7 +27,6 @@ interface EditingUser {
   id: string;
   full_name: string;
   phone: string;
-  departement: string;
   grade: Grade;
   practice: string;
   grade_echelon: string;
@@ -67,7 +66,6 @@ export default function AdminUsers() {
       id: u.id,
       full_name: u.full_name || '',
       phone: u.phone || '',
-      departement: u.departement || '',
       grade: (u.grade as Grade) || 'AUD',
       practice: u.practice || '',
       grade_echelon: u.grade_echelon || '',
@@ -78,7 +76,7 @@ export default function AdminUsers() {
   const handleSaveEdit = () => {
     if (!editingUser) return;
     updateUser.mutate(
-      { userId: editingUser.id, full_name: editingUser.full_name, phone: editingUser.phone, departement: editingUser.departement, grade: editingUser.grade, practice: editingUser.practice as 'comptable'|'conseil'|'juridique'||null, grade_echelon: editingUser.grade_echelon||null },
+      { userId: editingUser.id, full_name: editingUser.full_name, phone: editingUser.phone, grade: editingUser.grade, practice: editingUser.practice as 'comptable'|'conseil'|'juridique'||null, grade_echelon: editingUser.grade_echelon||null },
       { onSuccess: () => setEditOpen(false) }
     );
   };
@@ -183,11 +181,6 @@ export default function AdminUsers() {
             <div>
               <Label>Téléphone</Label>
               <Input value={editingUser?.phone ?? ''} onChange={(e) => setEditingUser((prev) => prev ? { ...prev, phone: e.target.value } : null)} placeholder="+225 XX XX XX XX" />
-            </div>
-            <div>
-              <Label>Département</Label>
-              <Input value={editingUser?.departement ?? ''} onChange={(e) => setEditingUser((prev) => prev ? { ...prev, departement: e.target.value } : null)} />
-              <p className="text-xs text-muted-foreground mt-1">Figure en en-tête des évaluations. Distinct de la practice, qui détermine la grille.</p>
             </div>
             <div>
               <Label>Grade</Label>

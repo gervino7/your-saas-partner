@@ -14,6 +14,7 @@
 // référence ne doit pas changer entre deux téléchargements.
 // ============================================================
 
+import { showEvaluationTracking } from './tracking.ts';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { z } from 'npm:zod@3';
 import { evaluationArchivePath, encryptArchive, decryptArchive } from './archive.ts';
@@ -516,7 +517,7 @@ async function buildEvaluation(d: any): Promise<Uint8Array> {
     quote(L, 'Motif invoqué', ev.motif_desaccord ?? 'Motif non précisé.', COPPER);
     L.gap(8);
     L.para('Conformément à la procédure, le désaccord est consigné et transmis à la direction. '
-         + 'L’évaluateur demeure seul responsable de la validation.',
+         + 'Le Directeur Associé valide l’évaluation après les observations et l’entretien.',
       { size: 8, color: MUTED });
   }
 
@@ -538,26 +539,24 @@ async function buildEvaluation(d: any): Promise<Uint8Array> {
     }
   }
 
-  // ── Historique ──
-  const ech: any[] = d.echanges ?? [];
-  if (ech.length) {
-    L.section('Historique des échanges');
-    timeline(L, ech);
+  // Le suivi en ligne ne figure sur le document d'entretien qu'en cas de désaccord.
+  if (showEvaluationTracking(d.entete, ev)) {
+    const ech: any[] = d.echanges ?? [];
+    if (ech.length) {
+      L.section('Historique des échanges');
+      timeline(L, ech);
+    }
+    L.need(30 + 94 + 146);
+    L.section('Validation');
+    identity(L, [
+      ['Transmise le', dateFR(ev.envoyee_le)],
+      ['Observée le', dateFR(ev.observee_le)],
+      ['Validée le', dateFR(ev.validee_le)],
+      ['Validée par', ev.validee_par],
+      ['Échanges', ev.nb_echanges != null ? `${ev.nb_echanges} / 2` : ''],
+      ['Accusé de lecture', dateFR(ev.accuse_lecture_le)],
+    ]);
   }
-
-  // ── Validation et signatures ──
-  // Réservées ensemble : une page de signatures orpheline n'a pas de sens
-  // sur une pièce que deux personnes doivent parapher.
-  L.need(30 + 94 + 146);
-  L.section('Validation');
-  identity(L, [
-    ['Transmise le', dateFR(ev.envoyee_le)],
-    ['Observée le', dateFR(ev.observee_le)],
-    ['Validée le', dateFR(ev.validee_le)],
-    ['Validée par', ev.validee_par],
-    ['Échanges', ev.nb_echanges != null ? `${ev.nb_echanges} / 2` : ''],
-    ['Accusé de lecture', dateFR(ev.accuse_lecture_le)],
-  ]);
 
   signatures(L, [
     ['L’évaluateur', d.evaluateur?.nom ?? ''],

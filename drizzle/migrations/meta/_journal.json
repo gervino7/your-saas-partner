@@ -57,6 +57,13 @@
       "when": 1793114071989,
       "tag": "0007_complete_dossier_evaluation_read_contracts",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793125385111,
+      "tag": "0008_set_department_default",
+      "breakpoints": true
     }
   ]
 }

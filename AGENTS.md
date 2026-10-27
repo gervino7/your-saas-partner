@@ -7,3 +7,5 @@
 - The evaluation form renders its category and subcriterion columns through the feature EvaluationGrid component to keep rating controls separate from weighted results.
 - Evaluation category display suppresses incomplete averages without changing authoritative scoring; appreciation graphics use RPC-provided scale thresholds.
 - Accounting dossier evaluations reuse mission-type workflows and RPC-derived practice/exercise; their fiscal-tab controls only mirror server permissions, preserving one scoring pipeline.
+- Department selectors share the organization-scoped reference hook; default dossier changes use a serialized transactional RPC to preserve exclusivity.
+- Validation eligibility is displayed independently from score editing; server workflow RPCs enforce grade and observation prerequisites.

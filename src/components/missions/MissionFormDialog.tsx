@@ -1,3 +1,5 @@
+import DepartmentSelect from '@/components/evaluations/DepartmentSelect';
+import { useState } from 'react';
 import { PRACTICES } from '@/lib/evaluation';
 import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
@@ -29,6 +31,7 @@ const missionSchema = z.object({
   end_date: z.string().optional(),
   priority: z.string().optional(),
   practice: z.string().optional(),
+  department_id: z.string().nullable().optional(),
 });
 
 type MissionFormValues = z.infer<typeof missionSchema>;
@@ -49,6 +52,7 @@ function SectionHeader({ icon: Icon, label }: { icon: any; label: string }) {
 }
 
 export default function MissionFormDialog({ open, onOpenChange, mission }: Props) {
+  const [savingContext, setSavingContext] = useState(false);
   const createMission = useCreateMission();
   const updateMission = useUpdateMission();
   const { data: users = [] } = useOrganizationUsers();
@@ -73,6 +77,7 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
       end_date: mission?.end_date ?? '',
       priority: mission?.priority ?? 'medium',
       practice: mission?.practice ?? 'none',
+      department_id: mission?.department_id ?? null,
     },
   });
 
@@ -85,20 +90,22 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
       });
       return;
     }
-    const { practice: rawPractice, ...rest } = values;
+    const { practice: rawPractice, department_id = null, ...rest } = values;
     const practice = rawPractice && rawPractice !== 'none' ? rawPractice : null;
     const cleaned = Object.fromEntries(
       Object.entries(rest).filter(([, v]) => v !== '' && v !== undefined)
     );
 
     if (isEdit) {
-      await updateMission.mutateAsync({ id: mission.id, ...cleaned, practice });
+      await updateMission.mutateAsync({ id: mission.id, ...cleaned, practice, department_id });
     } else {
       const created: any = await createMission.mutateAsync(cleaned as any);
       const newId = typeof created === 'string' ? created : created?.id ?? created?.mission_id;
-      if (practice && newId) {
-        const { error } = await supabase.from('missions').update({ practice: practice as 'comptable' | 'conseil' | 'juridique' }).eq('id', newId);
-        if (error) toast({ title: 'Practice non enregistrée', description: error.message, variant: 'destructive' });
+      if (newId) {
+        setSavingContext(true);
+        const { error } = await supabase.from('missions').update({ practice: practice as 'comptable' | 'conseil' | 'juridique' | null, department_id }).eq('id', newId);
+        setSavingContext(false);
+        if (error) { toast({ title: 'Département et practice non enregistrés', description: error.message, variant: 'destructive' }); return; }
       }
     }
     onOpenChange(false);
@@ -165,6 +172,7 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
                     )} />
                   </div>
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
                   <FormField control={form.control} name="practice" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Practice</FormLabel>
@@ -178,6 +186,9 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
                       <p className="text-xs text-muted-foreground">Détermine la grille appliquée aux évaluations de fin de mission. Laissée vide, c'est la practice de rattachement de chaque collaborateur qui s'applique.</p>
                     </FormItem>
                   )} />
+
+                  <FormField control={form.control} name="department_id" render={({ field }) => (<FormItem><FormLabel>Département</FormLabel><DepartmentSelect value={field.value} onChange={field.onChange} /><FormMessage /></FormItem>)} />
+                  </div>
 
                   <FormField control={form.control} name="client_id" render={({ field }) => (
                     <FormItem>
@@ -304,7 +315,7 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
             form="mission-form"
             size="sm"
             className="h-9 px-5"
-            disabled={createMission.isPending || updateMission.isPending}
+            disabled={createMission.isPending || updateMission.isPending || savingContext}
           >
             {createMission.isPending || updateMission.isPending ? 'En cours...' : isEdit ? 'Mettre à jour' : 'Créer la mission'}
           </Button>
