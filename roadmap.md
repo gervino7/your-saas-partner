@@ -1,9 +1,10 @@
 # Evaluation PDF export
 
 ## Dossiers comptables évaluables
-- [ ] Vérifier les RPC déjà installées et tracer la fonction mission existante dans les migrations.
-- [ ] Ajouter l'ouverture depuis la fiche fiscale, les repères dans les listes et les libellés fiche/PDF.
-- [ ] Vérifier les permissions, les tests et un dossier réel ; ne pas inventer de notes RH.
+- [x] Vérifier les RPC installées, tracer get_mission_evaluations et compléter les repères objet manquants de get_my_evaluations/get_evaluation_form ; types régénérés.
+- [x] Ajouter l'ouverture depuis la fiche fiscale, les repères dans les listes et les libellés fiche/PDF ; fonction déployée.
+- [x] Vérifier l'ouverture authentifiée, les listes, 22 tests, deno check et le PDF de contrôle ; compilation sans erreur.
+- [ ] Vérifier le cycle dossier complet et son téléchargement hébergé : le seul dossier accessible n'a aucun participant sur 2026, l'ouverture renvoie 0 affectation. Aucun dossier RH artificiel créé.
 
 ## Signatures après impression
 - [x] Ajouter les zones évaluateur et collaborateur à la fin des PDF d’évaluation et retirer les tirets cuivre des titres ; fonction déployée, 18 tests réussis, PDF hébergé 200 contrôlé visuellement. Archives existantes conservées.
@@ -25,7 +26,7 @@
 - [x] Add evaluations, campaign, objectives, synthesis, register, confidential feedback and export journal.
 - [x] Add cabinet settings and navigation; remove legacy task rating UI.
 - [x] Run 16 business/archive tests and authenticated browser checks: settings save/readback, fiscal simulation, 18 echelon choices, mission RPC, denied unauthorized synthesis, PDF download and export journal.
-- [ ] Verify populated scoring, observations, validation and archive readback end-to-end: requesting account has no evaluation assignments or evaluations; do not invent HR records or profile values.
+- [ ] Verify populated scoring, observations, validation and archive readback end-to-end: requires an authorized real HR evaluation to progress through the cycle; do not invent ratings or profile values.
 
 - [x] Review second uploaded brief: identical requirements; preserve approved archive separation.
 
