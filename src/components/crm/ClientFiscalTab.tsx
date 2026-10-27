@@ -19,6 +19,8 @@ import { REGIMES, PERIODICITE_LABELS, TAXPAYER_CATEGORIES } from '@/lib/obligati
 import { useAuthStore } from '@/stores/authStore';
 import { format, addDays } from 'date-fns';
 import EcheancierTable from './EcheancierTable';
+import DossierEvaluations from '@/components/evaluations/DossierEvaluations';
+import { canOpenDossierEvaluations } from '@/lib/evaluation';
 
 const FORME_JURIDIQUE = ['SA', 'SARL', 'SAS', 'SASU', 'EI', 'SCI', 'Association', 'Autre'];
 
@@ -30,9 +32,10 @@ const TVA_PERIOD = [
 
 interface Props {
   clientId: string;
+  clientName?: string;
 }
 
-const ClientFiscalTab = ({ clientId }: Props) => {
+const ClientFiscalTab = ({ clientId, clientName }: Props) => {
   const profile = useAuthStore((s) => s.profile);
   const isResponsable = (profile?.grade_level ?? 8) <= 3;
 
@@ -283,6 +286,7 @@ const ClientFiscalTab = ({ clientId }: Props) => {
           <EcheancierTable clientId={clientId} />
         </CardContent>
       </Card>
+      {fp?.id && <DossierEvaluations dossierId={fp.id} clientName={clientName} canOpen={canOpenDossierEvaluations(profile, fp, subs)} />}
     </div>
   );
 };
