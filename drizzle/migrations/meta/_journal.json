@@ -43,6 +43,13 @@
       "when": 1792596326853,
       "tag": "0005_annual_campaign_include_opener",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793114010032,
+      "tag": "0006_record_get_mission_evaluations",
+      "breakpoints": true
     }
   ]
 }
