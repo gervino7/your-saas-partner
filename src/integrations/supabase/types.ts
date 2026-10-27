@@ -1738,6 +1738,7 @@ export type Database = {
         Row: {
           assigned_by: string | null
           created_at: string | null
+          dossier_id: string | null
           due_date: string | null
           eval_type: Database["public"]["Enums"]["eval_type"]
           evaluatee_id: string
@@ -1752,6 +1753,7 @@ export type Database = {
         Insert: {
           assigned_by?: string | null
           created_at?: string | null
+          dossier_id?: string | null
           due_date?: string | null
           eval_type?: Database["public"]["Enums"]["eval_type"]
           evaluatee_id: string
@@ -1766,6 +1768,7 @@ export type Database = {
         Update: {
           assigned_by?: string | null
           created_at?: string | null
+          dossier_id?: string | null
           due_date?: string | null
           eval_type?: Database["public"]["Enums"]["eval_type"]
           evaluatee_id?: string
@@ -1790,6 +1793,13 @@ export type Database = {
             columns: ["assigned_by"]
             isOneToOne: false
             referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_assignments_dossier_id_fkey"
+            columns: ["dossier_id"]
+            isOneToOne: false
+            referencedRelation: "client_fiscal_profile"
             referencedColumns: ["id"]
           },
           {
@@ -2413,6 +2423,7 @@ export type Database = {
           departement: string | null
           disagreement: boolean
           disagreement_reason: string | null
+          dossier_id: string | null
           echelon: string
           eval_type: Database["public"]["Enums"]["eval_type"]
           evaluatee_id: string
@@ -2449,6 +2460,7 @@ export type Database = {
           departement?: string | null
           disagreement?: boolean
           disagreement_reason?: string | null
+          dossier_id?: string | null
           echelon: string
           eval_type: Database["public"]["Enums"]["eval_type"]
           evaluatee_id: string
@@ -2485,6 +2497,7 @@ export type Database = {
           departement?: string | null
           disagreement?: boolean
           disagreement_reason?: string | null
+          dossier_id?: string | null
           echelon?: string
           eval_type?: Database["public"]["Enums"]["eval_type"]
           evaluatee_id?: string
@@ -2517,6 +2530,13 @@ export type Database = {
             columns: ["assignment_id"]
             isOneToOne: false
             referencedRelation: "evaluation_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluations_dossier_id_fkey"
+            columns: ["dossier_id"]
+            isOneToOne: false
+            referencedRelation: "client_fiscal_profile"
             referencedColumns: ["id"]
           },
           {
@@ -6447,6 +6467,20 @@ export type Database = {
         }
         Returns: Json
       }
+      dossier_exercice_window: {
+        Args: { _dossier_id: string; _exercice: number }
+        Returns: {
+          period_end: string
+          period_start: string
+        }[]
+      }
+      dossier_label: { Args: { _dossier_id: string }; Returns: string }
+      dossier_participants: {
+        Args: { _dossier_id: string; _exercice: number }
+        Returns: {
+          user_id: string
+        }[]
+      }
       evaluation_weight: {
         Args: {
           _mode: string
@@ -6458,6 +6492,10 @@ export type Database = {
       }
       exercice_label: {
         Args: { _exercice: number; _org: string }
+        Returns: string
+      }
+      exercice_label_dossier: {
+        Args: { _dossier_id: string; _exercice: number }
         Returns: string
       }
       expire_portal_invitations: { Args: never; Returns: number }
@@ -6533,6 +6571,7 @@ export type Database = {
         Returns: Json
       }
       get_deposits_inbox: { Args: { _only_mine?: boolean }; Returns: Json }
+      get_dossier_evaluations: { Args: { _dossier_id: string }; Returns: Json }
       get_evaluation_feedback: {
         Args: { _evaluation_id: string }
         Returns: Json
@@ -6725,6 +6764,10 @@ export type Database = {
         Args: { _due_date?: string; _exercice?: number }
         Returns: Json
       }
+      open_dossier_evaluations: {
+        Args: { _dossier_id: string; _due_date?: string; _exercice?: number }
+        Returns: Json
+      }
       open_evaluation: { Args: { _assignment_id: string }; Returns: string }
       open_mission_evaluations: { Args: { _mission_id: string }; Returns: Json }
       portal_accept_invitation: {
@@ -6780,6 +6823,10 @@ export type Database = {
         Args: { _contributor_ids: string[]; _evaluation_id: string }
         Returns: Json
       }
+      resolve_dossier_practice: {
+        Args: { _dossier_id: string }
+        Returns: Database["public"]["Enums"]["eval_practice"]
+      }
       resolve_echelon: {
         Args: {
           _practice: Database["public"]["Enums"]["eval_practice"]
@@ -6790,6 +6837,7 @@ export type Database = {
       resolve_evaluation_practice: {
         Args: {
           _assignment_practice: Database["public"]["Enums"]["eval_practice"]
+          _dossier_id?: string
           _eval_type: Database["public"]["Enums"]["eval_type"]
           _mission_id: string
           _user_id: string
