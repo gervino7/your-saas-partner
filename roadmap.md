@@ -1,5 +1,10 @@
 # Evaluation PDF export
 
+## Alignement du front sur les rôles du 02/11/2026
+- [ ] Aligner les cinq rôles mission/staffing et les libellés DM/CM sans modifier les codes ni les rôles projet.
+- [ ] Retirer les négociations, conserver Active/Annulée et réserver le retrait à l'associé de la mission.
+- [ ] Tester les règles, contrôler la compilation et vérifier les écrans authentifiés ; ne pas créer d'affectation RH fictive.
+
 ## Département du travail et validation DA
 - [x] Vérifier les règles serveur déjà installées et actualiser les types ; changement de défaut transactionnel installé et contrôlé.
 - [x] Paramétrer les départements, ajouter les choix mission/dossier et retirer les lectures/écritures du champ profil et administration.
