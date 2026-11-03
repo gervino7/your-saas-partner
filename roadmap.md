@@ -1,9 +1,10 @@
 # Evaluation PDF export
 
 ## Alignement du front sur les rôles du 02/11/2026
-- [ ] Aligner les cinq rôles mission/staffing et les libellés DM/CM sans modifier les codes ni les rôles projet.
-- [ ] Retirer les négociations, conserver Active/Annulée et réserver le retrait à l'associé de la mission.
-- [ ] Tester les règles, contrôler la compilation et vérifier les écrans authentifiés ; ne pas créer d'affectation RH fictive.
+- [x] Aligner les cinq rôles mission/staffing et les libellés DM/CM sans modifier les codes ni les rôles projet.
+- [x] Retirer les négociations, conserver Active/Annulée et réserver le retrait à l'associé de la mission.
+- [x] 33 tests réussis et compilation OK ; écrans connectés vérifiés : cinq rôles, statut Active, absence de négociation, libellés DM/CM et aucun retrait pour le chef de mission ; contraintes et RPC serveur confirmées en lecture seule.
+- [ ] Vérifier une création suivie de sa notification et un retrait par un associé sur un cas métier réel fourni ; aucune affectation RH fictive ni modification de la base effectuée.
 
 ## Département du travail et validation DA
 - [x] Vérifier les règles serveur déjà installées et actualiser les types ; changement de défaut transactionnel installé et contrôlé.
