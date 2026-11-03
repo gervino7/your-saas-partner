@@ -9,7 +9,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AlertTriangle, Check, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-import { useRemoveMissionMember } from '@/hooks/useMissions';
+import { useMissionMembers, useRemoveMissionMember } from '@/hooks/useMissions';
+import { useAuthStore } from '@/stores/authStore';
+import { isMissionAssociate } from '@/lib/missionRoles';
 
 interface Props {
   open: boolean;
@@ -22,16 +24,20 @@ export default function RemoveMemberDialog({ open, onOpenChange, missionId, memb
   const [reason, setReason] = useState('');
   const [error, setError] = useState<string | null>(null);
   const removeMember = useRemoveMissionMember();
+  const profile = useAuthStore(s => s.profile);
+  const { data: members = [] } = useMissionMembers(missionId);
+  const canRemove = isMissionAssociate(members, profile?.id);
 
   useEffect(() => { if (open) { setReason(''); setError(null); } }, [open]);
 
   const { data: impact, isLoading } = useQuery({
     queryKey: ['member-removal-impact', missionId, member?.user_id],
-    enabled: open && !!member,
+    enabled: open && !!member && canRemove,
     queryFn: async () => {
+      if (!member || !canRemove) return null;
       const { data, error: err } = await supabase.rpc('get_member_removal_impact' as any, {
         _mission_id: missionId,
-        _user_id: member!.user_id,
+        _user_id: member.user_id,
       });
       if (err) throw err;
       return data as any;
@@ -39,7 +45,7 @@ export default function RemoveMemberDialog({ open, onOpenChange, missionId, memb
   });
 
   const submit = async () => {
-    if (!member || reason.trim().length < 5) return;
+    if (!canRemove || !member || reason.trim().length < 5) return;
     setError(null);
     try {
       await removeMember.mutateAsync({ missionId, userId: member.user_id, reason: reason.trim() });
@@ -48,6 +54,8 @@ export default function RemoveMemberDialog({ open, onOpenChange, missionId, memb
       setError(e?.message ?? 'Une erreur est survenue');
     }
   };
+
+  if (!canRemove) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
