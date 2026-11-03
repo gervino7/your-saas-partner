@@ -3312,21 +3312,21 @@ export type Database = {
           joined_at: string | null
           mission_id: string | null
           role: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           id?: string
           joined_at?: string | null
           mission_id?: string | null
           role?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           id?: string
           joined_at?: string | null
           mission_id?: string | null
           role?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -4865,7 +4865,7 @@ export type Database = {
           is_online: boolean | null
           last_login_at: string | null
           last_seen_at: string | null
-          organization_id: string | null
+          organization_id: string
           phone: string | null
           practice: Database["public"]["Enums"]["eval_practice"] | null
           skills: Json | null
@@ -4887,7 +4887,7 @@ export type Database = {
           is_online?: boolean | null
           last_login_at?: string | null
           last_seen_at?: string | null
-          organization_id?: string | null
+          organization_id: string
           phone?: string | null
           practice?: Database["public"]["Enums"]["eval_practice"] | null
           skills?: Json | null
@@ -4909,7 +4909,7 @@ export type Database = {
           is_online?: boolean | null
           last_login_at?: string | null
           last_seen_at?: string | null
-          organization_id?: string | null
+          organization_id?: string
           phone?: string | null
           practice?: Database["public"]["Enums"]["eval_practice"] | null
           skills?: Json | null
@@ -6334,6 +6334,11 @@ export type Database = {
         Args: { _obligation_document_id: string; _portal_document_id: string }
         Returns: Json
       }
+      best_leader_role: { Args: { _user_id: string }; Returns: string }
+      best_mission_role: {
+        Args: { _user_id: string; _wanted: string }
+        Returns: string
+      }
       caller_organization_id: { Args: never; Returns: string }
       caller_sees_user: { Args: { _user_id: string }; Returns: boolean }
       can_access_committee: {
@@ -6546,6 +6551,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      est_plomberie_de_compte: { Args: { _table: string }; Returns: boolean }
       evaluation_weight: {
         Args: {
           _mode: string
@@ -6825,6 +6831,9 @@ export type Database = {
         }
         Returns: undefined
       }
+      member_role_to_staffing: { Args: { _role: string }; Returns: string }
+      mission_role_label: { Args: { _role: string }; Returns: string }
+      mission_role_min_rank: { Args: { _role: string }; Returns: number }
       open_annual_campaign: {
         Args: { _due_date?: string; _exercice?: number }
         Returns: Json
@@ -6866,8 +6875,31 @@ export type Database = {
         Args: { _document_id: string; _restore?: boolean }
         Returns: Json
       }
+      profile_rank: { Args: { _user_id: string }; Returns: number }
       purge_old_activity_data: { Args: never; Returns: undefined }
       purge_old_attendance: { Args: never; Returns: undefined }
+      purger_fiches_sans_cabinet: {
+        Args: never
+        Returns: {
+          action_: string
+          email: string
+          nom: string
+          raison: string
+        }[]
+      }
+      rank_to_mission_role: { Args: { _rank: number }; Returns: string }
+      rapport_fiches_sans_cabinet: {
+        Args: never
+        Returns: {
+          donnees_travail: number
+          email: string
+          grade: string
+          nom: string
+          ou: string
+          plomberie_compte: number
+          verdict: string
+        }[]
+      }
       rate_evaluation_objective: {
         Args: {
           _achievement_rate: number
@@ -6974,6 +7006,7 @@ export type Database = {
         Args: { _evaluation_id: string; _reason: string }
         Returns: Json
       }
+      staffing_role_to_member: { Args: { _role: string }; Returns: string }
       submit_evaluation_feedback: {
         Args: {
           _feedback_id: string
