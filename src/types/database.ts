@@ -17,7 +17,14 @@ export type TimesheetStatus = 'draft' | 'submitted' | 'approved' | 'rejected';
 export type ExpenseCategory = 'transport' | 'hebergement' | 'restauration' | 'fournitures' | 'communication' | 'autre';
 export type InvoiceStatus = 'draft' | 'sent' | 'viewed' | 'paid' | 'overdue' | 'cancelled';
 export type Currency = 'XOF' | 'XAF' | 'EUR' | 'USD';
-export type MissionMemberRole = 'director' | 'chief' | 'supervisor' | 'project_lead' | 'member';
+export type MissionMemberRole = 'associe' | 'directeur_mission' | 'chef_mission' | 'auditeur_experimente' | 'auditeur';
+export const MISSION_MEMBER_ROLE_LABELS: Record<MissionMemberRole, string> = {
+  associe: 'Associé',
+  directeur_mission: 'Directeur de mission',
+  chef_mission: 'Chef de mission',
+  auditeur_experimente: 'Auditeur expérimenté',
+  auditeur: 'Auditeur',
+};
 export type ProjectMemberRole = 'lead' | 'sub_lead' | 'member';
 export type CommitteeType = 'copil' | 'comite_direction';
 export type ConversationType = 'individual' | 'group' | 'meeting' | 'project' | 'mission';
@@ -27,8 +34,8 @@ export type MeetingType = 'video' | 'audio' | 'in_person';
 
 export const GRADE_LABELS: Record<Grade, string> = {
   DA: 'Directeur Associé',
-  DM: 'Directeur de Mission',
-  CM: 'Chef de Mission',
+  DM: 'Directeur de Mission Senior',
+  CM: 'Directeur de Mission',
   SUP: 'Superviseur',
   AS: 'Auditeur Senior',
   AUD: 'Auditeur',

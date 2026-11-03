@@ -22,6 +22,7 @@ import {
   type StaffingAssignment,
 } from '@/hooks/useStaffing';
 import { STAFFING_ROLES, type StaffingRole } from '@/lib/staffing';
+import { isMissionPilotRole } from '@/lib/missionRoles';
 
 interface Props {
   open: boolean;
@@ -38,7 +39,7 @@ export default function AssignmentDialog({ open, onOpenChange, assignment }: Pro
   const [missionId, setMissionId] = useState<string | null>(null);
   const [projectId, setProjectId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  const [role, setRole] = useState<StaffingRole>('collaborateur');
+  const [role, setRole] = useState<StaffingRole>('auditeur');
   const [startDate, setStartDate] = useState<Date | undefined>(new Date());
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [weeklyHours, setWeeklyHours] = useState<string>('35');
@@ -57,7 +58,7 @@ export default function AssignmentDialog({ open, onOpenChange, assignment }: Pro
       setMissionId(null);
       setProjectId(null);
       setUserId(null);
-      setRole('collaborateur');
+      setRole('auditeur');
       setStartDate(new Date());
       setEndDate(undefined);
       setWeeklyHours('35');
@@ -69,7 +70,8 @@ export default function AssignmentDialog({ open, onOpenChange, assignment }: Pro
     queryKey: ['assign-projects', missionId],
     enabled: !!missionId,
     queryFn: async () => {
-      const { data, error } = await supabase.from('projects').select('id, name').eq('mission_id', missionId!).order('name');
+      if (!missionId) return [];
+      const { data, error } = await supabase.from('projects').select('id, name').eq('mission_id', missionId).order('name');
       if (error) throw error;
       return data ?? [];
     },
@@ -80,10 +82,11 @@ export default function AssignmentDialog({ open, onOpenChange, assignment }: Pro
     queryKey: ['org-members', profile?.organization_id],
     enabled: !!profile?.organization_id,
     queryFn: async () => {
+      if (!profile?.organization_id) return [];
       const { data, error } = await supabase
         .from('profiles')
         .select('id, full_name, grade, grade_level, avatar_url')
-        .eq('organization_id', profile!.organization_id!)
+        .eq('organization_id', profile.organization_id)
         .order('full_name');
       if (error) throw error;
       return data ?? [];
@@ -125,11 +128,11 @@ export default function AssignmentDialog({ open, onOpenChange, assignment }: Pro
     Number(weeklyHours) <= 80;
 
   const submit = async () => {
-    if (!canSave || !startDate) return;
+    if (!canSave || !startDate || !missionId || !userId) return;
     const payload = {
-      mission_id: missionId!,
+      mission_id: missionId,
       project_id: projectId,
-      user_id: userId!,
+      user_id: userId,
       role,
       start_date: format(startDate, 'yyyy-MM-dd'),
       end_date: endDate ? format(endDate, 'yyyy-MM-dd') : null,
@@ -143,7 +146,7 @@ export default function AssignmentDialog({ open, onOpenChange, assignment }: Pro
     onOpenChange(false);
   };
 
-  const isPilotRole = role === 'directeur_mission' || role === 'chef_projet';
+  const isPilotRole = isMissionPilotRole(role);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

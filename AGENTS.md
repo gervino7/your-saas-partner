@@ -9,3 +9,4 @@
 - Accounting dossier evaluations reuse mission-type workflows and RPC-derived practice/exercise; their fiscal-tab controls only mirror server permissions, preserving one scoring pipeline.
 - Department selectors share the organization-scoped reference hook; default dossier changes use a serialized transactional RPC to preserve exclusivity.
 - Validation eligibility is displayed independently from score editing; server workflow RPCs enforce grade and observation prerequisites.
+- Mission and staffing role display share the mission role reference and membership predicates; database defaults and RPCs remain authoritative for activation and removal to prevent client-side permission drift.

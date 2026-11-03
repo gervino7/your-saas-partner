@@ -13,17 +13,14 @@ import {
 import { UserPlus, MoreVertical, UserMinus } from 'lucide-react';
 import { useMissionMembers, useOrganizationUsers, useAddMissionMember, useMission } from '@/hooks/useMissions';
 import { useAuthStore } from '@/stores/authStore';
-import { GRADE_LABELS, GRADE_LEVELS } from '@/types/database';
+import { GRADE_LABELS, GRADE_LEVELS, MISSION_MEMBER_ROLE_LABELS } from '@/types/database';
+import { isMissionAssociate, isMissionPilotRole } from '@/lib/missionRoles';
 import type { Grade } from '@/types/database';
 import RemoveMemberDialog from './RemoveMemberDialog';
 
 function initials(name: string) {
   return name?.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2) ?? '?';
 }
-
-const roleLabels: Record<string, string> = {
-  director: 'Directeur de Mission', chief: 'Chef de Mission', supervisor: 'Superviseur', project_lead: 'Chef de Projet', member: 'Membre',
-};
 
 export default function MissionTeamTab({ missionId, canManage }: { missionId: string; canManage: boolean }) {
   const { data: allMembers = [], isLoading } = useMissionMembers(missionId);
@@ -40,12 +37,12 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
   const addMember = useAddMissionMember();
   const [addOpen, setAddOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState('');
-  const [selectedRole, setSelectedRole] = useState('member');
+  const [selectedRole, setSelectedRole] = useState('auditeur');
   const [removeTarget, setRemoveTarget] = useState<{ user_id: string; name: string } | null>(null);
 
+  const isAssociate = isMissionAssociate(allMembers, currentProfile?.id);
   const canRemove = (m: any) =>
-    canManage &&
-    viewerLevel <= 3 &&
+    isAssociate &&
     m.user_id !== currentProfile?.id &&
     m.user_id !== (mission as any)?.director_id &&
     m.user_id !== (mission as any)?.chief_id;
@@ -56,7 +53,7 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
   const handleAdd = async () => {
     if (!selectedUser) return;
     await addMember.mutateAsync({ missionId, userId: selectedUser, role: selectedRole });
-    setAddOpen(false); setSelectedUser(''); setSelectedRole('member');
+    setAddOpen(false); setSelectedUser(''); setSelectedRole('auditeur');
   };
 
 
@@ -81,7 +78,7 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
                   <p className="text-xs text-muted-foreground">{m.user?.email}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1">
-                  <Badge variant="outline" className="text-xs">{roleLabels[m.role] ?? m.role}</Badge>
+                  <Badge variant="outline" className="text-xs">{MISSION_MEMBER_ROLE_LABELS[m.role as keyof typeof MISSION_MEMBER_ROLE_LABELS] ?? m.role}</Badge>
                   {m.user?.grade && (<span className="text-xs text-muted-foreground">{GRADE_LABELS[m.user.grade as Grade] ?? m.user.grade}</span>)}
                 </div>
                 {canRemove(m) && (
@@ -105,7 +102,7 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
         </div>
       )}
 
-      <MissionEvaluations missionId={missionId} practice={(mission as any)?.practice ?? null} mission={mission} canOpen={viewerLevel<=2 || currentProfile?.id===(mission as any)?.lead_id || allMembers.some(m=>m.user_id===currentProfile?.id && ['chef','chef_de_mission','responsable','lead'].includes(m.role??''))}/>
+      <MissionEvaluations missionId={missionId} practice={(mission as any)?.practice ?? null} mission={mission} canOpen={viewerLevel<=2 || currentProfile?.id===(mission as any)?.lead_id || allMembers.some(m=>m.user_id===currentProfile?.id && isMissionPilotRole(m.role))}/>
       <RemoveMemberDialog
         open={!!removeTarget}
         onOpenChange={(v) => { if (!v) setRemoveTarget(null); }}
@@ -127,7 +124,7 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
             <div><Label>Rôle</Label>
               <Select value={selectedRole} onValueChange={setSelectedRole}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{Object.entries(roleLabels).map(([k, v]) => (<SelectItem key={k} value={k}>{v}</SelectItem>))}</SelectContent>
+                <SelectContent>{Object.entries(MISSION_MEMBER_ROLE_LABELS).map(([k, v]) => (<SelectItem key={k} value={k}>{v}</SelectItem>))}</SelectContent>
               </Select>
             </div>
           </div>
