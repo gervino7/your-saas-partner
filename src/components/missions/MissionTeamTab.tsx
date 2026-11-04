@@ -1,5 +1,5 @@
 import MissionEvaluations from '@/components/evaluations/MissionEvaluations';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -14,7 +14,9 @@ import { UserPlus, MoreVertical, UserMinus } from 'lucide-react';
 import { useMissionMembers, useOrganizationUsers, useAddMissionMember, useMission } from '@/hooks/useMissions';
 import { useAuthStore } from '@/stores/authStore';
 import { GRADE_LABELS, GRADE_LEVELS, MISSION_MEMBER_ROLE_LABELS } from '@/types/database';
-import { isMissionAssociate, isMissionPilotRole } from '@/lib/missionRoles';
+import { isMissionAssociate, isMissionPilotRole, isAuthorizedMissionRole } from '@/lib/missionRoles';
+import { useMissionRoles } from '@/hooks/useMissionRoles';
+import MissionRoleSelect from './MissionRoleSelect';
 import type { Grade } from '@/types/database';
 import RemoveMemberDialog from './RemoveMemberDialog';
 
@@ -37,7 +39,14 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
   const addMember = useAddMissionMember();
   const [addOpen, setAddOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState('');
-  const [selectedRole, setSelectedRole] = useState('auditeur');
+  const [selectedRole, setSelectedRole] = useState('');
+  const roleQuery = useMissionRoles(selectedUser, addOpen);
+  const roles = roleQuery.data ?? [];
+  const roleAllowed = !roleQuery.isFetching && !roleQuery.isError && isAuthorizedMissionRole(roles, selectedRole);
+  useEffect(() => {
+    if (!roleQuery.data || roleQuery.isFetching) return;
+    setSelectedRole(previous => isAuthorizedMissionRole(roleQuery.data, previous) ? previous : roleQuery.data.find(r => r.autorise)?.role ?? '');
+  }, [roleQuery.data, roleQuery.isFetching]);
   const [removeTarget, setRemoveTarget] = useState<{ user_id: string; name: string } | null>(null);
 
   const isAssociate = isMissionAssociate(allMembers, currentProfile?.id);
@@ -51,9 +60,9 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
   const availableUsers = orgUsers.filter((u: any) => !memberIds.has(u.id));
 
   const handleAdd = async () => {
-    if (!selectedUser) return;
+    if (!selectedUser || !roleAllowed) return;
     await addMember.mutateAsync({ missionId, userId: selectedUser, role: selectedRole });
-    setAddOpen(false); setSelectedUser(''); setSelectedRole('auditeur');
+    setAddOpen(false); setSelectedUser(''); setSelectedRole('');
   };
 
 
@@ -115,22 +124,19 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>Ajouter un membre</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div><Label>Utilisateur</Label>
-              <Select value={selectedUser} onValueChange={setSelectedUser}>
-                <SelectTrigger><SelectValue placeholder="Sélectionner un utilisateur" /></SelectTrigger>
+            <div><Label>Collaborateur</Label>
+              <Select value={selectedUser} onValueChange={value => { setSelectedUser(value); setSelectedRole(''); }}>
+                <SelectTrigger><SelectValue placeholder="Sélectionner un collaborateur" /></SelectTrigger>
                 <SelectContent>{availableUsers.map((u: any) => (<SelectItem key={u.id} value={u.id}>{u.full_name} {u.grade ? `(${u.grade})` : ''}</SelectItem>))}</SelectContent>
               </Select>
             </div>
             <div><Label>Rôle</Label>
-              <Select value={selectedRole} onValueChange={setSelectedRole}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{Object.entries(MISSION_MEMBER_ROLE_LABELS).map(([k, v]) => (<SelectItem key={k} value={k}>{v}</SelectItem>))}</SelectContent>
-              </Select>
+              <MissionRoleSelect roles={roles} value={selectedRole} onValueChange={setSelectedRole} disabled={!selectedUser} loading={roleQuery.isFetching} error={roleQuery.error?.message} />
             </div>
           </div>
           <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
             <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => setAddOpen(false)}>Annuler</Button>
-            <Button size="sm" className="h-9 px-5" onClick={handleAdd} disabled={!selectedUser || addMember.isPending}>{addMember.isPending ? 'Ajout...' : 'Ajouter'}</Button>
+            <Button size="sm" className="h-9 px-5" onClick={handleAdd} disabled={!selectedUser || !roleAllowed || addMember.isPending}>{addMember.isPending ? 'Ajout...' : 'Ajouter'}</Button>
           </div>
         </DialogContent>
       </Dialog>

@@ -10,3 +10,14 @@ export function isMissionAssociate(members: readonly MissionMembership[], userId
 export function isMissionPilotRole(role: string | null) {
   return ['associe', 'directeur_mission', 'chef_mission'].includes(role ?? '');
 }
+
+export interface MissionRoleEligibility {
+  role: string;
+  libelle: string;
+  autorise: boolean;
+  motif: string;
+}
+
+export function isAuthorizedMissionRole(roles: readonly MissionRoleEligibility[], role: string) {
+  return roles.some(option => option.role === role && option.autorise);
+}

@@ -1,9 +1,10 @@
 export const STAFFING_ROLES = {
-  associe: { label: 'Associé', color: 'navy' },
+  associe: { label: 'Associé de mission', color: 'navy' },
   directeur_mission: { label: 'Directeur de mission', color: 'navy' },
   chef_mission: { label: 'Chef de mission', color: 'copper' },
   auditeur_experimente: { label: 'Auditeur expérimenté', color: 'blue' },
   auditeur: { label: 'Auditeur', color: 'slate' },
+  auditeur_junior: { label: 'Auditeur junior', color: 'slate' },
 } as const;
 
 export type StaffingRole = keyof typeof STAFFING_ROLES;
@@ -21,6 +22,7 @@ export const ROLE_BADGE_CLASSES: Record<StaffingRole, string> = {
   chef_mission: 'bg-accent/10 text-accent border-accent/30',
   auditeur_experimente: 'bg-info/10 text-info border-info/30',
   auditeur: 'bg-muted text-muted-foreground border-border',
+  auditeur_junior: 'bg-muted text-muted-foreground border-border',
 };
 
 export const STATUS_BADGE_CLASSES: Record<StaffingStatus, string> = {

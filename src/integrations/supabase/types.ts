@@ -6318,6 +6318,17 @@ export type Database = {
       }
     }
     Functions: {
+      aligner_roles_hors_plage: {
+        Args: never
+        Returns: {
+          mission: string
+          nom: string
+          rang: number
+          role_apres: string
+          role_avant: string
+          source: string
+        }[]
+      }
       assign_evaluator: {
         Args: {
           _due_date?: string
@@ -6832,8 +6843,27 @@ export type Database = {
         Returns: undefined
       }
       member_role_to_staffing: { Args: { _role: string }; Returns: string }
+      mission_role_grid: {
+        Args: never
+        Returns: {
+          libelle: string
+          rang_max: number
+          rang_min: number
+          role: string
+        }[]
+      }
       mission_role_label: { Args: { _role: string }; Returns: string }
+      mission_role_max_rank: { Args: { _role: string }; Returns: number }
       mission_role_min_rank: { Args: { _role: string }; Returns: number }
+      mission_roles_for_user: {
+        Args: { _user_id: string }
+        Returns: {
+          autorise: boolean
+          libelle: string
+          motif: string
+          role: string
+        }[]
+      }
       open_annual_campaign: {
         Args: { _due_date?: string; _exercice?: number }
         Returns: Json
