@@ -17,13 +17,14 @@ export type TimesheetStatus = 'draft' | 'submitted' | 'approved' | 'rejected';
 export type ExpenseCategory = 'transport' | 'hebergement' | 'restauration' | 'fournitures' | 'communication' | 'autre';
 export type InvoiceStatus = 'draft' | 'sent' | 'viewed' | 'paid' | 'overdue' | 'cancelled';
 export type Currency = 'XOF' | 'XAF' | 'EUR' | 'USD';
-export type MissionMemberRole = 'associe' | 'directeur_mission' | 'chef_mission' | 'auditeur_experimente' | 'auditeur';
+export type MissionMemberRole = 'associe' | 'directeur_mission' | 'chef_mission' | 'auditeur_experimente' | 'auditeur' | 'auditeur_junior';
 export const MISSION_MEMBER_ROLE_LABELS: Record<MissionMemberRole, string> = {
-  associe: 'Associé',
+  associe: 'Associé de mission',
   directeur_mission: 'Directeur de mission',
   chef_mission: 'Chef de mission',
   auditeur_experimente: 'Auditeur expérimenté',
   auditeur: 'Auditeur',
+  auditeur_junior: 'Auditeur junior',
 };
 export type ProjectMemberRole = 'lead' | 'sub_lead' | 'member';
 export type CommitteeType = 'copil' | 'comite_direction';
