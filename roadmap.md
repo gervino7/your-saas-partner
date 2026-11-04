@@ -1,9 +1,10 @@
 # Evaluation PDF export
 
 ## Sixième rôle et grille des échelons
-- [ ] Ajouter Auditeur junior et limiter les deux sélecteurs aux rôles autorisés par les RPC serveur.
-- [ ] Ajouter la grille du cabinet : 3 practices, 18 rangs fixes, édition grade 1/2, lecture seule sinon, initialisation complète par RPC.
-- [ ] Vérifier les règles, les écrans connectés et les tests sans affectations RH fictives.
+- [x] Ajouter Auditeur junior et limiter les deux sélecteurs aux rôles autorisés par les RPC serveur.
+- [x] Ajouter la grille du cabinet : 3 practices, 18 rangs fixes, édition grade 1/2, lecture seule sinon, initialisation complète par RPC.
+- [x] 42 tests et compilation OK ; deux sélecteurs connectés vérifiés, stagiaire junior uniquement et DA associé/directeur uniquement, motifs visibles, 54 lignes affichées, doublon bloqué, échelon enregistré et relu sans changement, affichage mobile sans débordement.
+- [ ] Vérifier l'initialisation réelle sur un cabinet sans grille et la lecture seule avec une session grade > 2 : cabinet disponible déjà complet et session actuelle DM ; aucun cabinet ni compte fictif créé.
 
 ## Alignement du front sur les rôles du 02/11/2026
 - [x] Aligner les cinq rôles mission/staffing et les libellés DM/CM sans modifier les codes ni les rôles projet.
