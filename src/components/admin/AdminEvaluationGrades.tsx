@@ -22,7 +22,7 @@ export default function AdminEvaluationGrades() {
   if (query.isLoading) return <p className="text-muted-foreground">Chargement de la grille...</p>;
   if (query.error) return <div role="alert" className="space-y-3"><p className="text-destructive">Impossible de charger la grille : {query.error.message}</p><Button variant="outline" onClick={() => query.refetch()}>Réessayer</Button></div>;
 
-  return <div className="space-y-5">
+  return <div className="w-full min-w-0 space-y-5">
     <div className="flex flex-wrap items-center justify-between gap-2">
       <h2 className="text-base font-semibold text-primary">Grilles des grades et échelons</h2>
       <span className="text-sm text-muted-foreground tabular-nums">{rows.length} / 54 échelons{!canEdit && ' - Lecture seule'}</span>
@@ -32,9 +32,9 @@ export default function AdminEvaluationGrades() {
       {canEdit ? <Button onClick={() => seed.mutate()} disabled={seed.isPending}><Plus className="h-4 w-4 mr-2" />{seed.isPending ? 'Création...' : 'Créer la grille complète'}</Button> : <p className="text-sm text-muted-foreground">La direction du cabinet peut créer la grille complète.</p>}
       {seed.data && <p className="text-sm text-muted-foreground">Résultat : {JSON.stringify(seed.data)}</p>}
     </div>}
-    <Tabs defaultValue="comptable">
-      <TabsList className="w-full sm:w-auto">{PRACTICES.map(p => <TabsTrigger key={p} value={p}>{practiceLabels[p]}</TabsTrigger>)}</TabsList>
-      {PRACTICES.map(practice => <TabsContent key={practice} value={practice} className="space-y-4">
+    <Tabs defaultValue="comptable" className="w-full min-w-0 overflow-hidden">
+      <TabsList className="grid w-full grid-cols-3 sm:inline-flex sm:w-auto">{PRACTICES.map(p => <TabsTrigger key={p} value={p}>{practiceLabels[p]}</TabsTrigger>)}</TabsList>
+      {PRACTICES.map(practice => <TabsContent key={practice} value={practice} className="min-w-0 space-y-4">
         <section>
           <h3 className="text-sm font-semibold text-muted-foreground mb-2">Rôles de mission et rangs autorisés</h3>
           {roleGrid.isLoading ? <p>Chargement des rôles...</p> : roleGrid.error ? <p role="alert" className="text-destructive">Impossible de charger les rôles : {roleGrid.error.message}</p> : <Table>

@@ -15,7 +15,7 @@ export function validateGradeRow(row: EvaluationGradeRow, rows: readonly Evaluat
   if (!Number.isInteger(row.rank) || row.rank < 1 || row.rank > 18) return 'Le rang doit être compris entre 1 et 18.';
   if (!row.echelon.trim()) return 'Renseignez le libellé de l’échelon.';
   if (!row.family.trim()) return 'Renseignez la famille.';
-  if (!row.maps_to_grade || !Object.hasOwn(GRADE_LEVELS, row.maps_to_grade)) return 'Choisissez l’un des 8 grades.';
+  if (!row.maps_to_grade || !Object.prototype.hasOwnProperty.call(GRADE_LEVELS, row.maps_to_grade)) return 'Choisissez l’un des 8 grades.';
   const siblings = rows.filter(r => r.id !== row.id && r.organization_id === row.organization_id && r.practice === row.practice);
   if (siblings.some(r => r.rank === row.rank)) return 'Ce rang possède déjà un échelon dans cette practice.';
   if (siblings.some(r => r.echelon.trim() === row.echelon.trim())) return 'Ce libellé existe déjà dans cette practice.';
