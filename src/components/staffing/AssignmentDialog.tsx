@@ -21,8 +21,10 @@ import {
   useStaffingAssignments,
   type StaffingAssignment,
 } from '@/hooks/useStaffing';
-import { STAFFING_ROLES, type StaffingRole } from '@/lib/staffing';
-import { isMissionPilotRole } from '@/lib/missionRoles';
+import { type StaffingRole } from '@/lib/staffing';
+import { isMissionPilotRole, isAuthorizedMissionRole } from '@/lib/missionRoles';
+import { useMissionRoles } from '@/hooks/useMissionRoles';
+import MissionRoleSelect from '@/components/missions/MissionRoleSelect';
 
 interface Props {
   open: boolean;
@@ -39,7 +41,14 @@ export default function AssignmentDialog({ open, onOpenChange, assignment }: Pro
   const [missionId, setMissionId] = useState<string | null>(null);
   const [projectId, setProjectId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  const [role, setRole] = useState<StaffingRole>('auditeur');
+  const [role, setRole] = useState<StaffingRole | ''>('');
+  const roleQuery = useMissionRoles(userId, open);
+  const roles = roleQuery.data ?? [];
+  const roleAllowed = !roleQuery.isFetching && !roleQuery.isError && isAuthorizedMissionRole(roles, role);
+  useEffect(() => {
+    if (!roleQuery.data || roleQuery.isFetching) return;
+    setRole(previous => isAuthorizedMissionRole(roleQuery.data, previous) ? previous : (roleQuery.data.find(r => r.autorise)?.role as StaffingRole | undefined) ?? '');
+  }, [roleQuery.data, roleQuery.isFetching]);
   const [startDate, setStartDate] = useState<Date | undefined>(new Date());
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [weeklyHours, setWeeklyHours] = useState<string>('35');
@@ -58,7 +67,7 @@ export default function AssignmentDialog({ open, onOpenChange, assignment }: Pro
       setMissionId(null);
       setProjectId(null);
       setUserId(null);
-      setRole('auditeur');
+      setRole('');
       setStartDate(new Date());
       setEndDate(undefined);
       setWeeklyHours('35');
@@ -121,14 +130,14 @@ export default function AssignmentDialog({ open, onOpenChange, assignment }: Pro
   const canSave =
     !!missionId &&
     !!userId &&
-    !!role &&
+    !!role && roleAllowed &&
     !!startDate &&
     (!endDate || endDate >= startDate) &&
     Number(weeklyHours) >= 0 &&
     Number(weeklyHours) <= 80;
 
   const submit = async () => {
-    if (!canSave || !startDate || !missionId || !userId) return;
+    if (!canSave || !startDate || !missionId || !userId || !role) return;
     const payload = {
       mission_id: missionId,
       project_id: projectId,
@@ -189,7 +198,7 @@ export default function AssignmentDialog({ open, onOpenChange, assignment }: Pro
 
           <div className="space-y-1.5">
             <Label>Collaborateur <span className="text-destructive">*</span></Label>
-            <Select value={userId ?? ''} onValueChange={(v) => setUserId(v || null)}>
+            <Select value={userId ?? ''} onValueChange={(v) => { setUserId(v || null); setRole(''); }}>
               <SelectTrigger><SelectValue placeholder="Sélectionner un collaborateur" /></SelectTrigger>
               <SelectContent>
                 {(members as any[]).map((m) => (
@@ -206,14 +215,7 @@ export default function AssignmentDialog({ open, onOpenChange, assignment }: Pro
 
           <div className="space-y-1.5">
             <Label>Rôle <span className="text-destructive">*</span></Label>
-            <Select value={role} onValueChange={(v) => setRole(v as StaffingRole)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {(Object.entries(STAFFING_ROLES) as [StaffingRole, { label: string }][]).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>{v.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <MissionRoleSelect roles={roles} value={role} onValueChange={v => setRole(v as StaffingRole)} disabled={!userId} loading={roleQuery.isFetching} error={roleQuery.error?.message} />
             {isPilotRole && (
               <p className="text-xs text-muted-foreground">
                 Ce rôle confère le pilotage de la mission : validation des travaux et des plannings.
