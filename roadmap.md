@@ -1,5 +1,10 @@
 # Evaluation PDF export
 
+## Sixième rôle et grille des échelons
+- [ ] Ajouter Auditeur junior et limiter les deux sélecteurs aux rôles autorisés par les RPC serveur.
+- [ ] Ajouter la grille du cabinet : 3 practices, 18 rangs fixes, édition grade 1/2, lecture seule sinon, initialisation complète par RPC.
+- [ ] Vérifier les règles, les écrans connectés et les tests sans affectations RH fictives.
+
 ## Alignement du front sur les rôles du 02/11/2026
 - [x] Aligner les cinq rôles mission/staffing et les libellés DM/CM sans modifier les codes ni les rôles projet.
 - [x] Retirer les négociations, conserver Active/Annulée et réserver le retrait à l'associé de la mission.
