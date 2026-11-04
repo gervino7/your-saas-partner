@@ -22,6 +22,7 @@ import AdminUsers from '@/components/admin/AdminUsers';
 import AdminActivityLogs from '@/components/admin/AdminActivityLogs';
 import AdminSettings from '@/components/admin/AdminSettings';
 import AdminGrades from '@/components/admin/AdminGrades';
+import AdminEvaluationGrades from '@/components/admin/AdminEvaluationGrades';
 
 const sections = [
   { id: 'dashboard', label: 'Tableau de bord', icon: BarChart3 },
@@ -32,6 +33,7 @@ const sections = [
   { id: 'finance', label: 'Finance', icon: DollarSign },
   { id: 'reviews', label: 'Évaluations', icon: Star },
   { id: 'grades', label: 'Grades', icon: Shield },
+  { id: 'grade-grid', label: 'Grilles des échelons', icon: Shield },
   { id: 'logs', label: 'Journaux d\'activité', icon: Activity },
   { id: 'settings', label: 'Paramètres', icon: Settings },
 ];
@@ -114,14 +116,16 @@ const AdminPage = () => {
   const canAccess = gradeLevel <= 2;
   const navigate = useNavigate();
   const [params]=useSearchParams();
-  const [activeSection, setActiveSection] = useState(params.get('incomplete')==='1'?'users':'dashboard');
+  const [activeSection, setActiveSection] = useState(params.get('section') === 'grade-grid' ? 'grade-grid' : params.get('incomplete')==='1'?'users':'dashboard');
   const [sheetOpen, setSheetOpen] = useState(false);
 
   if (!canAccess) {
+    if (activeSection === 'grade-grid') return <div className="space-y-6"><h1 className="text-xl font-semibold">Administration - Grilles des échelons</h1><AdminEvaluationGrades /></div>;
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-semibold ">Administration</h1>
         <EmptyState icon={Shield} title="Accès restreint" description="Cette section est réservée aux Directeurs Associés et Directeurs de Mission." />
+        <Button variant="outline" onClick={() => setActiveSection('grade-grid')}>Consulter les grilles des échelons</Button>
       </div>
     );
   }
@@ -161,6 +165,7 @@ const AdminPage = () => {
           </div>
         );
       case 'grades': return <AdminGrades />;
+      case 'grade-grid': return <AdminEvaluationGrades />;
       case 'logs': return <AdminActivityLogs />;
       case 'settings': return <AdminSettings />;
       default: return null;
