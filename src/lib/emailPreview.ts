@@ -94,14 +94,12 @@ export function buildEmailPreviewHtml(opts: EmailPreviewOptions): string {
 export const REMINDER_FOOTER_NOTE =
   'Cet email vous est adressé par votre cabinet comptable dans le cadre du suivi de vos obligations.';
 
-export function buildReminderPreview(subject: string, message: string, withPortalCta: boolean) {
+export function buildReminderPreview(subject: string, message: string) {
   return buildEmailPreviewHtml({
     preheader: subject,
     greeting: 'Bonjour,',
     title: subject || '(objet)',
     body: `<div>${escapeHtml(message).replace(/\n/g, '<br />')}</div>`,
-    ctaLabel: withPortalCta ? 'Déposer mes documents' : undefined,
-    ctaUrl: withPortalCta ? 'https://mamission.abodje.com/espace-client/documents' : undefined,
     footerNote: REMINDER_FOOTER_NOTE,
   });
 }

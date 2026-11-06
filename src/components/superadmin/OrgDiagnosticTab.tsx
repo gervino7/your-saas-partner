@@ -21,7 +21,6 @@ const VOLUME_LABELS: [string, string][] = [
   ['clients', 'Clients'],
   ['documents', 'Documents'],
   ['time_entries', 'Saisies de temps'],
-  ['portal_users', 'Comptes clients'],
 ];
 
 interface Props {

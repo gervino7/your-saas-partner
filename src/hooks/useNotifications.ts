@@ -24,7 +24,6 @@ export const notificationIcons: Record<string, string> = {
   staffing_adjustment_requested: 'RefreshCw',
   staffing_response: 'MessageCircle',
   document_deposited: 'Upload',
-  portal_document_received: 'Upload',
 };
 
 
@@ -49,7 +48,6 @@ export const notificationLabels: Record<string, string> = {
   staffing_adjustment_requested: 'Demande d\'ajustement',
   staffing_response: 'Réponse d\'affectation',
   document_deposited: 'Pièce déposée',
-  portal_document_received: 'Envoi client reçu',
 };
 
 
@@ -152,7 +150,7 @@ export function useNotifications(limit = 20) {
     const { type, entity_type, entity_id } = notification;
     if (type === 'staffing_adjustment_requested') return '/staffing?tab=pending';
     if (type === 'staffing_response' || type === 'staffing_assigned') return '/staffing?tab=mine';
-    if (type === 'document_deposited' || type === 'portal_document_received') return '/depots';
+    if (type === 'document_deposited') return '/depots';
     if (type === 'timesheet_reminder') return '/timesheets';
     if (type === 'plan_submitted') return '/planning?tab=team';
     if (type === 'evaluation_assigned') return '/evaluations';
