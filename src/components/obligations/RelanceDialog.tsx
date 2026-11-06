@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useLogRelance, useSendClientReminder, useClientHasPortal, type EcheancierRow } from '@/hooks/useObligations';
+import { useLogRelance, useSendClientReminder, type EcheancierRow } from '@/hooks/useObligations';
 import { usePeriodDocuments } from '@/hooks/useObligationDocs';
 import { useClient } from '@/hooks/useCRM';
 import { useAuthStore } from '@/stores/authStore';
@@ -33,7 +33,6 @@ const RelanceDialog = ({ row, open, onOpenChange }: Props) => {
   const profile = useAuthStore((s) => s.profile);
   const organization = useAuthStore((s) => s.organization);
   const { data: client } = useClient(row.client_id);
-  const { data: hasPortal } = useClientHasPortal(row.client_id);
   const { data: docsData } = usePeriodDocuments(row.id);
   const log = useLogRelance();
   const send = useSendClientReminder();
@@ -75,8 +74,8 @@ ${profile?.full_name ?? ''} - ${cabinet}`
   }, [message, includeMissing, missingDocs]);
 
   const previewHtml = useMemo(
-    () => buildReminderPreview(objet, finalMessage, !!hasPortal),
-    [objet, finalMessage, hasPortal],
+    () => buildReminderPreview(objet, finalMessage),
+    [objet, finalMessage],
   );
 
   const isEmail = canal === 'email';
