@@ -1,5 +1,11 @@
 # Evaluation PDF export
 
+## Retrait du portail client
+- [x] Supprimer les 3 fonctions Edge (validate-portal-token, activate-portal-account, send-portal-invitation), dossiers, config et versions déployées.
+- [x] Supprimer les pages, composants et hooks du portail ; retirer routes /portal/:token et /espace-client* ; nettoyer connexion, réinitialisation, AuthGuard, CRM, relances, notifications, diagnostic.
+- [x] Retirer les liens morts « Déposer » des courriels de relance et de rejet (send-client-reminder, send-document-rejection) ; deno check OK.
+- [x] Vérifié en navigation connectée : tableau de bord, missions, documents, CRM et fiche client (7 onglets métier) rendus ; /espace-client et /portal/:token renvoient 404 ; build OK, 42 tests réussis, deno check OK.
+
 ## Sixième rôle et grille des échelons
 - [x] Ajouter Auditeur junior et limiter les deux sélecteurs aux rôles autorisés par les RPC serveur.
 - [x] Ajouter la grille du cabinet : 3 practices, 18 rangs fixes, édition grade 1/2, lecture seule sinon, initialisation complète par RPC.

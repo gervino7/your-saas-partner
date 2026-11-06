@@ -77,9 +77,7 @@ const ResetPasswordPage = () => {
       if (error) throw error;
       setSuccess(true);
       toast({ title: 'Mot de passe mis à jour', description: 'Votre mot de passe a été réinitialisé avec succès.' });
-      // Portal clients are sent back to their own space, staff to the login page.
-      const { data: isPortal } = await supabase.rpc('is_portal_user');
-      setTimeout(() => navigate(isPortal ? '/espace-client' : '/login', { replace: true }), 2500);
+      setTimeout(() => navigate('/login', { replace: true }), 2500);
     } catch (error: any) {
       toast({
         title: 'Erreur',

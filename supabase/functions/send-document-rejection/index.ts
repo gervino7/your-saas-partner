@@ -1,8 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.3';
 import { buildEmailHtml, sendResend } from '../_shared/email-template.ts';
 
-const APP_URL = Deno.env.get('APP_URL') || 'https://mamission.abodje.com';
-
 const ALLOWED_ORIGINS = [
   'https://mamission.abodje.com',
   'https://missionpro.lovable.app',
@@ -40,7 +38,6 @@ interface Ctx {
   due_date: string | null;
   client_id: string;
   client_name: string;
-  portal_emails: string[];
   contact_emails: string[];
 }
 
@@ -98,7 +95,7 @@ Deno.serve(async (req) => {
     const results: Array<{ client: string; ok: boolean; error?: string }> = [];
 
     for (const { ctx, docs } of byClient.values()) {
-      const recipients = (ctx.portal_emails?.length ? ctx.portal_emails : ctx.contact_emails ?? [])
+      const recipients = (ctx.contact_emails ?? [])
         .filter((e) => typeof e === 'string' && EMAIL_RE.test(e));
 
       if (recipients.length === 0) {
@@ -106,7 +103,6 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      const hasPortal = (ctx.portal_emails?.length ?? 0) > 0;
       const subject = `Pièces à renvoyer — ${ctx.obligation_label} ${ctx.period_label}`;
 
       const list = docs.map((d) => `
@@ -124,8 +120,6 @@ Deno.serve(async (req) => {
           <ul style="margin:0 0 16px 18px;padding:0;">${list}</ul>
           ${ctx.due_date ? `<p style="margin:0 0 12px 0;">Échéance de dépôt : <strong>${fmtDate(ctx.due_date)}</strong>.</p>` : ''}
           <p style="margin:0;">Merci de transmettre les pièces corrigées.</p>`,
-        ctaLabel: hasPortal ? 'Déposer les pièces' : undefined,
-        ctaUrl: hasPortal ? `${APP_URL}/espace-client/obligations` : undefined,
         footerNote: 'Cet email vous est adressé par votre cabinet comptable dans le cadre du suivi de vos obligations.',
       });
 

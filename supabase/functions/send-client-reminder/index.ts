@@ -1,8 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.95.3';
 import { buildEmailHtml, sendResend } from '../_shared/email-template.ts';
 
-const APP_URL = Deno.env.get('APP_URL') || 'https://mamission.abodje.com';
-
 const ALLOWED_ORIGINS = [
   'https://mamission.abodje.com',
   'https://missionpro.lovable.app',
@@ -83,18 +81,6 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Échéance introuvable ou non autorisée' }), { status: 403, headers });
     }
 
-    // Portal CTA only when the client has an active portal account.
-    let hasPortal = false;
-    try {
-      const { data: portal } = await supabase
-        .from('portal_users')
-        .select('id')
-        .eq('client_id', period.client_id)
-        .eq('is_active', true)
-        .limit(1);
-      hasPortal = !!portal?.length;
-    } catch (_) { /* ignore — no CTA */ }
-
     const htmlBody = escapeHtml(message).replace(/\n/g, '<br />');
 
     const html = buildEmailHtml({
@@ -102,8 +88,6 @@ Deno.serve(async (req) => {
       greeting: 'Bonjour,',
       title: subject,
       body: `<div>${htmlBody}</div>`,
-      ctaLabel: hasPortal ? 'Déposer mes documents' : undefined,
-      ctaUrl: hasPortal ? `${APP_URL}/espace-client/documents` : undefined,
       footerNote: 'Cet email vous est adressé par votre cabinet comptable dans le cadre du suivi de vos obligations.',
     });
 

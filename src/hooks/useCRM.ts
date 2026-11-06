@@ -199,48 +199,6 @@ export function useClientSurveys(clientId: string | undefined) {
   });
 }
 
-// ── Portal Tokens ──
-export function usePortalTokens(clientId: string | undefined) {
-  return useQuery({
-    queryKey: ['portal-tokens', clientId],
-    queryFn: async () => {
-      if (!clientId) return [];
-      const { data, error } = await supabase
-        .from('client_portal_tokens')
-        .select('*, mission:missions(name, code)')
-        .eq('client_id', clientId)
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data ?? [];
-    },
-    enabled: !!clientId,
-  });
-}
-
-export function useCreatePortalToken() {
-  const qc = useQueryClient();
-  const profile = useAuthStore((s) => s.profile);
-  return useMutation({
-    mutationFn: async ({ clientId, missionId }: { clientId: string; missionId: string }) => {
-      const token = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '');
-      const { data, error } = await supabase
-        .from('client_portal_tokens')
-        .insert({
-          client_id: clientId,
-          mission_id: missionId,
-          token,
-          created_by: profile!.id,
-        })
-        .select()
-        .single();
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: (d) => { qc.invalidateQueries({ queryKey: ['portal-tokens', d.client_id] }); toast.success('Lien portail créé'); },
-    onError: (e: Error) => toast.error(e.message),
-  });
-}
-
 // ── Satisfaction stats ──
 export function useSatisfactionStats() {
   const profile = useAuthStore((s) => s.profile);

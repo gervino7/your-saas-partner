@@ -71,7 +71,7 @@ ${profile?.full_name ?? ''} - ${cabinet}`
   const previewHtml = useMemo(() => {
     const first = sendable[0]?.row ?? rows[0];
     if (!first) return '';
-    return buildReminderPreview(substitute(objet, first), substitute(message, first), false);
+    return buildReminderPreview(substitute(objet, first), substitute(message, first));
   }, [objet, message, sendable, rows]);
 
   const run = async () => {

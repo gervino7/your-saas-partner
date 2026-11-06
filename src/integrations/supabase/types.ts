@@ -2749,6 +2749,90 @@ export type Database = {
           },
         ]
       }
+      grade_history: {
+        Row: {
+          decided_at: string
+          decided_by: string | null
+          effective_from: string
+          exercice: number
+          grade: string
+          grade_echelon: string
+          id: string
+          motif: string | null
+          organization_id: string
+          origine: string
+          practice: Database["public"]["Enums"]["eval_practice"]
+          rank: number
+          user_id: string
+        }
+        Insert: {
+          decided_at?: string
+          decided_by?: string | null
+          effective_from: string
+          exercice: number
+          grade: string
+          grade_echelon: string
+          id?: string
+          motif?: string | null
+          organization_id: string
+          origine?: string
+          practice: Database["public"]["Enums"]["eval_practice"]
+          rank: number
+          user_id: string
+        }
+        Update: {
+          decided_at?: string
+          decided_by?: string | null
+          effective_from?: string
+          exercice?: number
+          grade?: string
+          grade_echelon?: string
+          id?: string
+          motif?: string | null
+          organization_id?: string
+          origine?: string
+          practice?: Database["public"]["Enums"]["eval_practice"]
+          rank?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "grade_history_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grade_history_decided_by_fkey"
+            columns: ["decided_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grade_history_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grade_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "grade_history_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       group_emails: {
         Row: {
           attachments: Json | null
@@ -6329,6 +6413,7 @@ export type Database = {
           source: string
         }[]
       }
+      ancre_historique_grade: { Args: { _user_id: string }; Returns: string }
       assign_evaluator: {
         Args: {
           _due_date?: string
@@ -6561,6 +6646,19 @@ export type Database = {
         Returns: {
           user_id: string
         }[]
+      }
+      echelons_promouvables: {
+        Args: { _user_id: string }
+        Returns: {
+          echelon: string
+          grade: string
+          rang: number
+          sens: string
+        }[]
+      }
+      est_affecte_a_la_tache: {
+        Args: { _task_id: string; _user_id: string }
+        Returns: boolean
       }
       est_plomberie_de_compte: { Args: { _table: string }; Returns: boolean }
       evaluation_weight: {
@@ -6843,6 +6941,14 @@ export type Database = {
         Returns: undefined
       }
       member_role_to_staffing: { Args: { _role: string }; Returns: string }
+      mission_composition_defauts: {
+        Args: { _mission_id: string }
+        Returns: {
+          defaut: string
+          detail: string
+          regle: string
+        }[]
+      }
       mission_role_grid: {
         Args: never
         Returns: {
@@ -6864,6 +6970,7 @@ export type Database = {
           role: string
         }[]
       }
+      niveau_role: { Args: { _role: string }; Returns: number }
       open_annual_campaign: {
         Args: { _due_date?: string; _exercice?: number }
         Returns: Json
@@ -6874,6 +6981,18 @@ export type Database = {
       }
       open_evaluation: { Args: { _assignment_id: string }; Returns: string }
       open_mission_evaluations: { Args: { _mission_id: string }; Returns: Json }
+      peut_piloter_la_tache: {
+        Args: { _task_id: string; _user_id: string }
+        Returns: boolean
+      }
+      peut_piloter_le_projet: {
+        Args: { _project_id: string; _user_id: string }
+        Returns: boolean
+      }
+      peut_voir_donnee_personnelle: {
+        Args: { _mission: string; _observateur: string; _personne: string }
+        Returns: boolean
+      }
       portal_accept_invitation: {
         Args: { _auth_user_id: string; _token: string }
         Returns: Json
@@ -6905,7 +7024,38 @@ export type Database = {
         Args: { _document_id: string; _restore?: boolean }
         Returns: Json
       }
+      profile_grade_at: {
+        Args: { _date: string; _user_id: string }
+        Returns: {
+          exercice: number
+          grade: string
+          grade_echelon: string
+          rank: number
+          source: string
+        }[]
+      }
       profile_rank: { Args: { _user_id: string }; Returns: number }
+      profile_rank_at: {
+        Args: { _date: string; _user_id: string }
+        Returns: number
+      }
+      promouvoir_collaborateur: {
+        Args: {
+          _effective_from?: string
+          _grade_echelon: string
+          _motif?: string
+          _user_id: string
+        }
+        Returns: {
+          collaborateur: string
+          echelon_apres: string
+          echelon_avant: string
+          exercice: string
+          rang_apres: number
+          rang_avant: number
+          sens: string
+        }[]
+      }
       purge_old_activity_data: { Args: never; Returns: undefined }
       purge_old_attendance: { Args: never; Returns: undefined }
       purger_fiches_sans_cabinet: {

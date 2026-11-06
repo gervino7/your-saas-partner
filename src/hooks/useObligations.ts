@@ -392,25 +392,6 @@ export function useSendClientReminder() {
   });
 }
 
-/** Does this client have an active portal account? (drives the email CTA) */
-export function useClientHasPortal(clientId: string | undefined) {
-  return useQuery({
-    queryKey: ['client-has-portal', clientId],
-    enabled: !!clientId,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('portal_users')
-        .select('id')
-        .eq('client_id', clientId!)
-        .eq('is_active', true)
-        .limit(1);
-      if (error) return false;
-      return (data ?? []).length > 0;
-    },
-  });
-}
-
-
 // ── Org collaborators (for assign selects) ──
 export function useOrgCollaborators() {
   const profile = useAuthStore((s) => s.profile);
