@@ -10,4 +10,4 @@
 - Department selectors share the organization-scoped reference hook; default dossier changes use a serialized transactional RPC to preserve exclusivity.
 - Validation eligibility is displayed independently from score editing; server workflow RPCs enforce grade and observation prerequisites.
 - Mission and staffing role selectors share RPC-derived eligibility and membership predicates; database defaults and RPCs remain authoritative for activation and removal to prevent client-side permission drift.
-- Cabinet echelon grids use organization-scoped authorized reference tables and server seeding; fixed rank keys and client validation mirror existing RLS without introducing cross-cabinet administration.
+- Cabinet echelon grids use organization-scoped authorized reference tables and server seeding; fixed rank keys and client validation mirror existing RLS without introducing cross-cabinet administration.- Mission document folders and per-folder rights come only from the dossiers_de_la_mission RPC; the front never re-derives the access matrix, and deletions remove the row before the storage object so a refused delete leaves no orphan.
