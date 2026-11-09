@@ -63,8 +63,7 @@ export default function DocumentExplorer({ missionId, projectId, activityId }: D
   });
 
   const deleteDoc = useDeleteDocument();
-  const { data: rawDocuments = [] } = { data: documents };
-  const visibleDocuments = missionId ? rawDocuments.filter((d) => !d.folder_id || folderById.has(d.folder_id)) : rawDocuments;
+  const visibleDocuments = missionId ? documents.filter((d) => !d.folder_id || folderById.has(d.folder_id)) : documents;
 
   // Compute document counts per folder
   const { data: allDocs = [] } = useDocuments({
