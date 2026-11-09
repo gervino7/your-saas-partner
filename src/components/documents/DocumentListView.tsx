@@ -9,9 +9,10 @@ import { fr } from 'date-fns/locale';
 interface Props {
   documents: DocumentRow[];
   onAction: (action: string, doc: DocumentRow) => void;
+  canDelete?: (doc: DocumentRow) => boolean;
 }
 
-export default function DocumentListView({ documents, onAction }: Props) {
+export default function DocumentListView({ documents, onAction, canDelete }: Props) {
   const handleDragStart = (e: React.DragEvent, doc: DocumentRow) => {
     e.dataTransfer.setData('application/x-document-id', doc.id);
     e.dataTransfer.setData('application/x-document-name', doc.name);
@@ -66,7 +67,7 @@ export default function DocumentListView({ documents, onAction }: Props) {
               v{doc.version || 1}
             </TableCell>
             <TableCell onClick={(e) => e.stopPropagation()}>
-              <DocumentActions doc={doc} onAction={onAction} />
+              <DocumentActions doc={doc} onAction={onAction} canDelete={canDelete ? canDelete(doc) : true} />
             </TableCell>
           </TableRow>
         ))}

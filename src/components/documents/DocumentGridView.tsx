@@ -8,9 +8,10 @@ import { fr } from 'date-fns/locale';
 interface Props {
   documents: DocumentRow[];
   onAction: (action: string, doc: DocumentRow) => void;
+  canDelete?: (doc: DocumentRow) => boolean;
 }
 
-export default function DocumentGridView({ documents, onAction }: Props) {
+export default function DocumentGridView({ documents, onAction, canDelete }: Props) {
   const handleDragStart = (e: React.DragEvent, doc: DocumentRow) => {
     e.dataTransfer.setData('application/x-document-id', doc.id);
     e.dataTransfer.setData('application/x-document-name', doc.name);
@@ -30,7 +31,7 @@ export default function DocumentGridView({ documents, onAction }: Props) {
           <div className="flex items-center justify-between mb-2">
             <span className="text-2xl flex-shrink-0">{getFileIcon(doc.mime_type)}</span>
             <div onClick={(e) => e.stopPropagation()}>
-              <DocumentActions doc={doc} onAction={onAction} />
+              <DocumentActions doc={doc} onAction={onAction} canDelete={canDelete ? canDelete(doc) : true} />
             </div>
           </div>
           <p className="text-sm font-medium truncate" title={doc.name}>{doc.name}</p>

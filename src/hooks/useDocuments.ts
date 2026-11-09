@@ -34,6 +34,13 @@ export interface FolderRow {
   organization_id: string | null;
   created_by: string | null;
   created_at: string | null;
+  /** Champs fournis par dossiers_de_la_mission (mode mission uniquement). */
+  sorte?: string | null;
+  ordre?: number;
+  est_structure?: boolean;
+  peut_deposer?: boolean;
+  peut_supprimer?: boolean;
+  pieces?: number;
 }
 
 interface UseDocumentsOptions {
@@ -88,14 +95,25 @@ export function useDocuments(opts: UseDocumentsOptions) {
   });
 }
 
-export function useDocumentFolders(opts: { projectId?: string; organizationId?: string }) {
+export function useDocumentFolders(opts: { projectId?: string; organizationId?: string; missionId?: string }) {
   const profile = useAuthStore((s) => s.profile);
   const orgId = opts.organizationId || profile?.organization_id;
 
   return useQuery({
-    queryKey: ['document_folders', orgId, opts.projectId],
+    queryKey: ['document_folders', orgId, opts.projectId, opts.missionId, profile?.id],
     enabled: !!orgId,
     queryFn: async () => {
+      if (opts.missionId) {
+        // Les droits viennent exclusivement de la base : dossiers invisibles absents, capacités par dossier.
+        const { data, error } = await supabase.rpc('dossiers_de_la_mission', { _mission_id: opts.missionId });
+        if (error) throw error;
+        return (data || []).map((d) => ({
+          id: d.id, name: d.nom, parent_id: d.parent_id, project_id: null,
+          organization_id: orgId!, created_by: null, created_at: null,
+          sorte: d.sorte, ordre: d.ordre, est_structure: d.est_structure,
+          peut_deposer: d.peut_deposer, peut_supprimer: d.peut_supprimer, pieces: d.pieces,
+        })) as FolderRow[];
+      }
       let q = supabase.from('document_folders').select('*').eq('organization_id', orgId!);
       if (opts.projectId) q = q.eq('project_id', opts.projectId);
       q = q.order('name');
@@ -111,13 +129,14 @@ export function useCreateFolder() {
   const profile = useAuthStore((s) => s.profile);
 
   return useMutation({
-    mutationFn: async (input: { name: string; parentId?: string | null; projectId?: string }) => {
+    mutationFn: async (input: { name: string; parentId?: string | null; projectId?: string; missionId?: string }) => {
       const { data, error } = await supabase
         .from('document_folders')
         .insert({
           name: input.name,
           parent_id: input.parentId || null,
           project_id: input.projectId || null,
+          ...(input.missionId ? { mission_id: input.missionId } : {}),
           organization_id: profile!.organization_id,
           created_by: profile!.id,
         })
@@ -176,6 +195,7 @@ export function useUploadDocument() {
       visibilityGrade?: number;
       checksum?: string;
     }) => {
+      if (!input.folderId) throw new Error('Choisissez un des dossiers avant de déposer.');
       const orgId = profile!.organization_id!;
       const sanitizedName = input.file.name
         .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -193,7 +213,7 @@ export function useUploadDocument() {
         .select('id, version')
         .eq('organization_id', orgId)
         .eq('name', input.file.name)
-        .eq('folder_id', input.folderId || '')
+        .eq('folder_id', input.folderId)
         .order('version', { ascending: false })
         .limit(1);
 
@@ -207,7 +227,7 @@ export function useUploadDocument() {
           file_path: filePath,
           file_size: input.file.size,
           mime_type: input.file.type,
-          folder_id: input.folderId || null,
+          folder_id: input.folderId,
           mission_id: input.missionId || null,
           project_id: input.projectId || null,
           activity_id: input.activityId || null,
@@ -221,12 +241,17 @@ export function useUploadDocument() {
         })
         .select()
         .single();
-      if (error) throw error;
+      if (error) {
+        // Dépôt refusé par la base : on retire le fichier versé pour ne pas laisser d'objet orphelin.
+        await supabase.storage.from('documents').remove([filePath]);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['documents'] });
-      toast({ title: 'Document uploadé' });
+      qc.invalidateQueries({ queryKey: ['document_folders'] });
+      toast({ title: 'Document déposé' });
     },
     onError: (e: any) => toast({ title: 'Erreur upload', description: e.message, variant: 'destructive' }),
   });
@@ -250,14 +275,18 @@ export function useDeleteDocument() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (doc: { id: string; file_path: string }) => {
-      await supabase.storage.from('documents').remove([doc.file_path]);
-      const { error } = await supabase.from('documents').delete().eq('id', doc.id);
+      // La ligne d'abord : si la base refuse, le fichier reste en place.
+      const { data, error } = await supabase.from('documents').delete().eq('id', doc.id).select('id');
       if (error) throw error;
+      if (!data || data.length === 0) throw new Error('Suppression refusée.');
+      await supabase.storage.from('documents').remove([doc.file_path]);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['documents'] });
+      qc.invalidateQueries({ queryKey: ['document_folders'] });
       toast({ title: 'Document supprimé' });
     },
+    onError: (e: any) => toast({ title: 'Suppression impossible', description: e.message, variant: 'destructive' }),
   });
 }
 

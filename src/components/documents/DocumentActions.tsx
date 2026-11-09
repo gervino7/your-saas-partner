@@ -12,9 +12,10 @@ import {
 interface Props {
   doc: DocumentRow;
   onAction: (action: string, doc: DocumentRow) => void;
+  canDelete?: boolean;
 }
 
-export default function DocumentActions({ doc, onAction }: Props) {
+export default function DocumentActions({ doc, onAction, canDelete = true }: Props) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -42,10 +43,12 @@ export default function DocumentActions({ doc, onAction }: Props) {
         <DropdownMenuItem onClick={() => onAction('access_log', doc)}>
           <Eye className="h-3.5 w-3.5 mr-2" /> Historique d'accès
         </DropdownMenuItem>
+        {canDelete && (<>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-destructive" onClick={() => onAction('delete', doc)}>
           <Trash2 className="h-3.5 w-3.5 mr-2" /> Supprimer
         </DropdownMenuItem>
+        </>)}
       </DropdownMenuContent>
     </DropdownMenu>
   );

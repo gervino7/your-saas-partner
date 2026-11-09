@@ -12,6 +12,8 @@ interface UploadZoneProps {
   activityId?: string;
   visibilityGrade?: number;
   onDone?: () => void;
+  /** Motif affiché quand le dépôt n'est pas permis ; null = dépôt actif. */
+  disabledReason?: string | null;
 }
 
 interface FileEntry {
@@ -21,13 +23,14 @@ interface FileEntry {
   error?: string;
 }
 
-export default function UploadZone({ folderId, missionId, projectId, activityId, visibilityGrade, onDone }: UploadZoneProps) {
+export default function UploadZone({ folderId, missionId, projectId, activityId, visibilityGrade, onDone, disabledReason = null }: UploadZoneProps) {
   const [dragOver, setDragOver] = useState(false);
   const [files, setFiles] = useState<FileEntry[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const upload = useUploadDocument();
 
   const addFiles = useCallback(async (fileList: FileList) => {
+    if (disabledReason) return;
     const entries: FileEntry[] = Array.from(fileList).map((f) => ({ file: f, progress: 0, status: 'pending' as const }));
     setFiles((prev) => [...prev, ...entries]);
 
@@ -58,7 +61,7 @@ export default function UploadZone({ folderId, missionId, projectId, activityId,
       }
     }
     onDone?.();
-  }, [upload, folderId, missionId, projectId, activityId, visibilityGrade, onDone]);
+  }, [upload, disabledReason, folderId, missionId, projectId, activityId, visibilityGrade, onDone]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -67,6 +70,15 @@ export default function UploadZone({ folderId, missionId, projectId, activityId,
   }, [addFiles]);
 
   const clearDone = () => setFiles((prev) => prev.filter((f) => f.status !== 'done'));
+
+  if (disabledReason) {
+    return (
+      <div className="border-2 border-dashed rounded-lg p-8 text-center text-sm text-muted-foreground opacity-70" aria-disabled="true">
+        <Upload className="h-8 w-8 mx-auto mb-2" />
+        {disabledReason}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
