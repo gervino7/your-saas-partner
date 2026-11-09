@@ -17,10 +17,11 @@ interface FolderTreeProps {
   selectedFolderId: string | null;
   onSelectFolder: (id: string | null) => void;
   projectId?: string;
+  missionId?: string;
   documentCounts?: Record<string, number>;
 }
 
-export default function FolderTree({ folders, selectedFolderId, onSelectFolder, projectId, documentCounts = {} }: FolderTreeProps) {
+export default function FolderTree({ folders, selectedFolderId, onSelectFolder, projectId, missionId, documentCounts = {} }: FolderTreeProps) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [creatingIn, setCreatingIn] = useState<string | null | undefined>(undefined);
   const [newName, setNewName] = useState('');
@@ -43,7 +44,7 @@ export default function FolderTree({ folders, selectedFolderId, onSelectFolder, 
 
   const handleCreate = () => {
     if (!newName.trim()) return;
-    createFolder.mutate({ name: newName.trim(), parentId: creatingIn, projectId }, {
+    createFolder.mutate({ name: newName.trim(), parentId: creatingIn, projectId, missionId }, {
       onSuccess: () => { setCreatingIn(undefined); setNewName(''); },
     });
   };
@@ -70,14 +71,25 @@ export default function FolderTree({ folders, selectedFolderId, onSelectFolder, 
     setDragOverId(null);
     const docId = e.dataTransfer.getData('application/x-document-id');
     const docName = e.dataTransfer.getData('application/x-document-name');
+    if (missionId) {
+      const target = folders.find((f) => f.id === folderId);
+      if (!target?.peut_deposer) { toast.error('Vous ne déposez pas dans ce dossier'); return; }
+    }
     if (docId) {
       moveDocument.mutate({ id: docId, folderId }, {
         onSuccess: () => toast.success(`"${docName || 'Document'}" déplacé`),
       });
     }
-  }, [moveDocument]);
+  }, [moveDocument, missionId, folders]);
 
-  const getChildren = (parentId: string | null) => folders.filter((f) => f.parent_id === parentId);
+  // En mode mission, l'ordre vient de la base (champ ordre) ; sinon tri par nom côté requête.
+  const getChildren = (parentId: string | null) => {
+    const list = folders.filter((f) => f.parent_id === parentId);
+    return missionId ? [...list].sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0)) : list;
+  };
+  const canCreateIn = (f: FolderRow) => !missionId || (!!f.peut_deposer && !!f.peut_supprimer);
+  const canEdit = (f: FolderRow) => !f.est_structure && (!missionId || !!f.peut_supprimer);
+  const selectedFolder = folders.find((f) => f.id === selectedFolderId) || null;
 
   const renderFolder = (folder: FolderRow, depth: number) => {
     const children = getChildren(folder.id);
@@ -97,7 +109,7 @@ export default function FolderTree({ folders, selectedFolderId, onSelectFolder, 
                 isDragOver && 'bg-primary/20 ring-2 ring-primary/40'
               )}
               style={{ paddingLeft: `${depth * 16 + 8}px` }}
-              onClick={() => onSelectFolder(folder.id)}
+              onClick={() => { onSelectFolder(folder.id); if (children.length > 0 && !isExpanded) toggle(folder.id); }}
               onDragOver={(e) => handleDragOver(e, folder.id)}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, folder.id)}
@@ -122,20 +134,28 @@ export default function FolderTree({ folders, selectedFolderId, onSelectFolder, 
               ) : (
                 <span className="truncate flex-1">{folder.name}</span>
               )}
-              {count > 0 && <span className="text-xs text-muted-foreground">{count}</span>}
+              {(folder.pieces ?? count) > 0 && <span className="text-xs text-muted-foreground tabular-nums">{folder.pieces ?? count}</span>}
             </div>
           </ContextMenuTrigger>
+          {(canCreateIn(folder) || canEdit(folder)) && (
           <ContextMenuContent>
+            {canCreateIn(folder) && (
             <ContextMenuItem onClick={() => { setCreatingIn(folder.id); setExpanded((p) => new Set(p).add(folder.id)); }}>
               <Plus className="h-3.5 w-3.5 mr-2" /> Nouveau sous-dossier
             </ContextMenuItem>
+            )}
+            {canEdit(folder) && (
             <ContextMenuItem onClick={() => { setRenamingId(folder.id); setRenameValue(folder.name); }}>
               <Pencil className="h-3.5 w-3.5 mr-2" /> Renommer
             </ContextMenuItem>
+            )}
+            {canEdit(folder) && (
             <ContextMenuItem className="text-destructive" onClick={() => deleteFolder.mutate(folder.id)}>
               <Trash2 className="h-3.5 w-3.5 mr-2" /> Supprimer
             </ContextMenuItem>
+            )}
           </ContextMenuContent>
+          )}
         </ContextMenu>
 
         {isExpanded && children.map((c) => renderFolder(c, depth + 1))}
@@ -169,7 +189,7 @@ export default function FolderTree({ folders, selectedFolderId, onSelectFolder, 
         onClick={() => onSelectFolder(null)}
         onDragOver={(e) => handleDragOver(e, '__root__' as any)}
         onDragLeave={handleDragLeave}
-        onDrop={(e) => handleDrop(e, null)}
+        onDrop={(e) => { if (missionId) { e.preventDefault(); setDragOverId(null); return; } handleDrop(e, null); }}
       >
         <FolderOpen className="h-4 w-4 text-accent" />
         <span>Tous les documents</span>
@@ -191,14 +211,19 @@ export default function FolderTree({ folders, selectedFolderId, onSelectFolder, 
         </div>
       )}
 
+      {(!missionId || (selectedFolder && canCreateIn(selectedFolder))) && (
       <Button
         variant="ghost"
         size="sm"
         className="w-full justify-start text-xs text-muted-foreground mt-1"
-        onClick={() => setCreatingIn(null)}
+        onClick={() => {
+          if (missionId && selectedFolder) { setCreatingIn(selectedFolder.id); setExpanded((p) => new Set(p).add(selectedFolder.id)); }
+          else setCreatingIn(null);
+        }}
       >
         <Plus className="h-3.5 w-3.5 mr-1" /> Nouveau dossier
       </Button>
+      )}
     </div>
   );
 }
