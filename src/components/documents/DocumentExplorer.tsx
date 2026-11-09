@@ -36,8 +36,20 @@ export default function DocumentExplorer({ missionId, projectId, activityId }: D
 
   const { data: folders = [], isLoading: foldersLoading } = useDocumentFolders({
     projectId,
+    missionId,
     organizationId: profile?.organization_id || undefined,
   });
+
+  const selectedFolder = folders.find((f) => f.id === selectedFolderId) || null;
+  const folderById = useMemo(() => new Map(folders.map((f) => [f.id, f])), [folders]);
+  // Droits portés par dossiers_de_la_mission ; aucune règle de grade ou de rôle ici.
+  const uploadDisabledReason: string | null = !selectedFolder
+    ? 'Choisissez un des dossiers'
+    : missionId && !selectedFolder.peut_deposer
+      ? (selectedFolder.sorte === 'dossier_client' ? 'Choisissez un des dossiers' : 'Vous ne déposez pas dans ce dossier')
+      : null;
+  const canDeleteDoc = (doc: DocumentRow) =>
+    !missionId || (!!doc.folder_id && !!folderById.get(doc.folder_id)?.peut_supprimer);
 
   const { data: documents = [], isLoading: docsLoading } = useDocuments({
     missionId,
@@ -51,6 +63,8 @@ export default function DocumentExplorer({ missionId, projectId, activityId }: D
   });
 
   const deleteDoc = useDeleteDocument();
+  const { data: rawDocuments = [] } = { data: documents };
+  const visibleDocuments = missionId ? rawDocuments.filter((d) => !d.folder_id || folderById.has(d.folder_id)) : rawDocuments;
 
   // Compute document counts per folder
   const { data: allDocs = [] } = useDocuments({
@@ -76,6 +90,7 @@ export default function DocumentExplorer({ missionId, projectId, activityId }: D
         await downloadDocument(doc.file_path, doc.name);
         break;
       case 'delete':
+        if (!canDeleteDoc(doc)) break;
         if (confirm('Supprimer ce document ?')) {
           deleteDoc.mutate({ id: doc.id, file_path: doc.file_path });
         }
@@ -111,6 +126,7 @@ export default function DocumentExplorer({ missionId, projectId, activityId }: D
           selectedFolderId={selectedFolderId}
           onSelectFolder={setSelectedFolderId}
           projectId={projectId}
+          missionId={missionId}
           documentCounts={docCounts}
         />
       </div>
@@ -119,9 +135,12 @@ export default function DocumentExplorer({ missionId, projectId, activityId }: D
       <div className="flex-1 min-w-0 space-y-4">
         {/* Toolbar */}
         <div className="flex flex-wrap items-center gap-2">
-          <Button size="sm" onClick={() => setShowUpload(true)}>
-            <Upload className="h-4 w-4 mr-1" /> Upload
-          </Button>
+          <span title={uploadDisabledReason ?? undefined}>
+            <Button size="sm" onClick={() => setShowUpload(true)} disabled={!!uploadDisabledReason}>
+              <Upload className="h-4 w-4 mr-1" /> Déposer
+            </Button>
+          </span>
+          {uploadDisabledReason && <span className="text-xs text-muted-foreground">{uploadDisabledReason}</span>}
 
           <div className="relative flex-1 max-w-xs">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -181,18 +200,17 @@ export default function DocumentExplorer({ missionId, projectId, activityId }: D
         {/* Documents */}
         {docsLoading ? (
           <Loading />
-        ) : documents.length === 0 ? (
+        ) : visibleDocuments.length === 0 ? (
           <EmptyState
             icon={FileText}
             title="Aucun document"
-            description={search ? 'Aucun document ne correspond à votre recherche.' : 'Uploadez votre premier document.'}
-            actionLabel="Uploader"
-            onAction={() => setShowUpload(true)}
+            description={search ? 'Aucun document ne correspond à votre recherche.' : uploadDisabledReason ?? 'Déposez la première pièce de ce dossier.'}
+            {...(uploadDisabledReason ? {} : { actionLabel: 'Déposer', onAction: () => setShowUpload(true) })}
           />
         ) : viewMode === 'grid' ? (
-          <DocumentGridView documents={documents} onAction={handleAction} />
+          <DocumentGridView documents={visibleDocuments} onAction={handleAction} canDelete={canDeleteDoc} />
         ) : (
-          <DocumentListView documents={documents} onAction={handleAction} />
+          <DocumentListView documents={visibleDocuments} onAction={handleAction} canDelete={canDeleteDoc} />
         )}
       </div>
 
@@ -200,7 +218,7 @@ export default function DocumentExplorer({ missionId, projectId, activityId }: D
       <Dialog open={showUpload} onOpenChange={setShowUpload}>
         <DialogContent className="">
           <DialogHeader className="px-6 py-4 bg-primary text-primary-foreground">
-            <DialogTitle className="text-white ">Uploader des documents</DialogTitle>
+            <DialogTitle className="text-primary-foreground">Déposer des pièces{selectedFolder ? ` · ${selectedFolder.name}` : ''}</DialogTitle>
           </DialogHeader>
           <div className="">
             <UploadZone
@@ -208,6 +226,7 @@ export default function DocumentExplorer({ missionId, projectId, activityId }: D
               missionId={missionId}
               projectId={projectId}
               activityId={activityId}
+              disabledReason={uploadDisabledReason}
             />
           </div>
         </DialogContent>
