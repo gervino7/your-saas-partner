@@ -220,9 +220,13 @@ export function useUploadDocument() {
       const parentVersionId = existing?.[0]?.id || null;
       const version = existing?.[0]?.version ? (existing[0].version as number) + 1 : 1;
 
-      const { data, error } = await supabase
+      // Identifiant fixé ici : la lecture de retour (RETURNING) serait refusée par la politique de lecture,
+      // évaluée avant que la ligne ne soit visible.
+      const id = crypto.randomUUID();
+      const { error } = await supabase
         .from('documents')
         .insert({
+          id,
           name: input.file.name,
           file_path: filePath,
           file_size: input.file.size,
@@ -238,15 +242,13 @@ export function useUploadDocument() {
           parent_version_id: parentVersionId,
           checksum: input.checksum || null,
           status: 'draft',
-        })
-        .select()
-        .single();
+        });
       if (error) {
         // Dépôt refusé par la base : on retire le fichier versé pour ne pas laisser d'objet orphelin.
         await supabase.storage.from('documents').remove([filePath]);
         throw error;
       }
-      return data;
+      return { id, file_path: filePath };
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['documents'] });
