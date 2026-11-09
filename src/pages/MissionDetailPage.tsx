@@ -17,6 +17,7 @@ import MissionTeamTab from '@/components/missions/MissionTeamTab';
 import MissionBudgetTab from '@/components/missions/MissionBudgetTab';
 import MissionSettingsTab from '@/components/missions/MissionSettingsTab';
 import EmptyState from '@/components/common/EmptyState';
+import DocumentExplorer from '@/components/documents/DocumentExplorer';
 import CopilTab from '@/components/copil/CopilTab';
 import MissionCalendarTab from '@/components/missions/MissionCalendarTab';
 import MissionGanttTab from '@/components/missions/MissionGanttTab';
@@ -116,11 +117,7 @@ const MissionDetailPage = () => {
         </TabsContent>
 
         <TabsContent value="documents" className="mt-6">
-          <EmptyState
-            icon={FileText}
-            title="Documents"
-            description="La gestion documentaire sera implémentée dans le module GED."
-          />
+          <DocumentExplorer missionId={mission.id} />
         </TabsContent>
 
         <TabsContent value="copil" className="mt-6">
