@@ -1415,6 +1415,9 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           id: string
+          is_system: boolean
+          kind: string | null
+          mission_id: string | null
           name: string
           organization_id: string | null
           parent_id: string | null
@@ -1424,6 +1427,9 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           id?: string
+          is_system?: boolean
+          kind?: string | null
+          mission_id?: string | null
           name: string
           organization_id?: string | null
           parent_id?: string | null
@@ -1433,6 +1439,9 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           id?: string
+          is_system?: boolean
+          kind?: string | null
+          mission_id?: string | null
           name?: string
           organization_id?: string | null
           parent_id?: string | null
@@ -1451,6 +1460,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_folders_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
             referencedColumns: ["id"]
           },
           {
@@ -6623,6 +6639,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      creer_les_dossiers_de_mission: {
+        Args: { _mission_id: string }
+        Returns: number
+      }
       current_portal_client: { Args: never; Returns: string }
       decide_evaluation_arbitration: {
         Args: {
@@ -6632,6 +6652,10 @@ export type Database = {
           _revised_score?: number
         }
         Returns: Json
+      }
+      dirige_la_mission_du_dossier: {
+        Args: { _folder_id: string; _user_id: string }
+        Returns: boolean
       }
       dossier_exercice_window: {
         Args: { _dossier_id: string; _exercice: number }
@@ -6645,6 +6669,21 @@ export type Database = {
         Args: { _dossier_id: string; _exercice: number }
         Returns: {
           user_id: string
+        }[]
+      }
+      dossiers_de_la_mission: {
+        Args: { _mission_id: string }
+        Returns: {
+          est_structure: boolean
+          id: string
+          nom: string
+          ordre: number
+          parent_id: string
+          peut_deposer: boolean
+          peut_supprimer: boolean
+          pieces: number
+          profondeur: number
+          sorte: string
         }[]
       }
       echelons_promouvables: {
@@ -6949,6 +6988,7 @@ export type Database = {
           regle: string
         }[]
       }
+      mission_du_dossier: { Args: { _folder_id: string }; Returns: string }
       mission_role_grid: {
         Args: never
         Returns: {
@@ -6970,6 +7010,8 @@ export type Database = {
           role: string
         }[]
       }
+      niveau_requis_dossier: { Args: { _folder_id: string }; Returns: number }
+      niveau_requis_sorte_dossier: { Args: { _kind: string }; Returns: number }
       niveau_role: { Args: { _role: string }; Returns: number }
       open_annual_campaign: {
         Args: { _due_date?: string; _exercice?: number }
@@ -6981,6 +7023,10 @@ export type Database = {
       }
       open_evaluation: { Args: { _assignment_id: string }; Returns: string }
       open_mission_evaluations: { Args: { _mission_id: string }; Returns: Json }
+      peut_deposer_dans_dossier: {
+        Args: { _folder_id: string; _user_id: string }
+        Returns: boolean
+      }
       peut_piloter_la_tache: {
         Args: { _task_id: string; _user_id: string }
         Returns: boolean
@@ -6989,8 +7035,16 @@ export type Database = {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean
       }
+      peut_supprimer_document: {
+        Args: { _doc_id: string; _user_id: string }
+        Returns: boolean
+      }
       peut_voir_donnee_personnelle: {
         Args: { _mission: string; _observateur: string; _personne: string }
+        Returns: boolean
+      }
+      peut_voir_dossier: {
+        Args: { _folder_id: string; _user_id: string }
         Returns: boolean
       }
       portal_accept_invitation: {
