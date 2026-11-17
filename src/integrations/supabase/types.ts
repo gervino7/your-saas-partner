@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      actions_elementaires: {
+        Row: {
+          created_at: string
+          etat: string
+          heures: number | null
+          id: string
+          intitule: string
+          ordre: number | null
+          organization_id: string
+          preuve: string | null
+          quantite: number | null
+          time_entry_id: string
+          unite: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          etat?: string
+          heures?: number | null
+          id?: string
+          intitule: string
+          ordre?: number | null
+          organization_id: string
+          preuve?: string | null
+          quantite?: number | null
+          time_entry_id: string
+          unite?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          etat?: string
+          heures?: number | null
+          id?: string
+          intitule?: string
+          ordre?: number | null
+          organization_id?: string
+          preuve?: string | null
+          quantite?: number | null
+          time_entry_id?: string
+          unite?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "actions_elementaires_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "actions_elementaires_time_entry_id_fkey"
+            columns: ["time_entry_id"]
+            isOneToOne: false
+            referencedRelation: "time_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       activities: {
         Row: {
           actual_end_date: string | null
@@ -3406,6 +3466,71 @@ export type Database = {
           },
         ]
       }
+      mission_budgets: {
+        Row: {
+          amount: number | null
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          id: string
+          mission_id: string
+          notes: string | null
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          id?: string
+          mission_id: string
+          notes?: string | null
+          organization_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          id?: string
+          mission_id?: string
+          notes?: string | null
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mission_budgets_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mission_budgets_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mission_budgets_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: true
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mission_budgets_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mission_members: {
         Row: {
           id: string
@@ -4111,6 +4236,8 @@ export type Database = {
           suspension_reason: string | null
           trial_ends_at: string | null
           updated_at: string | null
+          working_days: number[]
+          working_hours_per_day: number
         }
         Insert: {
           billing_contact?: string | null
@@ -4143,6 +4270,8 @@ export type Database = {
           suspension_reason?: string | null
           trial_ends_at?: string | null
           updated_at?: string | null
+          working_days?: number[]
+          working_hours_per_day?: number
         }
         Update: {
           billing_contact?: string | null
@@ -4175,6 +4304,8 @@ export type Database = {
           suspension_reason?: string | null
           trial_ends_at?: string | null
           updated_at?: string | null
+          working_days?: number[]
+          working_hours_per_day?: number
         }
         Relationships: []
       }
@@ -6451,6 +6582,16 @@ export type Database = {
         Args: { _user_id: string; _wanted: string }
         Returns: string
       }
+      budget_de_la_mission: {
+        Args: { _mission_id: string }
+        Returns: {
+          devise: string
+          fixe_par: string
+          le: boolean
+          montant: number
+          notes: string
+        }[]
+      }
       caller_organization_id: { Args: never; Returns: string }
       caller_sees_user: { Args: { _user_id: string }; Returns: boolean }
       can_access_committee: {
@@ -6594,6 +6735,8 @@ export type Database = {
           suspension_reason: string | null
           trial_ends_at: string | null
           updated_at: string | null
+          working_days: number[]
+          working_hours_per_day: number
         }
         SetofOptions: {
           from: "*"
@@ -6657,6 +6800,21 @@ export type Database = {
         Args: { _folder_id: string; _user_id: string }
         Returns: boolean
       }
+      disponibilite: {
+        Args: { _debut: string; _fin: string }
+        Returns: {
+          capacite_heures: number
+          collaborateur: string
+          grade: string
+          heures_disponibles: number
+          heures_imputees: number
+          heures_planifiees: number
+          jours_ouvrables: number
+          missions: string
+          staffe: boolean
+          taux_occupation: number
+        }[]
+      }
       dossier_exercice_window: {
         Args: { _dossier_id: string; _exercice: number }
         Returns: {
@@ -6699,6 +6857,17 @@ export type Database = {
         Args: { _task_id: string; _user_id: string }
         Returns: boolean
       }
+      est_designe_pour_evaluer: {
+        Args: {
+          _dossier: string
+          _evaluateur: string
+          _evalue: string
+          _exercice: number
+          _mission: string
+        }
+        Returns: boolean
+      }
+      est_directeur_associe: { Args: { _user_id: string }; Returns: boolean }
       est_plomberie_de_compte: { Args: { _table: string }; Returns: boolean }
       evaluation_weight: {
         Args: {
@@ -6935,6 +7104,22 @@ export type Database = {
           user_id: string
         }[]
       }
+      grille_du_cabinet: {
+        Args: { _practice?: string }
+        Returns: {
+          actif: boolean
+          echelon: string
+          echelon_id: string
+          famille: string
+          grade: string
+          modifiable: boolean
+          occupants: number
+          practice: string
+          qui: string
+          rang: number
+          roles_permis: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -6958,6 +7143,10 @@ export type Database = {
       is_org_active: { Args: { _org_id: string }; Returns: boolean }
       is_platform_admin: { Args: { _min_role?: string }; Returns: boolean }
       is_portal_user: { Args: never; Returns: boolean }
+      jours_ouvrables: {
+        Args: { _debut: string; _fin: string; _org: string }
+        Returns: number
+      }
       log_evaluation_export: {
         Args: {
           _evaluation_id?: string
@@ -6989,6 +7178,7 @@ export type Database = {
         }[]
       }
       mission_du_dossier: { Args: { _folder_id: string }; Returns: string }
+      mission_occupe: { Args: { _status: string }; Returns: boolean }
       mission_role_grid: {
         Args: never
         Returns: {
@@ -7013,6 +7203,17 @@ export type Database = {
       niveau_requis_dossier: { Args: { _folder_id: string }; Returns: number }
       niveau_requis_sorte_dossier: { Args: { _kind: string }; Returns: number }
       niveau_role: { Args: { _role: string }; Returns: number }
+      occupation_du_jour: {
+        Args: { _jour: string; _user_id: string }
+        Returns: {
+          action: string
+          etat: string
+          heures: number
+          mission: string
+          quantite: string
+          tache: string
+        }[]
+      }
       open_annual_campaign: {
         Args: { _due_date?: string; _exercice?: number }
         Returns: Json
@@ -7025,6 +7226,10 @@ export type Database = {
       open_mission_evaluations: { Args: { _mission_id: string }; Returns: Json }
       peut_deposer_dans_dossier: {
         Args: { _folder_id: string; _user_id: string }
+        Returns: boolean
+      }
+      peut_fixer_le_budget: {
+        Args: { _mission_id: string; _user_id: string }
         Returns: boolean
       }
       peut_piloter_la_tache: {
@@ -7045,6 +7250,10 @@ export type Database = {
       }
       peut_voir_dossier: {
         Args: { _folder_id: string; _user_id: string }
+        Returns: boolean
+      }
+      peut_voir_le_budget: {
+        Args: { _mission_id: string; _user_id: string }
         Returns: boolean
       }
       portal_accept_invitation: {
@@ -7145,6 +7354,14 @@ export type Database = {
       remove_mission_member: {
         Args: { _mission_id: string; _reason: string; _user_id: string }
         Returns: Json
+      }
+      renommer_echelon: {
+        Args: { _echelon_id: string; _nouveau_nom: string }
+        Returns: {
+          echelon: string
+          lignes_d_historique_mises_a_jour: number
+          profils_mis_a_jour: number
+        }[]
       }
       request_evaluation_arbitration: {
         Args: { _evaluation_id: string; _reason: string }
@@ -7406,6 +7623,20 @@ export type Database = {
         }
         Returns: Json
       }
+      taches_imputables: {
+        Args: { _user_id?: string }
+        Returns: {
+          echeance: string
+          intitule: string
+          m_est_affecte: boolean
+          mission: string
+          mission_id: string
+          projet: string
+          statut: string
+          tache_generale: boolean
+          tache_id: string
+        }[]
+      }
       upsert_activity_report: {
         Args: {
           _active_seconds: number
@@ -7428,7 +7659,7 @@ export type Database = {
     Enums: {
       app_role: "owner" | "admin" | "member"
       eval_practice: "comptable" | "conseil" | "juridique"
-      eval_type: "mission" | "annuelle" | "fin_stage"
+      eval_type: "mission" | "annuelle" | "fin_stage" | "dossier"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -7558,7 +7789,7 @@ export const Constants = {
     Enums: {
       app_role: ["owner", "admin", "member"],
       eval_practice: ["comptable", "conseil", "juridique"],
-      eval_type: ["mission", "annuelle", "fin_stage"],
+      eval_type: ["mission", "annuelle", "fin_stage", "dossier"],
     },
   },
 } as const
