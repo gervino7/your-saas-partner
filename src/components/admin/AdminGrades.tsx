@@ -37,6 +37,7 @@ interface Echelon {
 interface FormState { echelon: string; family: string; rank: number | null; maps_to_grade: string; is_active: boolean }
 const EMPTY: FormState = { echelon: '', family: '', rank: null, maps_to_grade: 'AUD', is_active: true };
 
+const norm = (s: string) => s.trim().toLowerCase();
 const gradeLabel = (g: string) => (GRADE_LABELS as Record<string, string>)[g] ?? g;
 
 export default function AdminGrades() {
@@ -82,7 +83,7 @@ export default function AdminGrades() {
   const anomalies = useMemo(() => {
     if (!grille.length) return [];
     return profils.flatMap((p) => {
-      const match = grille.find((e) => e.practice === p.practice && e.echelon === p.grade_echelon);
+      const match = grille.find((e) => e.practice === p.practice && norm(e.echelon) === norm(p.grade_echelon));
       if (!match) return [{ ...p, motif: "Échelon non reconnu par la grille de sa practice" }];
       if (p.grade && match.grade && p.grade !== match.grade)
         return [{ ...p, motif: `Grade ${p.grade} différent de celui de l'échelon (${match.grade})` }];
