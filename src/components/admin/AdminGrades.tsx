@@ -1,372 +1,326 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Pencil, Trash2, GraduationCap, ArrowUpDown } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Plus, Pencil, Trash2, Lock, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { GRADE_LABELS, GRADE_LEVELS } from '@/types/database';
+import { GRADE_LABELS } from '@/types/database';
 
-interface OrgGrade {
-  id: string;
-  organization_id: string;
-  code: string;
-  label: string;
-  level: number;
-  daily_rate: number;
-  currency: string;
-  is_active: boolean;
+type Practice = 'comptable' | 'conseil' | 'juridique';
+const PRACTICES: { value: Practice; label: string }[] = [
+  { value: 'comptable', label: 'Comptable' },
+  { value: 'conseil', label: 'Conseil' },
+  { value: 'juridique', label: 'Juridique' },
+];
+const GRADE_CODES = ['DA', 'DM', 'CM', 'SUP', 'AS', 'AUD', 'AJ', 'STG'] as const;
+const RANKS = Array.from({ length: 18 }, (_, i) => i + 1);
+const OCCUPIED_HINT = "Déplacez d'abord les collaborateurs assis sur cet échelon.";
+
+interface Echelon {
+  echelon_id: string; practice: string; famille: string; echelon: string; rang: number;
+  grade: string; roles_permis: string; actif: boolean; occupants: number; qui: string | null; modifiable: boolean;
 }
 
-const DEFAULT_GRADES = Object.entries(GRADE_LABELS).map(([code, label]) => ({
-  code,
-  label,
-  level: GRADE_LEVELS[code as keyof typeof GRADE_LEVELS],
-  daily_rate: 0,
-  currency: 'XOF',
-  is_active: true,
-}));
+interface FormState { echelon: string; family: string; rank: number | null; maps_to_grade: string; is_active: boolean }
+const EMPTY: FormState = { echelon: '', family: '', rank: null, maps_to_grade: 'AUD', is_active: true };
+
+const gradeLabel = (g: string) => (GRADE_LABELS as Record<string, string>)[g] ?? g;
 
 export default function AdminGrades() {
   const profile = useAuthStore((s) => s.profile);
   const orgId = profile?.organization_id;
-  const queryClient = useQueryClient();
-
+  const qc = useQueryClient();
+  const [practice, setPractice] = useState<Practice>('comptable');
+  const [editing, setEditing] = useState<Echelon | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingGrade, setEditingGrade] = useState<OrgGrade | null>(null);
-  const [form, setForm] = useState({ code: '', label: '', level: 1, daily_rate: 0, currency: 'XOF', is_active: true });
+  const [form, setForm] = useState<FormState>(EMPTY);
+  const [toDelete, setToDelete] = useState<Echelon | null>(null);
 
-  const { data: grades = [], isLoading } = useQuery({
-    queryKey: ['organization-grades', orgId],
+  const { data: grille = [], isLoading } = useQuery({
+    queryKey: ['grille-du-cabinet', orgId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('organization_grades')
-        .select('*')
-        .eq('organization_id', orgId!)
-        .order('level', { ascending: true });
+      const { data, error } = await supabase.rpc('grille_du_cabinet', { _practice: null as unknown as string });
       if (error) throw error;
-      return data as OrgGrade[];
+      return (data ?? []) as Echelon[];
     },
     enabled: !!orgId,
   });
 
-  const initializeGrades = useMutation({
-    mutationFn: async () => {
-      const rows = DEFAULT_GRADES.map((g) => ({ ...g, organization_id: orgId! }));
-      const { error } = await supabase.from('organization_grades').insert(rows);
+  const { data: profils = [] } = useQuery({
+    queryKey: ['grille-profils', orgId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, practice, grade, grade_echelon')
+        .eq('organization_id', orgId!)
+        .not('grade_echelon', 'is', null);
       if (error) throw error;
+      return data as { id: string; full_name: string; practice: string | null; grade: string | null; grade_echelon: string }[];
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['organization-grades'] });
-      toast.success('Grades par défaut initialisés');
-    },
-    onError: (e: any) => toast.error(e.message),
+    enabled: !!orgId,
   });
 
-  const saveGrade = useMutation({
+  const modifiable = grille.length > 0 && grille.some((e) => e.modifiable);
+  const rows = useMemo(
+    () => grille.filter((e) => e.practice === practice).sort((a, b) => b.rang - a.rang),
+    [grille, practice],
+  );
+
+  const anomalies = useMemo(() => {
+    if (!grille.length) return [];
+    return profils.flatMap((p) => {
+      const match = grille.find((e) => e.practice === p.practice && e.echelon === p.grade_echelon);
+      if (!match) return [{ ...p, motif: "Échelon non reconnu par la grille de sa practice" }];
+      if (p.grade && match.grade && p.grade !== match.grade)
+        return [{ ...p, motif: `Grade ${p.grade} différent de celui de l'échelon (${match.grade})` }];
+      return [];
+    });
+  }, [grille, profils]);
+
+  const freeRanks = useMemo(() => {
+    const taken = new Set(rows.filter((r) => r.echelon_id !== editing?.echelon_id).map((r) => r.rang));
+    return RANKS.filter((r) => !taken.has(r));
+  }, [rows, editing]);
+
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: ['grille-du-cabinet'] });
+    qc.invalidateQueries({ queryKey: ['grille-profils'] });
+  };
+
+  const save = useMutation({
     mutationFn: async () => {
-      if (editingGrade) {
-        const { error } = await supabase
-          .from('organization_grades')
-          .update({ code: form.code, label: form.label, level: form.level, daily_rate: form.daily_rate, currency: form.currency, is_active: form.is_active })
-          .eq('id', editingGrade.id);
+      const nom = form.echelon.trim();
+      if (!nom || !form.family.trim() || !form.rank) throw new Error('Renseignez le nom, la famille et le rang.');
+      if (rows.some((r) => r.echelon_id !== editing?.echelon_id && r.echelon.toLowerCase() === nom.toLowerCase()))
+        throw new Error('Cet échelon existe déjà dans cette practice.');
+      if (!editing) {
+        const { error } = await supabase.from('evaluation_grades').insert({
+          practice, family: form.family.trim(), echelon: nom, rank: form.rank,
+          maps_to_grade: form.maps_to_grade, is_active: true, organization_id: orgId!,
+        });
         if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('organization_grades')
-          .insert({ ...form, organization_id: orgId! });
-        if (error) throw error;
+        return 'Échelon créé.';
       }
+      let msg = 'Échelon mis à jour.';
+      if (nom !== editing.echelon) {
+        const { data, error } = await supabase.rpc('renommer_echelon', { _echelon_id: editing.echelon_id, _nouveau_nom: nom });
+        if (error) throw error;
+        const r = (Array.isArray(data) ? data[0] : data) as { profils_mis_a_jour?: number; lignes_d_historique_mises_a_jour?: number } | null;
+        msg = `Échelon renommé. ${r?.profils_mis_a_jour ?? 0} collaborateurs et ${r?.lignes_d_historique_mises_a_jour ?? 0} lignes d'historique mis à jour.`;
+      }
+      const { error } = await supabase.from('evaluation_grades')
+        .update({ family: form.family.trim(), rank: form.rank, maps_to_grade: form.maps_to_grade, is_active: form.is_active })
+        .eq('id', editing.echelon_id);
+      if (error) throw error;
+      return msg;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['organization-grades'] });
-      toast.success(editingGrade ? 'Grade modifié' : 'Grade ajouté');
-      setDialogOpen(false);
-      setEditingGrade(null);
-    },
-    onError: (e: any) => toast.error(e.message),
+    onSuccess: (msg) => { invalidate(); setDialogOpen(false); toast.success(msg); },
+    onError: (e: Error) => toast.error(e.message),
   });
 
-  const deleteGrade = useMutation({
+  const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('organization_grades').delete().eq('id', id);
+      const { error } = await supabase.from('evaluation_grades').delete().eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['organization-grades'] });
-      toast.success('Grade supprimé');
-    },
-    onError: (e: any) => toast.error(e.message),
+    onSuccess: () => { invalidate(); setToDelete(null); toast.success('Échelon supprimé.'); },
+    onError: (e: Error) => { setToDelete(null); toast.error(e.message); },
   });
 
-  const openCreate = () => {
-    setEditingGrade(null);
-    const nextLevel = grades.length > 0 ? Math.max(...grades.map((g) => g.level)) + 1 : 1;
-    setForm({ code: '', label: '', level: nextLevel, daily_rate: 0, currency: 'XOF', is_active: true });
+  const openCreate = () => { setEditing(null); setForm(EMPTY); setDialogOpen(true); };
+  const openEdit = (e: Echelon) => {
+    setEditing(e);
+    setForm({ echelon: e.echelon, family: e.famille, rank: e.rang, maps_to_grade: e.grade, is_active: e.actif });
     setDialogOpen(true);
   };
-
-  const openEdit = (g: OrgGrade) => {
-    setEditingGrade(g);
-    setForm({ code: g.code, label: g.label, level: g.level, daily_rate: g.daily_rate, currency: g.currency, is_active: g.is_active });
-    setDialogOpen(true);
-  };
-
-  const formatRate = (rate: number, currency: string) => {
-    if (!rate) return '-';
-    return `${rate.toLocaleString('fr-FR')} ${currency}`;
-  };
-
-  if (isLoading) return <div className="animate-pulse h-32 bg-muted rounded-lg" />;
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <GraduationCap className="h-5 w-5 text-primary" />
-              <div>
-                <CardTitle className="text-base">Grades hiérarchiques</CardTitle>
-                <CardDescription>Gérez les grades de votre organisation et les taux journaliers associés.</CardDescription>
-              </div>
+    <TooltipProvider>
+      <div className="space-y-4">
+        <Card>
+          <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
+            <div>
+              <CardTitle>Grille des grades et des échelons</CardTitle>
+              <CardDescription>18 échelons par practice. Le rang décide des rôles qu'un collaborateur peut tenir en mission.</CardDescription>
             </div>
-            <div className="flex gap-2">
-              {grades.length === 0 && (
-                <Button variant="outline" size="sm" onClick={() => initializeGrades.mutate()} disabled={initializeGrades.isPending}>
-                  Initialiser par défaut
-                </Button>
-              )}
-              <Button size="sm" onClick={openCreate}>
-                <Plus className="h-4 w-4 mr-1" /> Nouveau grade
+            {modifiable && (
+              <Button size="sm" onClick={openCreate} disabled={freeRanks.length === 0}>
+                <Plus className="h-4 w-4 mr-1" /> Nouvel échelon
               </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {grades.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <GraduationCap className="h-10 w-10 mx-auto mb-2 opacity-40" />
-              <p>Aucun grade configuré.</p>
-              <p className="text-sm">Cliquez sur « Initialiser par défaut » pour charger les grades standards.</p>
-            </div>
-          ) : (
+            )}
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {anomalies.length > 0 && (
+              <div className="rounded-md border border-accent/40 bg-accent/5 p-3 text-sm">
+                <div className="flex items-center gap-2 font-medium mb-2">
+                  <AlertTriangle className="h-4 w-4 text-accent" />
+                  {anomalies.length} collaborateurs non reconnus par la grille : leur rang est approximé.
+                </div>
+                <ul className="space-y-1">
+                  {anomalies.map((a) => (
+                    <li key={a.id}>
+                      <Link to={`/profile/${a.id}`} className="font-medium text-primary hover:underline">{a.full_name}</Link>
+                      <span className="text-muted-foreground"> - {a.grade_echelon} ({a.practice ?? 'sans practice'}) : {a.motif}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {!isLoading && !modifiable && (
+              <div className="flex items-center gap-2 rounded-md border bg-muted/40 p-3 text-sm text-muted-foreground">
+                <Lock className="h-4 w-4" /> Seul le directeur associé peut modifier la grille.
+              </div>
+            )}
+            <Tabs value={practice} onValueChange={(v) => setPractice(v as Practice)}>
+              <TabsList>
+                {PRACTICES.map((p) => (
+                  <TabsTrigger key={p.value} value={p.value}>
+                    {p.label} <span className="ml-1 text-xs text-muted-foreground tabular">{grille.filter((e) => e.practice === p.value).length}</span>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-16">Niveau</TableHead>
-                  <TableHead className="w-24">Code</TableHead>
-                  <TableHead>Libellé</TableHead>
-                  <TableHead>Taux journalier</TableHead>
-                  <TableHead className="w-20">Statut</TableHead>
-                  <TableHead className="w-24 text-right">Actions</TableHead>
+                  <TableHead className="w-16">Rang</TableHead>
+                  <TableHead>Échelon</TableHead>
+                  <TableHead>Grade</TableHead>
+                  <TableHead>Rôles permis en mission</TableHead>
+                  <TableHead className="w-28">Occupants</TableHead>
+                  <TableHead className="w-24">Statut</TableHead>
+                  {modifiable && <TableHead className="w-24 text-right">Actions</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {grades.map((g) => (
-                  <TableRow key={g.id} className={!g.is_active ? 'text-muted-foreground' : ''}>
+                {isLoading ? (
+                  <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground">Chargement…</TableCell></TableRow>
+                ) : rows.length === 0 ? (
+                  <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground">Aucun échelon pour cette practice.</TableCell></TableRow>
+                ) : rows.map((e) => (
+                  <TableRow key={e.echelon_id} className="h-11">
+                    <TableCell className="tabular font-medium">{e.rang}</TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="tabular-nums">{g.level}</Badge>
+                      <div className="font-medium">{e.echelon}</div>
+                      <div className="text-xs text-muted-foreground">{e.famille}</div>
                     </TableCell>
-                    <TableCell className="tabular-nums font-semibold">{g.code}</TableCell>
-                    <TableCell>{g.label}</TableCell>
-                    <TableCell className="text-muted-foreground">{formatRate(g.daily_rate, g.currency)}</TableCell>
+                    <TableCell><Badge variant="outline">{e.grade}</Badge> <span className="text-xs text-muted-foreground">{gradeLabel(e.grade)}</span></TableCell>
+                    <TableCell className="text-sm">{e.roles_permis || '-'}</TableCell>
                     <TableCell>
-                      <Badge variant={g.is_active ? 'default' : 'secondary'} className="text-xs">
-                        {g.is_active ? 'Actif' : 'Inactif'}
-                      </Badge>
+                      <div className="tabular font-medium">{e.occupants}</div>
+                      {e.qui && <div className="text-xs text-muted-foreground line-clamp-2" title={e.qui}>{e.qui}</div>}
                     </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(g)}>
-                          <Pencil className="h-3.5 w-3.5" />
+                    <TableCell>
+                      <Badge variant={e.actif ? 'default' : 'secondary'}>{e.actif ? 'Actif' : 'Inactif'}</Badge>
+                    </TableCell>
+                    {modifiable && (
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="icon" onClick={() => openEdit(e)} aria-label="Modifier">
+                          <Pencil className="h-4 w-4" />
                         </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive">
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Supprimer le grade « {g.code} » ?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Cette action est irréversible. Les utilisateurs ayant ce grade devront être réassignés manuellement.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Annuler</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => deleteGrade.mutate(g.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                Supprimer
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </TableCell>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span>
+                              <Button variant="ghost" size="icon" disabled={e.occupants > 0} onClick={() => setToDelete(e)} aria-label="Supprimer">
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </span>
+                          </TooltipTrigger>
+                          {e.occupants > 0 && <TooltipContent>{OCCUPIED_HINT}</TooltipContent>}
+                        </Tooltip>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Create/Edit Dialog */}
-      {/* Create Dialog - Simple form */}
-      <Dialog open={dialogOpen && !editingGrade} onOpenChange={(v) => { setDialogOpen(v); if (!v) setEditingGrade(null); }}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Nouveau grade</DialogTitle>
-            <DialogDescription>Ajoutez un nouveau grade à votre organisation.</DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>Code</Label>
-                <Input value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} placeholder="DA" maxLength={10} />
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{editing ? "Modifier l'échelon" : 'Nouvel échelon'}</DialogTitle>
+              <DialogDescription>Practice {PRACTICES.find((p) => p.value === practice)?.label}</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div>
+                <Label>Échelon</Label>
+                <Input value={form.echelon} onChange={(ev) => setForm({ ...form, echelon: ev.target.value })} />
+                {editing && editing.occupants > 0 && (
+                  <p className="text-xs text-muted-foreground mt-1">Le renommage sera reporté sur les {editing.occupants} collaborateurs concernés et leur historique.</p>
+                )}
               </div>
-              <div className="space-y-1.5">
-                <Label>Niveau hiérarchique</Label>
-                <Input type="number" min={1} max={99} value={form.level} onChange={(e) => setForm({ ...form, level: parseInt(e.target.value) || 1 })} />
+              <div>
+                <Label>Famille</Label>
+                <Input value={form.family} onChange={(ev) => setForm({ ...form, family: ev.target.value })} />
               </div>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Libellé</Label>
-              <Input value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} placeholder="Directeur Associé" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>Taux journalier</Label>
-                <Input type="number" min={0} value={form.daily_rate} onChange={(e) => setForm({ ...form, daily_rate: parseFloat(e.target.value) || 0 })} />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Devise</Label>
-                <Input value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })} placeholder="XOF" />
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Switch checked={form.is_active} onCheckedChange={(v) => setForm({ ...form, is_active: v })} />
-              <Label>Grade actif</Label>
-            </div>
-          </div>
-
-          <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
-            <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => setDialogOpen(false)}>Annuler</Button>
-            <Button size="sm" className="h-9 px-5" onClick={() => saveGrade.mutate()} disabled={!form.code || !form.label || saveGrade.isPending}>
-              Ajouter
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Dialog - Form + grades list */}
-      <Dialog open={dialogOpen && !!editingGrade} onOpenChange={(v) => { setDialogOpen(v); if (!v) setEditingGrade(null); }}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Modifier le grade</DialogTitle>
-            <DialogDescription>Modifiez les informations du grade sélectionné.</DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Left: Form */}
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label>Code</Label>
-                    <Input value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} placeholder="DA" maxLength={10} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Niveau hiérarchique</Label>
-                    <Input type="number" min={1} max={99} value={form.level} onChange={(e) => setForm({ ...form, level: parseInt(e.target.value) || 1 })} />
-                  </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Rang</Label>
+                  <Select value={form.rank ? String(form.rank) : ''} onValueChange={(v) => setForm({ ...form, rank: Number(v) })}>
+                    <SelectTrigger><SelectValue placeholder="Rang libre" /></SelectTrigger>
+                    <SelectContent>
+                      {freeRanks.map((r) => <SelectItem key={r} value={String(r)}>{r}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="space-y-1.5">
-                  <Label>Libellé</Label>
-                  <Input value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} placeholder="Directeur Associé" />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label>Taux journalier</Label>
-                    <Input type="number" min={0} value={form.daily_rate} onChange={(e) => setForm({ ...form, daily_rate: parseFloat(e.target.value) || 0 })} />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Devise</Label>
-                    <Input value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })} placeholder="XOF" />
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Switch checked={form.is_active} onCheckedChange={(v) => setForm({ ...form, is_active: v })} />
-                  <Label>Grade actif</Label>
+                <div>
+                  <Label>Grade</Label>
+                  <Select value={form.maps_to_grade} onValueChange={(v) => setForm({ ...form, maps_to_grade: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {GRADE_CODES.map((g) => <SelectItem key={g} value={g}>{g} - {gradeLabel(g)}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-
-              {/* Right: Existing grades list */}
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold text-foreground">Grades existants ({grades.length})</Label>
-                <div className="rounded-lg max-h-64 overflow-y-auto bg-background border border-border">
-                  {grades.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-4">Aucun grade configuré</p>
-                  ) : (
-                    <ul className="divide-y divide-border">
-                      {grades.map((g) => {
-                        const isSelected = editingGrade?.id === g.id;
-                        return (
-                          <li key={g.id}>
-                            <button
-                              type="button"
-                              className={`w-full flex items-center justify-between px-3 py-2.5 text-sm text-left transition-colors
-                                ${isSelected
-                                  ? 'bg-primary/15 border-l-3 border-l-primary text-foreground'
-                                  : 'hover:bg-accent/50 text-foreground border-l-3 border-l-transparent'}
-                                ${!g.is_active ? 'text-muted-foreground' : ''}`}
-                              onPointerDown={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setEditingGrade(g);
-                                setForm({ code: g.code, label: g.label, level: g.level, daily_rate: g.daily_rate, currency: g.currency, is_active: g.is_active });
-                              }}
-                            >
-                              <div className="flex items-center gap-2.5 min-w-0 pointer-events-none">
-                                <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary/10 text-primary text-xs font-semibold shrink-0">{g.level}</span>
-                                <div className="min-w-0">
-                                  <span className="font-semibold text-foreground">{g.code}</span>
-                                  <span className="ml-1.5 text-muted-foreground truncate">{g.label}</span>
-                                </div>
-                              </div>
-                              <span className="text-xs font-medium text-foreground/70 shrink-0 ml-2 pointer-events-none">
-                                {g.daily_rate ? `${g.daily_rate.toLocaleString('fr-FR')} ${g.currency}` : '-'}
-                              </span>
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground italic">Cliquez sur un grade pour charger ses données dans le formulaire.</p>
-              </div>
+              {editing && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-2">
+                      <Switch checked={form.is_active} disabled={editing.occupants > 0 && form.is_active}
+                        onCheckedChange={(v) => setForm({ ...form, is_active: v })} />
+                      <Label>Actif</Label>
+                    </div>
+                  </TooltipTrigger>
+                  {editing.occupants > 0 && <TooltipContent>{OCCUPIED_HINT}</TooltipContent>}
+                </Tooltip>
+              )}
             </div>
-          </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDialogOpen(false)}>Annuler</Button>
+              <Button onClick={() => save.mutate()} disabled={save.isPending}>Enregistrer</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
-          <div className="sticky bottom-0 z-10 -mx-6 -mb-5 mt-1 px-6 py-4 border-t border-border bg-card flex items-center justify-end gap-2">
-            <Button variant="outline" size="sm" className="h-9 px-4" onClick={() => { setDialogOpen(false); setEditingGrade(null); }}>Annuler</Button>
-            <Button size="sm" className="h-9 px-5" onClick={() => saveGrade.mutate()} disabled={!form.code || !form.label || saveGrade.isPending}>
-              Enregistrer
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </div>
+        <AlertDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Supprimer l'échelon « {toDelete?.echelon} » ?</AlertDialogTitle>
+              <AlertDialogDescription>Cette action est définitive.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Annuler</AlertDialogCancel>
+              <AlertDialogAction onClick={() => toDelete && remove.mutate(toDelete.echelon_id)}>Supprimer</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </TooltipProvider>
   );
 }
