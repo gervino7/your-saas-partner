@@ -71,6 +71,13 @@
       "when": 1795017650890,
       "tag": "0009_bind_storage_policies_to_caller",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1795018467737,
+      "tag": "0010_revoke_fiches_sans_cabinet_exec",
+      "breakpoints": true
     }
   ]
 }
