@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
+import { titreDuCollaborateur } from '@/lib/titreCollaborateur';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { LogIn, UserPlus, Building2, Shield, Mail, Lock, User, BarChart3, Landmark, FolderOpen, Users } from 'lucide-react';
 import logoImg from '@/assets/logo.png';
-import { GRADE_LABELS } from '@/types/database';
 import type { Grade } from '@/types/database';
 
 const TOAST_ERROR = 'destructive' as const;
@@ -286,7 +286,7 @@ const LoginPage = () => {
   };
 
   const isLocked = lockoutUntil !== null && Date.now() < lockoutUntil;
-  const gradeLabel = invitation?.grade ? GRADE_LABELS[invitation.grade as Grade] || invitation.grade : null;
+  const gradeLabel = invitation?.grade ? titreDuCollaborateur({ grade: invitation.grade }) : null;
   const showInvitationFields = isSignUp || isForcedSignUp;
   const signUpBlocked = isSignUp && invitationToken && !invitation;
 

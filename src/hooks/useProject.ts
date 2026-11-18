@@ -33,7 +33,7 @@ export function useProjectMembers(projectId: string | undefined) {
         .from('project_members')
         .select(`
           *,
-          user:profiles!project_members_user_id_fkey(id, full_name, avatar_url, grade, grade_level, email, is_online)
+          user:profiles!project_members_user_id_fkey(id, full_name, avatar_url, grade, grade_level, grade_echelon, email, is_online)
         `)
         .eq('project_id', projectId);
       if (error) throw error;

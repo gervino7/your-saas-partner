@@ -1,4 +1,5 @@
 import { useNavigate,useSearchParams } from 'react-router-dom';
+import { titreDuCollaborateur } from '@/lib/titreCollaborateur';
 import ProfileEvaluationFields from '@/components/evaluations/ProfileEvaluationFields';
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -147,7 +148,7 @@ export default function AdminUsers() {
                       </div>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">{u.email}</TableCell>
-                    <TableCell><Badge variant="outline" className="text-xs">{u.grade || '-'}</Badge></TableCell>
+                    <TableCell><span className="text-sm" title={u.grade ? `Code ${u.grade}` : undefined}>{titreDuCollaborateur(u)}</span></TableCell>
                     <TableCell><Badge variant={u.is_online ? 'default' : 'secondary'} className="text-[10px]">{u.is_online ? 'En ligne' : 'Hors ligne'}</Badge></TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1"><Button size="icon" variant="ghost" className="h-7 w-7" title="Synthèse" onClick={()=>navigate(`/evaluations/synthese/${u.id}`)}><LineChart className="h-4 w-4"/></Button>

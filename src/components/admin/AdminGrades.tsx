@@ -150,9 +150,9 @@ export default function AdminGrades() {
 
   return (
     <TooltipProvider>
-      <div className="space-y-4">
-        <Card>
-          <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
+      <div className="space-y-4 min-w-0 max-w-full">
+        <Card className="min-w-0 max-w-full overflow-hidden">
+          <CardHeader className="flex flex-col sm:flex-row items-start justify-between gap-4 space-y-0">
             <div>
               <CardTitle>Grille des grades et des échelons</CardTitle>
               <CardDescription>18 échelons par practice. Le rang décide des rôles qu'un collaborateur peut tenir en mission.</CardDescription>
@@ -163,7 +163,7 @@ export default function AdminGrades() {
               </Button>
             )}
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 min-w-0">
             {anomalies.length > 0 && (
               <div className="rounded-md border border-accent/40 bg-accent/5 p-3 text-sm">
                 <div className="flex items-center gap-2 font-medium mb-2">
@@ -200,8 +200,8 @@ export default function AdminGrades() {
                   <TableHead className="w-16">Rang</TableHead>
                   <TableHead>Échelon</TableHead>
                   <TableHead>Grade</TableHead>
-                  <TableHead>Rôles permis en mission</TableHead>
-                  <TableHead className="w-28">Occupants</TableHead>
+                  <TableHead className="hidden sm:table-cell">Rôles permis en mission</TableHead>
+                  <TableHead className="hidden sm:table-cell w-28">Occupants</TableHead>
                   <TableHead className="w-24">Statut</TableHead>
                   {modifiable && <TableHead className="w-24 text-right">Actions</TableHead>}
                 </TableRow>
@@ -219,8 +219,8 @@ export default function AdminGrades() {
                       <div className="text-xs text-muted-foreground">{e.famille}</div>
                     </TableCell>
                     <TableCell><Badge variant="outline">{e.grade}</Badge> <span className="text-xs text-muted-foreground">{gradeLabel(e.grade)}</span></TableCell>
-                    <TableCell className="text-sm">{e.roles_permis || '-'}</TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell text-sm">{e.roles_permis || '-'}</TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <div className="tabular font-medium">{e.occupants}</div>
                       {e.qui && <div className="text-xs text-muted-foreground line-clamp-2" title={e.qui}>{e.qui}</div>}
                     </TableCell>

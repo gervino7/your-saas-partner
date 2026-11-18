@@ -1,4 +1,5 @@
 import MissionEvaluations from '@/components/evaluations/MissionEvaluations';
+import { titreDuCollaborateur } from '@/lib/titreCollaborateur';
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,7 +14,7 @@ import {
 import { UserPlus, MoreVertical, UserMinus } from 'lucide-react';
 import { useMissionMembers, useOrganizationUsers, useAddMissionMember, useMission } from '@/hooks/useMissions';
 import { useAuthStore } from '@/stores/authStore';
-import { GRADE_LABELS, GRADE_LEVELS, MISSION_MEMBER_ROLE_LABELS } from '@/types/database';
+import { GRADE_LEVELS, MISSION_MEMBER_ROLE_LABELS } from '@/types/database';
 import { isMissionAssociate, isMissionPilotRole, isAuthorizedMissionRole } from '@/lib/missionRoles';
 import { useMissionRoles } from '@/hooks/useMissionRoles';
 import MissionRoleSelect from './MissionRoleSelect';
@@ -88,7 +89,7 @@ export default function MissionTeamTab({ missionId, canManage }: { missionId: st
                 </div>
                 <div className="flex flex-col items-end gap-1">
                   <Badge variant="outline" className="text-xs">{MISSION_MEMBER_ROLE_LABELS[m.role as keyof typeof MISSION_MEMBER_ROLE_LABELS] ?? m.role}</Badge>
-                  {m.user?.grade && (<span className="text-xs text-muted-foreground">{GRADE_LABELS[m.user.grade as Grade] ?? m.user.grade}</span>)}
+                  {(m.user?.grade || m.user?.grade_echelon) && (<span className="text-xs text-muted-foreground">{titreDuCollaborateur(m.user)}</span>)}
                 </div>
                 {canRemove(m) && (
                   <DropdownMenu>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { titreDuCollaborateur } from '@/lib/titreCollaborateur';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +10,7 @@ import { Plus, Users } from 'lucide-react';
 import { useProjectMembers, useAddProjectMember } from '@/hooks/useProject';
 import { useMissionMembers } from '@/hooks/useMissions';
 import { useAuthStore } from '@/stores/authStore';
-import { GRADE_LABELS, GRADE_LEVELS } from '@/types/database';
+import { GRADE_LEVELS } from '@/types/database';
 import type { Grade } from '@/types/database';
 import EmptyState from '@/components/common/EmptyState';
 
@@ -114,7 +115,7 @@ export default function TeamTab({ projectId, missionId }: { projectId: string; m
                     <p className="text-sm font-medium truncate">{m.user?.full_name}</p>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <Badge variant="outline" className="text-[10px]">
-                        {GRADE_LABELS[m.user?.grade as Grade] ?? m.user?.grade ?? '-'}
+                        {titreDuCollaborateur(m.user ?? {})}
                       </Badge>
                       <Badge variant="secondary" className="text-[10px]">
                         {roleLabels[m.role] ?? m.role}
