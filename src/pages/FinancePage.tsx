@@ -22,11 +22,11 @@ import { useTableSort } from '@/hooks/useTableSort';
 import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
 const DEFAULT_RATES: Record<string, number> = {
-  DA: 750000, DM: 500000, CM: 400000, SUP: 300000,
+  DA: 750000, DM: 500000, MGR: 400000, SUP: 300000,
   AS: 250000, AUD: 200000, AJ: 150000, STG: 75000,
 };
 
-const GRADES = ['DA', 'DM', 'CM', 'SUP', 'AS', 'AUD', 'AJ', 'STG'];
+const GRADES = ['DA', 'DM', 'MGR', 'SUP', 'AS', 'AUD', 'AJ', 'STG'];
 const EXPENSE_CATEGORIES = ['Transport', 'Hébergement', 'Restauration', 'Fournitures', 'Communication', 'Autre'];
 
 function BudgetTab() {

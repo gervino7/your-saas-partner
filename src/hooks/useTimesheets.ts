@@ -474,7 +474,7 @@ export function useMissionBudgetSummary() {
       if (rErr) throw rErr;
 
       const gradeMap: Record<string, string> = {
-        '1': 'DA', '2': 'DM', '3': 'CM', '4': 'SUP',
+        '1': 'DA', '2': 'DM', '3': 'MGR', '4': 'SUP',
         '5': 'AS', '6': 'AUD', '7': 'AJ', '8': 'STG',
       };
       const rateMap: Record<string, number> = {};

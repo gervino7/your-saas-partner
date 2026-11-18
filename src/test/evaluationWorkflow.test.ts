@@ -6,7 +6,7 @@ describe('Départements et circuit DA', () => {
   it('reserves validation to DA, not DM or the ordinary evaluator', () => {
     expect(canValidateEvaluation('DA', 'observations_recues', '2026-10-27')).toBe(true);
     expect(canValidateEvaluation('DM', 'observations_recues', '2026-10-27')).toBe(false);
-    expect(canValidateEvaluation('CM', 'revisee', '2026-10-27')).toBe(false);
+    expect(canValidateEvaluation('MGR', 'revisee', '2026-10-27')).toBe(false);
   });
   it('requires online observations before DA validation', () => {
     expect(canValidateEvaluation('DA', 'envoyee', null)).toBe(false);

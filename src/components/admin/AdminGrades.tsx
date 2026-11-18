@@ -25,7 +25,7 @@ const PRACTICES: { value: Practice; label: string }[] = [
   { value: 'conseil', label: 'Conseil' },
   { value: 'juridique', label: 'Juridique' },
 ];
-const GRADE_CODES = ['DA', 'DM', 'CM', 'SUP', 'AS', 'AUD', 'AJ', 'STG'] as const;
+const GRADE_CODES = ['DA', 'DM', 'MGR', 'SUP', 'AS', 'AUD', 'AJ', 'STG'] as const;
 const RANKS = Array.from({ length: 18 }, (_, i) => i + 1);
 const OCCUPIED_HINT = "Déplacez d'abord les collaborateurs assis sur cet échelon.";
 

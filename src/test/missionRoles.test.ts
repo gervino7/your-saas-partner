@@ -25,7 +25,7 @@ describe('Référentiel mission et staffing', () => {
     for (const role of ['auditeur_experimente', 'auditeur', 'auditeur_junior', 'chef', 'lead', 'member', null]) expect(isMissionPilotRole(role)).toBe(false);
   });
   it('preserves all eight grade codes and levels, including CM', () => {
-    expect(GRADE_LEVELS).toEqual({ DA: 1, DM: 2, CM: 3, SUP: 4, AS: 5, AUD: 6, AJ: 7, STG: 8 });
+    expect(GRADE_LEVELS).toEqual({ DA: 1, DM: 2, MGR: 3, SUP: 4, AS: 5, AUD: 6, AJ: 7, STG: 8 });
   });
   const rpcRoles = (allowed: string[]) => Object.keys(STAFFING_ROLES).map(role => ({ role, libelle: role, autorise: allowed.includes(role), motif: allowed.includes(role) ? 'autorise' : 'grade insuffisant' }));
   it('allows only junior for the trainee RPC response', () => {

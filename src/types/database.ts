@@ -1,7 +1,7 @@
 // Mission-DGC Database Types
 // These types mirror the Supabase schema. For auto-generated types, use @/integrations/supabase/types
 
-export type Grade = 'DA' | 'DM' | 'CM' | 'SUP' | 'AS' | 'AUD' | 'AJ' | 'STG';
+export type Grade = 'DA' | 'DM' | 'MGR' | 'SUP' | 'AS' | 'AUD' | 'AJ' | 'STG';
 export type AppRole = 'owner' | 'admin' | 'member';
 
 export type MissionType =
@@ -36,7 +36,7 @@ export type MeetingType = 'video' | 'audio' | 'in_person';
 export const GRADE_LABELS: Record<Grade, string> = {
   DA: 'Directeur Associé',
   DM: 'Directeur de Mission Senior',
-  CM: 'Directeur de Mission',
+  MGR: 'Manager',
   SUP: 'Superviseur',
   AS: 'Auditeur Senior',
   AUD: 'Auditeur',
@@ -45,7 +45,7 @@ export const GRADE_LABELS: Record<Grade, string> = {
 };
 
 export const GRADE_LEVELS: Record<Grade, number> = {
-  DA: 1, DM: 2, CM: 3, SUP: 4, AS: 5, AUD: 6, AJ: 7, STG: 8,
+  DA: 1, DM: 2, MGR: 3, SUP: 4, AS: 5, AUD: 6, AJ: 7, STG: 8,
 };
 
 export const MISSION_TYPE_LABELS: Record<MissionType, string> = {
