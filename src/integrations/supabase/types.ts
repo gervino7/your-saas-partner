@@ -3130,6 +3130,36 @@ export type Database = {
           },
         ]
       }
+      journal_renommage_cm: {
+        Row: {
+          detail: string | null
+          execution: string | null
+          fait_le: string
+          id: number
+          lignes: number | null
+          nature: string
+          objet: string
+        }
+        Insert: {
+          detail?: string | null
+          execution?: string | null
+          fait_le?: string
+          id?: number
+          lignes?: number | null
+          nature: string
+          objet: string
+        }
+        Update: {
+          detail?: string | null
+          execution?: string | null
+          fait_le?: string
+          id?: number
+          lignes?: number | null
+          nature?: string
+          objet?: string
+        }
+        Relationships: []
+      }
       mailing_group_recipients: {
         Row: {
           created_at: string | null
