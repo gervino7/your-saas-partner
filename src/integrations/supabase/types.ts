@@ -6868,6 +6868,7 @@ export type Database = {
         Returns: boolean
       }
       est_directeur_associe: { Args: { _user_id: string }; Returns: boolean }
+      est_direction_du_cabinet: { Args: { _org: string }; Returns: boolean }
       est_plomberie_de_compte: { Args: { _table: string }; Returns: boolean }
       evaluation_weight: {
         Args: {
