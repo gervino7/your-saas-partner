@@ -25,8 +25,6 @@ const missionSchema = z.object({
   client_id: z.string().optional(),
   director_id: z.string().optional(),
   chief_id: z.string().optional(),
-  budget_amount: z.coerce.number().min(0).optional(),
-  budget_currency: z.string().optional(),
   start_date: z.string().optional(),
   end_date: z.string().optional(),
   priority: z.string().optional(),
@@ -71,8 +69,6 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
       client_id: mission?.client_id ?? '',
       director_id: mission?.director_id ?? '',
       chief_id: mission?.chief_id ?? '',
-      budget_amount: mission?.budget_amount ?? undefined,
-      budget_currency: mission?.budget_currency ?? 'XOF',
       start_date: mission?.start_date ?? '',
       end_date: mission?.end_date ?? '',
       priority: mission?.priority ?? 'medium',
@@ -242,35 +238,6 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
                         <SelectContent>
                           {chiefs.map((u: any) => (
                             <SelectItem key={u.id} value={u.id}>{u.full_name} ({u.grade})</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                </div>
-              </div>
-
-              {/* Section: Budget */}
-              <div>
-                <SectionHeader icon={Wallet} label="Budget & Finance" />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3">
-                  <FormField control={form.control} name="budget_amount" render={({ field }) => (
-                    <FormItem className="md:col-span-2">
-                      <FormLabel>Montant</FormLabel>
-                      <FormControl><Input type="number" placeholder="0" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-
-                  <FormField control={form.control} name="budget_currency" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Devise</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                        <SelectContent>
-                          {Object.entries(CURRENCY_LABELS).map(([key, label]) => (
-                            <SelectItem key={key} value={key}>{label}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>

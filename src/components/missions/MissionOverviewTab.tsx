@@ -1,3 +1,4 @@
+import { formatMontant, useMissionBudget } from '@/hooks/useMissionBudget';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { format } from 'date-fns';
@@ -15,6 +16,14 @@ function initials(name: string) {
 function formatCurrency(amount: number | null, currency: string | null) {
   if (amount == null) return '-';
   return new Intl.NumberFormat('fr-FR').format(amount) + ' ' + (currency ?? 'XOF');
+}
+
+function BudgetResume({ missionId }: { missionId: string }) {
+  const { data } = useMissionBudget(missionId);
+  if (!data) return <>-</>;
+  if (data.etat === 'reserve') return <>Réservé à la direction de mission</>;
+  if (data.etat === 'non_fixe') return <>Non fixé</>;
+  return <>{formatMontant(data.montant, data.devise)}</>;
 }
 
 export default function MissionOverviewTab({ mission }: { mission: any }) {
@@ -58,7 +67,7 @@ export default function MissionOverviewTab({ mission }: { mission: any }) {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Budget</p>
-                  <p className="text-sm font-medium">{formatCurrency(mission.budget_amount, mission.budget_currency)}</p>
+                  <p className="text-sm font-medium tabular-nums"><BudgetResume missionId={mission.id} /></p>
                 </div>
               </div>
             </CardContent>
