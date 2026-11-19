@@ -15,3 +15,4 @@
 - Mission budget visibility and the right to set it come only from budget_de_la_mission and the peut_voir/peut_fixer_le_budget RPCs; zero rows means refused, never a zero amount, and the budget is written only from the Budget tab.
 - Evaluator designation is DA-only and goes through assign_evaluator/retirer_designation; mission scope filters candidates by mission role (lib/designation mirrors it for display only), annual and dossier scopes by grade.
 - Promotions go only through promouvoir_collaborateur with options from echelons_promouvables (DA-only button via est_directeur_associe); the Parcours tab reads grade_history under RLS, empty meaning no right.
+- Timesheet Validation and Disponibilité tabs open only on what the database returns (pending submitted entries, other collaborators in disponibilite); project-less general tasks are created from the weekly tab by grade levels 1-3, matching the tasks insert policy.
