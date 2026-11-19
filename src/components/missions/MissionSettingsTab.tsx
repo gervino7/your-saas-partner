@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useUpdateMission, useDeleteMission } from '@/hooks/useMissions';
 import MissionFormDialog from './MissionFormDialog';
-import { Archive, Trash2, Edit } from 'lucide-react';
+import { Archive, Trash2, Edit, Ban, RotateCcw } from 'lucide-react';
 
 export default function MissionSettingsTab({ mission }: { mission: any }) {
   const navigate = useNavigate();
@@ -16,6 +16,9 @@ export default function MissionSettingsTab({ mission }: { mission: any }) {
   const handleArchive = async () => {
     await updateMission.mutateAsync({ id: mission.id, status: 'archived' });
   };
+
+  const setStatus = (status: 'cancelled' | 'planning') => updateMission.mutateAsync({ id: mission.id, status });
+  const cancelled = mission.status === 'cancelled';
 
   const handleDelete = async () => {
     await deleteMission.mutateAsync(mission.id);
@@ -46,6 +49,39 @@ export default function MissionSettingsTab({ mission }: { mission: any }) {
             <Archive className="h-4 w-4 mr-2" />
             {mission.status === 'archived' ? 'Déjà archivée' : 'Archiver'}
           </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle className="text-base">Annuler la mission</CardTitle></CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground mb-4">
+            Une mission qui ne se fera pas. Elle reste visible dans l'historique des collaborateurs.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" disabled={cancelled || mission.status === 'archived' || updateMission.isPending}>
+                  <Ban className="h-4 w-4 mr-2" /> {cancelled ? 'Déjà annulée' : 'Annuler la mission'}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Annuler la mission</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    La mission passe en Annulée. Plus personne ne pourra y être affecté. Les affectations existantes restent en place, comme trace de ce qui avait été prévu. Cette décision est réversible : vous pourrez la remettre en planification.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Retour</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => void setStatus('cancelled')} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Annuler la mission</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            {cancelled && <Button variant="outline" disabled={updateMission.isPending} onClick={() => void setStatus('planning')}>
+              <RotateCcw className="h-4 w-4 mr-2" /> Remettre en planification
+            </Button>}
+          </div>
         </CardContent>
       </Card>
 

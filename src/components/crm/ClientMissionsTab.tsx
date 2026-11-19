@@ -18,8 +18,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTableSort } from '@/hooks/useTableSort';
 import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
-const statusLabels: Record<string, string> = { draft: 'Brouillon', planning: 'Planification', active: 'Active', paused: 'En pause', completed: 'Terminée', archived: 'Archivée' };
-const statusColors: Record<string, string> = { draft: 'secondary', planning: 'outline', active: 'default', completed: 'default', paused: 'secondary', archived: 'secondary' };
+const statusLabels: Record<string, string> = { draft: 'Brouillon', planning: 'Planification', active: 'Active', paused: 'En pause', completed: 'Terminée', archived: 'Archivée', cancelled: 'Annulée' };
+const statusColors: Record<string, string> = { draft: 'secondary', planning: 'outline', active: 'default', completed: 'default', paused: 'secondary', archived: 'secondary', cancelled: 'destructive' };
 
 export default function ClientMissionsTab({ clientId }: { clientId: string }) {
   const { data: missions, isLoading } = useClientMissions(clientId);

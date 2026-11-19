@@ -8,7 +8,7 @@ export type MissionType =
   | 'audit_financier' | 'audit_it' | 'restructuration_si' | 'conseil_management'
   | 'expertise_comptable' | 'due_diligence' | 'etude' | 'autre';
 
-export type MissionStatus = 'draft' | 'planning' | 'active' | 'on_hold' | 'completed' | 'archived';
+export type MissionStatus = 'draft' | 'planning' | 'active' | 'on_hold' | 'completed' | 'archived' | 'cancelled';
 export type ProjectStatus = 'planning' | 'active' | 'on_hold' | 'review' | 'completed' | 'archived';
 export type TaskStatus = 'todo' | 'in_progress' | 'in_review' | 'correction' | 'validated' | 'completed' | 'cancelled';
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
@@ -66,6 +66,7 @@ export const MISSION_STATUS_LABELS: Record<MissionStatus, string> = {
   on_hold: 'En pause',
   completed: 'Terminée',
   archived: 'Archivée',
+  cancelled: 'Annulée',
 };
 
 export const TASK_STATUS_LABELS: Record<TaskStatus, string> = {

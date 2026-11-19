@@ -9,6 +9,7 @@ const statusColors: Record<MissionStatus, string> = {
   on_hold: 'bg-warning/15 text-warning border-warning/30',
   completed: 'bg-primary/15 text-primary border-primary/30',
   archived: 'bg-muted text-muted-foreground',
+  cancelled: 'bg-destructive/10 text-destructive border-destructive/25',
 };
 
 export default function MissionStatusBadge({ status }: { status: string }) {

@@ -33,6 +33,9 @@ export function useMissions(filters: MissionFilters = {}) {
 
       if (filters.status && filters.status !== 'all') {
         query = query.eq('status', filters.status);
+      } else {
+        // Par défaut, les missions archivées et annulées sont masquées ; le filtre permet de les retrouver.
+        query = query.not('status', 'in', '(archived,cancelled)');
       }
       if (filters.type && filters.type !== 'all') {
         query = query.eq('type', filters.type);
