@@ -225,7 +225,7 @@ function WeeklyView() {
           onPrev={() => setCurrentWeek(subWeeks(currentWeek, 1))}
           onNext={() => setCurrentWeek(addWeeks(currentWeek, 1))}
         />
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <GeneralTaskDialog />
           <Dialog open={addOpen} onOpenChange={setAddOpen}>
             <DialogTrigger asChild>
@@ -609,7 +609,7 @@ function TeamValidation({ canApprove }: { canApprove: boolean }) {
       />
 
       <Card className="border-border/30">
-        <CardHeader className="flex-row items-center justify-between gap-3 space-y-0">
+        <CardHeader className="flex-row flex-wrap items-center justify-between gap-3 space-y-0">
           <div>
             <CardTitle className="text-base">Feuilles de temps à valider</CardTitle>
             <p className="mt-1 text-sm text-muted-foreground">
