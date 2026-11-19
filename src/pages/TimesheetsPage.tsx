@@ -23,12 +23,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import DayDetailSheet, { DayDetailTarget } from '@/components/timesheets/DayDetailSheet';
+import AvailabilityView from '@/components/timesheets/AvailabilityView';
+import { useActionsCount, useEstDirecteurAssocie, useTachesImputables } from '@/hooks/useTimesheetDetails';
+import { SelectGroup, SelectLabel } from '@/components/ui/select';
+import { ListChecks, Users } from 'lucide-react';
 
 const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
 type TimesheetRow = {
   key: string;
-  mission_id: string;
+  mission_id: string | null;
   mission_name: string;
   project_id: string | null;
   project_name: string | null;
@@ -47,7 +52,7 @@ function groupEntriesToRows(entries: any[]): TimesheetRow[] {
       map.set(key, {
         key,
         mission_id: e.mission_id,
-        mission_name: e.mission?.name || e.mission?.code || 'Mission',
+        mission_name: e.mission?.name || e.mission?.code || (e.mission_id ? 'Mission' : 'Tâche générale'),
         project_id: e.project_id,
         project_name: e.project?.name || e.project?.code || null,
         task_id: e.task_id,
@@ -160,18 +165,13 @@ function WeeklyView() {
   const rows = useMemo(() => groupEntriesToRows(entries), [entries]);
 
   const [addOpen, setAddOpen] = useState(false);
-  const [newMissionId, setNewMissionId] = useState('');
-  const [newProjectId, setNewProjectId] = useState('');
-
-  const { data: projects = [] } = useQuery({
-    queryKey: ['projects-for-mission', newMissionId],
-    queryFn: async () => {
-      if (!newMissionId) return [];
-      const { data } = await supabase.from('projects').select('id, name, code').eq('mission_id', newMissionId);
-      return data ?? [];
-    },
-    enabled: !!newMissionId,
-  });
+  const [newTaskId, setNewTaskId] = useState('');
+  const { data: taches = [] } = useTachesImputables();
+  const tachesMission = taches.filter((t) => !t.tache_generale);
+  const tachesGenerales = taches.filter((t) => t.tache_generale);
+  const [detail, setDetail] = useState<DayDetailTarget | null>(null);
+  const entryIds = useMemo(() => entries.filter((e: any) => Number(e.hours) > 0).map((e: any) => e.id as string), [entries]);
+  const { data: actionCounts = {} } = useActionsCount(entryIds);
 
   const handleCellChange = useCallback((row: TimesheetRow, dateStr: string, value: string) => {
     const hours = parseFloat(value) || 0;
@@ -190,17 +190,18 @@ function WeeklyView() {
   }, [upsert, weekStr]);
 
   const handleAddRow = () => {
-    if (!newMissionId) return;
+    const t = taches.find((x) => x.tache_id === newTaskId);
+    if (!t) return;
     addRow.mutate({
-      mission_id: newMissionId,
-      project_id: newProjectId || null,
-      is_billable: true,
+      mission_id: t.mission_id,
+      project_id: null,
+      task_id: t.tache_id,
+      is_billable: !t.tache_generale,
       week_start: weekStr,
       dates: dateStrs,
     });
     setAddOpen(false);
-    setNewMissionId('');
-    setNewProjectId('');
+    setNewTaskId('');
   };
 
   const handleSubmit = () => {
@@ -236,30 +237,33 @@ function WeeklyView() {
               </DialogHeader>
               <div className="space-y-4 pt-2">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Mission</label>
-                  <Select value={newMissionId} onValueChange={setNewMissionId}>
-                    <SelectTrigger><SelectValue placeholder="Sélectionner une mission" /></SelectTrigger>
+                  <label className="text-sm font-medium">Tâche</label>
+                  <Select value={newTaskId} onValueChange={setNewTaskId}>
+                    <SelectTrigger><SelectValue placeholder="Sélectionner une tâche" /></SelectTrigger>
                     <SelectContent>
-                      {missions.map((m: any) => (
-                        <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
-                      ))}
+                      {tachesMission.length > 0 && (
+                        <SelectGroup>
+                          <SelectLabel>Mes missions</SelectLabel>
+                          {tachesMission.map((t) => (
+                            <SelectItem key={t.tache_id} value={t.tache_id}>
+                              {t.intitule}{t.mission ? ` - ${t.mission}` : ''}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      )}
+                      {tachesGenerales.length > 0 && (
+                        <SelectGroup>
+                          <SelectLabel>Tâches générales</SelectLabel>
+                          {tachesGenerales.map((t) => (
+                            <SelectItem key={t.tache_id} value={t.tache_id}>{t.intitule}</SelectItem>
+                          ))}
+                        </SelectGroup>
+                      )}
+                      {taches.length === 0 && <div className="px-2 py-3 text-sm text-muted-foreground">Aucune tâche imputable</div>}
                     </SelectContent>
                   </Select>
                 </div>
-                {projects.length > 0 && (
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-medium">Projet (optionnel)</label>
-                    <Select value={newProjectId} onValueChange={setNewProjectId}>
-                      <SelectTrigger><SelectValue placeholder="Sélectionner un projet" /></SelectTrigger>
-                      <SelectContent>
-                        {projects.map((p: any) => (
-                          <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-                <Button onClick={handleAddRow} className="w-full" disabled={!newMissionId}>
+                <Button onClick={handleAddRow} className="w-full" disabled={!newTaskId}>
                   Ajouter
                 </Button>
               </div>
@@ -380,6 +384,23 @@ function WeeklyView() {
                               disabled={isLocked}
                               onBlur={(e) => handleCellChange(row, dateStr, e.target.value)}
                             />
+                            {val > 0 && row.entries[dateStr]?.id && (
+                              <button
+                                type="button"
+                                className="mx-auto mt-1 flex items-center gap-1 rounded px-1.5 text-[10px] text-muted-foreground hover:bg-muted hover:text-foreground"
+                                aria-label="Détail de la journée"
+                                onClick={() => setDetail({
+                                  entryId: row.entries[dateStr].id,
+                                  tache: row.task_name || row.project_name || row.mission_name,
+                                  date: dateStr,
+                                  heures: val,
+                                  status: row.entries[dateStr].status,
+                                })}
+                              >
+                                <ListChecks className="h-3 w-3" />
+                                <span className="tabular-nums">{actionCounts[row.entries[dateStr].id] ?? 0}</span>
+                              </button>
+                            )}
                           </TableCell>
                         );
                       })}
@@ -432,6 +453,7 @@ function WeeklyView() {
           <Send className="h-4 w-4 mr-1.5" /> Soumettre la semaine
         </Button>
       </div>
+      <DayDetailSheet key={detail?.entryId ?? 'none'} target={detail} onClose={() => setDetail(null)} />
     </div>
   );
 }
@@ -535,7 +557,7 @@ function MonthlyView() {
   );
 }
 
-function TeamValidation() {
+function TeamValidation({ canApprove }: { canApprove: boolean }) {
   const profile = useAuthStore((s) => s.profile);
   const [currentWeek, setCurrentWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [allWeeks, setAllWeeks] = useState(false);
@@ -576,7 +598,6 @@ function TeamValidation() {
   const approveAll = (ids: string[]) => approve.mutate({ ids, action: 'approved' });
   const openReject = (ids: string[]) => setRejectDialog({ ids, comment: '' });
 
-  if ((profile?.grade_level ?? 99) > 3) return null;
 
   return (
     <div className="space-y-5">
@@ -651,7 +672,7 @@ function TeamValidation() {
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div className="flex gap-2 mb-3">
+                      {canApprove ? (<div className="flex gap-2 mb-3">
                         <Button size="sm" onClick={() => approveAll(ids)} className="bg-success hover:bg-success/90">
                           Tout approuver
                         </Button>
@@ -668,7 +689,9 @@ function TeamValidation() {
                             </Button>
                           </>
                         )}
-                      </div>
+                      </div>) : (
+                        <p className="mb-3 text-xs text-muted-foreground">Consultation seule : l'approbation revient au directeur associé.</p>
+                      )}
                       <Table>
                         <TableHeader>
                           <TableRow>
@@ -683,7 +706,7 @@ function TeamValidation() {
                           {group.items.map((it) => (
                             <TableRow key={it.id}>
                               <TableCell>
-                                <Checkbox checked={selected.has(it.id)} onCheckedChange={() => toggle(it.id)} />
+                                {canApprove && <Checkbox checked={selected.has(it.id)} onCheckedChange={() => toggle(it.id)} />}
                               </TableCell>
                               <TableCell>{format(new Date(it.date), 'EEE dd/MM', { locale: fr })}</TableCell>
                               <TableCell className="text-xs text-muted-foreground">
@@ -744,7 +767,8 @@ function TeamValidation() {
 
 const TimesheetsPage = () => {
   const profile = useAuthStore((s) => s.profile);
-  const isSuperior = (profile?.grade_level ?? 99) <= 3;
+  const { data: estDA = false } = useEstDirecteurAssocie();
+  const isSuperior = (profile?.grade_level ?? 99) <= 3 || estDA;
   const { data: pendingCount = 0 } = usePendingTimesheetsCount();
 
   return (
@@ -763,7 +787,7 @@ const TimesheetsPage = () => {
       </div>
 
       <Tabs defaultValue="weekly" className="space-y-5">
-        <TabsList className="bg-muted/40 p-1 rounded-xl">
+        <TabsList className="bg-muted/40 p-1 rounded-xl flex h-auto w-full justify-start overflow-x-auto sm:inline-flex sm:w-auto">
           <TabsTrigger value="weekly" className="rounded-lg gap-1.5 data-[state=active]:bg-primary data-[state=active]:text-white">
             <LayoutGrid className="h-3.5 w-3.5" /> Hebdomadaire
           </TabsTrigger>
@@ -780,10 +804,16 @@ const TimesheetsPage = () => {
               )}
             </TabsTrigger>
           )}
+          {isSuperior && (
+            <TabsTrigger value="disponibilite" className="rounded-lg gap-1.5 data-[state=active]:bg-primary data-[state=active]:text-white">
+              <Users className="h-3.5 w-3.5" /> Disponibilité
+            </TabsTrigger>
+          )}
         </TabsList>
         <TabsContent value="weekly"><WeeklyView /></TabsContent>
         <TabsContent value="monthly"><MonthlyView /></TabsContent>
-        {isSuperior && <TabsContent value="validation"><TeamValidation /></TabsContent>}
+        {isSuperior && <TabsContent value="validation"><TeamValidation canApprove={estDA} /></TabsContent>}
+        {isSuperior && <TabsContent value="disponibilite"><AvailabilityView /></TabsContent>}
       </Tabs>
     </div>
   );

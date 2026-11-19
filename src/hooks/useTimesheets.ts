@@ -102,7 +102,7 @@ export function useAddTimesheetRow() {
 
   return useMutation({
     mutationFn: async (row: {
-      mission_id: string;
+      mission_id: string | null;
       project_id?: string | null;
       task_id?: string | null;
       is_billable?: boolean;
