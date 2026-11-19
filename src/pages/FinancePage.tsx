@@ -21,36 +21,39 @@ import EmptyState from '@/components/common/EmptyState';
 import { useTableSort } from '@/hooks/useTableSort';
 import { SortableTableHead } from '@/components/ui/sortable-table-head';
 
-const DEFAULT_RATES: Record<string, number> = {
-  DA: 750000, DM: 500000, MGR: 400000, SUP: 300000,
-  AS: 250000, AUD: 200000, AJ: 150000, STG: 75000,
-};
-
 const GRADES = ['DA', 'DM', 'MGR', 'SUP', 'AS', 'AUD', 'AJ', 'STG'];
 const EXPENSE_CATEGORIES = ['Transport', 'Hébergement', 'Restauration', 'Fournitures', 'Communication', 'Autre'];
 
+const RATES_RESERVED = 'Les taux journaliers sont réservés à la direction.';
+const fcfa = (n: number) => `${Math.round(n).toLocaleString('fr-FR')} FCFA`;
+
 function BudgetTab() {
-  const { data: summaries = [], isLoading } = useMissionBudgetSummary();
+  const { data, isLoading } = useMissionBudgetSummary();
+  const summaries = data?.rows ?? [];
+  const ratesAvailable = data?.ratesAvailable ?? false;
   const { sorted: sortedSummaries, sort, handleSort } = useTableSort(summaries);
 
   const getBarColor = (pct: number) => {
-    if (pct < 70) return 'bg-green-500';
-    if (pct < 90) return 'bg-yellow-500';
+    if (pct < 70) return 'bg-success';
+    if (pct < 90) return 'bg-warning';
     return 'bg-destructive';
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm text-muted-foreground">
+          Seules apparaissent les missions dont vous êtes associé ou directeur de mission.
+        </p>
         <ExportMenu
-          data={summaries.map((m: any) => ({
+          data={summaries.map((m) => ({
             mission: m.name,
             code: m.code,
-            budget: m.budget ?? '',
+            budget: m.budget,
             heures: m.total_hours.toFixed(1),
-            cout_reel: m.total_cost,
-            marge: m.budget ? m.budget - m.total_cost : '',
-            consomme_pct: `${m.consumed_pct}%`,
+            cout_reel: m.total_cost ?? '',
+            marge: m.total_cost !== null ? m.budget - m.total_cost : '',
+            consomme_pct: m.consumed_pct !== null ? `${m.consumed_pct}%` : '',
           }))}
           filename="budget-missions"
           columns={[
@@ -65,43 +68,54 @@ function BudgetTab() {
           title="Budget des missions"
         />
       </div>
+      {!isLoading && !ratesAvailable && (
+        <p className="text-sm text-muted-foreground">{RATES_RESERVED}</p>
+      )}
       <Card>
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <SortableTableHead sortKey="name" currentSort={sort} onSort={handleSort}>Mission</SortableTableHead>
                 <SortableTableHead sortKey="budget" currentSort={sort} onSort={handleSort} className="text-right">Budget</SortableTableHead>
                 <SortableTableHead sortKey="total_hours" currentSort={sort} onSort={handleSort} className="text-right">Heures</SortableTableHead>
-                <SortableTableHead sortKey="total_cost" currentSort={sort} onSort={handleSort} className="text-right">Coût réel</SortableTableHead>
-                <TableHead className="text-right">Marge</TableHead>
-                <SortableTableHead sortKey="consumed_pct" currentSort={sort} onSort={handleSort} className="w-[180px]">Consommé</SortableTableHead>
+                {ratesAvailable && (
+                  <>
+                    <SortableTableHead sortKey="total_cost" currentSort={sort} onSort={handleSort} className="text-right">Coût réel</SortableTableHead>
+                    <TableHead className="text-right">Marge</TableHead>
+                    <SortableTableHead sortKey="consumed_pct" currentSort={sort} onSort={handleSort} className="w-[180px]">Consommé</SortableTableHead>
+                  </>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedSummaries.length === 0 && (
-                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-6">Aucune mission active</TableCell></TableRow>
+              {!isLoading && sortedSummaries.length === 0 && (
+                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-6">Aucun budget de mission visible</TableCell></TableRow>
               )}
-              {sortedSummaries.map((m: any) => (
+              {sortedSummaries.map((m) => (
                 <TableRow key={m.id}>
                   <TableCell>
                     <div className="font-medium text-sm">{m.name}</div>
                     <div className="text-xs text-muted-foreground">{m.code}</div>
                   </TableCell>
-                  <TableCell className="text-right text-sm">{m.budget ? `${m.budget.toLocaleString('fr-FR')} FCFA` : '-'}</TableCell>
-                  <TableCell className="text-right text-sm">{m.total_hours.toFixed(1)}h</TableCell>
-                  <TableCell className="text-right text-sm">{m.total_cost.toLocaleString('fr-FR')} FCFA</TableCell>
-                  <TableCell className="text-right text-sm">
-                    {m.budget ? `${(m.budget - m.total_cost).toLocaleString('fr-FR')} FCFA` : '-'}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 rounded-full bg-secondary overflow-hidden">
-                        <div className={cn("h-full rounded-full transition-all", getBarColor(m.consumed_pct))} style={{ width: `${Math.min(m.consumed_pct, 100)}%` }} />
-                      </div>
-                      <span className="text-xs font-medium w-10 text-right">{m.consumed_pct}%</span>
-                    </div>
-                  </TableCell>
+                  <TableCell className="text-right text-sm tabular-nums">{fcfa(m.budget)}</TableCell>
+                  <TableCell className="text-right text-sm tabular-nums">{m.total_hours.toFixed(1)} h</TableCell>
+                  {ratesAvailable && (
+                    <>
+                      <TableCell className="text-right text-sm tabular-nums">{m.total_cost !== null ? fcfa(m.total_cost) : '—'}</TableCell>
+                      <TableCell className="text-right text-sm tabular-nums">{m.total_cost !== null ? fcfa(m.budget - m.total_cost) : '—'}</TableCell>
+                      <TableCell>
+                        {m.consumed_pct !== null ? (
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 h-2 rounded-full bg-secondary overflow-hidden">
+                              <div className={cn('h-full rounded-full', getBarColor(m.consumed_pct))} style={{ width: `${Math.min(m.consumed_pct, 100)}%` }} />
+                            </div>
+                            <span className="text-xs font-medium w-10 text-right tabular-nums">{m.consumed_pct}%</span>
+                          </div>
+                        ) : <span className="text-sm text-muted-foreground">—</span>}
+                      </TableCell>
+                    </>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
@@ -113,7 +127,7 @@ function BudgetTab() {
 }
 
 function DailyRatesTab() {
-  const { data: rates = [] } = useDailyRates();
+  const { data: rates = [], isLoading } = useDailyRates();
   const upsert = useUpsertDailyRate();
   const [editing, setEditing] = useState<Record<string, number>>({});
 
@@ -124,77 +138,70 @@ function DailyRatesTab() {
 
   const handleSave = (grade: string) => {
     const val = editing[grade];
-    if (val === undefined) return;
+    if (val === undefined || !(val > 0)) return;
     const existing = rateMap[grade];
     upsert.mutate({ id: existing?.id, grade, daily_rate: val });
     setEditing((p) => { const n = { ...p }; delete n[grade]; return n; });
   };
 
-  const handleInit = () => {
-    GRADES.forEach((g) => {
-      if (!rateMap[g]) {
-        upsert.mutate({ grade: g, daily_rate: DEFAULT_RATES[g] });
-      }
-    });
-  };
+  if (isLoading) return null;
+  // Zero rows is the RLS rule for grades below 2, not an error.
+  if (rates.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center text-sm text-muted-foreground">{RATES_RESERVED}</CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <div className="space-y-4">
-      {rates.length === 0 && (
-        <Card>
-          <CardContent className="p-6 text-center">
-            <p className="text-muted-foreground mb-3">Aucun taux configuré.</p>
-            <Button onClick={handleInit}><Plus className="h-4 w-4 mr-1" /> Initialiser les taux par défaut</Button>
-          </CardContent>
-        </Card>
-      )}
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Grade</TableHead>
-                <TableHead className="text-right">Taux journalier (XOF / FCFA BCEAO)</TableHead>
-                <TableHead className="w-20" />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {GRADES.map((g) => {
-                const current = rateMap[g];
-                const isEditing = editing[g] !== undefined;
-                return (
-                  <TableRow key={g}>
-                    <TableCell className="font-medium">{g}</TableCell>
-                    <TableCell className="text-right">
-                      {isEditing ? (
-                        <Input
-                          type="number"
-                          className="h-8 w-40 ml-auto text-right"
-                          value={editing[g]}
-                          onChange={(e) => setEditing((p) => ({ ...p, [g]: Number(e.target.value) }))}
-                          onKeyDown={(e) => e.key === 'Enter' && handleSave(g)}
-                        />
-                      ) : (
-                        <span>{current ? current.daily_rate.toLocaleString() : DEFAULT_RATES[g].toLocaleString()}</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {isEditing ? (
-                        <Button size="sm" variant="ghost" onClick={() => handleSave(g)}><Check className="h-4 w-4" /></Button>
-                      ) : (
-                        <Button size="sm" variant="ghost" onClick={() => setEditing((p) => ({ ...p, [g]: current?.daily_rate || DEFAULT_RATES[g] }))}>
-                          Modifier
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
+    <Card>
+      <CardContent className="p-0 overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Grade</TableHead>
+              <TableHead className="text-right">Taux journalier (FCFA)</TableHead>
+              <TableHead className="w-20" />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {GRADES.map((g) => {
+              const current = rateMap[g];
+              const isEditing = editing[g] !== undefined;
+              return (
+                <TableRow key={g}>
+                  <TableCell className="font-medium">{g}</TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {isEditing ? (
+                      <Input
+                        type="number"
+                        min={1}
+                        className="h-8 w-40 ml-auto text-right"
+                        value={editing[g] || ''}
+                        onChange={(e) => setEditing((p) => ({ ...p, [g]: Number(e.target.value) }))}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSave(g)}
+                      />
+                    ) : (
+                      <span>{current ? fcfa(current.daily_rate) : '—'}</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {isEditing ? (
+                      <Button size="sm" variant="ghost" aria-label="Enregistrer" onClick={() => handleSave(g)}><Check className="h-4 w-4" /></Button>
+                    ) : (
+                      <Button size="sm" variant="ghost" onClick={() => setEditing((p) => ({ ...p, [g]: current?.daily_rate ?? 0 }))}>
+                        Modifier
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }
 

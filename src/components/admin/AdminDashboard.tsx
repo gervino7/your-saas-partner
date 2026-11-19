@@ -37,15 +37,16 @@ export default function AdminDashboard() {
   const { data: missionsByMonth = [] } = useMissionsByMonth();
   const { data: utilByGrade = [] } = useUtilizationByGrade();
   const { data: taskDist = [] } = useTaskStatusDistribution();
-  const { data: budgetSummaries = [] } = useMissionBudgetSummary();
+  const { data: budgetData } = useMissionBudgetSummary();
+  const budgetSummaries = budgetData?.rows ?? [];
 
   const scatterData = budgetSummaries
-    .filter((m: any) => m.budget > 0)
-    .map((m: any) => ({
+    .filter((m) => m.budget > 0 && m.total_cost !== null)
+    .map((m) => ({
       name: m.name,
       budget: m.budget,
-      margin: m.budget - m.total_cost,
-      marginPct: Math.round(((m.budget - m.total_cost) / m.budget) * 100),
+      margin: m.budget - (m.total_cost as number),
+      marginPct: Math.round(((m.budget - (m.total_cost as number)) / m.budget) * 100),
     }));
 
   return (

@@ -452,58 +452,108 @@ export function useUpdateInvoice() {
   });
 }
 
+export interface MissionBudgetRow {
+  id: string;
+  name: string;
+  code: string;
+  status: string;
+  budget: number;
+  total_hours: number;
+  /** null when daily rates are not readable or a grade has no rate. */
+  total_cost: number | null;
+  consumed_pct: number | null;
+}
+
+const GRADE_CODE_BY_LEVEL: Record<number, string> = {
+  1: 'DA', 2: 'DM', 3: 'MGR', 4: 'SUP', 5: 'AS', 6: 'AUD', 7: 'AJ', 8: 'STG',
+};
+
+/**
+ * Budgets come only from mission_budgets (RLS: associate / mission director);
+ * missions absent from that answer are left out, never shown at zero.
+ * Rates come only from daily_rates (RLS: levels 1-2); no fallback value.
+ */
 export function useMissionBudgetSummary() {
   const profile = useAuthStore((s) => s.profile);
 
   return useQuery({
     queryKey: ['mission-budget-summary', profile?.organization_id],
-    queryFn: async () => {
-      if (!profile?.organization_id) return [];
-      
+    queryFn: async (): Promise<{ rows: MissionBudgetRow[]; ratesAvailable: boolean }> => {
+      if (!profile?.organization_id) return { rows: [], ratesAvailable: false };
+      const orgId = profile.organization_id;
+
+      const { data: budgets, error: bErr } = await supabase
+        .from('mission_budgets')
+        .select('mission_id, amount, currency')
+        .eq('organization_id', orgId);
+      if (bErr) throw bErr;
+      const missionIds = (budgets ?? []).map((b: any) => b.mission_id);
+
+      const { data: rates, error: rErr } = await supabase
+        .from('daily_rates')
+        .select('grade, daily_rate, currency')
+        .eq('organization_id', orgId);
+      if (rErr) throw rErr;
+      const rateMap: Record<string, number> = Object.fromEntries(
+        (rates ?? []).map((r: any) => [r.grade, Number(r.daily_rate)]),
+      );
+      const ratesAvailable = (rates ?? []).length > 0;
+
+      if (missionIds.length === 0) return { rows: [], ratesAvailable };
+
       const { data: missions, error: mErr } = await supabase
         .from('missions')
-        .select('id, name, code, budget_amount, budget_currency, status')
-        .eq('organization_id', profile.organization_id)
-        .in('status', ['active', 'planning']);
+        .select('id, name, code, status')
+        .in('id', missionIds);
       if (mErr) throw mErr;
 
       const { data: entries, error: eErr } = await supabase
         .from('time_entries')
-        .select('mission_id, hours, user:profiles!time_entries_user_id_fkey(grade_level)')
-        .eq('organization_id', profile.organization_id)
+        .select('mission_id, hours, user_id')
+        .eq('organization_id', orgId)
+        .in('mission_id', missionIds)
         .in('status', ['approved', 'submitted']);
       if (eErr) throw eErr;
 
-      const { data: rates, error: rErr } = await supabase
-        .from('daily_rates')
-        .select('grade, daily_rate')
-        .eq('organization_id', profile.organization_id);
-      if (rErr) throw rErr;
+      // time_entries.user_id references auth users, not profiles: read profiles separately.
+      const userIds = [...new Set((entries ?? []).map((e: any) => e.user_id).filter(Boolean))];
+      const levelByUser: Record<string, number | null> = {};
+      if (userIds.length > 0) {
+        const { data: profs, error: pErr } = await supabase
+          .from('profiles')
+          .select('id, grade_level')
+          .in('id', userIds);
+        if (pErr) throw pErr;
+        (profs ?? []).forEach((p: any) => { levelByUser[p.id] = p.grade_level; });
+      }
 
-      const gradeMap: Record<string, string> = {
-        '1': 'DA', '2': 'DM', '3': 'MGR', '4': 'SUP',
-        '5': 'AS', '6': 'AUD', '7': 'AJ', '8': 'STG',
-      };
-      const rateMap: Record<string, number> = {};
-      (rates ?? []).forEach((r: any) => { rateMap[r.grade] = Number(r.daily_rate); });
+      const budgetByMission: Record<string, number> = Object.fromEntries(
+        (budgets ?? []).map((b: any) => [b.mission_id, Number(b.amount)]),
+      );
 
-      return (missions ?? []).map((m: any) => {
+      const rows = (missions ?? []).map((m: any) => {
         const mEntries = (entries ?? []).filter((e: any) => e.mission_id === m.id);
         const totalHours = mEntries.reduce((s: number, e: any) => s + Number(e.hours), 0);
-        const totalCost = mEntries.reduce((s: number, e: any) => {
-          const gl = e.user?.grade_level;
-          const grade = gradeMap[String(gl)] || 'AUD';
-          const rate = rateMap[grade] || 200000;
-          return s + (Number(e.hours) / 8) * rate;
-        }, 0);
+        let totalCost: number | null = ratesAvailable ? 0 : null;
+        for (const e of mEntries) {
+          if (totalCost === null) break;
+          const code = GRADE_CODE_BY_LEVEL[levelByUser[e.user_id] ?? -1];
+          const rate = code ? rateMap[code] : undefined;
+          totalCost = rate === undefined ? null : totalCost + (Number(e.hours) / 8) * rate;
+        }
+        const budget = budgetByMission[m.id];
         return {
-          ...m,
+          id: m.id,
+          name: m.name,
+          code: m.code,
+          status: m.status,
+          budget,
           total_hours: totalHours,
           total_cost: totalCost,
-          budget: Number(m.budget_amount) || 0,
-          consumed_pct: m.budget_amount ? Math.round((totalCost / Number(m.budget_amount)) * 100) : 0,
+          consumed_pct: totalCost !== null && budget > 0 ? Math.round((totalCost / budget) * 100) : null,
         };
       });
+      return { rows, ratesAvailable };
     },
     enabled: !!profile?.organization_id,
   });

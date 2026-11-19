@@ -133,8 +133,6 @@ export function useCreateMission() {
       client_id?: string;
       director_id?: string;
       chief_id?: string;
-      budget_amount?: number;
-      budget_currency?: string;
       start_date?: string;
       end_date?: string;
       priority?: string;
@@ -150,8 +148,9 @@ export function useCreateMission() {
         _client_id: values.client_id ?? null,
         _director_id: values.director_id ?? null,
         _chief_id: values.chief_id ?? null,
-        _budget_amount: values.budget_amount ?? null,
-        _budget_currency: values.budget_currency ?? 'XOF',
+        // The budget is set only from the Budget tab (mission_budgets).
+        _budget_amount: null,
+        _budget_currency: 'XOF',
         _start_date: values.start_date ?? null,
         _end_date: values.end_date ?? null,
         _priority: values.priority ?? 'medium',
