@@ -3130,6 +3130,75 @@ export type Database = {
           },
         ]
       }
+      journal_anon: {
+        Row: {
+          execution: string | null
+          fait_le: string
+          id: number
+          nature: string | null
+          objet: string | null
+          resultat: string | null
+        }
+        Insert: {
+          execution?: string | null
+          fait_le?: string
+          id?: number
+          nature?: string | null
+          objet?: string | null
+          resultat?: string | null
+        }
+        Update: {
+          execution?: string | null
+          fait_le?: string
+          id?: number
+          nature?: string | null
+          objet?: string | null
+          resultat?: string | null
+        }
+        Relationships: []
+      }
+      journal_echelons: {
+        Row: {
+          apres_echelon: string | null
+          apres_grade: string | null
+          apres_rang: number | null
+          avant_echelon: string | null
+          avant_grade: string | null
+          avant_rang: number | null
+          collaborateur: string | null
+          execution: string | null
+          fait_le: string
+          id: number
+          resultat: string | null
+        }
+        Insert: {
+          apres_echelon?: string | null
+          apres_grade?: string | null
+          apres_rang?: number | null
+          avant_echelon?: string | null
+          avant_grade?: string | null
+          avant_rang?: number | null
+          collaborateur?: string | null
+          execution?: string | null
+          fait_le?: string
+          id?: number
+          resultat?: string | null
+        }
+        Update: {
+          apres_echelon?: string | null
+          apres_grade?: string | null
+          apres_rang?: number | null
+          avant_echelon?: string | null
+          avant_grade?: string | null
+          avant_rang?: number | null
+          collaborateur?: string | null
+          execution?: string | null
+          fait_le?: string
+          id?: number
+          resultat?: string | null
+        }
+        Relationships: []
+      }
       journal_renommage_cm: {
         Row: {
           detail: string | null
@@ -6835,6 +6904,7 @@ export type Database = {
         Returns: {
           capacite_heures: number
           collaborateur: string
+          collaborateur_id: string
           grade: string
           heures_disponibles: number
           heures_imputees: number
