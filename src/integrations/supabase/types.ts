@@ -6662,6 +6662,7 @@ export type Database = {
       ancre_historique_grade: { Args: { _user_id: string }; Returns: string }
       assign_evaluator: {
         Args: {
+          _dossier_id?: string
           _due_date?: string
           _eval_type?: Database["public"]["Enums"]["eval_type"]
           _evaluatee_id: string
@@ -7497,6 +7498,7 @@ export type Database = {
         }
         Returns: Database["public"]["Enums"]["eval_practice"]
       }
+      retirer_designation: { Args: { _assignment_id: string }; Returns: Json }
       review_deposited_documents: {
         Args: { _action: string; _document_ids: string[]; _reason?: string }
         Returns: Json

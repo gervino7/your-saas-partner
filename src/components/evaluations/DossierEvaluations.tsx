@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AssignEvaluatorDialog from './AssignEvaluatorDialog';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/authStore';
-import { evaluationRpc, type EvaluationData, useOpenDossierEvaluations } from '@/hooks/useEvaluations';
+import { evaluationRpc, type EvaluationData, useOpenDossierEvaluations, useEstDirecteurAssocie } from '@/hooks/useEvaluations';
 import { Button } from '@/components/ui/button';
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from '@/components/ui/table';
 import { EvaluationStatus, QueryState } from './EvaluationUI';
@@ -14,6 +16,8 @@ export default function DossierEvaluations({ dossierId, clientName, canOpen }: {
   const p = useAuthStore(s => s.profile);
   const start = useOpenDossierEvaluations();
   const nav = useNavigate();
+  const estDA = useEstDirecteurAssocie().data === true;
+  const [assign, setAssign] = useState(false);
   const q = useQuery({
     queryKey: ['dossier-evaluations', dossierId, p?.id],
     enabled: !!p?.id && canOpen,
@@ -28,6 +32,8 @@ export default function DossierEvaluations({ dossierId, clientName, canOpen }: {
         <Button variant="outline" className="whitespace-normal h-auto min-h-10 text-left" disabled={start.isPending} onClick={() => start.mutate({ _dossier_id: dossierId }, {
           onSuccess: r => toast.success(`${r.created ?? 0} affectation(s) créée(s) sur ${r.dossier ?? clientName ?? 'le dossier'} - exercice ${r.periode ?? '-'}${r.practice ? ` - ${PRACTICES[r.practice as keyof typeof PRACTICES] ?? r.practice}` : ''}${r.profils_incomplets > 0 ? ` · ${r.profils_incomplets} collaborateur(s) sans practice ou échelon ne pourront pas être évalués.` : ''}`),
         })}>Ouvrir les évaluations du dossier</Button>
+        {estDA ? <Button variant="outline" onClick={() => setAssign(true)}>Désigner un évaluateur</Button>
+          : <p className="text-xs text-muted-foreground">La désignation des évaluateurs revient au directeur associé.</p>}
       </div>
     </div>
     <QueryState loading={q.isLoading} error={q.error} />
@@ -37,5 +43,6 @@ export default function DossierEvaluations({ dossierId, clientName, canOpen }: {
         <TableCell>{r.evaluator?.full_name}</TableCell><TableCell><EvaluationStatus status={r.status} /></TableCell><TableCell className="tabular-nums">{numberFR(r.weighted_score)}</TableCell>
       </TableRow>)}{q.data?.length === 0 && <TableRow><TableCell colSpan={4} className="py-5 text-muted-foreground">Aucune évaluation ouverte sur ce dossier.</TableCell></TableRow>}</TableBody>
     </Table>
+    {assign && <AssignEvaluatorDialog open onOpenChange={setAssign} dossierId={dossierId} />}
   </section>;
 }

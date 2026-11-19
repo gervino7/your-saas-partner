@@ -67,3 +67,8 @@ export function useEvaluationGrades(practice: string) {
     if(error) throw new Error(error.message); return data ?? [];
   }});
 }
+// Seul le directeur associé désigne les évaluateurs ; la base reste l'autorité.
+export const useEstDirecteurAssocie = () => {
+  const id = useAuthStore(s => s.profile?.id);
+  return useQuery({ queryKey: ['est-da', id], enabled: !!id, queryFn: () => evaluationRpc<boolean>('est_directeur_associe', { _user_id: id }) });
+};
