@@ -1,0 +1,4 @@
+ALTER POLICY attachments_org_upload ON storage.objects WITH CHECK (bucket_id = 'attachments' AND owner_id = (select auth.uid()::text) AND (storage.foldername(name))[1] = (select organization_id::text from public.profiles where id = auth.uid()));
+ALTER POLICY documents_org_upload ON storage.objects WITH CHECK (bucket_id = 'documents' AND owner_id = (select auth.uid()::text) AND (storage.foldername(name))[1] = (select organization_id::text from public.profiles where id = auth.uid()));
+ALTER POLICY eval_pdf_write ON storage.objects WITH CHECK (bucket_id = 'evaluations' AND owner_id = (select auth.uid()::text) AND (storage.foldername(name))[1] = (select p.organization_id::text from public.profiles p where p.id = auth.uid()));
+ALTER POLICY org_assets_org_upload ON storage.objects WITH CHECK (bucket_id = 'org-assets' AND owner_id = (select auth.uid()::text) AND (storage.foldername(name))[1] = (select organization_id::text from public.profiles where id = auth.uid()));
