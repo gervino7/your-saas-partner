@@ -25,7 +25,8 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import DayDetailSheet, { DayDetailTarget } from '@/components/timesheets/DayDetailSheet';
 import AvailabilityView from '@/components/timesheets/AvailabilityView';
-import { useActionsCount, useEstDirecteurAssocie, useTachesImputables } from '@/hooks/useTimesheetDetails';
+import GeneralTaskDialog from '@/components/timesheets/GeneralTaskDialog';
+import { useActionsCount, useEstDirecteurAssocie, useTachesImputables, useDisponibilite } from '@/hooks/useTimesheetDetails';
 import { SelectGroup, SelectLabel } from '@/components/ui/select';
 import { ListChecks, Users } from 'lucide-react';
 
@@ -225,6 +226,7 @@ function WeeklyView() {
           onNext={() => setCurrentWeek(addWeeks(currentWeek, 1))}
         />
         <div className="flex items-center gap-2">
+          <GeneralTaskDialog />
           <Dialog open={addOpen} onOpenChange={setAddOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
@@ -569,8 +571,7 @@ function TeamValidation({ canApprove }: { canApprove: boolean }) {
   const grouped = useMemo(() => {
     const map = new Map<string, { user: any; week: string; items: any[]; totalHours: number }>();
     for (const e of teamEntries) {
-      const uid = (e as any).user?.id;
-      if (!uid) continue;
+      const uid = (e as any).user_id as string;
       const key = allWeeks ? `${uid}|${e.week_start}` : uid;
       if (!map.has(key)) {
         map.set(key, {
@@ -658,8 +659,8 @@ function TeamValidation({ canApprove }: { canApprove: boolean }) {
                     <AccordionTrigger>
                       <div className="flex flex-1 items-center justify-between pr-4">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium">{group.user.full_name}</span>
-                          <Badge variant="outline" className="text-[10px]">{group.user.grade}</Badge>
+                          <span className={cn('font-medium', !group.user && 'italic text-muted-foreground')}>{group.user?.full_name ?? 'Collaborateur non visible'}</span>
+                          {group.user?.grade && <Badge variant="outline" className="text-[10px]">{group.user.grade}</Badge>}
                           {allWeeks && (
                             <Badge variant="secondary" className="text-[10px] tabular-nums">
                               Semaine du {format(new Date(group.week), 'dd/MM/yyyy')}
@@ -768,8 +769,12 @@ function TeamValidation({ canApprove }: { canApprove: boolean }) {
 const TimesheetsPage = () => {
   const profile = useAuthStore((s) => s.profile);
   const { data: estDA = false } = useEstDirecteurAssocie();
-  const isSuperior = (profile?.grade_level ?? 99) <= 3 || estDA;
   const { data: pendingCount = 0 } = usePendingTimesheetsCount();
+  // Tabs open on what the database returns, never on a hard-coded grade threshold.
+  const lundi = startOfWeek(new Date(), { weekStartsOn: 1 });
+  const { data: dispo = [] } = useDisponibilite(format(lundi, 'yyyy-MM-dd'), format(addDays(lundi, 4), 'yyyy-MM-dd'));
+  const voitDesCollaborateurs = dispo.some((l) => l.collaborateur_id !== profile?.id);
+  const voitValidation = pendingCount > 0;
 
   return (
     <div className="space-y-6">
@@ -794,7 +799,7 @@ const TimesheetsPage = () => {
           <TabsTrigger value="monthly" className="rounded-lg gap-1.5 data-[state=active]:bg-primary data-[state=active]:text-white">
             <CalendarDays className="h-3.5 w-3.5" /> Mensuelle
           </TabsTrigger>
-          {isSuperior && (
+          {voitValidation && (
             <TabsTrigger value="validation" className="rounded-lg gap-1.5 data-[state=active]:bg-primary data-[state=active]:text-white">
               <CheckCircle2 className="h-3.5 w-3.5" /> Validation
               {pendingCount > 0 && (
@@ -804,7 +809,7 @@ const TimesheetsPage = () => {
               )}
             </TabsTrigger>
           )}
-          {isSuperior && (
+          {voitDesCollaborateurs && (
             <TabsTrigger value="disponibilite" className="rounded-lg gap-1.5 data-[state=active]:bg-primary data-[state=active]:text-white">
               <Users className="h-3.5 w-3.5" /> Disponibilité
             </TabsTrigger>
@@ -812,8 +817,8 @@ const TimesheetsPage = () => {
         </TabsList>
         <TabsContent value="weekly"><WeeklyView /></TabsContent>
         <TabsContent value="monthly"><MonthlyView /></TabsContent>
-        {isSuperior && <TabsContent value="validation"><TeamValidation canApprove={estDA} /></TabsContent>}
-        {isSuperior && <TabsContent value="disponibilite"><AvailabilityView /></TabsContent>}
+        {voitValidation && <TabsContent value="validation"><TeamValidation canApprove={estDA} /></TabsContent>}
+        {voitDesCollaborateurs && <TabsContent value="disponibilite"><AvailabilityView /></TabsContent>}
       </Tabs>
     </div>
   );
