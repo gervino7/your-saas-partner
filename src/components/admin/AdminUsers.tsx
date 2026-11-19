@@ -6,13 +6,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import PromotionDialog from '@/components/grades/PromotionDialog';
+import { useEstDirecteurAssocie } from '@/hooks/useEvaluations';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Search, UserPlus, Pencil, Trash2, AlertCircle, LineChart } from 'lucide-react';
+import { Search, UserPlus, Pencil, Trash2, AlertCircle, LineChart, TrendingUp } from 'lucide-react';
 import ExportMenu from '@/components/common/ExportMenu';
 import { useOrganizationUsers } from '@/hooks/useMissions';
 import { useUpdateUserProfile, useDeleteUser, useInviteUser } from '@/hooks/useAdmin';
@@ -42,6 +44,8 @@ export default function AdminUsers() {
   const inviteUser = useInviteUser();
   const currentUserId = useAuthStore((s) => s.profile?.id);
   const [search, setSearch] = useState('');
+  const estDA = useEstDirecteurAssocie().data === true;
+  const [promoTarget, setPromoTarget] = useState<{ id: string; name: string } | null>(null);
   const [filterGrade, setFilterGrade] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [editingUser, setEditingUser] = useState<EditingUser | null>(null);
@@ -152,6 +156,7 @@ export default function AdminUsers() {
                     <TableCell><Badge variant={u.is_online ? 'default' : 'secondary'} className="text-[10px]">{u.is_online ? 'En ligne' : 'Hors ligne'}</Badge></TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1"><Button size="icon" variant="ghost" className="h-7 w-7" title="Synthèse" onClick={()=>navigate(`/evaluations/synthese/${u.id}`)}><LineChart className="h-4 w-4"/></Button>
+                        {estDA && <Button size="icon" variant="ghost" className="h-7 w-7" title="Promouvoir" aria-label="Promouvoir" onClick={() => setPromoTarget({ id: u.id, name: u.full_name })}><TrendingUp className="h-4 w-4" /></Button>}
                         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleOpenEdit(u)} title="Modifier">
                           <Pencil className="h-3.5 w-3.5" />
                         </Button>
@@ -240,6 +245,7 @@ export default function AdminUsers() {
           </div>
         </DialogContent>
       </Dialog>
+    {promoTarget && <PromotionDialog open onOpenChange={b => { if (!b) setPromoTarget(null); }} userId={promoTarget.id} name={promoTarget.name} />}
     </div>
   );
 }
