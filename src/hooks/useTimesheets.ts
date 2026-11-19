@@ -199,7 +199,9 @@ export function useTeamTimesheets(weekStart: Date, allWeeks = false) {
         .from('time_entries')
         .select(`
           *,
-          user:profiles!time_entries_user_id_fkey(id, full_name, avatar_url, grade)
+          mission:missions(name, code),
+          project:projects(name, code),
+          task:tasks(title)
         `)
         .eq('organization_id', profile.organization_id)
         .eq('status', 'submitted')
@@ -209,10 +211,15 @@ export function useTeamTimesheets(weekStart: Date, allWeeks = false) {
         .order('week_start', { ascending: true })
         .order('date');
       if (error) throw error;
-      return data ?? [];
+      const rows = data ?? [];
+      // user_id references auth.users, so profiles are read separately (RLS applies).
+      const ids = Array.from(new Set(rows.map((r: any) => r.user_id)));
+      if (ids.length === 0) return [];
+      const { data: profs } = await supabase.from('profiles').select('id, full_name, avatar_url, grade').in('id', ids);
+      const byId = new Map((profs ?? []).map((pr: any) => [pr.id, pr]));
+      return rows.map((r: any) => ({ ...r, user: byId.get(r.user_id) ?? null }));
     },
-    enabled: !!profile?.organization_id && (profile?.grade_level ?? 99) <= 3,
-
+    enabled: !!profile?.organization_id,
   });
 }
 
