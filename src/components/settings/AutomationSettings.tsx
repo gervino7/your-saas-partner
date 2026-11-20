@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
 import { Zap } from 'lucide-react';
@@ -60,13 +61,19 @@ const AutomationSettings = () => {
       .eq('id', profile.organization_id)
       .single();
     const currentSettings = (org?.settings as any) || {};
-    const { error } = await supabase
-      .from('organizations')
-      .update({ settings: { ...currentSettings, automations: config } })
-      .eq('id', profile.organization_id);
-    setSaving(false);
-    if (error) toast.error("Erreur lors de la sauvegarde");
-    else toast.success("Automatisations mises à jour");
+    try {
+      await updateByIdOrFail(
+        'organizations',
+        profile.organization_id,
+        { settings: { ...currentSettings, automations: config } },
+        "Les automatisations n'ont pas été enregistrées : vous n'avez pas le droit de modifier le cabinet.",
+      );
+      toast.success("Automatisations mises à jour");
+    } catch (e: any) {
+      toast.error(e.message || "Erreur lors de la sauvegarde");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const toggle = (key: keyof AutomationConfig) => {

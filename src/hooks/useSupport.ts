@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -230,8 +231,7 @@ export function useUpdateTicket() {
         patch.resolved_at = new Date().toISOString();
         patch.resolution = payload.resolution ?? null;
       }
-      const { error } = await supabase.from('support_tickets').update(patch).eq('id', payload.ticketId);
-      if (error) throw error;
+      await updateByIdOrFail('support_tickets', payload.ticketId, patch, "Cette demande n'a pas été mise à jour : vous n'avez pas le droit de la modifier.");
     },
     onSuccess: (_d, v) => {
       toast({ title: 'Demande mise à jour' });

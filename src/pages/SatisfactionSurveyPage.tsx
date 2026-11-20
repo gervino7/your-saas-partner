@@ -77,7 +77,7 @@ const SatisfactionSurveyPage = () => {
 
   const handleSubmit = async () => {
     if (form.overall_rating === 0) { toast.error('Veuillez donner une note globale'); return; }
-    const { error } = await supabase.from('client_surveys').update({
+    const { data, error } = await supabase.from('client_surveys').update({
       respondent_name: form.respondent_name,
       respondent_email: form.respondent_email,
       overall_rating: form.overall_rating,
@@ -89,9 +89,9 @@ const SatisfactionSurveyPage = () => {
       nps_score: form.nps_score,
       comments: form.comments || null,
       submitted_at: new Date().toISOString(),
-    }).eq('token', token!);
+    }).eq('token', token!).select('id');
 
-    if (error) { toast.error('Erreur lors de la soumission'); return; }
+    if (error || !data || data.length === 0) { toast.error('Erreur lors de la soumission'); return; }
     setSubmitted(true);
   };
 

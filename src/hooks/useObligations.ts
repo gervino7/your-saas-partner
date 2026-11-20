@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { updateManyOrFail } from '@/lib/safeUpdate';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
 
@@ -102,11 +103,7 @@ export function useBulkUpdateObligations() {
       ids: string[];
       values: { status?: string; assigned_to?: string | null };
     }) => {
-      const { error } = await supabase
-        .from('obligation_periods')
-        .update(values)
-        .in('id', ids);
-      if (error) throw error;
+      await updateManyOrFail('obligation_periods', ids, values, "Certaines échéances n'ont pas été mises à jour : vous n'avez pas le droit de les modifier.");
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['echeancier'] });

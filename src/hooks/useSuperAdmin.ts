@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { useToast } from '@/hooks/use-toast';
 import type { PlanId } from '@/lib/plans';
 
@@ -342,11 +343,12 @@ export function useRevokeAdmin() {
   const { toast } = useToast();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('platform_admins')
-        .update({ is_active: false, revoked_at: new Date().toISOString() })
-        .eq('id', id);
-      if (error) throw error;
+      await updateByIdOrFail(
+        'platform_admins',
+        id,
+        { is_active: false, revoked_at: new Date().toISOString() },
+        "Cet accès n'a pas été révoqué : vous n'avez pas le droit de le modifier.",
+      );
     },
     onSuccess: () => {
       toast({ title: 'Accès révoqué' });

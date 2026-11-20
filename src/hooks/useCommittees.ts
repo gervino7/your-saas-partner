@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
 
@@ -43,8 +44,7 @@ export const useUpdateCommittee = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...rest }: { id: string; [k: string]: any }) => {
-      const { error } = await supabase.from('committees').update(rest).eq('id', id);
-      if (error) throw error;
+      await updateByIdOrFail('committees', id, rest, "Ce comité n'a pas été mis à jour : vous n'avez pas le droit de le modifier.");
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['committees'] }); toast.success('Comité mis à jour'); },
     onError: (e: Error) => toast.error(e.message),
@@ -149,8 +149,7 @@ export const useUpdateMeeting = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...rest }: { id: string; committee_id?: string; [k: string]: any }) => {
-      const { error } = await supabase.from('committee_meetings').update(rest).eq('id', id);
-      if (error) throw error;
+      await updateByIdOrFail('committee_meetings', id, rest, "Cette réunion n'a pas été mise à jour : vous n'avez pas le droit de la modifier.");
       return rest.committee_id;
     },
     onSuccess: (cid) => { qc.invalidateQueries({ queryKey: ['committee-meetings', cid] }); toast.success('Réunion mise à jour'); },

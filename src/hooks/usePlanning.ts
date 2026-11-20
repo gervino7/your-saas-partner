@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail, updateManyOrFail } from '@/lib/safeUpdate';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -78,8 +79,7 @@ export function useUpsertPlanEntry() {
         status: (payload.status ?? 'draft') as PlanEntryStatus,
       };
       if (payload.id) {
-        const { error } = await supabase.from('plan_entries').update(row).eq('id', payload.id);
-        if (error) throw error;
+        await updateByIdOrFail('plan_entries', payload.id, row, "Cette entrée n'a pas été modifiée : elle a peut-être déjà été soumise.");
       } else {
         const { error } = await supabase.from('plan_entries').insert(row);
         if (error) throw error;
@@ -220,16 +220,17 @@ export function useReviewPlan() {
       if (payload.status === 'rejected' && !payload.review_comment?.trim()) {
         throw new Error('Un commentaire est obligatoire pour renvoyer un planning');
       }
-      const { error } = await supabase
-        .from('plan_entries')
-        .update({
+      await updateManyOrFail(
+        'plan_entries',
+        payload.ids,
+        {
           status: payload.status,
           reviewer_id: profile.id,
           reviewed_at: new Date().toISOString(),
           review_comment: payload.review_comment ?? null,
-        })
-        .in('id', payload.ids);
-      if (error) throw error;
+        },
+        "Certaines entrées n'ont pas été mises à jour : vous n'avez pas le droit de les valider.",
+      );
     },
     onSuccess: (_d, vars) => {
       qc.invalidateQueries({ queryKey: ['team-plans'] });

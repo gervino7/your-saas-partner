@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { useAuthStore } from '@/stores/authStore';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -413,11 +414,7 @@ export function useMessages(conversationId: string | null) {
 
   const editMessage = useMutation({
     mutationFn: async ({ id, content }: { id: string; content: string }) => {
-      const { error } = await supabase
-        .from('messages')
-        .update({ content, is_edited: true, updated_at: new Date().toISOString() })
-        .eq('id', id);
-      if (error) throw error;
+      await updateByIdOrFail('messages', id, { content, is_edited: true, updated_at: new Date().toISOString() }, "Ce message n'a pas été modifié : vous n'avez pas le droit de le modifier.");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['messages', conversationId] });

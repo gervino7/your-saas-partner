@@ -2,6 +2,7 @@ import DepartmentSelect from '@/components/evaluations/DepartmentSelect';
 import { useState } from 'react';
 import { PRACTICES } from '@/lib/evaluation';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -99,9 +100,19 @@ export default function MissionFormDialog({ open, onOpenChange, mission }: Props
       const newId = typeof created === 'string' ? created : created?.id ?? created?.mission_id;
       if (newId) {
         setSavingContext(true);
-        const { error } = await supabase.from('missions').update({ practice: practice as 'comptable' | 'conseil' | 'juridique' | null, department_id }).eq('id', newId);
-        setSavingContext(false);
-        if (error) { toast({ title: 'Département et practice non enregistrés', description: error.message, variant: 'destructive' }); return; }
+        try {
+          await updateByIdOrFail(
+            'missions',
+            newId,
+            { practice: practice as 'comptable' | 'conseil' | 'juridique' | null, department_id },
+            "Le département et la practice n'ont pas été enregistrés : vous n'avez pas le droit de modifier cette mission.",
+          );
+        } catch (error: any) {
+          toast({ title: 'Département et practice non enregistrés', description: error.message, variant: 'destructive' });
+          return;
+        } finally {
+          setSavingContext(false);
+        }
       }
     }
     onOpenChange(false);

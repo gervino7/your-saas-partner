@@ -44,6 +44,7 @@ import EmptyState from '@/components/common/EmptyState';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 
 function formatDate(d: string | null) {
   if (!d) return '-';
@@ -886,7 +887,11 @@ export default function WorkspacePage() {
                 checked={workspace?.sync_enabled ?? true}
                 onCheckedChange={async (v) => {
                   if (!workspace) return;
-                  await supabase.from('personal_workspaces').update({ sync_enabled: v }).eq('id', workspace.id);
+                  try {
+                    await updateByIdOrFail('personal_workspaces', workspace.id, { sync_enabled: v }, "Ce réglage n'a pas été enregistré : vous n'avez pas le droit de le modifier.");
+                  } catch (e: any) {
+                    toast({ title: 'Erreur', description: e.message, variant: 'destructive' });
+                  }
                 }}
               />
             </div>

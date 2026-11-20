@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from '@/hooks/use-toast';
 
@@ -157,8 +158,7 @@ export function useRenameFolder() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, name }: { id: string; name: string }) => {
-      const { error } = await supabase.from('document_folders').update({ name }).eq('id', id);
-      if (error) throw error;
+      await updateByIdOrFail('document_folders', id, { name }, "Ce dossier n'a pas été renommé : vous n'avez pas le droit de le modifier.");
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['document_folders'] });
@@ -263,8 +263,7 @@ export function useUpdateDocumentStatus() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase.from('documents').update({ status }).eq('id', id);
-      if (error) throw error;
+      await updateByIdOrFail('documents', id, { status }, "Le statut n'a pas été mis à jour : vous n'avez pas le droit de modifier ce document.");
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['documents'] });
@@ -296,8 +295,7 @@ export function useMoveDocument() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, folderId }: { id: string; folderId: string | null }) => {
-      const { error } = await supabase.from('documents').update({ folder_id: folderId }).eq('id', id);
-      if (error) throw error;
+      await updateByIdOrFail('documents', id, { folder_id: folderId }, "Ce document n'a pas été déplacé : vous n'avez pas le droit de le modifier.");
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['documents'] });

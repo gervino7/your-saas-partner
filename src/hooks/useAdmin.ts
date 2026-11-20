@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
 
@@ -218,11 +219,7 @@ export function useUpdateOrganization() {
   return useMutation({
     mutationFn: async (values: Record<string, any>) => {
       if (!profile?.organization_id) throw new Error('No org');
-      const { error } = await supabase
-        .from('organizations')
-        .update(values)
-        .eq('id', profile.organization_id);
-      if (error) throw error;
+      await updateByIdOrFail('organizations', profile.organization_id, values, "Les paramètres n'ont pas été enregistrés : vous n'avez pas le droit de modifier le cabinet.");
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['organization'] });
@@ -247,11 +244,7 @@ export function useUpdateOrgSettings() {
         .single();
       const current = (org?.settings as Record<string, any>) ?? {};
       const merged = { ...current, ...settingsPartial };
-      const { error } = await supabase
-        .from('organizations')
-        .update({ settings: merged })
-        .eq('id', profile.organization_id);
-      if (error) throw error;
+      await updateByIdOrFail('organizations', profile.organization_id, { settings: merged }, "Les paramètres n'ont pas été enregistrés : vous n'avez pas le droit de modifier le cabinet.");
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['organization'] });
@@ -266,11 +259,7 @@ export function useUpdateUserGrade() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ userId, grade, grade_level }: { userId: string; grade: string; grade_level: number }) => {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ grade, grade_level })
-        .eq('id', userId);
-      if (error) throw error;
+      await updateByIdOrFail('profiles', userId, { grade, grade_level }, "Le grade n'a pas été mis à jour : vous n'avez pas le droit de modifier ce collaborateur.");
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['org-users'] });
@@ -284,11 +273,12 @@ export function useUpdateUserProfile() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ userId, full_name, phone, grade, practice, grade_echelon }: { userId: string; full_name: string; phone?: string; grade: string; practice?: 'comptable'|'conseil'|'juridique'|null; grade_echelon?: string|null }) => {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ full_name, phone: phone || null, grade, practice, grade_echelon })
-        .eq('id', userId);
-      if (error) throw error;
+      await updateByIdOrFail(
+        'profiles',
+        userId,
+        { full_name, phone: phone || null, grade, practice, grade_echelon },
+        "Ce collaborateur n'a pas été mis à jour : vous n'avez pas le droit de le modifier.",
+      );
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['org-users'] });

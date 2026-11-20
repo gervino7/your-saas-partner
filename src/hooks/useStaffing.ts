@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -131,8 +132,7 @@ export function useUpdateAssignment() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...patch }: { id: string } & Partial<CreateAssignmentInput> & { status?: StaffingStatus; collaborator_note?: string | null }) => {
-      const { error } = await supabase.from('staffing_assignments').update(patch).eq('id', id);
-      if (error) throw error;
+      await updateByIdOrFail('staffing_assignments', id, patch, "Cette affectation n'a pas été mise à jour : vous n'avez pas le droit de la modifier.");
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['staffing'] });
@@ -149,8 +149,7 @@ export function useCancelAssignment() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('staffing_assignments').update({ status: 'cancelled' }).eq('id', id);
-      if (error) throw error;
+      await updateByIdOrFail('staffing_assignments', id, { status: 'cancelled' }, "Cette affectation n'a pas été annulée : vous n'avez pas le droit de la modifier.");
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['staffing'] });

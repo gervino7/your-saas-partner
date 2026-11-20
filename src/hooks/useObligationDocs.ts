@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { toast } from 'sonner';
 
 export interface PeriodDocument {
@@ -107,11 +108,7 @@ export function useUpdateDocument() {
       // organization_id is filled by a database trigger - never send it.
       const payload = { ...values } as Record<string, unknown>;
       delete payload.organization_id;
-      const { error } = await supabase
-        .from('obligation_documents')
-        .update(payload as never)
-        .eq('id', id);
-      if (error) throw error;
+      await updateByIdOrFail('obligation_documents', id, payload, "Cette pièce n'a pas été mise à jour : vous n'avez pas le droit de la modifier.");
     },
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ['period-documents', vars.periodId] });

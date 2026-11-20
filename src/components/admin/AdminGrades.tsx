@@ -14,6 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Plus, Pencil, Trash2, Lock, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { useAuthStore } from '@/stores/authStore';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -122,10 +123,12 @@ export default function AdminGrades() {
         const r = (Array.isArray(data) ? data[0] : data) as { profils_mis_a_jour?: number; lignes_d_historique_mises_a_jour?: number } | null;
         msg = `Échelon renommé. ${r?.profils_mis_a_jour ?? 0} collaborateurs et ${r?.lignes_d_historique_mises_a_jour ?? 0} lignes d'historique mis à jour.`;
       }
-      const { error } = await supabase.from('evaluation_grades')
-        .update({ family: form.family.trim(), rank: form.rank, maps_to_grade: form.maps_to_grade, is_active: form.is_active })
-        .eq('id', editing.echelon_id);
-      if (error) throw error;
+      await updateByIdOrFail(
+        'evaluation_grades',
+        editing.echelon_id,
+        { family: form.family.trim(), rank: form.rank, maps_to_grade: form.maps_to_grade, is_active: form.is_active },
+        "Cet échelon n'a pas été mis à jour : seule la direction peut modifier la grille.",
+      );
       return msg;
     },
     onSuccess: (msg) => { invalidate(); setDialogOpen(false); toast.success(msg); },

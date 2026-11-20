@@ -9,6 +9,7 @@ import { formatFcfa, formatQuota, findPlan } from '@/lib/plans';
 import { usePlans } from '@/hooks/usePlans';
 import { useSubscriptionLimits } from '@/hooks/useSubscriptionLimits';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { useAuthStore } from '@/stores/authStore';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
@@ -28,15 +29,18 @@ const SubscriptionSection = () => {
     if (!orgId) return;
     const p = findPlan(plans, selected);
     if (!p) return;
-    const { error } = await supabase
-      .from('organizations')
-      .update({ subscription_plan: p.code, max_users: p.max_users, max_storage_gb: p.max_storage_gb })
-      .eq('id', orgId);
-    if (error) toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
-    else {
+    try {
+      await updateByIdOrFail(
+        'organizations',
+        orgId,
+        { subscription_plan: p.code, max_users: p.max_users, max_storage_gb: p.max_storage_gb },
+        "Le plan n'a pas été modifié : vous n'avez pas le droit de modifier le cabinet.",
+      );
       toast({ title: 'Plan mis à jour', description: `Vous êtes maintenant sur ${p.name}` });
       qc.invalidateQueries({ queryKey: ['subscription-limits'] });
       setOpen(false);
+    } catch (error: any) {
+      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
     }
   };
 

@@ -13,6 +13,7 @@ import { useOrganization, useUpdateOrganization, useUpdateOrgSettings } from '@/
 import { Building2, Shield, Briefcase, FileText, Mail, Bell, Clock, Receipt, CreditCard, Save, Check, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 function SettingsSection({ title, description, icon: Icon, children, onSave, saving }: {
@@ -121,7 +122,7 @@ export default function AdminSettings() {
       if (uploadError) throw uploadError;
       const { data: urlData } = supabase.storage.from('org-assets').getPublicUrl(filePath);
       const publicUrl = urlData.publicUrl;
-      await supabase.from('organizations').update({ logo_url: publicUrl }).eq('id', org.id);
+      await updateByIdOrFail('organizations', org.id, { logo_url: publicUrl }, "Le logo n'a pas été enregistré : vous n'avez pas le droit de modifier le cabinet.");
       setLogoUrl(publicUrl);
       toast.success('Logo mis à jour.');
     } catch (err: any) {
@@ -133,9 +134,13 @@ export default function AdminSettings() {
 
   const handleRemoveLogo = async () => {
     if (!org) return;
-    await supabase.from('organizations').update({ logo_url: null }).eq('id', org.id);
-    setLogoUrl(null);
-    toast.success('Logo supprimé.');
+    try {
+      await updateByIdOrFail('organizations', org.id, { logo_url: null }, "Le logo n'a pas été supprimé : vous n'avez pas le droit de modifier le cabinet.");
+      setLogoUrl(null);
+      toast.success('Logo supprimé.');
+    } catch (err: any) {
+      toast.error(err.message || 'Erreur lors de la suppression.');
+    }
   };
 
   return (

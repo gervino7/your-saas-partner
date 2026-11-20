@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from '@/hooks/use-toast';
 import { compressImage, computeChecksum } from '@/lib/fileUtils';
@@ -213,8 +214,7 @@ export function useRenameWorkspaceFile() {
 
   return useMutation({
     mutationFn: async ({ id, name }: { id: string; name: string }) => {
-      const { error } = await supabase.from('workspace_files').update({ file_name: name }).eq('id', id);
-      if (error) throw error;
+      await updateByIdOrFail('workspace_files', id, { file_name: name }, "Ce fichier n'a pas été renommé : vous n'avez pas le droit de le modifier.");
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['workspace_files'] });
@@ -228,11 +228,7 @@ export function useMoveWorkspaceFile() {
 
   return useMutation({
     mutationFn: async ({ id, targetFolderPath }: { id: string; targetFolderPath: string }) => {
-      const { error } = await supabase
-        .from('workspace_files')
-        .update({ folder_path: targetFolderPath })
-        .eq('id', id);
-      if (error) throw error;
+      await updateByIdOrFail('workspace_files', id, { folder_path: targetFolderPath }, "Ce fichier n'a pas été déplacé : vous n'avez pas le droit de le modifier.");
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['workspace_files'] });
@@ -324,11 +320,7 @@ export function useUpdateWorkspaceSettings() {
 
   return useMutation({
     mutationFn: async ({ id, settings }: { id: string; settings: any }) => {
-      const { error } = await supabase
-        .from('personal_workspaces')
-        .update({ settings })
-        .eq('id', id);
-      if (error) throw error;
+      await updateByIdOrFail('personal_workspaces', id, { settings }, "Ces paramètres n'ont pas été enregistrés : vous n'avez pas le droit de les modifier.");
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['workspace'] });
@@ -342,11 +334,12 @@ export function useForceSync() {
 
   return useMutation({
     mutationFn: async (fileId: string) => {
-      const { error } = await supabase
-        .from('workspace_files')
-        .update({ sync_status: 'synced', updated_at: new Date().toISOString() })
-        .eq('id', fileId);
-      if (error) throw error;
+      await updateByIdOrFail(
+        'workspace_files',
+        fileId,
+        { sync_status: 'synced', updated_at: new Date().toISOString() },
+        "La synchronisation n'a pas été forcée : vous n'avez pas le droit de modifier ce fichier.",
+      );
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['workspace_files'] });

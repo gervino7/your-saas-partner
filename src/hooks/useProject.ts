@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
 
@@ -280,11 +281,7 @@ export function useReorderActivities() {
   return useMutation({
     mutationFn: async ({ updates, projectId }: { updates: { id: string; order_index: number }[]; projectId: string }) => {
       for (const u of updates) {
-        const { error } = await supabase
-          .from('activities')
-          .update({ order_index: u.order_index })
-          .eq('id', u.id);
-        if (error) throw error;
+        await updateByIdOrFail('activities', u.id, { order_index: u.order_index }, "Le nouvel ordre n'a pas été enregistré : vous n'avez pas le droit de modifier ces activités.");
       }
       return projectId;
     },

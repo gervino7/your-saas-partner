@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail, updateManyOrFail } from '@/lib/safeUpdate';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
 import { startOfWeek, format } from 'date-fns';
@@ -79,11 +80,12 @@ export function useUpsertTimeEntry() {
       };
 
       if (entry.id) {
-        const { error } = await supabase
-          .from('time_entries')
-          .update({ hours: entry.hours, description: entry.description, is_billable: entry.is_billable })
-          .eq('id', entry.id);
-        if (error) throw error;
+        await updateByIdOrFail(
+          'time_entries',
+          entry.id,
+          { hours: entry.hours, description: entry.description, is_billable: entry.is_billable },
+          "Cette saisie n'a pas été modifiée : elle a peut-être déjà été soumise ou validée.",
+        );
       } else {
         if (entry.hours <= 0) return;
         const { error } = await supabase.from('time_entries').insert(payload);
@@ -164,16 +166,17 @@ export function useApproveTimeEntries() {
       if (params.action === 'rejected' && (params.comment?.trim().length ?? 0) < 5) {
         throw new Error('Précisez ce qui doit être corrigé');
       }
-      const { error } = await supabase
-        .from('time_entries')
-        .update({
+      await updateManyOrFail(
+        'time_entries',
+        params.ids,
+        {
           status: params.action,
           reviewer_id: profile!.id,
           reviewed_at: new Date().toISOString(),
           review_comment: params.comment?.trim() || null,
-        })
-        .in('id', params.ids);
-      if (error) throw error;
+        },
+        "Certaines lignes n'ont pas été mises à jour : vous n'avez pas le droit de les valider.",
+      );
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['time-entries'] });
@@ -269,11 +272,15 @@ export function useUpsertDailyRate() {
   return useMutation({
     mutationFn: async (rate: { id?: string; grade: string; daily_rate: number; currency?: string }) => {
       if (rate.id) {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('daily_rates')
           .update({ daily_rate: rate.daily_rate, currency: rate.currency || 'XOF' })
-          .eq('id', rate.id);
+          .eq('id', rate.id)
+          .select('id');
         if (error) throw error;
+        if (!data || data.length === 0) {
+          throw new Error("Ce taux n'a pas été modifié : seul le directeur associé peut le fixer.");
+        }
       } else {
         const { error } = await supabase.from('daily_rates').insert({
           organization_id: profile!.organization_id!,
@@ -353,11 +360,12 @@ export function useApproveExpense() {
 
   return useMutation({
     mutationFn: async (params: { id: string; action: 'approved' | 'rejected' }) => {
-      const { error } = await supabase
-        .from('expenses')
-        .update({ status: params.action, approved_by: profile!.id })
-        .eq('id', params.id);
-      if (error) throw error;
+      await updateByIdOrFail(
+        'expenses',
+        params.id,
+        { status: params.action, approved_by: profile!.id },
+        "Cette note de frais n'a pas été mise à jour : vous n'avez pas le droit de la valider.",
+      );
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['expenses'] });
@@ -441,8 +449,7 @@ export function useUpdateInvoice() {
 
   return useMutation({
     mutationFn: async ({ id, ...values }: { id: string; [key: string]: any }) => {
-      const { error } = await supabase.from('invoices').update(values).eq('id', id);
-      if (error) throw error;
+      await updateByIdOrFail('invoices', id, values, "Cette facture n'a pas été mise à jour : vous n'avez pas le droit de la modifier.");
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['invoices'] });

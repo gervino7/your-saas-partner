@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthStore } from '@/stores/authStore';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 
 export type EtatAction = 'a_faire' | 'en_cours' | 'fait' | 'bloque';
 export const ETAT_LABELS: Record<EtatAction, string> = {
@@ -50,8 +51,7 @@ export function useSaveAction(entryId: string) {
   return useMutation({
     mutationFn: async ({ id, values, ordre }: { id?: string; values: ActionInput; ordre?: number }) => {
       if (id) {
-        const { error } = await db.from('actions_elementaires').update(values).eq('id', id);
-        if (error) throw error;
+        await updateByIdOrFail('actions_elementaires', id, values as Record<string, unknown>, "Cette action n'a pas été modifiée : la journée n'est plus modifiable.");
       } else {
         const { error } = await db.from('actions_elementaires').insert({
           time_entry_id: entryId, organization_id: profile!.organization_id, ...values, ordre,

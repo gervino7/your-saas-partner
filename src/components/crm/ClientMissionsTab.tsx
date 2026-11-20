@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useClientMissions } from '@/hooks/useCRM';
 import { useMissions } from '@/hooks/useMissions';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Plus, Link2, Unlink } from 'lucide-react';
@@ -36,9 +37,14 @@ export default function ClientMissionsTab({ clientId }: { clientId: string }) {
   const handleLink = async () => {
     if (!selectedMissionId) return;
     setLinking(true);
-    const { error } = await supabase.from('missions').update({ client_id: clientId }).eq('id', selectedMissionId);
+    try {
+      await updateByIdOrFail('missions', selectedMissionId, { client_id: clientId }, "La mission n'a pas été associée : vous n'avez pas le droit de la modifier.");
+    } catch (error: any) {
+      setLinking(false);
+      toast.error(error.message);
+      return;
+    }
     setLinking(false);
-    if (error) { toast.error(error.message); return; }
     toast.success('Mission associée au client');
     setLinkOpen(false);
     setSelectedMissionId('');
@@ -48,8 +54,12 @@ export default function ClientMissionsTab({ clientId }: { clientId: string }) {
 
   const handleUnlink = async (missionId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const { error } = await supabase.from('missions').update({ client_id: null }).eq('id', missionId);
-    if (error) { toast.error(error.message); return; }
+    try {
+      await updateByIdOrFail('missions', missionId, { client_id: null }, "La mission n'a pas été dissociée : vous n'avez pas le droit de la modifier.");
+    } catch (error: any) {
+      toast.error(error.message);
+      return;
+    }
     toast.success('Mission dissociée du client');
     qc.invalidateQueries({ queryKey: ['client-missions', clientId] });
     qc.invalidateQueries({ queryKey: ['missions'] });

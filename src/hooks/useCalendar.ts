@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { useAuthStore } from '@/stores/authStore';
 import { startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns';
 
@@ -179,20 +180,21 @@ export function useCalendar() {
 
   const updateMeeting = useMutation({
     mutationFn: async ({ id, ...updates }: { id: string; [key: string]: any }) => {
-      const { error } = await supabase.from('meetings').update(updates).eq('id', id);
-      if (error) throw error;
+      await updateByIdOrFail('meetings', id, updates, "Cette réunion n'a pas été mise à jour : vous n'avez pas le droit de la modifier.");
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['meetings'] }),
   });
 
   const respondToMeeting = useMutation({
     mutationFn: async ({ meetingId, status }: { meetingId: string; status: string }) => {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('meeting_participants')
         .update({ status })
         .eq('meeting_id', meetingId)
-        .eq('user_id', user!.id);
+        .eq('user_id', user!.id)
+        .select('meeting_id');
       if (error) throw error;
+      if (!data || data.length === 0) throw new Error("Votre réponse n'a pas été enregistrée : vous n'êtes pas participant de cette réunion.");
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['meetings'] }),
   });
