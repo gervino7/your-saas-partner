@@ -1,4 +1,3 @@
-import { formatMontant, useMissionBudget } from '@/hooks/useMissionBudget';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { format } from 'date-fns';
@@ -7,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MISSION_TYPE_LABELS, CURRENCY_LABELS } from '@/types/database';
 import MissionStatusBadge from './MissionStatusBadge';
 import PriorityBadge from './PriorityBadge';
-import { Calendar, DollarSign, Users, TrendingUp } from 'lucide-react';
+import { Calendar, Users, TrendingUp } from 'lucide-react';
 
 function initials(name: string) {
   return name?.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2) ?? '?';
@@ -16,14 +15,6 @@ function initials(name: string) {
 function formatCurrency(amount: number | null, currency: string | null) {
   if (amount == null) return '-';
   return new Intl.NumberFormat('fr-FR').format(amount) + ' ' + (currency ?? 'XOF');
-}
-
-function BudgetResume({ missionId }: { missionId: string }) {
-  const { data } = useMissionBudget(missionId);
-  if (!data) return <>-</>;
-  if (data.etat === 'reserve') return <>Réservé à la direction de mission</>;
-  if (data.etat === 'non_fixe') return <>Non fixé</>;
-  return <>{formatMontant(data.montant, data.devise)}</>;
 }
 
 export default function MissionOverviewTab({ mission }: { mission: any }) {
@@ -41,7 +32,7 @@ export default function MissionOverviewTab({ mission }: { mission: any }) {
         </Card>
 
         {/* Key Info */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
@@ -55,19 +46,6 @@ export default function MissionOverviewTab({ mission }: { mission: any }) {
                     {' - '}
                     {mission.end_date ? format(new Date(mission.end_date), 'dd MMM yyyy', { locale: fr }) : '-'}
                   </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-success/10">
-                  <DollarSign className="h-5 w-5 text-success" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Budget</p>
-                  <p className="text-sm font-medium tabular-nums"><BudgetResume missionId={mission.id} /></p>
                 </div>
               </div>
             </CardContent>

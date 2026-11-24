@@ -12,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useMissionBudgetSummary, useDailyRates, useUpsertDailyRate, useExpenses, useApproveExpense, useCreateExpense, useInvoices, useCreateInvoice, useUpdateInvoice } from '@/hooks/useTimesheets';
+import { useBudgetsDuCabinet, useSetMissionBudget, formatMontant, type BudgetDuCabinet } from '@/hooks/useMissionBudget';
+import { toast } from 'sonner';
 import { useMissions, useClients } from '@/hooks/useMissions';
 import { useAuthStore } from '@/stores/authStore';
 import { cn } from '@/lib/utils';
@@ -27,11 +29,65 @@ const EXPENSE_CATEGORIES = ['Transport', 'Hébergement', 'Restauration', 'Fourni
 const RATES_RESERVED = 'Les taux journaliers sont réservés à la direction.';
 const fcfa = (n: number) => `${Math.round(n).toLocaleString('fr-FR')} FCFA`;
 
+function FixerBudgetDialog({ row }: { row: BudgetDuCabinet }) {
+  const [open, setOpen] = useState(false);
+  const [montant, setMontant] = useState(row.montant != null ? String(row.montant) : '');
+  const [devise, setDevise] = useState(row.devise || 'XOF');
+  const [notes, setNotes] = useState(row.notes ?? '');
+  const setBudget = useSetMissionBudget();
+  const valeur = Number(montant.replace(/\s/g, ''));
+  const valide = montant.trim() !== '' && Number.isFinite(valeur) && valeur >= 0;
+
+  const enregistrer = () => {
+    setBudget.mutate({ missionId: row.mission_id, montant: valeur, devise, notes }, {
+      onSuccess: () => { toast.success('Budget enregistré'); setOpen(false); },
+      onError: (e: any) => toast.error(e.message),
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline">Fixer</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Budget de {row.code}</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground">{row.intitule}</p>
+          <div className="grid grid-cols-3 gap-2">
+            <Input className="col-span-2 tabular-nums" inputMode="numeric" placeholder="Montant" value={montant} onChange={(e) => setMontant(e.target.value)} />
+            <Select value={devise} onValueChange={setDevise}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {['XOF', 'XAF', 'EUR', 'USD'].map((d) => <SelectItem key={d} value={d}>{d === 'XOF' ? 'FCFA' : d}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <Textarea placeholder="Notes (facultatif)" value={notes} onChange={(e) => setNotes(e.target.value)} />
+          <Button className="w-full" disabled={!valide || setBudget.isPending} onClick={enregistrer}>Enregistrer</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function BudgetTab() {
-  const { data, isLoading } = useMissionBudgetSummary();
-  const summaries = data?.rows ?? [];
-  const ratesAvailable = data?.ratesAvailable ?? false;
-  const { sorted: sortedSummaries, sort, handleSort } = useTableSort(summaries);
+  const { data: budgets = [], isLoading } = useBudgetsDuCabinet();
+  const { data: summary } = useMissionBudgetSummary();
+  const ratesAvailable = summary?.ratesAvailable ?? false;
+  const conso = new Map((summary?.rows ?? []).map((r) => [r.id, r]));
+  const rows = budgets.map((b) => {
+    const c = conso.get(b.mission_id);
+    const montant = b.montant != null ? Number(b.montant) : null;
+    return {
+      ...b, montant,
+      total_hours: c?.total_hours ?? 0,
+      total_cost: montant != null ? (c?.total_cost ?? null) : null,
+      consumed_pct: montant != null ? (c?.consumed_pct ?? null) : null,
+    };
+  });
+  const { sorted, sort, handleSort } = useTableSort(rows);
+  const montantDe = (m: number | null, d: string | null) => (m == null ? '—' : formatMontant(m, d || 'XOF'));
 
   const getBarColor = (pct: number) => {
     if (pct < 70) return 'bg-success';
@@ -46,13 +102,13 @@ function BudgetTab() {
           Seules apparaissent les missions dont vous êtes associé ou directeur de mission.
         </p>
         <ExportMenu
-          data={summaries.map((m) => ({
-            mission: m.name,
+          data={rows.map((m) => ({
+            mission: m.intitule,
             code: m.code,
-            budget: m.budget,
+            budget: m.montant ?? '',
             heures: m.total_hours.toFixed(1),
             cout_reel: m.total_cost ?? '',
-            marge: m.total_cost !== null ? m.budget - m.total_cost : '',
+            marge: m.total_cost !== null && m.montant != null ? m.montant - m.total_cost : '',
             consomme_pct: m.consumed_pct !== null ? `${m.consumed_pct}%` : '',
           }))}
           filename="budget-missions"
@@ -76,8 +132,8 @@ function BudgetTab() {
           <Table>
             <TableHeader>
               <TableRow>
-                <SortableTableHead sortKey="name" currentSort={sort} onSort={handleSort}>Mission</SortableTableHead>
-                <SortableTableHead sortKey="budget" currentSort={sort} onSort={handleSort} className="text-right">Budget</SortableTableHead>
+                <SortableTableHead sortKey="intitule" currentSort={sort} onSort={handleSort}>Mission</SortableTableHead>
+                <SortableTableHead sortKey="montant" currentSort={sort} onSort={handleSort} className="text-right">Budget</SortableTableHead>
                 <SortableTableHead sortKey="total_hours" currentSort={sort} onSort={handleSort} className="text-right">Heures</SortableTableHead>
                 {ratesAvailable && (
                   <>
@@ -86,24 +142,25 @@ function BudgetTab() {
                     <SortableTableHead sortKey="consumed_pct" currentSort={sort} onSort={handleSort} className="w-[180px]">Consommé</SortableTableHead>
                   </>
                 )}
+                <TableHead className="w-[90px]" />
               </TableRow>
             </TableHeader>
             <TableBody>
-              {!isLoading && sortedSummaries.length === 0 && (
-                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-6">Aucun budget de mission visible</TableCell></TableRow>
+              {!isLoading && sorted.length === 0 && (
+                <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-6">Aucun budget de mission visible</TableCell></TableRow>
               )}
-              {sortedSummaries.map((m) => (
-                <TableRow key={m.id}>
+              {sorted.map((m) => (
+                <TableRow key={m.mission_id}>
                   <TableCell>
-                    <div className="font-medium text-sm">{m.name}</div>
-                    <div className="text-xs text-muted-foreground">{m.code}</div>
+                    <div className="font-medium text-sm">{m.intitule}</div>
+                    <div className="text-xs text-muted-foreground">{m.code}{m.fixe_par ? ` · fixé par ${m.fixe_par}` : ''}</div>
                   </TableCell>
-                  <TableCell className="text-right text-sm tabular-nums">{fcfa(m.budget)}</TableCell>
+                  <TableCell className="text-right text-sm tabular-nums">{montantDe(m.montant, m.devise)}</TableCell>
                   <TableCell className="text-right text-sm tabular-nums">{m.total_hours.toFixed(1)} h</TableCell>
                   {ratesAvailable && (
                     <>
                       <TableCell className="text-right text-sm tabular-nums">{m.total_cost !== null ? fcfa(m.total_cost) : '—'}</TableCell>
-                      <TableCell className="text-right text-sm tabular-nums">{m.total_cost !== null ? fcfa(m.budget - m.total_cost) : '—'}</TableCell>
+                      <TableCell className="text-right text-sm tabular-nums">{m.total_cost !== null && m.montant != null ? fcfa(m.montant - m.total_cost) : '—'}</TableCell>
                       <TableCell>
                         {m.consumed_pct !== null ? (
                           <div className="flex items-center gap-2">
@@ -116,6 +173,7 @@ function BudgetTab() {
                       </TableCell>
                     </>
                   )}
+                  <TableCell className="text-right">{m.peut_le_fixer && <FixerBudgetDialog row={m} />}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

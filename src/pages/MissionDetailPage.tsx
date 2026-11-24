@@ -14,7 +14,6 @@ import PracticeChip from '@/components/missions/PracticeChip';
 import MissionOverviewTab from '@/components/missions/MissionOverviewTab';
 import MissionProjectsTab from '@/components/missions/MissionProjectsTab';
 import MissionTeamTab from '@/components/missions/MissionTeamTab';
-import MissionBudgetTab from '@/components/missions/MissionBudgetTab';
 import MissionSettingsTab from '@/components/missions/MissionSettingsTab';
 import EmptyState from '@/components/common/EmptyState';
 import DocumentExplorer from '@/components/documents/DocumentExplorer';
@@ -100,7 +99,6 @@ const MissionDetailPage = () => {
           <TabsTrigger value="copil">COPIL</TabsTrigger>
           <TabsTrigger value="gantt">Gantt</TabsTrigger>
           <TabsTrigger value="calendar">Calendrier</TabsTrigger>
-          <TabsTrigger value="budget">Budget</TabsTrigger>
           {canManage && <TabsTrigger value="settings">Paramètres</TabsTrigger>}
         </TabsList>
 
@@ -130,10 +128,6 @@ const MissionDetailPage = () => {
 
         <TabsContent value="calendar" className="mt-6">
           <MissionCalendarTab missionId={mission.id} />
-        </TabsContent>
-
-        <TabsContent value="budget" className="mt-6">
-          <MissionBudgetTab mission={mission} />
         </TabsContent>
 
         {canManage && (
