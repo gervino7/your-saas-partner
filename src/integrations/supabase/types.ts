@@ -6587,6 +6587,20 @@ export type Database = {
           notes: string
         }[]
       }
+      budgets_du_cabinet: {
+        Args: never
+        Returns: {
+          code: string
+          devise: string
+          fixe_par: string
+          intitule: string
+          mission_id: string
+          montant: number
+          notes: string
+          peut_le_fixer: boolean
+          statut: string
+        }[]
+      }
       caller_organization_id: { Args: never; Returns: string }
       caller_sees_user: { Args: { _user_id: string }; Returns: boolean }
       can_access_committee: {
