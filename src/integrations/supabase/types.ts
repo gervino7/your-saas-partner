@@ -6863,6 +6863,24 @@ export type Database = {
           sens: string
         }[]
       }
+      essai_cabinets_51: {
+        Args: never
+        Returns: {
+          controle: string
+          detail: string
+          etat: string
+          n: number
+        }[]
+      }
+      essai_invitations_50: {
+        Args: never
+        Returns: {
+          controle: string
+          detail: string
+          etat: string
+          n: number
+        }[]
+      }
       est_affecte_a_la_tache: {
         Args: { _task_id: string; _user_id: string }
         Returns: boolean
@@ -7138,6 +7156,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      invitation_utilisable: {
+        Args: { _email: string; _jeton: string }
+        Returns: {
+          grade: string
+          organization_id: string
+          organization_name: string
+        }[]
+      }
       is_committee_member: { Args: { _committee_id: string }; Returns: boolean }
       is_conversation_creator: {
         Args: { _conversation_id: string; _user_id: string }
@@ -7211,6 +7237,7 @@ export type Database = {
           role: string
         }[]
       }
+      niveau_du_grade: { Args: { _grade: string }; Returns: number }
       niveau_requis_dossier: { Args: { _folder_id: string }; Returns: number }
       niveau_requis_sorte_dossier: { Args: { _kind: string }; Returns: number }
       niveau_role: { Args: { _role: string }; Returns: number }
@@ -7241,6 +7268,10 @@ export type Database = {
       }
       peut_fixer_le_budget: {
         Args: { _mission_id: string; _user_id: string }
+        Returns: boolean
+      }
+      peut_inviter: {
+        Args: { _grade: string; _organization_id: string }
         Returns: boolean
       }
       peut_piloter_la_tache: {
@@ -7499,6 +7530,16 @@ export type Database = {
           _new_price?: number
           _org_id: string
           _reason?: string
+        }
+        Returns: Json
+      }
+      super_admin_creer_cabinet: {
+        Args: {
+          _email_da: string
+          _nom: string
+          _nom_da?: string
+          _offre: string
+          _reglages?: Json
         }
         Returns: Json
       }
