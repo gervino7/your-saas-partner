@@ -44,14 +44,6 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       const hasOrganization = typeof profile?.organization_id === 'string' && profile.organization_id.trim().length > 0;
       const isSuspendedRoute = location.pathname === '/compte-suspendu';
 
-      console.log('[AuthGuard]', {
-        reason,
-        userId: user.id,
-        orgId: profile?.organization_id ?? null,
-        hasOrganization,
-        profileError: profileError?.message ?? null,
-        path: location.pathname,
-      });
 
       // Aucun cabinet : écran bloquant, aucune autre action
       if (!hasOrganization) {
@@ -88,6 +80,20 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       }
 
 
+      // Mot de passe provisoire : changement obligatoire avant toute autre page
+      const isChangeRoute = location.pathname === '/changer-mot-de-passe';
+      const { data: provisoire } = await supabase.rpc('mon_mot_de_passe_est_provisoire' as any);
+      if (cancelled) return;
+      if (provisoire === true && !isChangeRoute) {
+        navigate('/changer-mot-de-passe', { replace: true });
+        setLoading(false);
+        return;
+      }
+      if (provisoire !== true && isChangeRoute) {
+        navigate('/', { replace: true });
+        setLoading(false);
+        return;
+      }
 
       setAuthorized(true);
       setLoading(false);

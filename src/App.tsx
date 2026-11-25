@@ -13,6 +13,7 @@ import type { Grade } from '@/types/database';
 
 import AuthGuard from '@/components/auth/AuthGuard';
 import CompteSuspenduPage from '@/pages/CompteSuspenduPage';
+import ChangerMotDePassePage from '@/pages/ChangerMotDePassePage';
 import AppLayout from '@/components/layout/AppLayout';
 import LoginPage from '@/pages/LoginPage';
 import LandingPage from '@/pages/LandingPage';
@@ -282,6 +283,7 @@ const App = () => (
               <Route path="/survey/:token" element={<SatisfactionSurveyPage />} />
               <Route path="/org/:slug" element={<OrgRedirectPage />} />
               <Route path="/compte-suspendu" element={<AuthGuard><CompteSuspenduPage /></AuthGuard>} />
+              <Route path="/changer-mot-de-passe" element={<AuthGuard><ChangerMotDePassePage /></AuthGuard>} />
 
               <Route element={<AuthGuard><AppLayout /></AuthGuard>}>
                 <Route path="/" element={<DashboardPage />} />

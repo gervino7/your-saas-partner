@@ -19,7 +19,8 @@ import { planByCode, barClass } from '@/lib/superAdmin';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, UserPlus } from 'lucide-react';
+import AjoutDirectDialog from '@/components/admin/AjoutDirectDialog';
 
 const UsageCard = ({ label, used, max, unit = '' }: { label: string; used: number; max?: number | null; unit?: string }) => {
   const pct = max && max > 0 ? (used / max) * 100 : 0;
@@ -51,6 +52,7 @@ export default function OrganisationDetailPage() {
   const toggleOrg = useToggleOrg();
   const [planOpen, setPlanOpen] = useState(false);
   const [suspendOpen, setSuspendOpen] = useState(false);
+  const [ajoutOpen, setAjoutOpen] = useState(false);
 
   const org = data?.organization ?? {};
   const usage = data?.usage ?? {};
@@ -89,6 +91,11 @@ export default function OrganisationDetailPage() {
           <h1 className="text-2xl font-semibold">{org.name}</h1>
           <p className="text-sm text-muted-foreground">{org.slug}</p>
         </div>
+        {canManage && (
+          <Button size="sm" variant="outline" className="ml-auto" onClick={() => setAjoutOpen(true)}>
+            <UserPlus className="mr-2 h-4 w-4" /> Ajouter un membre
+          </Button>
+        )}
         <Badge variant="outline">{plan?.name ?? org.subscription_plan}</Badge>
         {org.is_active === false
           ? <Badge variant="destructive">Suspendue</Badge>
@@ -297,6 +304,7 @@ export default function OrganisationDetailPage() {
         onOpenChange={setPlanOpen}
         org={{ id: id!, name: org.name, subscription_plan: org.subscription_plan, user_count: usage.users, storage_used_mb: storageMb }}
       />
+      <AjoutDirectDialog open={ajoutOpen} onOpenChange={setAjoutOpen} organizationId={id} />
       <SuspendDialog open={suspendOpen} onOpenChange={setSuspendOpen} org={{ id: id!, name: org.name }} />
     </div>
   );

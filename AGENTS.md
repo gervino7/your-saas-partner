@@ -18,3 +18,5 @@
 - Timesheet Validation and Disponibilité tabs open only on what the database returns (pending submitted entries, other collaborators in disponibilite); project-less general tasks are created from the weekly tab by grade levels 1-3, matching the tasks insert policy.
 - Finance reads rates only from daily_rates and budgets only from mission_budgets under RLS, with no fallback values; zero rows means reserved (message), never zero amounts.
 - Accounts are created only from invitations: signup goes through send-signup-confirmation (server-side invitation and password checks, no confirmation email), cabinets only through super_admin_creer_cabinet, and send-invitation builds emails solely from the stored invitation of its caller.
+
+- Direct member creation goes only through the ajouter-membre function (permission from peut_ajouter_directement, one-time provisional password); AuthGuard forces /changer-mot-de-passe while mon_mot_de_passe_est_provisoire is true, and only changer-mot-de-passe-provisoire changes the password and clears the flag.

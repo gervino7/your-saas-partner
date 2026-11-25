@@ -6,8 +6,8 @@ const APP_URL = 'https://mamission.abodje.com';
 
 const GRADE_LABELS: Record<string, string> = {
   DA: 'Directeur Associé', DM: 'Directeur de Mission', MGR: 'Manager',
-  SUP: 'Superviseur', SEN: 'Auditeur Senior', AUD: 'Auditeur',
-  JUN: 'Auditeur Junior', STG: 'Stagiaire',
+  SUP: 'Superviseur', AS: 'Auditeur Senior', AUD: 'Auditeur',
+  AJ: 'Auditeur Junior', STG: 'Stagiaire',
 };
 
 Deno.serve(async (req) => {

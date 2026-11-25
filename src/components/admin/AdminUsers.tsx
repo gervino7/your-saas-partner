@@ -14,8 +14,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Search, UserPlus, Pencil, Trash2, AlertCircle, LineChart, TrendingUp } from 'lucide-react';
+import { Search, UserPlus, Pencil, Trash2, AlertCircle, LineChart, TrendingUp, KeyRound } from 'lucide-react';
 import ExportMenu from '@/components/common/ExportMenu';
+import AjoutDirectDialog from '@/components/admin/AjoutDirectDialog';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useOrganizationUsers } from '@/hooks/useMissions';
 import { useUpdateUserProfile, useDeleteUser, useInviteUser } from '@/hooks/useAdmin';
 import { GRADE_LABELS, GRADE_LEVELS } from '@/types/database';
@@ -52,6 +55,17 @@ export default function AdminUsers() {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [ajoutOpen, setAjoutOpen] = useState(false);
+  const orgId = useAuthStore((s) => s.profile?.organization_id);
+  const { data: peutAjouter = false } = useQuery({
+    queryKey: ['peut_ajouter_directement', orgId],
+    enabled: !!orgId,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('peut_ajouter_directement' as any, { _organization_id: orgId, _grade: 'STG' });
+      if (error) return false;
+      return data === true;
+    },
+  });
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteGrade, setInviteGrade] = useState<Grade>('AUD');
 
@@ -120,6 +134,8 @@ export default function AdminUsers() {
         </Select>
         <ExportMenu data={filtered.map((u: any) => ({ nom: u.full_name ?? '', email: u.email ?? '', grade: u.grade ?? '', statut: u.is_online ? 'En ligne' : 'Hors ligne' }))} filename="utilisateurs" columns={[{ key: 'nom', label: 'Nom' }, { key: 'email', label: 'Email' }, { key: 'grade', label: 'Grade' }, { key: 'statut', label: 'Statut' }]} title="Liste des utilisateurs" />
         <Button size="sm" variant="default" onClick={() => setInviteOpen(true)}><UserPlus className="h-4 w-4 mr-1" /> Inviter</Button>
+        {peutAjouter && <Button size="sm" variant="outline" onClick={() => setAjoutOpen(true)}><KeyRound className="h-4 w-4 mr-1" /> Ajouter directement</Button>}
+        <AjoutDirectDialog open={ajoutOpen} onOpenChange={setAjoutOpen} />
       </div>
 
       <Card>

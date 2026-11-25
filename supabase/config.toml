@@ -30,3 +30,9 @@ verify_jwt = false
 [functions.export-evaluation-pdf]
 verify_jwt = true
 
+
+[functions.ajouter-membre]
+verify_jwt = true
+
+[functions.changer-mot-de-passe-provisoire]
+verify_jwt = true
