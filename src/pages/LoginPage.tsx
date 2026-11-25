@@ -137,12 +137,10 @@ const LoginPage = () => {
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [invitation, setInvitation] = useState<InvitationInfo | null>(null);
   const [loadingInvitation, setLoadingInvitation] = useState(false);
-  const [pendingConfirmEmail, setPendingConfirmEmail] = useState<string | null>(null);
-  const [resending, setResending] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const showInvitationCard = !!invitationToken;
+  const showInvitationCard = !!invitationToken && (loadingInvitation || !!invitation);
 
   useEffect(() => {
     if (!invitationToken) {
@@ -165,7 +163,6 @@ const LoginPage = () => {
           setEmail(inv.email);
         } else {
           setInvitation(null);
-          toast({ title: 'Invitation invalide', description: 'Ce lien d\'invitation est expiré ou invalide.', variant: TOAST_ERROR });
         }
       } finally {
         if (isMounted) setLoadingInvitation(false);
@@ -209,29 +206,30 @@ const LoginPage = () => {
     try {
       if (isSignUp) {
         const { data, error } = await supabase.functions.invoke('send-signup-confirmation', {
-          body: {
-            email,
-            password,
-            full_name: fullName,
-            invitation_token: invitationToken,
-            redirect_to: window.location.origin,
-          },
+          body: { email: invitation?.email ?? email, password, full_name: fullName, invitation_token: invitationToken },
         });
-        if (error) throw error;
-        if (data?.error === 'already_registered') {
-          toast({ title: 'Email déjà utilisé', description: 'Cette adresse est déjà enregistrée. Connectez-vous directement.', variant: TOAST_ERROR });
-          setIsSignUp(false);
+        let payload: { error?: string; regles?: string[] } | null = data ?? null;
+        if (error) {
+          const ctx = (error as { context?: Response }).context;
+          try { payload = ctx ? await ctx.json() : null; } catch { payload = null; }
+        }
+        if (error || payload?.error) {
+          const code = payload?.error;
+          const description =
+            code === 'invitation_invalide' ? "Ce lien d'invitation est invalide, expiré ou déjà utilisé."
+            : code === 'already_registered' ? 'Un compte existe déjà pour cette adresse. Connectez-vous.'
+            : code === 'mot_de_passe_faible' ? `Règles non respectées : ${(payload?.regles ?? []).join(', ')}`
+            : "L'inscription n'a pas abouti. Réessayez ou contactez votre administrateur.";
+          toast({ title: "Erreur d'inscription", description, variant: TOAST_ERROR });
           return;
         }
-        if (data?.error) throw new Error(data.error);
-        setLoginAttempts(0);
-        setPendingConfirmEmail(email);
-        setIsSignUp(false);
-        setPassword('');
-        toast({
-          title: 'Inscription réussie 🎉',
-          description: `Un email de confirmation a été envoyé à ${email}. Cliquez sur le lien pour activer votre compte.`,
-        });
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email: invitation?.email ?? email, password });
+        if (signInError) {
+          toast({ title: 'Compte créé', description: 'Connectez-vous avec votre adresse et votre mot de passe.' });
+          navigate('/login', { replace: true });
+          return;
+        }
+        navigate('/', { replace: true });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
@@ -241,18 +239,7 @@ const LoginPage = () => {
           throw error;
         }
         setLoginAttempts(0);
-
-        const { data: { user } } = await supabase.auth.getUser();
-        const { data: profile } = user
-          ? await supabase
-              .from('profiles')
-              .select('organization_id')
-              .eq('id', user.id)
-              .maybeSingle()
-          : { data: null };
-
-        const hasOrganization = typeof profile?.organization_id === 'string' && profile.organization_id.trim().length > 0;
-        navigate(hasOrganization ? '/' : '/onboarding', { replace: true });
+        navigate('/', { replace: true });
       }
     } catch (error: unknown) {
       console.error('[Auth Error]', error);
@@ -262,33 +249,10 @@ const LoginPage = () => {
     }
   };
 
-  const handleResendConfirmation = async () => {
-    if (!pendingConfirmEmail) return;
-    setResending(true);
-    try {
-      const { error } = await supabase.functions.invoke('send-signup-confirmation', {
-        body: {
-          email: pendingConfirmEmail,
-          password,
-          full_name: fullName,
-          invitation_token: invitationToken,
-          redirect_to: window.location.origin,
-        },
-      });
-      if (error) throw error;
-      toast({ title: 'Email renvoyé', description: `Un nouvel email a été envoyé à ${pendingConfirmEmail}.` });
-    } catch (error) {
-      console.error('[Resend Error]', error);
-      toast({ title: 'Erreur', description: "Impossible de renvoyer l'email. Réessayez dans quelques instants.", variant: TOAST_ERROR });
-    } finally {
-      setResending(false);
-    }
-  };
-
   const isLocked = lockoutUntil !== null && Date.now() < lockoutUntil;
   const gradeLabel = invitation?.grade ? titreDuCollaborateur({ grade: invitation.grade }) : null;
-  const showInvitationFields = isSignUp || isForcedSignUp;
-  const signUpBlocked = isSignUp && invitationToken && !invitation;
+  const signUpBlocked = isSignUp && !invitation;
+  const showInvitationOnly = isForcedSignUp && !loadingInvitation && !invitation;
 
   return (
     <div className="flex min-h-screen">
@@ -379,13 +343,13 @@ const LoginPage = () => {
           {/* Desktop header */}
           <div className="hidden lg:block space-y-2">
             <h1 className="text-[1.75rem] font-semibold tracking-tight text-foreground">
-              {isSignUp ? 'Créer un compte' : 'Bon retour !'}
+              {isSignUp ? 'Créer un compte' : 'Connexion'}
             </h1>
             <p className="text-muted-foreground text-[15px]">
               {invitationToken
                 ? 'Complétez votre inscription pour rejoindre l\'équipe'
                 : isSignUp
-                  ? 'Créez votre compte pour démarrer avec MissionFlow'
+                  ? 'Les comptes sont créés sur invitation'
                   : 'Connectez-vous à votre espace de travail'}
             </p>
           </div>
@@ -397,7 +361,7 @@ const LoginPage = () => {
                 {invitationToken
                   ? 'Complétez votre inscription'
                   : isSignUp
-                    ? 'Nouveau ? Créez votre compte en 2 minutes'
+                    ? 'Les comptes sont créés sur invitation'
                     : 'Accédez à votre espace'}
               </CardDescription>
             </CardHeader>
@@ -429,28 +393,22 @@ const LoginPage = () => {
                 </div>
               )}
 
-              {pendingConfirmEmail && (
-                <div className="mb-6 rounded-xl border border-primary/30 bg-primary/[0.06] p-4 space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15">
-                      <Mail className="h-4 w-4 text-primary" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-sm font-semibold">Confirmez votre email</p>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        Un lien de confirmation a été envoyé à <span className="font-medium text-foreground">{pendingConfirmEmail}</span>. Cliquez sur ce lien pour activer votre compte, puis revenez vous connecter.
-                      </p>
-                    </div>
-                  </div>
-                  <Button type="button" variant="outline" size="sm" onClick={handleResendConfirmation} disabled={resending} className="w-full">
-                    {resending ? 'Envoi en cours…' : "Renvoyer l'email de confirmation"}
-                  </Button>
-                </div>
-              )}
-
-
               {loadingInvitation ? (
                 <div className="py-12 text-center text-sm text-muted-foreground">Chargement de l'invitation…</div>
+              ) : showInvitationOnly ? (
+                <div className="space-y-4 py-4 text-center">
+                  <p className="text-sm text-foreground">
+                    {invitationToken
+                      ? "Ce lien d'invitation est invalide, expiré ou déjà utilisé."
+                      : 'Les comptes Mission-DGC sont créés sur invitation. Demandez une invitation à l\'administrateur de votre cabinet.'}
+                  </p>
+                  {invitationToken && (
+                    <p className="text-sm text-muted-foreground">Les comptes Mission-DGC sont créés sur invitation. Demandez une invitation à l'administrateur de votre cabinet.</p>
+                  )}
+                  <Button type="button" variant="outline" onClick={() => navigate('/login')} className="w-full">
+                    <LogIn className="mr-2 h-4 w-4" />Se connecter
+                  </Button>
+                </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {isSignUp && (
@@ -472,7 +430,7 @@ const LoginPage = () => {
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
                       <Input
                         id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                        placeholder="jean@cabinet.com" required disabled={isSignUp && !!invitationToken}
+                        placeholder="jean@cabinet.com" required readOnly={isSignUp} disabled={isSignUp}
                         className="pl-10 h-11 bg-muted/30 border-border/50 focus:bg-background transition-colors rounded-xl"
                       />
                     </div>
@@ -528,20 +486,6 @@ const LoginPage = () => {
                 </form>
               )}
 
-              {!isForcedSignUp && (
-                <div className="mt-6 pt-6 border-t border-border/40 text-center text-sm">
-                  <span className="text-muted-foreground">
-                    {isSignUp ? 'Déjà un compte ?' : 'Pas encore de compte ?'}
-                  </span>{' '}
-                  <button
-                    type="button"
-                    onClick={() => { setIsSignUp(!isSignUp); setPasswordErrors([]); }}
-                    className="text-primary hover:text-primary/80 font-semibold transition-colors"
-                  >
-                    {isSignUp ? 'Se connecter' : "S'inscrire"}
-                  </button>
-                </div>
-              )}
             </CardContent>
           </Card>
 

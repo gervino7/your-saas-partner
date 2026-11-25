@@ -43,7 +43,6 @@ import NotificationsPage from '@/pages/NotificationsPage';
 import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
 import ResetPasswordPage from '@/pages/ResetPasswordPage';
 import NotFound from '@/pages/NotFound';
-import OnboardingPage from '@/pages/OnboardingPage';
 import SuperAdminGuard from '@/components/superadmin/SuperAdminGuard';
 import SuperAdminLayout from '@/components/superadmin/SuperAdminLayout';
 import SuperAdminDashboard from '@/pages/superadmin/SuperAdminDashboard';
@@ -282,7 +281,6 @@ const App = () => (
               <Route path="/copil-portal/:committeeId" element={<CopilPortalPage />} />
               <Route path="/survey/:token" element={<SatisfactionSurveyPage />} />
               <Route path="/org/:slug" element={<OrgRedirectPage />} />
-              <Route path="/onboarding" element={<AuthGuard><OnboardingPage /></AuthGuard>} />
               <Route path="/compte-suspendu" element={<AuthGuard><CompteSuspenduPage /></AuthGuard>} />
 
               <Route element={<AuthGuard><AppLayout /></AuthGuard>}>

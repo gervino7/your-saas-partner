@@ -323,20 +323,12 @@ export function useInviteUser() {
       });
       if (error) throw error;
 
-      // Send invitation email via edge function
-      const { data: org } = await supabase
-        .from('organizations')
-        .select('name')
-        .eq('id', profile.organization_id)
-        .single();
-
       const { data: fnData, error: fnError } = await supabase.functions.invoke('send-invitation', {
-        body: { email, token, grade, organizationName: org?.name },
+        body: { token },
       });
-      console.log('send-invitation response data:', fnData);
-      console.log('send-invitation response error:', fnError);
-      if (fnError) throw new Error(`Edge function error: ${fnError.message}`);
-      if (fnData?.error) throw new Error(`Email error: ${fnData.error}`);
+      if (fnError || fnData?.error) {
+        throw new Error("L'invitation est enregistrée mais le courriel n'a pas pu être envoyé.");
+      }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['org-users'] });

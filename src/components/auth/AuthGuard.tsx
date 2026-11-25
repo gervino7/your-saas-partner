@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Loading from '@/components/common/Loading';
+import { Button } from '@/components/ui/button';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -12,6 +13,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [authorized, setAuthorized] = useState(false);
+  const [noOrganization, setNoOrganization] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -40,7 +42,6 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       if (cancelled) return;
 
       const hasOrganization = typeof profile?.organization_id === 'string' && profile.organization_id.trim().length > 0;
-      const isOnboardingRoute = location.pathname === '/onboarding';
       const isSuspendedRoute = location.pathname === '/compte-suspendu';
 
       console.log('[AuthGuard]', {
@@ -52,12 +53,13 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         path: location.pathname,
       });
 
-      // No organization → force onboarding
-      if (!hasOrganization && !isOnboardingRoute) {
-        navigate('/onboarding', { replace: true });
+      // Aucun cabinet : écran bloquant, aucune autre action
+      if (!hasOrganization) {
+        setNoOrganization(true);
         setLoading(false);
         return;
       }
+      setNoOrganization(false);
 
       // Organisation suspendue → écran dédié (sauf administrateurs plateforme)
       if (hasOrganization) {
@@ -85,12 +87,6 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         }
       }
 
-      // Has organization but on onboarding → go to dashboard
-      if (hasOrganization && isOnboardingRoute) {
-        navigate('/', { replace: true });
-        setLoading(false);
-        return;
-      }
 
 
       setAuthorized(true);
@@ -116,6 +112,21 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
   if (loading) {
     return <Loading fullScreen message="Vérification de l'authentification..." />;
+  }
+
+  if (noOrganization) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background p-6">
+        <div className="w-full max-w-md space-y-4 rounded-lg border bg-card p-6 text-center">
+          <p className="text-sm text-foreground">
+            Votre compte n'est rattaché à aucun cabinet. Contactez l'administrateur de votre cabinet.
+          </p>
+          <Button variant="outline" className="w-full" onClick={() => void supabase.auth.signOut()}>
+            Se déconnecter
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   if (!authorized) {

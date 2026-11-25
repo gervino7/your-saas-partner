@@ -36,7 +36,7 @@ export function usePlans() {
   });
 }
 
-/** Plans actifs et publics - page tarifs, onboarding. */
+/** Plans actifs et publics - page tarifs. */
 export function usePublicPlans() {
   return useQuery({
     queryKey: ['plans', 'public'],

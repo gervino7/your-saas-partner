@@ -10,11 +10,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAllOrgs, useToggleOrg, useIsPlatformAdmin } from '@/hooks/useSuperAdmin';
 import PlanChangeDialog from '@/components/superadmin/PlanChangeDialog';
 import SuspendDialog from '@/components/superadmin/SuspendDialog';
+import CreateCabinetDialog from '@/components/superadmin/CreateCabinetDialog';
 import { usePlans } from '@/hooks/usePlans';
 import { planOf, planNameOf, daysUntil, daysSince, barClass } from '@/lib/superAdmin';
 import { exportToCSV } from '@/lib/exportUtils';
 import { cn } from '@/lib/utils';
-import { Download, Search } from 'lucide-react';
+import { Download, Search, Plus } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -36,6 +37,7 @@ export default function OrganisationsListPage() {
   const [sortAsc, setSortAsc] = useState(true);
   const [planOrg, setPlanOrg] = useState<Org | null>(null);
   const [suspendOrg, setSuspendOrg] = useState<Org | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
 
   const countries = useMemo(
     () => Array.from(new Set((orgs as Org[]).map((o) => o.country).filter(Boolean))) as string[],
@@ -93,6 +95,10 @@ export default function OrganisationsListPage() {
           <h1 className="text-2xl font-semibold">Organisations</h1>
           <p className="text-sm text-muted-foreground">{rows.length} organisation(s)</p>
         </div>
+        <div className="flex flex-wrap gap-2">
+        {canManage && (
+          <Button onClick={() => setCreateOpen(true)}><Plus className="mr-2 h-4 w-4" /> Créer un cabinet</Button>
+        )}
         <Button
           variant="outline"
           onClick={() =>
@@ -109,6 +115,7 @@ export default function OrganisationsListPage() {
         >
           <Download className="mr-2 h-4 w-4" /> Export CSV
         </Button>
+        </div>
       </div>
 
       <Card>
@@ -232,6 +239,7 @@ export default function OrganisationsListPage() {
       </Card>
 
       <PlanChangeDialog open={!!planOrg} onOpenChange={(v) => !v && setPlanOrg(null)} org={planOrg} />
+      <CreateCabinetDialog open={createOpen} onOpenChange={setCreateOpen} />
       <SuspendDialog open={!!suspendOrg} onOpenChange={(v) => !v && setSuspendOrg(null)} org={suspendOrg} />
     </div>
   );
