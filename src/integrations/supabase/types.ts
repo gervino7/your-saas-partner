@@ -3801,6 +3801,39 @@ export type Database = {
           },
         ]
       }
+      mots_de_passe_provisoires: {
+        Row: {
+          cree_le: string
+          cree_par: string | null
+          user_id: string
+        }
+        Insert: {
+          cree_le?: string
+          cree_par?: string | null
+          user_id: string
+        }
+        Update: {
+          cree_le?: string
+          cree_par?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mots_de_passe_provisoires_cree_par_fkey"
+            columns: ["cree_par"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mots_de_passe_provisoires_cree_par_fkey"
+            columns: ["cree_par"]
+            isOneToOne: false
+            referencedRelation: "profiles_safe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notes: {
         Row: {
           content: string
@@ -6863,6 +6896,15 @@ export type Database = {
           sens: string
         }[]
       }
+      essai_ajout_direct_52: {
+        Args: never
+        Returns: {
+          controle: string
+          detail: string
+          etat: string
+          n: number
+        }[]
+      }
       essai_cabinets_51: {
         Args: never
         Returns: {
@@ -7237,6 +7279,7 @@ export type Database = {
           role: string
         }[]
       }
+      mon_mot_de_passe_est_provisoire: { Args: never; Returns: boolean }
       niveau_du_grade: { Args: { _grade: string }; Returns: number }
       niveau_requis_dossier: { Args: { _folder_id: string }; Returns: number }
       niveau_requis_sorte_dossier: { Args: { _kind: string }; Returns: number }
@@ -7262,6 +7305,10 @@ export type Database = {
       }
       open_evaluation: { Args: { _assignment_id: string }; Returns: string }
       open_mission_evaluations: { Args: { _mission_id: string }; Returns: Json }
+      peut_ajouter_directement: {
+        Args: { _grade: string; _organization_id: string }
+        Returns: boolean
+      }
       peut_deposer_dans_dossier: {
         Args: { _folder_id: string; _user_id: string }
         Returns: boolean
