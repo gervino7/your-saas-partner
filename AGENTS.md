@@ -20,3 +20,4 @@
 - Accounts are created only from invitations: signup goes through send-signup-confirmation (server-side invitation and password checks, no confirmation email), cabinets only through super_admin_creer_cabinet, and send-invitation builds emails solely from the stored invitation of its caller.
 
 - Direct member creation goes only through the ajouter-membre function (permission from peut_ajouter_directement, one-time provisional password); AuthGuard forces /changer-mot-de-passe while mon_mot_de_passe_est_provisoire is true, and only changer-mot-de-passe-provisoire changes the password and clears the flag.
+- The database security layer is documented in supabase/securite (reference snapshot, scripts, tools); it is applied manually and must never be moved into supabase/migrations, and any new security script must be added there with an updated reference snapshot.
