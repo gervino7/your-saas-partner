@@ -44,8 +44,8 @@ const CopilPortalPage = () => {
     if (!email.trim()) return;
     setLoading(true);
     try {
-      await callApi({ action: 'send-otp', committee_id: committeeId, email: email.trim() });
-      toast.success('Code envoyé par email');
+      const res = await callApi({ action: 'send-otp', committee_id: committeeId, email: email.trim() });
+      toast.success(res.message || 'Si cette adresse est autorisée pour ce comité, un code vient de lui être envoyé.');
       setStep('otp');
     } catch (e: any) {
       toast.error(e.message);

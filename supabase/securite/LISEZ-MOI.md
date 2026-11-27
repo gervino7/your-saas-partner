@@ -25,6 +25,7 @@ Pourquoi ce dossier existe : entre septembre et novembre 2026, cette couche a é
 | 51 — Vous seul créez les cabinets | Seul l'administrateur de la plateforme crée un cabinet et invite son premier DA. Les quotas viennent de l'offre. | Appliqué, contrôles OK |
 | 52 — Ajouter un membre directement | Le DA et l'administrateur de la plateforme créent un compte avec un mot de passe provisoire, à changer à la première connexion. | Appliqué, contrôles OK |
 | 53 — Supprimer un compte sans perdre les traces | Suppression encadrée, fiche archivée, journal inaltérable. | **Bloc 1 en place mais inutilisé.** À revoir : en production, `profiles.organization_id` est obligatoire. Ne pas appliquer le prompt Lovable correspondant avant la révision. |
+| 54 — Fermer le portail COPIL | Codes et jetons tirés par le serveur et gardés en empreinte, 5 essais par code, 1 code par minute et 5 par heure, adresse comparée exactement, accès coupé dès qu'un membre est retiré ou que la mission se termine. Va avec la nouvelle fonction `copil-portal-auth`. | **À appliquer avant la fusion de la fonction.** |
 
 ---
 

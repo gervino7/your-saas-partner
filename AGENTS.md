@@ -21,3 +21,4 @@
 
 - Direct member creation goes only through the ajouter-membre function (permission from peut_ajouter_directement, one-time provisional password); AuthGuard forces /changer-mot-de-passe while mon_mot_de_passe_est_provisoire is true, and only changer-mot-de-passe-provisoire changes the password and clears the flag.
 - The database security layer is documented in supabase/securite (reference snapshot, scripts, tools); it is applied manually and must never be moved into supabase/migrations, and any new security script must be added there with an updated reference snapshot.
+- The COPIL portal (copil-portal-auth) holds no access rule of its own: codes, attempts, rate limits and sessions come only from copil_demander_code, copil_verifier_code and copil_session (service_role); responses never reveal whether an address belongs to the committee.
