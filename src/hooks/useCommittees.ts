@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { codeErreurFonction } from '@/lib/fonctionErreur';
 import { updateByIdOrFail } from '@/lib/safeUpdate';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
@@ -216,11 +217,20 @@ export const useSendGroupEmail = () => {
       const { data, error } = await supabase.functions.invoke('send-group-email', {
         body: { emailId },
       });
-      if (error) throw error;
+      if (error) {
+        const { code } = await codeErreurFonction(error);
+        const messages: Record<string, string> = {
+          interdit: 'Vous ne pouvez pas envoyer ce courriel.',
+          deja_envoye: 'Ce courriel a déjà été envoyé.',
+          piece_jointe_interdite: 'Une pièce jointe n\'appartient pas à votre cabinet.',
+          aucun_destinataire: 'Cette liste n\'a aucun destinataire valide.',
+        };
+        throw new Error(messages[code] ?? 'L\'envoi n\'a pas abouti.');
+      }
       return data;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['group-emails'] }); toast.success('Emails envoyés'); },
-    onError: (e: Error) => toast.error('Erreur d\'envoi: ' + e.message),
+    onError: (e: Error) => toast.error(e.message),
   });
 };
 

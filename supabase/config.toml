@@ -1,7 +1,7 @@
 project_id = "zewszfgmysyocroavlja"
 
 [functions.send-group-email]
-verify_jwt = false
+verify_jwt = true
 
 [functions.meeting-reminders]
 verify_jwt = false

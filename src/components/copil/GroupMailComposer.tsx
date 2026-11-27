@@ -199,7 +199,8 @@ const GroupMailComposer = ({ committeeId, committeeName, missionName, canManage 
     try {
       for (const file of Array.from(files)) {
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-        const path = `email-attachments/${profile?.organization_id}/${Date.now()}_${safeName}`;
+        // Le stockage n'accepte que les chemins qui commencent par le cabinet.
+        const path = `${profile?.organization_id}/email-attachments/${Date.now()}_${safeName}`;
         
         const { error } = await supabase.storage.from('documents').upload(path, file);
         if (error) {
